@@ -8,13 +8,24 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = app.get(ConfigService);
-  const frontendUrl =
-    config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+  const frontendUrls = (
+    config.get<string>('FRONTEND_URL') || 'http://localhost:3000'
+  )
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
   app.use(cookieParser());
 
   app.enableCors({
-    origin: frontendUrl,
+    origin: (origin, callback) => {
+      if (!origin || frontendUrls.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Origin ${origin} is not allowed by CORS`));
+    },
     credentials: true,
   });
 

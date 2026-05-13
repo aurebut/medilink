@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, Suspense, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { Alert, Button, Field, Input } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const search = useSearchParams();
   const { login } = useAuth();
@@ -48,5 +48,13 @@ export default function LoginPage() {
         </div>
       </form>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

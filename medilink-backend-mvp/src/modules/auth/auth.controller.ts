@@ -34,7 +34,7 @@ export class AuthController {
     const cookieName = this.cookieName();
     const token = req.cookies?.[cookieName];
     const result = await this.auth.logout(token);
-    res.clearCookie(cookieName);
+    res.clearCookie(cookieName, this.cookieOptions());
     return result;
   }
 
@@ -61,12 +61,20 @@ export class AuthController {
 
   private setSessionCookie(res: Response, token: string, expiresAt: Date) {
     res.cookie(this.cookieName(), token, {
-      httpOnly: true,
-      secure: this.config.get<string>('NODE_ENV') === 'production',
-      sameSite: 'lax',
+      ...this.cookieOptions(),
       expires: expiresAt,
-      path: '/',
     });
+  }
+
+  private cookieOptions() {
+    const isProduction = this.config.get<string>('NODE_ENV') === 'production';
+
+    return {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      path: '/',
+    };
   }
 
   private cookieName() {

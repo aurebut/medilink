@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, Suspense, useState } from 'react';
 import { api } from '@/lib/api';
 import { Alert, Button, Field, Input, LinkButton } from '@/components/ui';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const token = useSearchParams().get('token') || '';
   const [newPassword, setNewPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -26,4 +26,12 @@ export default function ResetPasswordPage() {
     <Button>Réinitialiser</Button>
     {message ? <LinkButton href="/login">Se connecter</LinkButton> : null}
   </form></main>;
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
 }

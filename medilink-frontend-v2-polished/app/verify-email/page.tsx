@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Alert, LinkButton } from '@/components/ui';
 
-export default function VerifyEmailPage() {
+function VerifyEmailStatus() {
   const token = useSearchParams().get('token');
   const [message, setMessage] = useState('Vérification en cours...');
   const [error, setError] = useState<string | null>(null);
@@ -24,4 +24,12 @@ export default function VerifyEmailPage() {
     {error ? <Alert type="error">{error}</Alert> : <Alert type="success">{message}</Alert>}
     <LinkButton href="/login">Aller à la connexion</LinkButton>
   </div></main>;
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyEmailStatus />
+    </Suspense>
+  );
 }
