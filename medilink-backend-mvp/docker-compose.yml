@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: medilink-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medilink
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - medilink_pgdata:/var/lib/postgresql/data
+volumes:
+  medilink_pgdata:

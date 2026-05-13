@@ -1,0 +1,629 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CANDIDATE
+  ESTABLISHMENT_OWNER
+  ESTABLISHMENT_ADMIN
+  ESTABLISHMENT_RECRUITER
+  ESTABLISHMENT_VIEWER
+  MEDILINK_ADMIN
+  MEDILINK_SUPPORT
+}
+
+enum UserStatus {
+  PENDING_EMAIL_VERIFICATION
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum MedicalStatus {
+  STUDENT
+  INTERN
+  JUNIOR_DOCTOR
+  DOCTOR
+  NURSE
+  OPERATING_ROOM_ASSISTANT
+  OTHER
+}
+
+enum DocumentType {
+  CV
+  ATTESTATION
+  CONVENTION
+  DIPLOMA
+  IDENTITY_DOCUMENT
+  INSURANCE
+  AVATAR
+  MESSAGE_ATTACHMENT
+  OTHER
+}
+
+enum DocumentVerificationStatus {
+  UPLOAD_PENDING
+  PENDING_VERIFICATION
+  APPROVED
+  REJECTED
+  EXPIRED
+  DELETED
+}
+
+enum EstablishmentType {
+  HOSPITAL
+  CLINIC
+  CABINET
+  MEDICAL_SERVICE
+  AGENCY
+  OTHER
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum EstablishmentMemberRole {
+  OWNER
+  ADMIN
+  RECRUITER
+  VIEWER
+}
+
+enum MissionType {
+  GARDE
+  REMPLACEMENT
+  VACATION
+  STAGE
+  AIDE_OP
+}
+
+enum RequiredLevel {
+  STUDENT
+  INTERN
+  JUNIOR_DOCTOR
+  DOCTOR
+}
+
+enum MissionStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+  FILLED
+  ARCHIVED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  VIEWED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  CANCELLED
+}
+
+enum MessageType {
+  TEXT
+  FILE
+  SYSTEM
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  APPLICATION_RECEIVED
+  APPLICATION_STATUS_CHANGED
+  DOCUMENT_APPROVED
+  DOCUMENT_REJECTED
+  PROFILE_INCOMPLETE
+}
+
+enum EmailEventStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum MissionAgreementStatus {
+  PROPOSED
+  PAYMENT_REQUIRED
+  FUNDS_SECURED
+  COMPLETED
+  PAYMENT_RELEASED
+  REJECTED
+  CANCELLED
+  DISPUTED
+  EXPIRED
+}
+
+enum EscrowPaymentStatus {
+  REQUIRES_PAYMENT
+  SECURED
+  RELEASED
+  REFUNDED
+  FAILED
+  DISPUTED
+}
+
+enum InvoiceType {
+  RECRUITER_INVOICE
+  CANDIDATE_RECEIPT
+}
+
+enum InvoiceStatus {
+  GENERATED
+  VOID
+}
+
+enum AgreementEventType {
+  PROPOSAL_SENT
+  PROPOSAL_ACCEPTED
+  PROPOSAL_REJECTED
+  PAYMENT_REQUIRED
+  FUNDS_SECURED
+  MISSION_COMPLETED
+  PAYMENT_RELEASED
+  INVOICES_GENERATED
+}
+
+model User {
+  id            String     @id @default(uuid())
+  email         String     @unique
+  passwordHash  String
+  role          UserRole
+  status        UserStatus @default(PENDING_EMAIL_VERIFICATION)
+  emailVerified Boolean    @default(false)
+  phone         String?
+  phoneVerified Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  sessions        Session[]
+  emailTokens     EmailVerificationToken[]
+  resetTokens     PasswordResetToken[]
+  profile         Profile?
+  documents       Document[] @relation("DocumentOwner")
+  verifiedDocs    Document[] @relation("DocumentVerifier")
+  memberships     EstablishmentMember[]
+  missionsCreated Mission[] @relation("MissionCreator")
+  applications    Application[] @relation("CandidateApplications")
+  messages        Message[]
+  notifications   Notification[]
+  emailEvents     EmailEvent[]
+  auditLogs       AuditLog[] @relation("ActorAuditLogs")
+  agreementEvents AgreementEvent[] @relation("AgreementEventActor")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id                  String         @id @default(uuid())
+  userId              String         @unique
+  firstName           String?
+  lastName            String?
+  avatarUrl           String?
+  city                String?
+  country             String?        @default("France")
+  medicalStatus       MedicalStatus?
+  specialty           String?
+  orientation         String?
+  hospitalOrFaculty   String?
+  bio                 String?
+  experienceYears     Int?
+  actsPerformed       String[]       @default([])
+  availabilityNotes   String?
+  completionScore     Int            @default(0)
+  visibilityStatus    String         @default("PRIVATE")
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userSkills UserSkill[]
+}
+
+model Skill {
+  id         String      @id @default(uuid())
+  name       String      @unique
+  category   String?
+  createdAt  DateTime    @default(now())
+  userSkills UserSkill[]
+}
+
+model UserSkill {
+  id        String   @id @default(uuid())
+  profileId String
+  skillId   String
+  level     String?
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, skillId])
+}
+
+model Document {
+  id                 String                     @id @default(uuid())
+  userId             String
+  documentType       DocumentType
+  fileName           String
+  storageKey         String                     @unique
+  mimeType           String
+  sizeBytes          Int
+  verificationStatus DocumentVerificationStatus @default(UPLOAD_PENDING)
+  verifiedById       String?
+  verifiedAt         DateTime?
+  rejectionReason    String?
+  expiresAt          DateTime?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  owner      User  @relation("DocumentOwner", fields: [userId], references: [id], onDelete: Cascade)
+  verifiedBy User? @relation("DocumentVerifier", fields: [verifiedById], references: [id])
+
+  @@index([userId])
+  @@index([verificationStatus])
+}
+
+model Establishment {
+  id                 String             @id @default(uuid())
+  name               String
+  type               EstablishmentType
+  address            String?
+  city               String?
+  country            String             @default("France")
+  phone              String?
+  email              String?
+  website            String?
+  logoUrl            String?
+  description        String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  members       EstablishmentMember[]
+  missions      Mission[]
+  conversations Conversation[]
+}
+
+model EstablishmentMember {
+  id              String                  @id @default(uuid())
+  establishmentId String
+  userId          String
+  role            EstablishmentMemberRole
+  createdAt       DateTime                @default(now())
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([establishmentId, userId])
+  @@index([userId])
+}
+
+model Mission {
+  id                  String        @id @default(uuid())
+  establishmentId     String
+  createdById         String
+  title               String
+  description         String?
+  missionType         MissionType
+  specialty           String
+  requiredLevel       RequiredLevel
+  location            String?
+  city                String
+  startDate           DateTime
+  endDate             DateTime?
+  startTime           String?
+  endTime             String?
+  durationHours       Int?
+  compensationAmount  Int?
+  compensationCurrency String       @default("EUR")
+  status              MissionStatus @default(DRAFT)
+  publishedAt         DateTime?
+  archivedAt          DateTime?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  createdBy     User          @relation("MissionCreator", fields: [createdById], references: [id])
+  tags          MissionTag[]
+  applications  Application[]
+  conversations Conversation[]
+  agreements    MissionAgreement[]
+
+  @@index([status])
+  @@index([missionType])
+  @@index([specialty])
+  @@index([city])
+  @@index([startDate])
+}
+
+model MissionTag {
+  id        String @id @default(uuid())
+  missionId String
+  tag       String
+
+  mission Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+
+  @@index([missionId])
+}
+
+model Application {
+  id              String            @id @default(uuid())
+  missionId       String
+  candidateUserId String
+  status          ApplicationStatus @default(SUBMITTED)
+  coverMessage    String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  mission      Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  candidate    User    @relation("CandidateApplications", fields: [candidateUserId], references: [id], onDelete: Cascade)
+  history      ApplicationStatusHistory[]
+  conversation Conversation?
+  agreements   MissionAgreement[]
+
+  @@unique([missionId, candidateUserId])
+  @@index([candidateUserId])
+  @@index([status])
+}
+
+model ApplicationStatusHistory {
+  id              String             @id @default(uuid())
+  applicationId   String
+  oldStatus       ApplicationStatus?
+  newStatus       ApplicationStatus
+  changedByUserId String
+  reason          String?
+  createdAt       DateTime           @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+model Conversation {
+  id              String    @id @default(uuid())
+  missionId       String
+  applicationId   String    @unique
+  candidateUserId String
+  establishmentId String
+  lastMessageAt   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  mission       Mission       @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  application   Application   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  participants  ConversationParticipant[]
+  messages      Message[]
+  agreements    MissionAgreement[]
+  events        AgreementEvent[]
+
+  @@index([candidateUserId])
+  @@index([establishmentId])
+}
+
+model ConversationParticipant {
+  id             String    @id @default(uuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime?
+  archivedAt     DateTime?
+  muted          Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String      @id @default(uuid())
+  conversationId String
+  senderUserId   String
+  body           String
+  messageType    MessageType @default(TEXT)
+  readAt         DateTime?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderUserId], references: [id])
+  attachments  MessageAttachment[]
+
+  @@index([conversationId, createdAt])
+}
+
+model MessageAttachment {
+  id         String   @id @default(uuid())
+  messageId  String
+  fileName   String
+  storageKey String
+  mimeType   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model MissionAgreement {
+  id              String                 @id @default(uuid())
+  applicationId   String
+  conversationId  String
+  missionId       String
+  candidateUserId String
+  establishmentId String
+  status          MissionAgreementStatus @default(PROPOSED)
+  amount          Int
+  currency        String                 @default("EUR")
+  platformFee     Int                    @default(0)
+  candidateAmount Int
+  startDate       DateTime?
+  endDate         DateTime?
+  startTime       String?
+  endTime         String?
+  terms           String?
+  acceptedAt      DateTime?
+  expiresAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  conversation  Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  mission       Mission           @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  payment       EscrowPayment?
+  invoices      Invoice[]
+  events        AgreementEvent[]
+
+  @@index([conversationId, createdAt])
+  @@index([status])
+}
+
+model EscrowPayment {
+  id          String              @id @default(uuid())
+  agreementId String              @unique
+  status      EscrowPaymentStatus @default(REQUIRES_PAYMENT)
+  provider    String              @default("mock")
+  providerRef String?
+  amount      Int
+  currency    String              @default("EUR")
+  securedAt   DateTime?
+  releasedAt  DateTime?
+  refundedAt  DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  agreement MissionAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  agreementId String
+  paymentId   String?
+  type        InvoiceType
+  status      InvoiceStatus @default(GENERATED)
+  number      String        @unique
+  amount      Int
+  currency    String        @default("EUR")
+  pdfUrl      String?
+  issuedAt    DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+
+  agreement MissionAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  @@index([agreementId])
+}
+
+model AgreementEvent {
+  id             String             @id @default(uuid())
+  agreementId    String
+  conversationId String
+  actorUserId    String?
+  type           AgreementEventType
+  metadata       Json?
+  createdAt      DateTime           @default(now())
+
+  agreement   MissionAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  conversation Conversation      @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  actor       User?             @relation("AgreementEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([agreementId, createdAt])
+  @@index([conversationId, createdAt])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model EmailEvent {
+  id                String           @id @default(uuid())
+  userId            String?
+  recipient         String
+  type              String
+  subject           String
+  status            EmailEventStatus @default(PENDING)
+  providerMessageId String?
+  errorMessage      String?
+  createdAt         DateTime         @default(now())
+  sentAt            DateTime?
+  failedAt          DateTime?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String?
+  action      String
+  entityType  String?
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  actor User? @relation("ActorAuditLogs", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([actorUserId])
+  @@index([action])
+  @@index([entityType, entityId])
+}
