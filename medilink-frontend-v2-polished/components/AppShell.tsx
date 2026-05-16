@@ -2,10 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { roleLabel } from '@/lib/labels';
 import { useAuth } from './AuthProvider';
-import { Button } from './ui';
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -46,6 +45,18 @@ function initials(email?: string) {
   return email.slice(0, 1).toUpperCase();
 }
 
+function profileHref(area: 'candidate' | 'establishment' | 'admin') {
+  if (area === 'candidate') return '/app/profile';
+  if (area === 'establishment') return '/establishment/onboarding';
+  return '/admin/users';
+}
+
+function accountHref(area: 'candidate' | 'establishment' | 'admin') {
+  if (area === 'candidate') return '/app/account';
+  if (area === 'establishment') return '/establishment/account';
+  return '/admin/account';
+}
+
 export function AppShell({
   children,
   area,
@@ -57,12 +68,35 @@ export function AppShell({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
+  const userProfileHref = profileHref(area);
+  const userAccountHref = accountHref(area);
 
   async function onLogout() {
     await logout();
     router.push('/login');
   }
+
+  useEffect(() => {
+    function onDocumentClick(event: MouseEvent) {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setAccountMenuOpen(false);
+      }
+    }
+
+    function onEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') setAccountMenuOpen(false);
+    }
+
+    document.addEventListener('mousedown', onDocumentClick);
+    document.addEventListener('keydown', onEscape);
+    return () => {
+      document.removeEventListener('mousedown', onDocumentClick);
+      document.removeEventListener('keydown', onEscape);
+    };
+  }, []);
 
   return (
     <div className="shell">
@@ -105,15 +139,53 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-chip">
+        <div className="sidebar-footer" ref={accountMenuRef}>
+          {accountMenuOpen ? (
+            <div className="account-menu" role="menu">
+              <div className="account-menu-head">
+                <span className="avatar">{initials(user?.email)}</span>
+                <span className="truncate">
+                  <strong>{user?.email || 'Utilisateur'}</strong>
+                  <br />
+                  <span>{roleLabel(user?.role)}</span>
+                </span>
+              </div>
+              <div className="account-menu-section">
+                <Link href={userProfileHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                  <span>Mon profil</span>
+                  <span className="menu-arrow">&gt;</span>
+                </Link>
+                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                  <span>Parametres du compte</span>
+                  <span className="menu-arrow">&gt;</span>
+                </Link>
+                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                  <span>Securite et mot de passe</span>
+                  <span className="menu-arrow">&gt;</span>
+                </Link>
+              </div>
+              <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
+                <span>Deconnexion</span>
+                <span className="menu-arrow">&gt;</span>
+              </button>
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            className={`user-chip ${accountMenuOpen ? 'open' : ''}`}
+            aria-haspopup="menu"
+            aria-expanded={accountMenuOpen}
+            onClick={() => setAccountMenuOpen((open) => !open)}
+          >
             <span className="avatar">{initials(user?.email)}</span>
             <span className="truncate">
               <strong>{user?.email || 'Utilisateur'}</strong>
               <br />
               <span>{roleLabel(user?.role)}</span>
             </span>
-          </div>
+            <span className="user-chip-arrow">v</span>
+          </button>
         </div>
       </aside>
 
@@ -122,9 +194,6 @@ export function AppShell({
           <div className="topbar-title">
             <strong>{areaLabel(area)}</strong>
             <div className="small">Plateforme Medilink</div>
-          </div>
-          <div className="actions">
-            <Button variant="light" onClick={onLogout}>Deconnexion</Button>
           </div>
         </header>
         <div className="content">{children}</div>

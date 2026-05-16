@@ -430,12 +430,64 @@ button { touch-action: manipulation; }
 .sidebar-link .nav-main { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .sidebar-link .nav-icon { width: 25px; height: 25px; border-radius: 8px; display: grid; place-items: center; background: rgba(255,255,255,.08); font-size: 14px; }
 .sidebar-footer {
-  margin-top: auto; display: grid; gap: 10px; color: #cbd5e1; font-size: 13px;
+  position: relative; margin-top: auto; display: grid; gap: 10px; color: #cbd5e1; font-size: 13px;
   padding: 14px; border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08);
 }
-.user-chip { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.user-chip {
+  width: 100%; display: flex; align-items: center; gap: 10px; min-width: 0;
+  padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer;
+}
+.user-chip:hover .avatar,
+.user-chip.open .avatar { background: #bfdbfe; }
+.user-chip-arrow {
+  margin-left: auto; color: #94a3b8; font-size: 12px; font-weight: 900; line-height: 1;
+}
 .avatar { width: 42px; height: 42px; border-radius: 10px; background: #e0ecff; display: grid; place-items: center; color: #1d4ed8; font-weight: 900; flex: 0 0 auto; }
 .truncate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 30;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .26);
+}
+.account-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafc;
+}
+.account-menu-head strong { color: var(--heading); }
+.account-menu-head span span { color: var(--muted); }
+.account-menu-section { padding: 6px; border-bottom: 1px solid var(--line); }
+.account-menu-item {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 750;
+  text-align: left;
+}
+.account-menu-item:hover { background: var(--surface-blue); color: #1d4ed8; }
+.account-menu-item.danger { margin: 6px; width: calc(100% - 12px); color: #991b1b; }
+.account-menu-item.danger:hover { background: #fef2f2; color: #991b1b; }
+.menu-arrow { color: var(--muted-2); font-size: 13px; font-weight: 900; }
 .main { min-width: 0; overflow: hidden; }
 .topbar {
   height: 72px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
