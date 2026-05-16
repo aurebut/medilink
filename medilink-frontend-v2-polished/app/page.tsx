@@ -1,27 +1,49 @@
 import Link from 'next/link';
 import { Badge, Card, LinkButton } from '@/components/ui';
 
-const platformStats = [
-  { label: 'Missions', value: 'courtes', helper: 'Gardes, remplacements, vacations et renforts ponctuels.' },
-  { label: 'Candidatures', value: 'centralisées', helper: 'Profil, documents, échanges et statut réunis au même endroit.' },
-  { label: 'Accord', value: 'sécurisé', helper: 'Proposition finale, validation de mission et paiement encadré.' },
+const painPoints = [
+  'Informations de mission dispersées entre appels, mails et fichiers.',
+  'Documents candidats difficiles à vérifier et à partager proprement.',
+  'Accord final et paiement souvent gérés hors du suivi de recrutement.',
+];
+
+const productPillars = [
+  { title: 'Missions', detail: 'Publier un besoin court, clair et daté.' },
+  { title: 'Candidatures', detail: 'Suivre les profils et les statuts reçus.' },
+  { title: 'Documents', detail: 'Centraliser CV, diplômes et attestations.' },
+  { title: 'Messagerie', detail: 'Garder le contexte de chaque échange.' },
+  { title: 'Proposition', detail: 'Formaliser le montant et les conditions.' },
+  { title: 'Paiement', detail: 'Sécuriser la confirmation de mission.' },
 ];
 
 const candidateFlow = [
-  'Compléter son profil médical',
-  'Ajouter ses documents',
-  'Postuler à une mission',
-  'Échanger et accepter une proposition',
+  'Complète son profil et ses documents.',
+  'Trouve une mission selon son lieu, niveau et disponibilité.',
+  'Postule puis échange dans une conversation dédiée.',
+  'Accepte une proposition claire avant la mission.',
 ];
 
 const establishmentFlow = [
-  'Créer une fiche établissement',
-  'Publier un besoin court terme',
-  'Comparer les candidatures',
-  'Formaliser l’accord final',
+  'Publie une mission courte avec les conditions attendues.',
+  'Consulte les candidatures et les documents utiles.',
+  'Échange avec les profils retenus dans le bon contexte.',
+  'Confirme l’accord, le paiement et la fin de mission.',
 ];
 
-const workflowSteps = ['Mission', 'Candidature', 'Conversation', 'Proposition', 'Paiement', 'Justificatifs'];
+const workflowSteps = [
+  'Mission publiée',
+  'Candidature reçue',
+  'Échange centralisé',
+  'Proposition finale',
+  'Paiement sécurisé',
+  'Justificatifs',
+];
+
+const candidates = [
+  { name: 'Dr Alice Martin', detail: 'Urgences · 5 documents validés', status: 'Retenue' },
+  { name: 'Karim Benali', detail: 'Interne · Disponible nuit', status: 'À revoir' },
+  { name: 'Lina Moreau', detail: 'Médecine générale · Profil complet', status: 'Nouveau' },
+];
 
 export default function HomePage() {
   return (
@@ -39,93 +61,115 @@ export default function HomePage() {
         </nav>
 
         <section className="hero landing-hero">
-          <div className="hero-copy">
-            <div className="kicker">Plateforme santé</div>
-            <h1>Missions médicales courtes, candidatures et paiements sécurisés.</h1>
+          <div className="hero-copy landing-hero-copy">
+            <div className="kicker">Remplacement médical</div>
+            <h1>Remplacements médicaux, sans les échanges dispersés.</h1>
             <p>
-              Médilink aide les établissements et les professionnels de santé à gérer le cycle complet
-              d’une mission courte, depuis la publication jusqu’aux justificatifs.
+              Médilink centralise les missions courtes, les candidatures, les documents, la messagerie
+              et le paiement sécurisé entre établissements et professionnels de santé.
             </p>
             <div className="actions">
-              <LinkButton href="/register">Créer un compte</LinkButton>
-              <LinkButton variant="light" href="/login">Connexion</LinkButton>
+              <LinkButton href="/register">Publier ou trouver une mission</LinkButton>
+              <LinkButton variant="light" href="/login">Se connecter</LinkButton>
             </div>
-            <div className="hero-badges">
-              <Badge>Remplacements</Badge>
-              <Badge tone="neutral">Documents vérifiés</Badge>
-              <Badge tone="success">Paiement encadré</Badge>
+            <div className="landing-proof">
+              <span>Pour les gardes, remplacements, vacations et renforts ponctuels.</span>
             </div>
           </div>
 
-          <Card className="landing-panel">
-            <div className="landing-panel-header">
+          <aside className="operations-panel" aria-label="Aperçu opérationnel Médilink">
+            <div className="operations-panel-head">
               <div>
-                <span className="small">Mission recommandée</span>
+                <span>Mission en cours</span>
                 <h2>Garde médicale - Urgences</h2>
               </div>
-              <Badge tone="success">Publiée</Badge>
+              <Badge tone="success">Ouverte</Badge>
             </div>
 
-            <div className="landing-panel-meta">
+            <div className="mission-summary">
               <div>
                 <span>Établissement</span>
                 <strong>Clinique Rhône Santé</strong>
               </div>
               <div>
-                <span>Lieu</span>
+                <span>Ville</span>
                 <strong>Lyon</strong>
               </div>
               <div>
                 <span>Créneau</span>
-                <strong>24 mai · Nuit</strong>
+                <strong>24 mai · 19:00-07:00</strong>
               </div>
-            </div>
-
-            <div className="landing-panel-row">
               <div>
-                <span className="small">Rémunération</span>
+                <span>Rémunération</span>
                 <strong>640 €</strong>
               </div>
-              <div>
-                <span className="small">Candidatures</span>
-                <strong>8 reçues</strong>
-              </div>
             </div>
 
-            <div className="landing-timeline" aria-label="Cycle de mission">
-              {workflowSteps.map((step) => (
-                <div key={step}>
-                  <span />
-                  <strong>{step}</strong>
+            <div className="candidate-stack">
+              <div className="candidate-stack-head">
+                <strong>Candidatures</strong>
+                <span>8 reçues</span>
+              </div>
+              {candidates.map((candidate) => (
+                <div className="candidate-row" key={candidate.name}>
+                  <div>
+                    <strong>{candidate.name}</strong>
+                    <span>{candidate.detail}</span>
+                  </div>
+                  <Badge tone={candidate.status === 'Retenue' ? 'success' : 'neutral'}>{candidate.status}</Badge>
                 </div>
               ))}
             </div>
 
-            <div className="landing-message">
-              <span>Dernier échange</span>
-              <p>Votre profil est complet. L’établissement peut vous envoyer une proposition finale.</p>
+            <div className="agreement-card">
+              <div>
+                <span>Accord final</span>
+                <strong>Proposition envoyée</strong>
+              </div>
+              <p>Le montant, les horaires et les conditions restent rattachés à la conversation.</p>
             </div>
-          </Card>
+          </aside>
         </section>
 
-        <section className="landing-stats" aria-label="Points forts Médilink">
-          {platformStats.map((stat) => (
-            <Card key={stat.label} className="landing-stat-card">
-              <span>{stat.label}</span>
-              <strong>{stat.value}</strong>
-              <p>{stat.helper}</p>
-            </Card>
-          ))}
+        <section className="landing-split">
+          <div className="section-heading">
+            <div className="kicker">Le problème</div>
+            <h2>Une mission courte implique souvent trop de canaux.</h2>
+          </div>
+          <div className="problem-list">
+            {painPoints.map((point) => (
+              <div key={point}>
+                <span />
+                <p>{point}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="landing-section">
+          <div className="section-heading">
+            <div className="kicker">La réponse Médilink</div>
+            <h2>Un espace unique pour suivre ce qui compte.</h2>
+            <p>
+              La plateforme rapproche le recrutement, les pièces administratives et la formalisation
+              de la mission, sans disperser les informations importantes.
+            </p>
+          </div>
+
+          <div className="pillar-grid">
+            {productPillars.map((pillar) => (
+              <Card key={pillar.title} className="pillar-card">
+                <strong>{pillar.title}</strong>
+                <p>{pillar.detail}</p>
+              </Card>
+            ))}
+          </div>
         </section>
 
         <section className="landing-section">
           <div className="section-heading">
             <div className="kicker">Deux parcours</div>
-            <h2>Un espace clair pour chaque côté de la mission.</h2>
-            <p>
-              Les candidats suivent leurs opportunités. Les établissements pilotent leurs besoins,
-              leurs candidatures et leurs échanges.
-            </p>
+            <h2>Le même fil de mission, vu par chaque côté.</h2>
           </div>
 
           <div className="audience-grid">
@@ -145,7 +189,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <LinkButton variant="light" href="/register">Je suis candidat</LinkButton>
+              <LinkButton variant="light" href="/register">Je cherche une mission</LinkButton>
             </Card>
 
             <Card className="audience-card">
@@ -164,7 +208,7 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <LinkButton variant="light" href="/register">Je recrute</LinkButton>
+              <LinkButton variant="light" href="/register">Je publie une mission</LinkButton>
             </Card>
           </div>
         </section>
@@ -172,15 +216,17 @@ export default function HomePage() {
         <section className="workflow-band">
           <div className="section-heading">
             <div className="kicker">Cycle complet</div>
-            <h2>Plus qu’une annonce, un suivi opérationnel.</h2>
+            <h2>De l’annonce au justificatif, le suivi reste lisible.</h2>
             <p>
-              Chaque mission conserve ses informations clés : candidature, conversation, proposition,
-              paiement sécurisé et documents de fin de mission.
+              Chaque étape garde sa place dans un parcours simple, traçable et partagé entre les parties.
             </p>
           </div>
           <div className="workflow-rail">
-            {workflowSteps.map((step) => (
-              <span key={step}>{step}</span>
+            {workflowSteps.map((step, index) => (
+              <span key={step}>
+                <small>{String(index + 1).padStart(2, '0')}</small>
+                {step}
+              </span>
             ))}
           </div>
         </section>
@@ -188,10 +234,10 @@ export default function HomePage() {
         <section className="landing-cta">
           <div>
             <div className="kicker">Médilink</div>
-            <h2>Une base plus simple pour tester les parcours candidat et établissement.</h2>
+            <h2>Une plateforme sobre pour organiser les missions médicales courtes.</h2>
           </div>
           <div className="actions">
-            <LinkButton href="/register">Démarrer</LinkButton>
+            <LinkButton href="/register">Créer un compte</LinkButton>
             <LinkButton variant="light" href="/login">Connexion</LinkButton>
           </div>
         </section>
