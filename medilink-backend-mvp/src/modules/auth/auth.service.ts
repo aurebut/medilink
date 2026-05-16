@@ -39,9 +39,6 @@ export class AuthService {
         ? UserRole.CANDIDATE
         : UserRole.ESTABLISHMENT_OWNER;
 
-    const rawEmailToken = createRawToken();
-    const emailTokenHash = hashToken(rawEmailToken);
-
     const user = await this.prisma.$transaction(async (tx) => {
       const createdUser = await tx.user.create({
         data: {
@@ -49,7 +46,8 @@ export class AuthService {
           passwordHash,
           role,
           phone: dto.phone,
-          status: UserStatus.PENDING_EMAIL_VERIFICATION,
+          status: UserStatus.ACTIVE,
+          emailVerified: true,
           profile:
             role === UserRole.CANDIDATE
               ? {
@@ -62,18 +60,9 @@ export class AuthService {
         },
       });
 
-      await tx.emailVerificationToken.create({
-        data: {
-          userId: createdUser.id,
-          tokenHash: emailTokenHash,
-          expiresAt: addHours(new Date(), 24),
-        },
-      });
-
       return createdUser;
     });
 
-    await this.emailService.sendVerificationEmail(user.id, user.email, rawEmailToken);
     await this.audit.log({
       actorUserId: user.id,
       action: 'user.registered',
@@ -83,7 +72,7 @@ export class AuthService {
     });
 
     return {
-      message: 'Compte créé. Vérifiez votre email pour activer le compte.',
+      message: 'Compte cree. Vous pouvez maintenant vous connecter.',
       userId: user.id,
     };
   }
@@ -259,3 +248,4 @@ export class AuthService {
     };
   }
 }
+
