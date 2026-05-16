@@ -81,18 +81,18 @@ export default function NewMissionPage() {
       return;
     }
 
-    if (!primary) return;
     setSaving(true);
     setError(null);
 
     const payload = {
       ...form,
-      establishmentId: primary.id,
+      establishmentId: primary?.id,
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       compensationAmount: form.compensationAmount ? Number(form.compensationAmount) : undefined,
       tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
     };
     delete payload.tagsText;
+    if (!payload.establishmentId) delete payload.establishmentId;
 
     try {
       const mission = await api.post<Mission>('/missions', payload);
@@ -112,15 +112,6 @@ export default function NewMissionPage() {
   }
 
   if (loading) return <LoadingCard />;
-
-  if (!primary) {
-    return (
-      <>
-        <PageHeader title="Creer une mission" />
-        <Card><p>Cree d'abord ton etablissement.</p></Card>
-      </>
-    );
-  }
 
   if (createdMission) {
     return (
@@ -144,7 +135,10 @@ export default function NewMissionPage() {
 
   return (
     <>
-      <PageHeader title="Creer une mission" description={`Etablissement : ${primary.name}`} />
+      <PageHeader
+        title="Creer une mission"
+        description={primary ? `Etablissement : ${primary.name}` : 'La mission sera rattachee automatiquement a ton compte etablissement.'}
+      />
       <div className="wizard-layout">
         <Card className="wizard-panel">
           <div className="wizard-progress">

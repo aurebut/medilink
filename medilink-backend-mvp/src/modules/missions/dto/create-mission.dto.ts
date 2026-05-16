@@ -12,8 +12,9 @@ import {
 } from 'class-validator';
 
 export class CreateMissionDto {
+  @IsOptional()
   @IsString()
-  establishmentId: string;
+  establishmentId?: string;
 
   @IsString()
   title: string;

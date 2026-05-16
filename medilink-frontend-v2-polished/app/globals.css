@@ -489,6 +489,7 @@ button { touch-action: manipulation; }
 .account-menu-item.danger:hover { background: #fef2f2; color: #991b1b; }
 .menu-arrow { color: var(--muted-2); font-size: 13px; font-weight: 900; }
 .mobile-account-menu { display: none; }
+.mobile-account-entry { display: none; }
 .main { min-width: 0; overflow: hidden; }
 .topbar {
   height: 72px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
@@ -923,6 +924,28 @@ tbody tr:hover { background: #f9fafb; }
   }
   .mobile-account-menu .account-menu-section {
     padding: 6px;
+  }
+  .mobile-account-entry {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.04);
+    color: #e5e7eb;
+    cursor: pointer;
+  }
+  .mobile-account-entry .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+  .mobile-account-back {
+    justify-content: flex-start;
+    border-radius: 0;
+    border-bottom: 1px solid var(--line);
+    background: #f8fafc;
+    color: var(--heading);
   }
   .topbar {
     padding: 10px;

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { MissionStatus } from '@prisma/client';
+import { EstablishmentMemberRole, EstablishmentType, MissionStatus, UserRole } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -16,8 +16,6 @@ export class MissionsService {
   ) {}
 
   async create(user: RequestUser, dto: CreateMissionDto) {
-    await this.permissions.ensureEstablishmentMember(user.id, dto.establishmentId);
-
     const startDate = new Date(dto.startDate);
     const endDate = dto.endDate ? new Date(dto.endDate) : null;
 
@@ -29,9 +27,11 @@ export class MissionsService {
       throw new BadRequestException('La date de fin doit être après la date de début.');
     }
 
+    const establishmentId = await this.resolveEstablishmentId(user, dto);
+
     const mission = await this.prisma.mission.create({
       data: {
-        establishmentId: dto.establishmentId,
+        establishmentId,
         createdById: user.id,
         title: dto.title,
         description: dto.description,
@@ -67,6 +67,76 @@ export class MissionsService {
     });
 
     return mission;
+  }
+
+  private async resolveEstablishmentId(user: RequestUser, dto: CreateMissionDto) {
+    if (dto.establishmentId) {
+      await this.permissions.ensureEstablishmentMember(user.id, dto.establishmentId);
+      return dto.establishmentId;
+    }
+
+    if (
+      ![
+        UserRole.ESTABLISHMENT_OWNER,
+        UserRole.ESTABLISHMENT_ADMIN,
+        UserRole.ESTABLISHMENT_RECRUITER,
+      ].includes(user.role)
+    ) {
+      throw new BadRequestException('Un etablissement est requis pour creer une mission.');
+    }
+
+    const existingMembership = await this.prisma.establishmentMember.findFirst({
+      where: {
+        userId: user.id,
+        role: {
+          in: [
+            EstablishmentMemberRole.OWNER,
+            EstablishmentMemberRole.ADMIN,
+            EstablishmentMemberRole.RECRUITER,
+          ],
+        },
+      },
+      include: { establishment: true },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (existingMembership) {
+      return existingMembership.establishmentId;
+    }
+
+    const defaultName = user.email
+      ? `Etablissement ${user.email.split('@')[0]}`
+      : 'Etablissement Medilink';
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const establishment = await tx.establishment.create({
+        data: {
+          name: defaultName,
+          type: EstablishmentType.OTHER,
+          city: dto.city,
+          email: user.email,
+        },
+      });
+
+      await tx.establishmentMember.create({
+        data: {
+          establishmentId: establishment.id,
+          userId: user.id,
+          role: EstablishmentMemberRole.OWNER,
+        },
+      });
+
+      return establishment;
+    });
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.auto_created',
+      entityType: 'establishment',
+      entityId: created.id,
+    });
+
+    return created.id;
   }
 
   async search(dto: SearchMissionsDto) {
