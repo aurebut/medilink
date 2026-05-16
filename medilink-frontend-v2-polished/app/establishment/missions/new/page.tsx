@@ -145,24 +145,15 @@ export default function NewMissionPage() {
         <Card className="wizard-panel">
           <div className="wizard-progress">
             <div className="toolbar">
-              <Badge tone="neutral">Etape {step + 1}/{steps.length}</Badge>
+              <div>
+                <Badge tone="neutral">Etape {step + 1}/{steps.length}</Badge>
+                <strong className="wizard-current-step">{steps[step].title}</strong>
+                <span className="small">{steps[step].helper}</span>
+              </div>
               <span className="small">{progress}% complete</span>
             </div>
             <div className="progress" aria-label={`Progression ${progress}%`}>
               <span style={{ width: `${progress}%` }} />
-            </div>
-            <div className="wizard-steps">
-              {steps.map((item, index) => (
-                <button
-                  key={item.title}
-                  type="button"
-                  className={`wizard-step ${index === step ? 'active' : ''} ${index < step ? 'done' : ''}`}
-                  onClick={() => setStep(index)}
-                >
-                  <span>{index + 1}</span>
-                  <strong>{item.title}</strong>
-                </button>
-              ))}
             </div>
           </div>
 
@@ -175,8 +166,6 @@ export default function NewMissionPage() {
             </div>
           </form>
         </Card>
-
-        <MissionDraftSummary form={form} />
       </div>
     </>
   );
