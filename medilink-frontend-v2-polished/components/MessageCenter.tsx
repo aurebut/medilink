@@ -8,6 +8,8 @@ import { Alert, Badge, Button, Card, EmptyState, Field, Input, Textarea } from '
 import { useAuth } from './AuthProvider';
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
+const MESSAGE_POLL_INTERVAL_MS = 2000;
+const CONVERSATION_POLL_INTERVAL_MS = 5000;
 
 type ConversationWithLast = Conversation & { messages?: Message[] };
 type WorkflowKind =
@@ -166,8 +168,26 @@ export function MessageCenter() {
   }, [activeId]);
   useEffect(() => {
     if (!activeId) return undefined;
-    const timer = setInterval(() => void loadMessages(activeId), 8000);
+    const timer = setInterval(() => void loadMessages(activeId), MESSAGE_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
+  }, [activeId]);
+  useEffect(() => {
+    const timer = setInterval(() => void loadConversations(), CONVERSATION_POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [activeId]);
+  useEffect(() => {
+    function refreshWhenVisible() {
+      if (document.visibilityState !== 'visible') return;
+      void refresh();
+    }
+
+    document.addEventListener('visibilitychange', refreshWhenVisible);
+    window.addEventListener('focus', refreshWhenVisible);
+
+    return () => {
+      document.removeEventListener('visibilitychange', refreshWhenVisible);
+      window.removeEventListener('focus', refreshWhenVisible);
+    };
   }, [activeId]);
 
   async function refresh() {
