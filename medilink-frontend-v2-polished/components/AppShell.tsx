@@ -57,6 +57,12 @@ function accountHref(area: 'candidate' | 'establishment' | 'admin') {
   return '/admin/account';
 }
 
+function homeHref(area: 'candidate' | 'establishment' | 'admin') {
+  if (area === 'candidate') return '/app/dashboard';
+  if (area === 'establishment') return '/establishment/dashboard';
+  return '/admin/dashboard';
+}
+
 export function AppShell({
   children,
   area,
@@ -73,6 +79,7 @@ export function AppShell({
   const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
   const userProfileHref = profileHref(area);
   const userAccountHref = accountHref(area);
+  const userHomeHref = homeHref(area);
 
   async function onLogout() {
     setMobileNavOpen(false);
@@ -104,7 +111,7 @@ export function AppShell({
     <div className="shell">
       <aside className="sidebar">
         <div className="sidebar-head">
-          <Link href="/" className="brand">
+          <Link href={userHomeHref} className="brand">
             <span className="brand-mark">M</span>
             <span>Medilink</span>
           </Link>
