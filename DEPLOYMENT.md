@@ -51,7 +51,8 @@ Create a new Vercel project from this GitHub repository.
 Environment variables:
 
 ```env
-NEXT_PUBLIC_API_URL=https://YOUR_RENDER_SERVICE.onrender.com/api
+NEXT_PUBLIC_API_URL=/api
+API_PROXY_URL=https://YOUR_RENDER_SERVICE.onrender.com
 ```
 
 After Vercel gives you the frontend URL, update Render's `FRONTEND_URL` with that exact URL and redeploy the API.

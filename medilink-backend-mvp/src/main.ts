@@ -14,12 +14,21 @@ async function bootstrap() {
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+  const allowedVercelSuffix = '.vercel.app';
 
   app.use(cookieParser());
 
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || frontendUrls.includes(origin)) {
+      const isConfiguredOrigin = Boolean(origin && frontendUrls.includes(origin));
+      let isVercelPreview = false;
+      try {
+        isVercelPreview = Boolean(origin && new URL(origin).hostname.endsWith(allowedVercelSuffix));
+      } catch {
+        isVercelPreview = false;
+      }
+
+      if (!origin || isConfiguredOrigin || isVercelPreview) {
         callback(null, true);
         return;
       }
@@ -27,6 +36,8 @@ async function bootstrap() {
       callback(new Error(`Origin ${origin} is not allowed by CORS`));
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.setGlobalPrefix('api');
