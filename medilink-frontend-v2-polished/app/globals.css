@@ -535,6 +535,9 @@ tbody tr:hover { background: #f9fafb; }
 .conversation-button { text-align: left; width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px; cursor: pointer; transition: .15s ease; }
 .conversation-button:hover { transform: none; border-color: var(--line-strong); }
 .conversation-button.active { border-color: #bfdbfe; background: #eff6ff; box-shadow: none; }
+.message-heading { min-width: 0; display: flex; align-items: flex-start; gap: 10px; }
+.message-heading h2 { overflow-wrap: anywhere; }
+.mobile-conversation-back { display: none; flex: 0 0 auto; }
 .messages { flex: 1; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 14px 2px; }
 .message { max-width: 72%; border-radius: 12px 12px 12px 4px; padding: 12px 14px; background: #f3f4f6; border: 1px solid #e5e7eb; }
 .message.mine { margin-left: auto; background: #eff6ff; border-color: #bfdbfe; border-radius: 12px 12px 4px 12px; }
@@ -874,11 +877,38 @@ tbody tr:hover { background: #f9fafb; }
   td:last-child { border-bottom: 0; }
   tbody tr:hover { background: var(--surface); }
   .message-layout { gap: 10px; }
+  .message-layout-mobile {
+    min-height: calc(100dvh - 158px);
+  }
+  .message-layout-mobile .conversation-list,
+  .message-layout-mobile .message-pane {
+    min-height: calc(100dvh - 158px);
+  }
+  .message-layout-mobile .message-pane {
+    padding-bottom: 0;
+  }
+  .message-layout-mobile .messages {
+    padding: 10px 0;
+  }
+  .message-heading {
+    width: 100%;
+    align-items: center;
+  }
+  .mobile-conversation-back {
+    display: inline-flex;
+  }
   .message-pane { min-height: auto; }
   .conversation-list { max-height: none; }
   .conversation-items {
-    max-height: 260px;
+    max-height: none;
     overflow: auto;
+  }
+  .conversation-button {
+    padding: 13px;
+  }
+  .conversation-button strong,
+  .conversation-button .small {
+    overflow-wrap: anywhere;
   }
   .message { max-width: 92%; }
   .message-form {
@@ -886,7 +916,11 @@ tbody tr:hover { background: #f9fafb; }
     position: sticky;
     bottom: 0;
     background: rgba(255,255,255,.95);
-    padding: 10px 0 0;
+    padding: 10px 0 12px;
+    margin: 0 -1px;
+  }
+  .message-form .textarea {
+    min-height: 48px;
   }
   .workflow-card {
     border-radius: var(--radius);

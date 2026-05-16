@@ -74,6 +74,9 @@ function workflowLabel(kind: WorkflowKind) {
 
 export function MessageCenter() {
   const { user } = useAuth();
+  const [isMobile, setIsMobile] = useState(() => (
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 620px)').matches : false
+  ));
   const [conversations, setConversations] = useState<ConversationWithLast[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -133,7 +136,7 @@ export function MessageCenter() {
     try {
       const data = await api.get<ConversationWithLast[]>('/conversations');
       setConversations(data);
-      if (!activeId && data[0]) setActiveId(data[0].id);
+      if (!activeId && data[0] && !isMobile) setActiveId(data[0].id);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -151,6 +154,17 @@ export function MessageCenter() {
     }
   }
 
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 620px)');
+    const update = () => setIsMobile(media.matches);
+
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  useEffect(() => {
+    if (!isMobile && !activeId && conversations[0]) setActiveId(conversations[0].id);
+  }, [isMobile, activeId, conversations]);
   useEffect(() => { void loadConversations(); }, []);
   useEffect(() => {
     if (!activeId) return;
@@ -277,9 +291,12 @@ export function MessageCenter() {
     return <EmptyState title="Aucune conversation" description="Les conversations sont creees automatiquement lorsqu'un candidat postule a une mission." />;
   }
 
+  const showConversationList = !isMobile || !activeId;
+  const showMessagePane = !isMobile || Boolean(activeId);
+
   return (
-    <div className="message-layout">
-      <Card className="conversation-list">
+    <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''}`}>
+      {showConversationList ? <Card className="conversation-list">
         <div className="toolbar">
           <div>
             <h2>Conversations</h2>
@@ -303,13 +320,20 @@ export function MessageCenter() {
             );
           })}
         </div>
-      </Card>
+      </Card> : null}
 
-      <Card className="message-pane">
+      {showMessagePane ? <Card className="message-pane">
         <div className="toolbar">
-          <div>
-            <h2>{active?.mission?.title || 'Conversation'}</h2>
-            <div className="small">{active?.establishment?.name} - {active?.mission?.city}</div>
+          <div className="message-heading">
+            {isMobile ? (
+              <Button type="button" variant="light" className="mobile-conversation-back" onClick={() => setActiveId(null)}>
+                Retour
+              </Button>
+            ) : null}
+            <div>
+              <h2>{active?.mission?.title || 'Conversation'}</h2>
+              <div className="small">{active?.establishment?.name} - {active?.mission?.city}</div>
+            </div>
           </div>
           <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
         </div>
@@ -371,7 +395,7 @@ export function MessageCenter() {
           <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Ecrire un message..." />
           <Button onClick={send}>Envoyer</Button>
         </div>
-      </Card>
+      </Card> : null}
     </div>
   );
 }
