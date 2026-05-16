@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Mission } from '@/lib/types';
 import { formatDate, formatMoney } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabel, statusLabel } from '@/lib/labels';
+import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
 
 export function MissionCard({
@@ -58,6 +59,7 @@ export function MissionCard({
         <Link className="btn btn-light" href={`/app/missions/${mission.id}`}>Voir détail</Link>
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}
+        {mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} /> : null}
       </div>
     </Card>
   );
