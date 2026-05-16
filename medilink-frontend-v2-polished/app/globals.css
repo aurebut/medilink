@@ -488,6 +488,7 @@ button { touch-action: manipulation; }
 .account-menu-item.danger { margin: 6px; width: calc(100% - 12px); color: #991b1b; }
 .account-menu-item.danger:hover { background: #fef2f2; color: #991b1b; }
 .menu-arrow { color: var(--muted-2); font-size: 13px; font-weight: 900; }
+.mobile-account-menu { display: none; }
 .main { min-width: 0; overflow: hidden; }
 .topbar {
   height: 72px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
@@ -895,6 +896,21 @@ tbody tr:hover { background: #f9fafb; }
     height: 22px;
     border-radius: 8px;
     font-size: 12px;
+  }
+  .mobile-account-menu {
+    display: block;
+    overflow: hidden;
+    margin-top: 8px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--text);
+  }
+  .mobile-account-menu .account-menu-head {
+    padding: 12px;
+  }
+  .mobile-account-menu .account-menu-section {
+    padding: 6px;
   }
   .topbar {
     padding: 10px;

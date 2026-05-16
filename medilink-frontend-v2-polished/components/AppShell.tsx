@@ -75,6 +75,8 @@ export function AppShell({
   const userAccountHref = accountHref(area);
 
   async function onLogout() {
+    setMobileNavOpen(false);
+    setAccountMenuOpen(false);
     await logout();
     router.push('/login');
   }
@@ -137,6 +139,35 @@ export function AppShell({
               </Link>
             );
           })}
+
+          <div className="mobile-account-menu" role="menu" aria-label="Compte">
+            <div className="account-menu-head">
+              <span className="avatar">{initials(user?.email)}</span>
+              <span className="truncate">
+                <strong>{user?.email || 'Utilisateur'}</strong>
+                <br />
+                <span>{roleLabel(user?.role)}</span>
+              </span>
+            </div>
+            <div className="account-menu-section">
+              <Link href={userProfileHref} className="account-menu-item" role="menuitem" onClick={() => setMobileNavOpen(false)}>
+                <span>Mon profil</span>
+                <span className="menu-arrow">&gt;</span>
+              </Link>
+              <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setMobileNavOpen(false)}>
+                <span>Parametres du compte</span>
+                <span className="menu-arrow">&gt;</span>
+              </Link>
+              <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setMobileNavOpen(false)}>
+                <span>Securite et mot de passe</span>
+                <span className="menu-arrow">&gt;</span>
+              </Link>
+            </div>
+            <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
+              <span>Deconnexion</span>
+              <span className="menu-arrow">&gt;</span>
+            </button>
+          </div>
         </nav>
 
         <div className="sidebar-footer" ref={accountMenuRef}>
