@@ -75,13 +75,13 @@ export class MissionsService {
       return dto.establishmentId;
     }
 
-    if (
-      ![
-        UserRole.ESTABLISHMENT_OWNER,
-        UserRole.ESTABLISHMENT_ADMIN,
-        UserRole.ESTABLISHMENT_RECRUITER,
-      ].includes(user.role)
-    ) {
+    const establishmentRoles: UserRole[] = [
+      UserRole.ESTABLISHMENT_OWNER,
+      UserRole.ESTABLISHMENT_ADMIN,
+      UserRole.ESTABLISHMENT_RECRUITER,
+    ];
+
+    if (!establishmentRoles.includes(user.role)) {
       throw new BadRequestException('Un etablissement est requis pour creer une mission.');
     }
 
