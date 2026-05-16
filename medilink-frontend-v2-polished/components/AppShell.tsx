@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { roleLabel } from '@/lib/labels';
 import { useAuth } from './AuthProvider';
-import { Badge, Button } from './ui';
+import { Button } from './ui';
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -124,7 +124,6 @@ export function AppShell({
             <div className="small">Plateforme Medilink</div>
           </div>
           <div className="actions">
-            <Badge tone="success">API connectee</Badge>
             <Button variant="light" onClick={onLogout}>Deconnexion</Button>
           </div>
         </header>
