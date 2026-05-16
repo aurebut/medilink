@@ -560,6 +560,22 @@ button { touch-action: manipulation; }
 .wizard-step-content h2 { margin: 0 0 8px; color: var(--heading); font-size: 26px; letter-spacing: 0; }
 .wizard-step-content p { margin: 0; color: var(--muted); line-height: 1.6; }
 .wizard-actions { display: flex; justify-content: space-between; gap: 12px; padding-top: 4px; }
+.choice-section {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.choice-section + .choice-section { margin-top: 2px; }
+.choice-section-title {
+  color: var(--heading);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
 .choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .choice-grid button,
 .publish-choice button {
@@ -579,6 +595,28 @@ button { touch-action: manipulation; }
   background: var(--surface-blue);
   color: #1d4ed8;
   box-shadow: 0 0 0 4px rgba(20,99,255,.08);
+}
+.time-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.time-presets button {
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+}
+.time-presets button:hover,
+.time-presets button.active {
+  border-color: var(--primary);
+  background: var(--surface-blue);
+  color: #1d4ed8;
 }
 .publish-choice { display: grid; gap: 10px; }
 .publish-choice button { display: grid; gap: 5px; }

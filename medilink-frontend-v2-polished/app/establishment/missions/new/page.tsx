@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
@@ -25,6 +26,9 @@ const initialForm = {
   compensationCurrency: 'EUR',
   publishNow: true,
 };
+
+const startTimePresets = ['08:00', '09:00', '14:00', '20:00'];
+const endTimePresets = ['12:00', '17:00', '20:00', '08:00'];
 
 export default function NewMissionPage() {
   const { primary, loading } = useEstablishments();
@@ -179,16 +183,20 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Quel type de mission veux-tu publier ?</h2>
           <p>Choisis le format et le niveau attendu pour cadrer la recherche des candidats.</p>
         </div>
-        <ChoiceGrid
-          value={form.missionType}
-          options={missionTypeOptions}
-          onChange={(value) => set('missionType', value)}
-        />
-        <ChoiceGrid
-          value={form.requiredLevel}
-          options={requiredLevelOptions}
-          onChange={(value) => set('requiredLevel', value)}
-        />
+        <ChoiceSection title="Type de mission">
+          <ChoiceGrid
+            value={form.missionType}
+            options={missionTypeOptions}
+            onChange={(value) => set('missionType', value)}
+          />
+        </ChoiceSection>
+        <ChoiceSection title="Type de profil demande">
+          <ChoiceGrid
+            value={form.requiredLevel}
+            options={requiredLevelOptions}
+            onChange={(value) => set('requiredLevel', value)}
+          />
+        </ChoiceSection>
       </div>
     );
   }
@@ -242,8 +250,20 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <Field label="Date fin"><Input type="date" value={form.endDate || ''} onChange={(e) => set('endDate', e.target.value)} /></Field>
         </div>
         <div className="form-row">
-          <Field label="Heure debut"><Input value={form.startTime || ''} placeholder="08:00" onChange={(e) => set('startTime', e.target.value)} /></Field>
-          <Field label="Heure fin"><Input value={form.endTime || ''} placeholder="20:00" onChange={(e) => set('endTime', e.target.value)} /></Field>
+          <TimeField
+            label="Heure debut"
+            value={form.startTime || ''}
+            presets={startTimePresets}
+            placeholder="08:00"
+            onChange={(value) => set('startTime', value)}
+          />
+          <TimeField
+            label="Heure fin"
+            value={form.endTime || ''}
+            presets={endTimePresets}
+            placeholder="20:00"
+            onChange={(value) => set('endTime', value)}
+          />
         </div>
         <Field label="Duree estimee en heures">
           <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
@@ -303,6 +323,47 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       </div>
       <MissionDraftSummary form={form} compact />
     </div>
+  );
+}
+
+function ChoiceSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="choice-section">
+      <div className="choice-section-title">{title}</div>
+      {children}
+    </section>
+  );
+}
+
+function TimeField({
+  label,
+  value,
+  presets,
+  placeholder,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  presets: string[];
+  placeholder: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <Field label={label}>
+      <Input value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      <div className="time-presets" aria-label={`Raccourcis ${label.toLowerCase()}`}>
+        {presets.map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            className={value === preset ? 'active' : ''}
+            onClick={() => onChange(preset)}
+          >
+            {preset}
+          </button>
+        ))}
+      </div>
+    </Field>
   );
 }
 
