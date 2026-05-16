@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, clearAuthToken, setAuthToken } from '@/lib/api';
 import type { CurrentUser } from '@/lib/types';
 
 type AuthContextValue = {
@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(current);
       return current;
     } catch {
+      clearAuthToken();
       setUser(null);
       return null;
     } finally {
@@ -34,13 +35,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { void refresh(); }, [refresh]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const result = await api.post<{ user: CurrentUser }>('/auth/login', { email, password });
+    const result = await api.post<{ user: CurrentUser; token: string }>('/auth/login', { email, password });
+    setAuthToken(result.token);
     setUser(result.user);
     return result.user;
   }, []);
 
   const logout = useCallback(async () => {
-    try { await api.post('/auth/logout'); } finally { setUser(null); }
+    try { await api.post('/auth/logout'); } finally { clearAuthToken(); setUser(null); }
   }, []);
 
   const value = useMemo(() => ({ user, loading, refresh, login, logout }), [user, loading, refresh, login, logout]);

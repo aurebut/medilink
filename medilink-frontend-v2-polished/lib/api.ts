@@ -1,4 +1,5 @@
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '');
+const AUTH_TOKEN_KEY = 'medilink_auth_token';
 
 export class ApiError extends Error {
   status: number;
@@ -15,6 +16,21 @@ type ApiOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
 };
 
+export function getAuthToken() {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function setAuthToken(token: string) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+export function clearAuthToken() {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
 function normalizeError(payload: any): string {
   if (!payload) return 'Erreur API.';
   if (typeof payload.message === 'string') return payload.message;
@@ -25,11 +41,13 @@ function normalizeError(payload: any): string {
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
+  const token = getAuthToken();
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
       ...(hasJsonBody ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },
     body: hasJsonBody ? JSON.stringify(options.body) : (options.body as BodyInit | undefined),

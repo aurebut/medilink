@@ -21,7 +21,12 @@ export class AuthGuard implements CanActivate {
     const cookieName =
       this.config.get<string>('SESSION_COOKIE_NAME') || 'medilink_session';
 
-    const rawToken = req.cookies?.[cookieName];
+    const authHeader = req.headers?.authorization;
+    const bearerToken =
+      typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
+        ? authHeader.slice('Bearer '.length).trim()
+        : undefined;
+    const rawToken = req.cookies?.[cookieName] || bearerToken;
 
     if (!rawToken) {
       throw new UnauthorizedException('Authentification requise.');

@@ -26,13 +26,13 @@ export class AuthController {
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.auth.login(dto);
     this.setSessionCookie(res, result.token, result.expiresAt);
-    return { user: result.user };
+    return { user: result.user, token: result.token };
   }
 
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const cookieName = this.cookieName();
-    const token = req.cookies?.[cookieName];
+    const token = req.cookies?.[cookieName] || this.bearerToken(req);
     const result = await this.auth.logout(token);
     res.clearCookie(cookieName, this.cookieOptions());
     return result;
@@ -79,5 +79,14 @@ export class AuthController {
 
   private cookieName() {
     return this.config.get<string>('SESSION_COOKIE_NAME') || 'medilink_session';
+  }
+
+  private bearerToken(req: Request) {
+    const authHeader = req.headers?.authorization;
+    if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
+      return undefined;
+    }
+
+    return authHeader.slice('Bearer '.length).trim();
   }
 }
