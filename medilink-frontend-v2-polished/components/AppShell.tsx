@@ -107,6 +107,10 @@ export function AppShell({
     };
   }, []);
 
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
+
   return (
     <div className="shell">
       <aside className={`sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
