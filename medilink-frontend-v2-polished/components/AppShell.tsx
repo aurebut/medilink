@@ -74,7 +74,6 @@ export function AppShell({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [mobileAccountOpen, setMobileAccountOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
@@ -84,7 +83,6 @@ export function AppShell({
 
   async function onLogout() {
     setMobileNavOpen(false);
-    setMobileAccountOpen(false);
     setAccountMenuOpen(false);
     await logout();
     router.push('/login');
@@ -123,10 +121,7 @@ export function AppShell({
             aria-label={mobileNavOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             aria-expanded={mobileNavOpen}
             aria-controls="sidebar-nav"
-            onClick={() => {
-              setMobileNavOpen((open) => !open);
-              if (mobileNavOpen) setMobileAccountOpen(false);
-            }}
+            onClick={() => setMobileNavOpen((open) => !open)}
           >
             <span />
             <span />
@@ -136,88 +131,47 @@ export function AppShell({
         </div>
 
         <nav id="sidebar-nav" className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}>
-          <button
-            type="button"
-            className="mobile-menu-close"
-            onClick={() => {
-              setMobileNavOpen(false);
-              setMobileAccountOpen(false);
-            }}
-          >
-            <span>Fermer</span>
-            <span className="menu-arrow">x</span>
-          </button>
-
-          {!mobileAccountOpen ? (
-            <>
-              {nav.map((item) => {
-                const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`sidebar-link ${active ? 'active' : ''}`}
-                    onClick={() => setMobileNavOpen(false)}
-                  >
-                    <span className="nav-main">
-                      <span className="nav-icon">{item.icon}</span>
-                      <span>{item.label}</span>
-                    </span>
-                  </Link>
-                );
-              })}
-
-              <button
-                type="button"
-                className="sidebar-link mobile-account-entry"
-                aria-expanded={mobileAccountOpen}
-                onClick={() => setMobileAccountOpen(true)}
+          {nav.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sidebar-link ${active ? 'active' : ''}`}
+                onClick={() => setMobileNavOpen(false)}
               >
                 <span className="nav-main">
-                  <span className="avatar">{initials(user?.email)}</span>
-                  <span className="truncate">
-                    <strong>{user?.email || 'Utilisateur'}</strong>
-                    <br />
-                    <span>{roleLabel(user?.role)}</span>
-                  </span>
+                  <span className="nav-icon">{item.icon}</span>
+                  <span>{item.label}</span>
                 </span>
+              </Link>
+            );
+          })}
+
+          <div className="mobile-menu-account">
+            <div className="mobile-menu-user">
+              <span className="avatar">{initials(user?.email)}</span>
+              <span className="truncate">
+                <strong>{user?.email || 'Utilisateur'}</strong>
+                <br />
+                <span>{roleLabel(user?.role)}</span>
+              </span>
+            </div>
+            <div className="mobile-menu-actions">
+              <Link href={userProfileHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+                <span>Mon profil</span>
                 <span className="menu-arrow">&gt;</span>
-              </button>
-            </>
-          ) : (
-            <div className="mobile-account-menu" role="menu" aria-label="Compte">
-              <button type="button" className="account-menu-item mobile-account-back" onClick={() => setMobileAccountOpen(false)}>
-                <span className="menu-arrow">&lt;</span>
-                <span>Compte</span>
-              </button>
-              <div className="account-menu-head">
-                <span className="avatar">{initials(user?.email)}</span>
-                <span className="truncate">
-                  <strong>{user?.email || 'Utilisateur'}</strong>
-                  <br />
-                  <span>{roleLabel(user?.role)}</span>
-                </span>
-              </div>
-              <div className="account-menu-section">
-                <Link href={userProfileHref} className="account-menu-item" role="menuitem" onClick={() => { setMobileNavOpen(false); setMobileAccountOpen(false); }}>
-                  <span>Mon profil</span>
-                  <span className="menu-arrow">&gt;</span>
-                </Link>
-                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => { setMobileNavOpen(false); setMobileAccountOpen(false); }}>
-                  <span>Parametres du compte</span>
-                  <span className="menu-arrow">&gt;</span>
-                </Link>
-                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => { setMobileNavOpen(false); setMobileAccountOpen(false); }}>
-                  <span>Securite et mot de passe</span>
-                  <span className="menu-arrow">&gt;</span>
-                </Link>
-              </div>
-              <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
+              </Link>
+              <Link href={userAccountHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+                <span>Parametres du compte</span>
+                <span className="menu-arrow">&gt;</span>
+              </Link>
+              <button type="button" className="account-menu-item danger" onClick={onLogout}>
                 <span>Deconnexion</span>
                 <span className="menu-arrow">&gt;</span>
               </button>
             </div>
-          )}
+          </div>
         </nav>
 
         <div className="sidebar-footer" ref={accountMenuRef}>

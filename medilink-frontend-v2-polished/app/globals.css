@@ -488,9 +488,7 @@ button { touch-action: manipulation; }
 .account-menu-item.danger { margin: 6px; width: calc(100% - 12px); color: #991b1b; }
 .account-menu-item.danger:hover { background: #fef2f2; color: #991b1b; }
 .menu-arrow { color: var(--muted-2); font-size: 13px; font-weight: 900; }
-.mobile-menu-close { display: none; }
-.mobile-account-menu { display: none; }
-.mobile-account-entry { display: none; }
+.mobile-menu-account { display: none; }
 .main { min-width: 0; overflow: hidden; }
 .topbar {
   height: 72px; background: rgba(255,255,255,.92); backdrop-filter: blur(16px);
@@ -737,12 +735,13 @@ tbody tr:hover { background: #f9fafb; }
     top: 0;
     z-index: 20;
     height: auto;
-    gap: 14px;
+    gap: 0;
     padding: 14px 16px;
     border-right: 0;
     border-bottom: 1px solid rgba(255,255,255,.08);
   }
   .sidebar .brand { padding: 0; }
+  .sidebar-head { min-height: 44px; }
   .mobile-menu-button {
     width: 42px;
     height: 42px;
@@ -766,28 +765,12 @@ tbody tr:hover { background: #f9fafb; }
   .sidebar-nav {
     display: none;
     grid-template-columns: 1fr;
-    gap: 7px;
+    gap: 8px;
     overflow: visible;
-    padding: 10px 0 0;
+    padding: 12px 0 4px;
     margin: 0;
   }
   .sidebar-nav.open { display: grid; }
-  .mobile-menu-close {
-    width: 100%;
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 12px;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 10px;
-    background: rgba(255,255,255,.08);
-    color: #fff;
-    cursor: pointer;
-    font-weight: 800;
-    text-align: left;
-  }
   .sidebar-link {
     min-height: 44px;
     padding: 10px 12px;
@@ -810,42 +793,43 @@ tbody tr:hover { background: #f9fafb; }
     border-radius: 8px;
     font-size: 12px;
   }
-  .mobile-account-menu {
-    display: block;
-    overflow: hidden;
-    margin-top: 8px;
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    background: #ffffff;
-    color: var(--text);
+  .mobile-menu-account {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.12);
   }
-  .mobile-account-menu .account-menu-head {
-    padding: 12px;
-  }
-  .mobile-account-menu .account-menu-section {
-    padding: 6px;
-  }
-  .mobile-account-entry {
-    width: 100%;
+  .mobile-menu-user {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px 12px;
     border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
     background: rgba(255,255,255,.04);
     color: #e5e7eb;
-    cursor: pointer;
   }
-  .mobile-account-entry .avatar {
+  .mobile-menu-user .avatar {
     width: 32px;
     height: 32px;
     border-radius: 9px;
   }
-  .mobile-account-back {
-    justify-content: flex-start;
+  .mobile-menu-user strong { color: #fff; }
+  .mobile-menu-actions {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+  }
+  .mobile-menu-actions .account-menu-item {
     border-radius: 0;
-    border-bottom: 1px solid var(--line);
-    background: #f8fafc;
-    color: var(--heading);
+  }
+  .mobile-menu-actions .account-menu-item.danger {
+    margin: 0;
+    width: 100%;
   }
   .sidebar-footer { display: none; }
   .topbar {
