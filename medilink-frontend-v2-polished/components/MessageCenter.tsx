@@ -63,11 +63,11 @@ function workflowLabel(kind: WorkflowKind) {
   const labels: Record<WorkflowKind, string> = {
     FINAL_PROPOSAL: 'Proposition finale',
     PAYMENT_REQUIRED: 'Paiement requis',
-    PROPOSAL_REJECTED: 'Proposition refusee',
-    FUNDS_SECURED: 'Paiement securise',
-    MISSION_COMPLETED: 'Mission terminee',
-    PAYMENT_RELEASED: 'Paiement libere',
-    INVOICES_GENERATED: 'Factures generees',
+    PROPOSAL_REJECTED: 'Proposition refusée',
+    FUNDS_SECURED: 'Paiement sécurisé',
+    MISSION_COMPLETED: 'Mission terminée',
+    PAYMENT_RELEASED: 'Paiement libéré',
+    INVOICES_GENERATED: 'Factures générées',
   };
   return labels[kind];
 }
@@ -119,17 +119,17 @@ export function MessageCenter() {
   const currentStatus = state.invoices
     ? 'Factures disponibles'
     : state.released
-      ? 'Paiement libere'
+      ? 'Paiement libéré'
       : state.completed
-        ? 'Mission terminee'
+        ? 'Mission terminée'
         : state.fundsSecured
-          ? 'Mission confirmee'
+          ? 'Mission confirmée'
           : state.paymentRequired
             ? 'Paiement requis'
           : state.rejected
-            ? 'Proposition refusee'
+            ? 'Proposition refusée'
             : state.hasProposal
-              ? 'Proposition envoyee'
+              ? 'Proposition envoyée'
               : 'Discussion';
 
   async function loadConversations() {
@@ -262,20 +262,20 @@ export function MessageCenter() {
   function downloadInvoice(kind: 'recruiter' | 'candidate') {
     if (!active || !lastProposal?.workflow?.proposal) return;
     const p = lastProposal.workflow.proposal;
-    const title = kind === 'recruiter' ? 'Facture etablissement' : 'Justificatif candidat';
+    const title = kind === 'recruiter' ? 'Facture établissement' : 'Justificatif candidat';
     const content = [
       title,
       '',
       `Mission: ${active.mission?.title || ''}`,
-      `Etablissement: ${active.establishment?.name || ''}`,
+      `Établissement: ${active.establishment?.name || ''}`,
       `Ville: ${active.mission?.city || ''}`,
       `Date: ${p.startDate ? formatDate(p.startDate) : ''}`,
       `Horaire: ${p.startTime || ''}${p.endTime ? ` - ${p.endTime}` : ''}`,
       `Montant: ${formatMoney(p.amount, p.currency || 'EUR')}`,
       '',
       kind === 'recruiter'
-        ? 'Document genere apres validation de fin de mission et confirmation du paiement.'
-        : 'Document genere pour le candidat apres confirmation du paiement.',
+        ? 'Document généré après validation de fin de mission et confirmation du paiement.'
+        : 'Document généré pour le candidat après confirmation du paiement.',
     ].join('\n');
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -288,7 +288,7 @@ export function MessageCenter() {
 
   if (loading) return <Card><p className="muted">Chargement des conversations...</p></Card>;
   if (conversations.length === 0) {
-    return <EmptyState title="Aucune conversation" description="Les conversations sont creees automatiquement lorsqu'un candidat postule a une mission." />;
+    return <EmptyState title="Aucune conversation" description="Les conversations sont créées automatiquement lorsqu'un candidat postule à une mission." />;
   }
 
   const showConversationList = !isMobile || !activeId;
@@ -300,7 +300,7 @@ export function MessageCenter() {
         <div className="toolbar">
           <div>
             <h2>Conversations</h2>
-            <div className="small">{conversations.length} echange(s)</div>
+            <div className="small">{conversations.length} échange(s)</div>
           </div>
         </div>
         {error ? <Alert type="error">{error}</Alert> : null}
@@ -315,7 +315,7 @@ export function MessageCenter() {
               >
                 <strong>{conv.establishment?.name || conv.mission?.title || 'Conversation'}</strong>
                 <div className="small">{conv.mission?.title}</div>
-                <div className="small">{last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise a jour du suivi' : last?.body || 'Aucun message'} - {formatDateTime(conv.lastMessageAt)}</div>
+                <div className="small">{last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise à jour du suivi' : last?.body || 'Aucun message'} - {formatDateTime(conv.lastMessageAt)}</div>
               </button>
             );
           })}
@@ -392,7 +392,7 @@ export function MessageCenter() {
         </div>
 
         <div className="message-form">
-          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Ecrire un message..." />
+          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." />
           <Button onClick={send}>Envoyer</Button>
         </div>
       </Card> : null}
@@ -423,9 +423,9 @@ function WorkflowComposer({
     return (
       <div className="workflow-card">
         <div>
-          <Badge>{hasProposal ? 'Proposition envoyee' : 'Prochaine etape'}</Badge>
+          <Badge>{hasProposal ? 'Proposition envoyée' : 'Prochaine étape'}</Badge>
           <h3>{hasProposal ? 'Envoyer une nouvelle proposition finale' : 'Formaliser une proposition finale'}</h3>
-          <p>La proposition apparaitra dans le fil avec les boutons d'acceptation cote candidat.</p>
+          <p>La proposition apparaîtra dans le fil avec les boutons d'acceptation côté candidat.</p>
         </div>
         <div className="actions">
           <Button onClick={onOpen}>{hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition'}</Button>
@@ -438,7 +438,7 @@ function WorkflowComposer({
     <form className="workflow-card workflow-form" onSubmit={onSubmit}>
       <div>
         <Badge>Proposition finale</Badge>
-        <h3>Details de l'accord</h3>
+        <h3>Détails de l'accord</h3>
       </div>
       <div className="form-row">
         <Field label="Montant">
@@ -449,7 +449,7 @@ function WorkflowComposer({
         </Field>
       </div>
       <div className="form-row">
-        <Field label="Date debut">
+        <Field label="Date début">
           <Input type="date" value={proposal.startDate} onChange={(e) => onChange({ startDate: e.target.value })} />
         </Field>
         <Field label="Date fin">
@@ -457,7 +457,7 @@ function WorkflowComposer({
         </Field>
       </div>
       <div className="form-row">
-        <Field label="Heure debut">
+        <Field label="Heure début">
           <Input type="time" value={proposal.startTime} onChange={(e) => onChange({ startTime: e.target.value })} />
         </Field>
         <Field label="Heure fin">
@@ -465,7 +465,7 @@ function WorkflowComposer({
         </Field>
       </div>
       <Field label="Conditions / notes">
-        <Textarea value={proposal.notes} onChange={(e) => onChange({ notes: e.target.value })} placeholder="Consignes, contact sur place, conditions particulieres..." />
+        <Textarea value={proposal.notes} onChange={(e) => onChange({ notes: e.target.value })} placeholder="Consignes, contact sur place, conditions particulières..." />
       </Field>
       <div className="actions">
         <Button disabled={disabled}>{disabled ? 'Envoi...' : 'Publier dans le chat'}</Button>
@@ -532,7 +532,7 @@ function WorkflowMessageCard({
             <div><span>Montant</span><strong>{formatMoney(proposal.amount, proposal.currency || 'EUR')}</strong></div>
             <div><span>Date</span><strong>{proposal.startDate ? formatDate(proposal.startDate) : '-'}</strong></div>
             <div><span>Horaire</span><strong>{proposal.startTime || '-'} {proposal.endTime ? `- ${proposal.endTime}` : ''}</strong></div>
-            <div><span>Paiement</span><strong>Bloque par Medilink</strong></div>
+            <div><span>Paiement</span><strong>Bloqué par Medilink</strong></div>
           </div>
           {proposal.notes ? <p>{proposal.notes}</p> : null}
           {candidateCanAnswer ? (
@@ -547,7 +547,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_REQUIRED' ? (
         <>
           <h3>Paiement requis</h3>
-          <p>Le candidat a accepte. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'a la fin.</p>
+          <p>Le candidat a accepté. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin.</p>
           {recruiterCanSecure ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Paiement...' : 'Payer et confirmer'}</Button>
@@ -558,18 +558,18 @@ function WorkflowMessageCard({
 
       {workflow.kind === 'PROPOSAL_REJECTED' ? (
         <>
-          <h3>Proposition refusee</h3>
-          <p>La proposition finale a ete refusee. Le recruteur peut discuter avec le candidat puis envoyer une nouvelle proposition.</p>
+          <h3>Proposition refusée</h3>
+          <p>La proposition finale a été refusée. Le recruteur peut discuter avec le candidat puis envoyer une nouvelle proposition.</p>
         </>
       ) : null}
 
       {workflow.kind === 'FUNDS_SECURED' ? (
         <>
-          <h3>Mission confirmee</h3>
-          <p>Le paiement du recruteur est securise par Medilink. Les fonds seront liberes au candidat apres validation de la fin de mission.</p>
+          <h3>Mission confirmée</h3>
+          <p>Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés au candidat après validation de la fin de mission.</p>
           {recruiterCanComplete ? (
             <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminee'}</Button>
+              <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}</Button>
             </div>
           ) : null}
         </>
@@ -577,11 +577,11 @@ function WorkflowMessageCard({
 
       {workflow.kind === 'MISSION_COMPLETED' ? (
         <>
-          <h3>Mission terminee</h3>
-          <p>La fin de mission a ete validee. Le paiement securise peut maintenant etre libere au candidat.</p>
+          <h3>Mission terminée</h3>
+          <p>La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré au candidat.</p>
           {recruiterCanPay ? (
             <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Liberation...' : 'Liberer le paiement'}</Button>
+              <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Libération...' : 'Libérer le paiement'}</Button>
             </div>
           ) : null}
         </>
@@ -589,11 +589,11 @@ function WorkflowMessageCard({
 
       {workflow.kind === 'PAYMENT_RELEASED' ? (
         <>
-          <h3>Paiement libere</h3>
-          <p>Les fonds ont ete liberes au candidat. Les factures et justificatifs peuvent etre generes.</p>
+          <h3>Paiement libéré</h3>
+          <p>Les fonds ont été libérés au candidat. Les factures et justificatifs peuvent être générés.</p>
           {canGenerateInvoices ? (
             <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>{busyAction === 'invoices' ? 'Generation...' : 'Generer les factures'}</Button>
+              <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>{busyAction === 'invoices' ? 'Génération...' : 'Générer les factures'}</Button>
             </div>
           ) : null}
         </>

@@ -46,25 +46,25 @@ export default function RegisterPage() {
       <form className="auth-card form" onSubmit={submit}>
         <Link className="brand" href="/"><span className="brand-mark">M</span><span>Medilink</span></Link>
         <div>
-          <h1>Creer un compte</h1>
-          <p>Choisis le type de compte pour acceder directement a ton espace.</p>
+          <h1>Créer un compte</h1>
+          <p>Choisis le type de compte pour accéder directement à ton espace.</p>
         </div>
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Type de compte">
           <Select value={accountType} onChange={(e) => setAccountType(e.target.value as any)}>
-            <option value="candidate">Candidat medical</option>
-            <option value="establishment">Etablissement / recruteur</option>
+            <option value="candidate">Candidat médical</option>
+            <option value="establishment">Établissement / recruteur</option>
           </Select>
         </Field>
         <div className="form-row">
-          <Field label="Prenom"><Input value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
+          <Field label="Prénom"><Input value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
           <Field label="Nom"><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
         </div>
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
-        <Field label="Telephone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
+        <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
         <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
-        <Button block disabled={loading}>{loading ? 'Creation...' : 'Creer le compte'}</Button>
-        <Link href="/login" className="small">J'ai deja un compte</Link>
+        <Button block disabled={loading}>{loading ? 'Création...' : 'Créer le compte'}</Button>
+        <Link href="/login" className="small">J'ai déjà un compte</Link>
       </form>
     </main>
   );

@@ -55,12 +55,12 @@ export default function ApplyMissionPage() {
     return (
       <>
         <PageHeader
-          title="Candidature envoyee"
-          description="Votre candidature a bien ete transmise a l'etablissement. Une conversation a ete creee pour la suite."
+          title="Candidature envoyée"
+          description="Votre candidature a bien été transmise à l'établissement. Une conversation a été créée pour la suite."
         />
         <Card className="card-highlight">
           <h2>{mission.title}</h2>
-          <p>{mission.establishment?.name || 'Etablissement'} - {mission.city}</p>
+          <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
           <div className="actions">
             <LinkButton href="/app/applications">Voir mes candidatures</LinkButton>
             <LinkButton variant="light" href="/app/messages">Ouvrir la messagerie</LinkButton>
@@ -74,9 +74,9 @@ export default function ApplyMissionPage() {
   return (
     <>
       <PageHeader
-        title="Postuler a la mission"
+        title="Postuler à la mission"
         description="Relisez les informations, ajoutez un message de candidature si besoin, puis envoyez votre dossier."
-        actions={<LinkButton variant="light" href={`/missions/${mission.id}`}>Retour au detail</LinkButton>}
+        actions={<LinkButton variant="light" href={`/missions/${mission.id}`}>Retour au détail</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
@@ -84,7 +84,7 @@ export default function ApplyMissionPage() {
       <div className="grid-main apply-layout">
         <Card>
           <h2>Message de candidature</h2>
-          <p>Ce message sera visible par l'etablissement avec votre profil et vos documents valides.</p>
+          <p>Ce message sera visible par l'établissement avec votre profil et vos documents validés.</p>
           <form className="form" onSubmit={submit}>
             <Field label="Message facultatif">
               <Textarea
@@ -95,7 +95,7 @@ export default function ApplyMissionPage() {
               />
             </Field>
             <div className="toolbar">
-              <span className="small">{coverMessage.length}/2000 caracteres</span>
+              <span className="small">{coverMessage.length}/2000 caractères</span>
               <div className="actions">
                 <LinkButton variant="light" href="/app/search">Annuler</LinkButton>
                 <Button disabled={submitting}>{submitting ? 'Envoi...' : 'Envoyer ma candidature'}</Button>
@@ -105,18 +105,18 @@ export default function ApplyMissionPage() {
         </Card>
 
         <Card className="card-highlight">
-          <h2>Recapitulatif mission</h2>
+          <h2>Récapitulatif mission</h2>
           <div className="tag-list">
             <Badge>{missionTypeLabel(mission.missionType)}</Badge>
             <Badge tone="neutral">{requiredLevelLabel(mission.requiredLevel)}</Badge>
           </div>
           <div className="info-list">
             <div><span>Mission</span><strong>{mission.title}</strong></div>
-            <div><span>Etablissement</span><strong>{mission.establishment?.name || 'Etablissement'}</strong></div>
+            <div><span>Établissement</span><strong>{mission.establishment?.name || 'Établissement'}</strong></div>
             <div><span>Ville</span><strong>{mission.city}</strong></div>
             <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
             <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
-            <div><span>Remuneration</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
+            <div><span>Rémunération</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
           </div>
         </Card>
       </div>

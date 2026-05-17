@@ -74,7 +74,7 @@ export default function MissionPage() {
             ) : (
               <>
                 <LinkButton variant="light" href="/login">Connexion</LinkButton>
-                <LinkButton href="/register">Creer un compte</LinkButton>
+                <LinkButton href="/register">Créer un compte</LinkButton>
               </>
             )}
           </div>
@@ -87,9 +87,9 @@ export default function MissionPage() {
           <>
             <section className="public-mission-hero">
               <div className="section-heading">
-                <div className="kicker">{canManageMission ? 'Mission etablissement' : 'Mission medicale'}</div>
+                <div className="kicker">{canManageMission ? 'Mission établissement' : 'Mission médicale'}</div>
                 <h1>{mission.title}</h1>
-                <p>{mission.establishment?.name || 'Etablissement'} - {mission.city}</p>
+                <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
               </div>
               <div className="actions">
                 {canManageMission ? (
@@ -113,7 +113,7 @@ export default function MissionPage() {
 
             <div className="grid-2">
               <Card>
-                <h2>Details</h2>
+                <h2>Détails</h2>
                 <p>{mission.description || 'Aucune description.'}</p>
                 <div className="tag-list">
                   <Badge>{missionTypeLabel(mission.missionType)}</Badge>
@@ -128,8 +128,8 @@ export default function MissionPage() {
                 <div className="info-list">
                   <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
                   <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
-                  <div><span>Duree</span><strong>{mission.durationHours || '-'} h</strong></div>
-                  <div><span>Remuneration</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
+                  <div><span>Durée</span><strong>{mission.durationHours || '-'} h</strong></div>
+                  <div><span>Rémunération</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
                   <div><span>Localisation</span><strong>{mission.location || mission.city}</strong></div>
                 </div>
               </Card>

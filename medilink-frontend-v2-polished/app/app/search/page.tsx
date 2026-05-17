@@ -47,21 +47,21 @@ export default function SearchMissionsPage() {
     <>
       <PageHeader
         title="Recherche de missions"
-        description="Filtre les gardes, remplacements, vacations, stages et aides operatoires disponibles."
+        description="Filtre les gardes, remplacements, vacations, stages et aides opératoires disponibles."
       />
 
       <div className="grid-main">
         <Card>
           <h2>Filtres</h2>
-          <p>Affinez la recherche selon votre disponibilite, votre niveau et votre localisation.</p>
+          <p>Affinez la recherche selon votre disponibilité, votre niveau et votre localisation.</p>
           <form className="form" onSubmit={submit}>
             <Field label="Recherche">
-              <Input value={filters.q} onChange={(e) => set('q', e.target.value)} placeholder="Urgences, pediatrie..." />
+              <Input value={filters.q} onChange={(e) => set('q', e.target.value)} placeholder="Urgences, pédiatrie..." />
             </Field>
             <Field label="Ville">
               <Input value={filters.city} onChange={(e) => set('city', e.target.value)} placeholder="Lyon" />
             </Field>
-            <Field label="Specialite">
+            <Field label="Spécialité">
               <Input value={filters.specialty} onChange={(e) => set('specialty', e.target.value)} placeholder="Urgences" />
             </Field>
             <Field label="Type mission">
@@ -76,7 +76,7 @@ export default function SearchMissionsPage() {
                 {requiredLevelOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Select>
             </Field>
-            <Field label="A partir du">
+            <Field label="À partir du">
               <Input type="date" value={filters.dateFrom} onChange={(e) => set('dateFrom', e.target.value)} />
             </Field>
             <div className="actions">
@@ -86,7 +86,7 @@ export default function SearchMissionsPage() {
                 variant="light"
                 onClick={() => setFilters({ q: '', city: '', specialty: '', missionType: '', requiredLevel: '', dateFrom: '' })}
               >
-                Reinitialiser
+                Réinitialiser
               </Button>
             </div>
           </form>
@@ -96,12 +96,12 @@ export default function SearchMissionsPage() {
           {error ? <Alert type="error">{error}</Alert> : null}
           <div className="toolbar">
             <div>
-              <strong>{total} resultat(s)</strong>
-              <div className="small">Missions publiees disponibles</div>
+              <strong>{total} résultat(s)</strong>
+              <div className="small">Missions publiées disponibles</div>
             </div>
           </div>
           {items.map((mission) => <MissionCard key={mission.id} mission={mission} applyHref={`/app/missions/${mission.id}/apply`} />)}
-          {!loading && items.length === 0 ? <Card><p>Aucune mission publiee ne correspond aux filtres.</p></Card> : null}
+          {!loading && items.length === 0 ? <Card><p>Aucune mission publiée ne correspond aux filtres.</p></Card> : null}
         </div>
       </div>
     </>

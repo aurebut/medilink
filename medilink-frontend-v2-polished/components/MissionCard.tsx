@@ -35,7 +35,7 @@ export function MissionCard({
           <h3>{mission.title}</h3>
         </div>
         <div className="mission-pay">
-          <span className="small">Remuneration</span>
+          <span className="small">Rémunération</span>
           <strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong>
         </div>
       </div>
@@ -43,7 +43,7 @@ export function MissionCard({
       <p>{mission.description || 'Aucune description pour cette mission.'}</p>
 
       <div className="mission-meta">
-        <span>{mission.establishment?.name || 'Etablissement'}</span>
+        <span>{mission.establishment?.name || 'Établissement'}</span>
         <span>-</span>
         <span>{mission.city}</span>
         <span>-</span>
@@ -64,7 +64,7 @@ export function MissionCard({
 
       <div className="actions">
         {canDelete || mission.status === 'PUBLISHED' ? (
-          <Link className="btn btn-light" href={detailHref}>Voir detail</Link>
+          <Link className="btn btn-light" href={detailHref}>Voir détail</Link>
         ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}

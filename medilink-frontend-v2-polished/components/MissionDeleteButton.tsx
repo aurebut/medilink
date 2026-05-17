@@ -17,7 +17,7 @@ export function MissionDeleteButton({
   const [deleting, setDeleting] = useState(false);
 
   async function remove() {
-    if (!confirm(`Supprimer definitivement la mission "${mission.title}" ? Les candidatures et conversations liees seront aussi supprimees.`)) {
+    if (!confirm(`Supprimer définitivement la mission "${mission.title}" ? Les candidatures et conversations liées seront aussi supprimées.`)) {
       return;
     }
 

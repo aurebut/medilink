@@ -31,27 +31,27 @@ export default function EstablishmentMissionsPage() {
     <>
       <PageHeader
         title="Missions"
-        description="Toutes les missions de ton etablissement, publiees ou en brouillon."
+        description="Toutes les missions de ton établissement, publiées ou en brouillon."
         actions={
           primary ? (
-            <LinkButton href="/establishment/missions/new">Creer mission</LinkButton>
+            <LinkButton href="/establishment/missions/new">Créer mission</LinkButton>
           ) : (
-            <LinkButton href="/establishment/onboarding">Creer mon etablissement</LinkButton>
+            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
           )
         }
       />
       {error ? <Alert type="error">{error}</Alert> : null}
       {!primary ? (
         <Card className="card-highlight">
-          <h2>Aucun etablissement rattache</h2>
-          <p>Cree d'abord un etablissement pour pouvoir publier une mission et pre-remplir les informations de lieu.</p>
-          <LinkButton href="/establishment/onboarding">Creer mon etablissement</LinkButton>
+          <h2>Aucun établissement rattaché</h2>
+          <p>Crée d'abord un établissement pour pouvoir publier une mission et pré-remplir les informations de lieu.</p>
+          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       ) : missions.length === 0 ? (
         <Card>
           <h2>Aucune mission</h2>
-          <p>Cree une mission pour la publier, la partager ou la gerer depuis cet espace.</p>
-          <LinkButton href="/establishment/missions/new">Creer une mission</LinkButton>
+          <p>Crée une mission pour la publier, la partager ou la gérer depuis cet espace.</p>
+          <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
         </Card>
       ) : (
         <div className="grid">

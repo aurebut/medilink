@@ -19,9 +19,9 @@ const candidateNav: NavItem[] = [
 
 const establishmentNav: NavItem[] = [
   { href: '/establishment/dashboard', label: 'Dashboard', icon: '⌂' },
-  { href: '/establishment/onboarding', label: 'Etablissement', icon: '◆' },
+  { href: '/establishment/onboarding', label: 'Établissement', icon: '◆' },
   { href: '/establishment/missions', label: 'Missions', icon: '≡' },
-  { href: '/establishment/missions/new', label: 'Creer mission', icon: '+' },
+  { href: '/establishment/missions/new', label: 'Créer mission', icon: '+' },
   { href: '/establishment/applications', label: 'Candidatures', icon: '✓' },
   { href: '/establishment/messages', label: 'Messagerie', icon: '✉' },
 ];
@@ -30,13 +30,13 @@ const adminNav: NavItem[] = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: '⌂' },
   { href: '/admin/users', label: 'Utilisateurs', icon: '◉' },
   { href: '/admin/documents', label: 'Documents', icon: '□' },
-  { href: '/admin/establishments', label: 'Etablissements', icon: '◆' },
+  { href: '/admin/establishments', label: 'Établissements', icon: '◆' },
   { href: '/admin/missions', label: 'Missions', icon: '≡' },
 ];
 
 function areaLabel(area: 'candidate' | 'establishment' | 'admin') {
   if (area === 'candidate') return 'Espace candidat';
-  if (area === 'establishment') return 'Espace etablissement';
+  if (area === 'establishment') return 'Espace établissement';
   return 'Administration';
 }
 
@@ -167,11 +167,11 @@ export function AppShell({
                 <span className="menu-arrow">&gt;</span>
               </Link>
               <Link href={userAccountHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
-                <span>Parametres du compte</span>
+                <span>Paramètres du compte</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
               <button type="button" className="account-menu-item danger" onClick={onLogout}>
-                <span>Deconnexion</span>
+                <span>Déconnexion</span>
                 <span className="menu-arrow">&gt;</span>
               </button>
             </div>
@@ -195,16 +195,16 @@ export function AppShell({
                   <span className="menu-arrow">&gt;</span>
                 </Link>
                 <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
-                  <span>Parametres du compte</span>
+                  <span>Paramètres du compte</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
                 <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
-                  <span>Securite et mot de passe</span>
+                  <span>Sécurité et mot de passe</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
               </div>
               <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
-                <span>Deconnexion</span>
+                <span>Déconnexion</span>
                 <span className="menu-arrow">&gt;</span>
               </button>
             </div>

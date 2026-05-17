@@ -41,8 +41,8 @@ export function AccountSettingsPage() {
   return (
     <>
       <PageHeader
-        title="Parametres du compte"
-        description="Email de connexion, securite et deconnexion de votre session Medilink."
+        title="Paramètres du compte"
+        description="Email de connexion, sécurité et déconnexion de votre session Medilink."
       />
 
       <div className="grid-main">
@@ -54,7 +54,7 @@ export function AccountSettingsPage() {
               <strong>{user?.email || '-'}</strong>
             </div>
             <div>
-              <span>Role</span>
+              <span>Rôle</span>
               <strong>{roleLabel(user?.role)}</strong>
             </div>
             <div>
@@ -62,11 +62,11 @@ export function AccountSettingsPage() {
               <strong>{user?.status || '-'}</strong>
             </div>
             <div>
-              <span>Verification email</span>
-              <strong>{user?.emailVerified ? 'Verifie' : 'En attente'}</strong>
+              <span>Vérification email</span>
+              <strong>{user?.emailVerified ? 'Vérifié' : 'En attente'}</strong>
             </div>
             <div>
-              <span>Telephone</span>
+              <span>Téléphone</span>
               <strong>{user?.phone || '-'}</strong>
             </div>
           </div>
@@ -76,11 +76,11 @@ export function AccountSettingsPage() {
           <Card>
             <div className="toolbar">
               <div>
-                <h2>Securite</h2>
-                <p className="small">Recevez un lien pour definir un nouveau mot de passe.</p>
+                <h2>Sécurité</h2>
+                <p className="small">Recevez un lien pour définir un nouveau mot de passe.</p>
               </div>
               <Badge tone={user?.emailVerified ? 'success' : 'warning'}>
-                {user?.emailVerified ? 'Email verifie' : 'Email non verifie'}
+                {user?.emailVerified ? 'Email vérifié' : 'Email non vérifié'}
               </Badge>
             </div>
 
@@ -90,16 +90,16 @@ export function AccountSettingsPage() {
               <Field label="Email du compte">
                 <Input type="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
               </Field>
-              <Button disabled={sendingReset}>{sendingReset ? 'Envoi...' : 'Envoyer un lien de reinitialisation'}</Button>
+              <Button disabled={sendingReset}>{sendingReset ? 'Envoi...' : 'Envoyer un lien de réinitialisation'}</Button>
             </form>
           </Card>
 
           <Card>
             <h2>Session</h2>
-            <p>Deconnectez cette session sur cet appareil.</p>
+            <p>Déconnectez cette session sur cet appareil.</p>
             <div className="actions">
               <Button variant="danger" disabled={loggingOut} onClick={onLogout}>
-                {loggingOut ? 'Deconnexion...' : 'Se deconnecter'}
+                {loggingOut ? 'Déconnexion...' : 'Se déconnecter'}
               </Button>
             </div>
           </Card>
