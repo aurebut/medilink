@@ -126,6 +126,7 @@ export function AppShell({
           <button
             type="button"
             className="mobile-menu-button"
+            aria-label={mobileNavOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             aria-expanded={mobileNavOpen}
             aria-controls="sidebar-nav"
             onClick={() => {
@@ -141,6 +142,18 @@ export function AppShell({
         </div>
 
         <nav id="sidebar-nav" className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}>
+          <button
+            type="button"
+            className="mobile-menu-close"
+            onClick={() => {
+              setMobileNavOpen(false);
+              setMobileAccountOpen(false);
+            }}
+          >
+            <span>Fermer</span>
+            <span className="menu-arrow">x</span>
+          </button>
+
           {!mobileAccountOpen ? (
             <>
               {nav.map((item) => {
