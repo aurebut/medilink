@@ -71,9 +71,14 @@ export class AuthService {
       metadata: { role },
     });
 
+    const session = await this.createSession(user.id);
+
     return {
-      message: 'Compte cree. Vous pouvez maintenant vous connecter.',
+      message: 'Compte cree.',
       userId: user.id,
+      token: session.token,
+      expiresAt: session.expiresAt,
+      user: this.toSafeUser(user),
     };
   }
 
@@ -100,20 +105,7 @@ export class AuthService {
       throw new UnauthorizedException('Identifiants invalides.');
     }
 
-    const rawToken = createRawToken();
-    const tokenHash = hashToken(rawToken);
-    const expiresAt = addDays(
-      new Date(),
-      Number(this.config.get<string>('SESSION_MAX_AGE_DAYS') || 30),
-    );
-
-    await this.prisma.session.create({
-      data: {
-        userId: user.id,
-        tokenHash,
-        expiresAt,
-      },
-    });
+    const session = await this.createSession(user.id);
 
     await this.audit.log({
       actorUserId: user.id,
@@ -123,8 +115,8 @@ export class AuthService {
     });
 
     return {
-      token: rawToken,
-      expiresAt,
+      token: session.token,
+      expiresAt: session.expiresAt,
       user: this.toSafeUser(user),
     };
   }
@@ -246,6 +238,25 @@ export class AuthService {
       phone: user.phone,
       createdAt: user.createdAt,
     };
+  }
+
+  private async createSession(userId: string) {
+    const rawToken = createRawToken();
+    const tokenHash = hashToken(rawToken);
+    const expiresAt = addDays(
+      new Date(),
+      Number(this.config.get<string>('SESSION_MAX_AGE_DAYS') || 30),
+    );
+
+    await this.prisma.session.create({
+      data: {
+        userId,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    return { token: rawToken, expiresAt };
   }
 }
 

@@ -9,7 +9,17 @@ type AuthContextValue = {
   loading: boolean;
   refresh: () => Promise<CurrentUser | null>;
   login: (email: string, password: string) => Promise<CurrentUser>;
+  register: (data: RegisterPayload) => Promise<CurrentUser>;
   logout: () => Promise<void>;
+};
+
+type RegisterPayload = {
+  accountType: 'candidate' | 'establishment';
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -41,11 +51,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result.user;
   }, []);
 
+  const register = useCallback(async (data: RegisterPayload) => {
+    const result = await api.post<{ user: CurrentUser; token: string }>('/auth/register', data);
+    setAuthToken(result.token);
+    setUser(result.user);
+    return result.user;
+  }, []);
+
   const logout = useCallback(async () => {
     try { await api.post('/auth/logout'); } finally { clearAuthToken(); setUser(null); }
   }, []);
 
-  const value = useMemo(() => ({ user, loading, refresh, login, logout }), [user, loading, refresh, login, logout]);
+  const value = useMemo(() => ({ user, loading, refresh, login, register, logout }), [user, loading, refresh, login, register, logout]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
