@@ -106,7 +106,6 @@ export default function MissionPage() {
                 ) : (
                   <>
                     <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
-                    <LinkButton variant="light" href="/app/search">Voir les missions</LinkButton>
                   </>
                 )}
               </div>
