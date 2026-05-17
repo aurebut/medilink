@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
 import { missionTypeLabel, missionTypeOptions, requiredLevelLabel, requiredLevelOptions } from '@/lib/labels';
@@ -31,8 +31,9 @@ const startTimePresets = ['08:00', '09:00', '14:00', '20:00'];
 const endTimePresets = ['12:00', '17:00', '20:00', '08:00'];
 
 export default function NewMissionPage() {
-  const { primary, loading } = useEstablishments();
+  const { establishments, primary, loading } = useEstablishments();
   const [form, setForm] = useState<any>(initialForm);
+  const [selectedEstablishmentId, setSelectedEstablishmentId] = useState('');
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [createdMission, setCreatedMission] = useState<Mission | null>(null);
@@ -40,6 +41,25 @@ export default function NewMissionPage() {
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
+  const selectedEstablishment = useMemo(
+    () => establishments.find((item) => item.id === selectedEstablishmentId) || primary,
+    [establishments, primary, selectedEstablishmentId],
+  );
+
+  useEffect(() => {
+    if (!primary || selectedEstablishmentId) return;
+    setSelectedEstablishmentId(primary.id);
+  }, [primary, selectedEstablishmentId]);
+
+  useEffect(() => {
+    if (!selectedEstablishment) return;
+
+    setForm((current: any) => ({
+      ...current,
+      city: current.city || selectedEstablishment.city || '',
+      location: current.location || selectedEstablishment.address || '',
+    }));
+  }, [selectedEstablishment]);
 
   function set(name: string, value: unknown) {
     setForm((p: any) => ({ ...p, [name]: value }));
@@ -86,13 +106,12 @@ export default function NewMissionPage() {
 
     const payload = {
       ...form,
-      establishmentId: primary?.id,
+      establishmentId: selectedEstablishment?.id,
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       compensationAmount: form.compensationAmount ? Number(form.compensationAmount) : undefined,
       tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
     };
     delete payload.tagsText;
-    if (!payload.establishmentId) delete payload.establishmentId;
 
     try {
       const mission = await api.post<Mission>('/missions', payload);
@@ -112,6 +131,22 @@ export default function NewMissionPage() {
   }
 
   if (loading) return <LoadingCard />;
+
+  if (establishments.length === 0) {
+    return (
+      <>
+        <PageHeader
+          title="Creer une mission"
+          description="Un etablissement est requis avant de pouvoir publier une mission."
+        />
+        <Card className="card-highlight">
+          <h2>Aucun etablissement rattache</h2>
+          <p>Cree d'abord une fiche etablissement. Elle permettra de rattacher la mission, de pre-remplir la ville et le lieu, puis de recevoir les candidatures au bon endroit.</p>
+          <LinkButton href="/establishment/onboarding">Creer mon etablissement</LinkButton>
+        </Card>
+      </>
+    );
+  }
 
   if (createdMission) {
     return (
@@ -137,7 +172,7 @@ export default function NewMissionPage() {
     <>
       <PageHeader
         title="Creer une mission"
-        description={primary ? `Etablissement : ${primary.name}` : 'La mission sera rattachee automatiquement a ton compte etablissement.'}
+        description={selectedEstablishment ? `Etablissement : ${selectedEstablishment.name}` : 'Choisis un etablissement pour rattacher la mission.'}
       />
       <div className="wizard-layout">
         <Card className="wizard-panel">
@@ -157,6 +192,27 @@ export default function NewMissionPage() {
 
           <form className="form wizard-form" onSubmit={submit}>
             {error ? <Alert type="error">{error}</Alert> : null}
+            <Field label="Etablissement rattache">
+              <Select
+                required
+                value={selectedEstablishmentId}
+                onChange={(e) => {
+                  const next = establishments.find((item) => item.id === e.target.value);
+                  setSelectedEstablishmentId(e.target.value);
+                  setForm((current: any) => ({
+                    ...current,
+                    city: next?.city || current.city || '',
+                    location: next?.address || current.location || '',
+                  }));
+                }}
+              >
+                {establishments.map((establishment) => (
+                  <option key={establishment.id} value={establishment.id}>
+                    {establishment.name}{establishment.city ? ` - ${establishment.city}` : ''}
+                  </option>
+                ))}
+              </Select>
+            </Field>
             <StepContent step={step} form={form} set={set} />
             <div className="wizard-actions">
               <Button type="button" variant="light" disabled={step === 0 || saving} onClick={previous}>Retour</Button>

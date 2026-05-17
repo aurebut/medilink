@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EstablishmentMemberRole, EstablishmentType, MissionStatus, UserRole } from '@prisma/client';
+import { EstablishmentMemberRole, MissionStatus } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -70,73 +70,12 @@ export class MissionsService {
   }
 
   private async resolveEstablishmentId(user: RequestUser, dto: CreateMissionDto) {
-    if (dto.establishmentId) {
-      await this.permissions.ensureEstablishmentMember(user.id, dto.establishmentId);
-      return dto.establishmentId;
-    }
-
-    const establishmentRoles: UserRole[] = [
-      UserRole.ESTABLISHMENT_OWNER,
-      UserRole.ESTABLISHMENT_ADMIN,
-      UserRole.ESTABLISHMENT_RECRUITER,
-    ];
-
-    if (!establishmentRoles.includes(user.role)) {
+    if (!dto.establishmentId) {
       throw new BadRequestException('Un etablissement est requis pour creer une mission.');
     }
 
-    const existingMembership = await this.prisma.establishmentMember.findFirst({
-      where: {
-        userId: user.id,
-        role: {
-          in: [
-            EstablishmentMemberRole.OWNER,
-            EstablishmentMemberRole.ADMIN,
-            EstablishmentMemberRole.RECRUITER,
-          ],
-        },
-      },
-      include: { establishment: true },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (existingMembership) {
-      return existingMembership.establishmentId;
-    }
-
-    const defaultName = user.email
-      ? `Etablissement ${user.email.split('@')[0]}`
-      : 'Etablissement Medilink';
-
-    const created = await this.prisma.$transaction(async (tx) => {
-      const establishment = await tx.establishment.create({
-        data: {
-          name: defaultName,
-          type: EstablishmentType.OTHER,
-          city: dto.city,
-          email: user.email,
-        },
-      });
-
-      await tx.establishmentMember.create({
-        data: {
-          establishmentId: establishment.id,
-          userId: user.id,
-          role: EstablishmentMemberRole.OWNER,
-        },
-      });
-
-      return establishment;
-    });
-
-    await this.audit.log({
-      actorUserId: user.id,
-      action: 'establishment.auto_created',
-      entityType: 'establishment',
-      entityId: created.id,
-    });
-
-    return created.id;
+    await this.permissions.ensureEstablishmentMember(user.id, dto.establishmentId);
+    return dto.establishmentId;
   }
 
   async search(dto: SearchMissionsDto) {
