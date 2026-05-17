@@ -866,8 +866,11 @@ tbody tr:hover { background: #f9fafb; }
     height: 42px;
     border: 1px solid rgba(255,255,255,.16);
     border-radius: 10px;
-    display: grid;
-    place-items: center;
+    display: inline-flex;
+    flex: 0 0 42px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 4px;
     padding: 9px;
     background: rgba(255,255,255,.08);
@@ -888,6 +891,12 @@ tbody tr:hover { background: #f9fafb; }
     overflow: visible;
     padding: 10px 0 0;
     margin: 0;
+  }
+  .sidebar-nav:not(.open) {
+    display: none !important;
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
   }
   .sidebar-nav.open { display: grid; }
   .sidebar-link {
