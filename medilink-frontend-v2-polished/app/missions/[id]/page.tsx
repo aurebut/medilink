@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
-import { MissionShareActions } from '@/components/MissionShareActions';
 import { Alert, Badge, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
@@ -93,11 +92,6 @@ export default function PublicMissionPage() {
               </Card>
             </div>
 
-            <Card className="public-mission-share">
-              <h2>Partager cette mission</h2>
-              <p>Copie le lien public pour l'envoyer a un candidat ou le publier dans un message.</p>
-              <MissionShareActions missionId={mission.id} showUrl />
-            </Card>
           </>
         ) : null}
       </div>
