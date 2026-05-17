@@ -109,12 +109,6 @@ export function AppShell({
     };
   }, []);
 
-  useEffect(() => {
-    setMobileNavOpen(false);
-    setMobileAccountOpen(false);
-    setAccountMenuOpen(false);
-  }, [pathname]);
-
   return (
     <div className="shell">
       <aside className="sidebar">
