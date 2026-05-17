@@ -39,7 +39,7 @@ function LoginForm() {
           <p>Connecte-toi pour accéder à ton espace candidat, établissement ou admin.</p>
         </div>
         {error ? <Alert type="error">{error}</Alert> : null}
-        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@medilink.local" /></Field>
+        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
         <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
         <Button block disabled={loading}>{loading ? 'Connexion...' : 'Se connecter'}</Button>
         <div className="actions">
