@@ -2,11 +2,15 @@
   "name": "medilink-backend-mvp",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "description": "Backend MVP Médilink - NestJS, Prisma, PostgreSQL",
   "scripts": {
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
+    "prestart:prod": "npm run build",
     "start:prod": "node dist/src/main.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
