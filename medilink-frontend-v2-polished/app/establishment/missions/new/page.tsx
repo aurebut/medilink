@@ -123,7 +123,7 @@ export default function NewMissionPage() {
         <Card className="card-highlight">
           <h2>{createdMission.title}</h2>
           <p>Copie ce lien pour le partager avec un candidat ou dans un message.</p>
-          <MissionShareActions missionId={createdMission.id} showUrl />
+          <MissionShareActions missionId={createdMission.id} showUrl showPublicLink={false} />
           <div className="actions" style={{ marginTop: 12 }}>
             <LinkButton href="/establishment/missions">Voir mes missions</LinkButton>
             <Button type="button" variant="light" onClick={resetWizard}>Creer une autre mission</Button>

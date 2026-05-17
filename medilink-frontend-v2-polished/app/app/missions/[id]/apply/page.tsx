@@ -76,7 +76,7 @@ export default function ApplyMissionPage() {
       <PageHeader
         title="Postuler a la mission"
         description="Relisez les informations, ajoutez un message de candidature si besoin, puis envoyez votre dossier."
-        actions={<LinkButton variant="light" href={`/app/missions/${mission.id}`}>Retour au detail</LinkButton>}
+        actions={<LinkButton variant="light" href={`/missions/${mission.id}`}>Retour au detail</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}

@@ -24,9 +24,11 @@ async function copyText(value: string) {
 export function MissionShareActions({
   missionId,
   showUrl = false,
+  showPublicLink = true,
 }: {
   missionId: string;
   showUrl?: boolean;
+  showPublicLink?: boolean;
 }) {
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState(false);
@@ -50,7 +52,7 @@ export function MissionShareActions({
       ) : null}
       <div className="actions">
         <Button type="button" variant="light" onClick={copy}>{copied ? 'Lien copie' : 'Copier le lien'}</Button>
-        <LinkButton variant="light" href={publicPath}>Voir le lien public</LinkButton>
+        {showPublicLink ? <LinkButton variant="light" href={publicPath}>Voir le lien public</LinkButton> : null}
       </div>
     </div>
   );

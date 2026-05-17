@@ -1,30 +1,59 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { MissionDeleteButton } from '@/components/MissionDeleteButton';
+import { MissionShareActions } from '@/components/MissionShareActions';
 import { Alert, Badge, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabel, statusLabel } from '@/lib/labels';
 import { getMissionApplyPath } from '@/lib/mission-links';
-import { defaultRouteForUser } from '@/lib/routes';
+import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
 
-export default function PublicMissionPage() {
+export default function MissionPage() {
   const { id } = useParams<{ id: string }>();
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [mission, setMission] = useState<Mission | null>(null);
+  const [canManageMission, setCanManageMission] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get<Mission>(`/missions/${id}`)
-      .then(setMission)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, [id]);
+    if (authLoading) return;
+
+    async function loadMission() {
+      setLoading(true);
+      setError(null);
+      setCanManageMission(false);
+
+      try {
+        if (isEstablishmentRole(user?.role)) {
+          try {
+            const managedMission = await api.get<Mission>(`/missions/mine/${id}`);
+            setMission(managedMission);
+            setCanManageMission(true);
+            return;
+          } catch {
+            // If this establishment does not manage the mission, fall through to the public view.
+          }
+        }
+
+        setMission(await api.get<Mission>(`/missions/${id}`));
+      } catch (e: any) {
+        setMission(null);
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadMission();
+  }, [authLoading, id, user?.role]);
 
   const applyPath = useMemo(() => getMissionApplyPath(id), [id]);
   const applyHref = user?.role === 'CANDIDATE'
@@ -51,20 +80,35 @@ export default function PublicMissionPage() {
           </div>
         </nav>
 
-        {loading ? <LoadingCard label="Chargement de la mission..." /> : null}
+        {loading || authLoading ? <LoadingCard label="Chargement de la mission..." /> : null}
         {error ? <Alert type="error">{error}</Alert> : null}
 
-        {!loading && mission ? (
+        {!loading && !authLoading && mission ? (
           <>
             <section className="public-mission-hero">
               <div className="section-heading">
-                <div className="kicker">Mission medicale</div>
+                <div className="kicker">{canManageMission ? 'Mission etablissement' : 'Mission medicale'}</div>
                 <h1>{mission.title}</h1>
                 <p>{mission.establishment?.name || 'Etablissement'} - {mission.city}</p>
               </div>
               <div className="actions">
-                <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
-                <LinkButton variant="light" href="/app/search">Voir les missions</LinkButton>
+                {canManageMission ? (
+                  <>
+                    <LinkButton variant="light" href="/establishment/missions">Retour aux missions</LinkButton>
+                    {mission.status === 'PUBLISHED' ? (
+                      <MissionShareActions missionId={mission.id} showUrl showPublicLink={false} />
+                    ) : null}
+                    <MissionDeleteButton
+                      mission={mission}
+                      onDeleted={() => router.push('/establishment/missions')}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
+                    <LinkButton variant="light" href="/app/search">Voir les missions</LinkButton>
+                  </>
+                )}
               </div>
             </section>
 
@@ -74,7 +118,7 @@ export default function PublicMissionPage() {
                 <p>{mission.description || 'Aucune description.'}</p>
                 <div className="tag-list">
                   <Badge>{missionTypeLabel(mission.missionType)}</Badge>
-                  <Badge>{requiredLevelLabel(mission.requiredLevel)}</Badge>
+                  <Badge tone="neutral">{requiredLevelLabel(mission.requiredLevel)}</Badge>
                   <Badge tone={mission.status === 'PUBLISHED' ? 'success' : 'warning'}>{statusLabel(mission.status)}</Badge>
                   {mission.tags?.map((tag) => <Badge key={tag.id} tone="neutral">#{tag.tag}</Badge>)}
                 </div>
@@ -91,7 +135,6 @@ export default function PublicMissionPage() {
                 </div>
               </Card>
             </div>
-
           </>
         ) : null}
       </div>
