@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { Mission } from '@/lib/types';
 import { formatDate, formatMoney } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabel, statusLabel } from '@/lib/labels';
+import { MissionDeleteButton } from './MissionDeleteButton';
 import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
 
@@ -11,10 +12,14 @@ export function MissionCard({
   mission,
   applyHref,
   onApply,
+  canDelete,
+  onDeleted,
 }: {
   mission: Mission;
   applyHref?: string;
   onApply?: (mission: Mission) => void;
+  canDelete?: boolean;
+  onDeleted?: (missionId: string) => void;
 }) {
   return (
     <Card className="mission-card">
@@ -28,7 +33,7 @@ export function MissionCard({
           <h3>{mission.title}</h3>
         </div>
         <div className="mission-pay">
-          <span className="small">Rémunération</span>
+          <span className="small">Remuneration</span>
           <strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong>
         </div>
       </div>
@@ -36,14 +41,14 @@ export function MissionCard({
       <p>{mission.description || 'Aucune description pour cette mission.'}</p>
 
       <div className="mission-meta">
-        <span>{mission.establishment?.name || 'Établissement'}</span>
-        <span>•</span>
+        <span>{mission.establishment?.name || 'Etablissement'}</span>
+        <span>-</span>
         <span>{mission.city}</span>
-        <span>•</span>
+        <span>-</span>
         <span>{formatDate(mission.startDate)}</span>
         {mission.startTime ? (
           <>
-            <span>•</span>
+            <span>-</span>
             <span>{mission.startTime}{mission.endTime ? ` - ${mission.endTime}` : ''}</span>
           </>
         ) : null}
@@ -56,10 +61,13 @@ export function MissionCard({
       ) : null}
 
       <div className="actions">
-        <Link className="btn btn-light" href={`/app/missions/${mission.id}`}>Voir détail</Link>
+        {mission.status === 'PUBLISHED' ? (
+          <Link className="btn btn-light" href={`/app/missions/${mission.id}`}>Voir detail</Link>
+        ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}
         {mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} /> : null}
+        {canDelete ? <MissionDeleteButton mission={mission} onDeleted={onDeleted} /> : null}
       </div>
     </Card>
   );

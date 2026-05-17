@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { MissionStatus } from '@prisma/client';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -14,6 +14,12 @@ export class MissionsController {
   @Get()
   search(@Query() dto: SearchMissionsDto) {
     return this.missions.search(dto);
+  }
+
+  @Get('mine')
+  @UseGuards(AuthGuard)
+  mine(@CurrentUser() user: RequestUser, @Query('establishmentId') establishmentId?: string) {
+    return this.missions.findMine(user, establishmentId);
   }
 
   @Get(':id')
@@ -35,6 +41,12 @@ export class MissionsController {
     @Body() dto: Partial<CreateMissionDto>,
   ) {
     return this.missions.update(user, id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  delete(@CurrentUser() user: RequestUser, @Param('id') id: string) {
+    return this.missions.delete(user, id);
   }
 
   @Post(':id/publish')

@@ -173,6 +173,39 @@ export class MissionsService {
     return { items, total };
   }
 
+  async findMine(user: RequestUser, establishmentId?: string) {
+    const manageableRoles = [
+      EstablishmentMemberRole.OWNER,
+      EstablishmentMemberRole.ADMIN,
+      EstablishmentMemberRole.RECRUITER,
+    ];
+
+    if (establishmentId) {
+      await this.permissions.ensureEstablishmentMember(user.id, establishmentId, manageableRoles);
+
+      return this.prisma.mission.findMany({
+        where: { establishmentId },
+        include: { tags: true, establishment: true },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
+
+    return this.prisma.mission.findMany({
+      where: {
+        establishment: {
+          members: {
+            some: {
+              userId: user.id,
+              role: { in: manageableRoles },
+            },
+          },
+        },
+      },
+      include: { tags: true, establishment: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async getPublic(id: string) {
     const mission = await this.prisma.mission.findUnique({
       where: { id },
@@ -231,5 +264,23 @@ export class MissionsService {
     });
 
     return updated;
+  }
+
+  async delete(user: RequestUser, missionId: string) {
+    const mission = await this.permissions.ensureMissionManager(user.id, missionId);
+
+    await this.prisma.mission.delete({
+      where: { id: missionId },
+    });
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'mission.deleted',
+      entityType: 'mission',
+      entityId: missionId,
+      metadata: { establishmentId: mission.establishmentId, status: mission.status },
+    });
+
+    return { deleted: true };
   }
 }

@@ -6,6 +6,7 @@ import type { Application, ApplicationStatus } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { formatDateTime } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
+import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 function tone(status: string) {
@@ -96,6 +97,13 @@ export default function EstablishmentApplicationsPage() {
                       <LinkButton variant="light" href={`/establishment/candidates/${a.id}`}>
                         Voir profil
                       </LinkButton>
+
+                      {a.mission ? (
+                        <MissionDeleteButton
+                          mission={a.mission}
+                          onDeleted={() => setItems((current) => current.filter((item) => item.missionId !== a.missionId))}
+                        />
+                      ) : null}
 
                       {isFinal ? (
                         <span className="small">Décision enregistrée</span>
