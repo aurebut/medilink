@@ -10,7 +10,6 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "build": "nest build",
-    "prestart:prod": "npm run build",
     "start:prod": "node dist/src/main.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
