@@ -206,6 +206,21 @@ export class MissionsService {
     });
   }
 
+  async getMine(user: RequestUser, missionId: string) {
+    await this.permissions.ensureMissionManager(user.id, missionId);
+
+    const mission = await this.prisma.mission.findUnique({
+      where: { id: missionId },
+      include: { tags: true, establishment: true },
+    });
+
+    if (!mission) {
+      throw new NotFoundException('Mission introuvable.');
+    }
+
+    return mission;
+  }
+
   async getPublic(id: string) {
     const mission = await this.prisma.mission.findUnique({
       where: { id },

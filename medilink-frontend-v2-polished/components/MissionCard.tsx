@@ -21,6 +21,8 @@ export function MissionCard({
   canDelete?: boolean;
   onDeleted?: (missionId: string) => void;
 }) {
+  const detailHref = canDelete ? `/establishment/missions/${mission.id}` : `/app/missions/${mission.id}`;
+
   return (
     <Card className="mission-card">
       <div className="mission-top">
@@ -61,8 +63,8 @@ export function MissionCard({
       ) : null}
 
       <div className="actions">
-        {mission.status === 'PUBLISHED' ? (
-          <Link className="btn btn-light" href={`/app/missions/${mission.id}`}>Voir detail</Link>
+        {canDelete || mission.status === 'PUBLISHED' ? (
+          <Link className="btn btn-light" href={detailHref}>Voir detail</Link>
         ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}

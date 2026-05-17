@@ -22,6 +22,12 @@ export class MissionsController {
     return this.missions.findMine(user, establishmentId);
   }
 
+  @Get('mine/:id')
+  @UseGuards(AuthGuard)
+  getMine(@CurrentUser() user: RequestUser, @Param('id') id: string) {
+    return this.missions.getMine(user, id);
+  }
+
   @Get(':id')
   get(@Param('id') id: string) {
     return this.missions.getPublic(id);
