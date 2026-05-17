@@ -109,7 +109,7 @@ export function AppShell({
 
   return (
     <div className="shell">
-      <aside className="sidebar">
+      <aside className={`sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-head">
           <Link href={userHomeHref} className="brand">
             <span className="brand-mark">M</span>

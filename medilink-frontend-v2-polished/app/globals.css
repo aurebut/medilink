@@ -1244,6 +1244,136 @@ tbody tr:hover { background: #f9fafb; }
   .info-list strong { text-align: left; }
 }
 
+@media (max-width: 1180px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar {
+    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+    padding: 10px 12px;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .sidebar-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 48px;
+  }
+  .sidebar .brand { padding: 0; }
+  .mobile-menu-button {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border: 1px solid rgba(255,255,255,.16);
+    border-radius: 10px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 9px;
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    cursor: pointer;
+  }
+  .mobile-menu-button span:not(.sr-only) {
+    display: block;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .sidebar-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 55;
+    display: none !important;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    max-height: calc(100dvh - 72px);
+    overflow: auto;
+    padding: 12px;
+    margin: 0;
+    background: #111827;
+    border-top: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    box-shadow: 0 18px 38px rgba(15,23,42,.22);
+  }
+  .sidebar.mobile-open .sidebar-nav,
+  .sidebar-nav.open {
+    display: grid !important;
+  }
+  .sidebar-link {
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    white-space: normal;
+    text-align: left;
+    justify-content: flex-start;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .sidebar-link .nav-main {
+    display: inline-flex;
+    justify-items: initial;
+    gap: 8px;
+  }
+  .sidebar-link .nav-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .mobile-menu-account {
+    display: grid;
+    gap: 8px;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.12);
+  }
+  .mobile-menu-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    background: rgba(255,255,255,.04);
+    color: #e5e7eb;
+  }
+  .mobile-menu-user .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+  .mobile-menu-user strong { color: #fff; }
+  .mobile-menu-actions {
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+  }
+  .mobile-menu-actions .account-menu-item {
+    border-radius: 0;
+  }
+  .mobile-menu-actions .account-menu-item.danger {
+    margin: 0;
+    width: 100%;
+  }
+  .sidebar-footer { display: none; }
+}
+
 /* Candidate profile feature */
 .info-list { display: grid; gap: 10px; }
 .info-list > div { display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); }
