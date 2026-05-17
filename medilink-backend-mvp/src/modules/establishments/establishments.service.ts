@@ -81,6 +81,35 @@ export class EstablishmentsService {
     return updated;
   }
 
+  async delete(user: RequestUser, establishmentId: string) {
+    await this.permissions.ensureEstablishmentMember(user.id, establishmentId, [
+      EstablishmentMemberRole.OWNER,
+      EstablishmentMemberRole.ADMIN,
+    ]);
+
+    const establishment = await this.prisma.establishment.findUnique({
+      where: { id: establishmentId },
+    });
+
+    if (!establishment) {
+      throw new NotFoundException('Etablissement introuvable.');
+    }
+
+    await this.prisma.establishment.delete({
+      where: { id: establishmentId },
+    });
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.deleted',
+      entityType: 'establishment',
+      entityId: establishmentId,
+      metadata: { name: establishment.name },
+    });
+
+    return { deleted: true };
+  }
+
   async addMember(user: RequestUser, establishmentId: string, dto: AddMemberDto) {
     await this.permissions.ensureEstablishmentMember(user.id, establishmentId, [
       EstablishmentMemberRole.OWNER,
