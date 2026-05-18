@@ -94,8 +94,8 @@ export default function HomePage() {
               <a href="#cycle" className="text-sm font-light tracking-wide text-stone-600 transition-colors duration-300 hover:text-stone-900">Processus</a>
             </div>
 
-            <div className="flex items-center gap-3 sm:gap-6">
-              <Link href="/login" className="hidden text-sm font-light text-stone-500 transition-colors duration-300 hover:text-stone-900 md:block">Connexion</Link>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Link href="/login" className="btn-secondary rounded-sm px-4 py-2.5 text-sm font-medium sm:px-5">Se connecter</Link>
               <Link href="/register" className="btn-primary rounded-sm px-5 py-2.5 text-sm font-medium sm:px-6">Démarrer</Link>
             </div>
           </div>
