@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Conversation, Message } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
@@ -66,23 +66,14 @@ function isRecruiterRole(role?: string) {
 function workflowLabel(kind: WorkflowKind) {
   const labels: Record<WorkflowKind, string> = {
     FINAL_PROPOSAL: 'Proposition finale',
-    PAYMENT_REQUIRED: 'Paiement requis',
+    PAYMENT_REQUIRED: 'Confirmation requise',
     PROPOSAL_REJECTED: 'Proposition refusée',
-    FUNDS_SECURED: 'Paiement sécurisé',
+    FUNDS_SECURED: 'Mission confirmée',
     MISSION_COMPLETED: 'Mission terminée',
-    PAYMENT_RELEASED: 'Paiement libéré',
+    PAYMENT_RELEASED: 'Rétrocession validée',
     INVOICES_GENERATED: 'Factures générées',
   };
   return labels[kind];
-}
-
-function ChoiceSection({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="choice-section">
-      <div className="choice-section-title">{title}</div>
-      {children}
-    </section>
-  );
 }
 
 export function MessageCenter() {
@@ -131,16 +122,17 @@ export function MessageCenter() {
 
   const recruiter = isRecruiterRole(user?.role);
   const candidate = user?.role === 'CANDIDATE';
+  const currentRetrocession = lastProposal?.workflow?.proposal?.compensationMode === 'RETROCESSION';
   const currentStatus = state.invoices
     ? 'Factures disponibles'
     : state.released
-      ? 'Paiement libéré'
+      ? currentRetrocession ? 'Rétrocession validée' : 'Paiement libéré'
       : state.completed
         ? 'Mission terminée'
         : state.fundsSecured
           ? 'Mission confirmée'
           : state.paymentRequired
-            ? 'Paiement requis'
+            ? 'Confirmation requise'
           : state.rejected
             ? 'Proposition refusée'
             : state.hasProposal
@@ -245,8 +237,8 @@ export function MessageCenter() {
     setError(null);
     try {
       await api.post(`/conversations/${activeId}/proposal`, {
-        compensationMode: proposal.compensationMode,
-        amount: proposal.amount ? Number(proposal.amount) : undefined,
+        compensationMode: 'RETROCESSION',
+        amount: undefined,
         currency: proposal.currency || 'EUR',
         retrocessionPercentage: proposal.retrocessionPercentage ? Number(proposal.retrocessionPercentage) : undefined,
         startDate: proposal.startDate || undefined,
@@ -464,30 +456,9 @@ function WorkflowComposer({
         <Badge>Proposition finale</Badge>
         <h3>Détails de l'accord</h3>
       </div>
-      <ChoiceSection title="Mode de rémunération">
-        <div className="choice-grid">
-          <button type="button" className={proposal.compensationMode === 'RETROCESSION' ? 'active' : ''} onClick={() => onChange({ compensationMode: 'RETROCESSION' })}>
-            Rétrocession d'honoraires
-          </button>
-          <button type="button" className={proposal.compensationMode === 'FIXED_AMOUNT' ? 'active' : ''} onClick={() => onChange({ compensationMode: 'FIXED_AMOUNT' })}>
-            Montant fixe
-          </button>
-        </div>
-      </ChoiceSection>
-      {proposal.compensationMode === 'FIXED_AMOUNT' ? (
-        <div className="form-row">
-          <Field label="Montant">
-            <Input type="number" min="0" required value={proposal.amount} onChange={(e) => onChange({ amount: e.target.value })} />
-          </Field>
-          <Field label="Devise">
-            <Input value={proposal.currency} onChange={(e) => onChange({ currency: e.target.value })} />
-          </Field>
-        </div>
-      ) : (
-        <Field label="Pourcentage de rétrocession">
-          <Input type="number" min="1" max="100" required value={proposal.retrocessionPercentage} onChange={(e) => onChange({ retrocessionPercentage: e.target.value })} />
-        </Field>
-      )}
+      <Field label="Pourcentage de rétrocession">
+        <Input type="number" min="1" max="100" required value={proposal.retrocessionPercentage} onChange={(e) => onChange({ retrocessionPercentage: e.target.value })} />
+      </Field>
       <div className="form-row">
         <Field label="Date début">
           <Input type="date" value={proposal.startDate} onChange={(e) => onChange({ startDate: e.target.value })} />
@@ -624,10 +595,10 @@ function WorkflowMessageCard({
       {workflow.kind === 'MISSION_COMPLETED' ? (
         <>
           <h3>Mission terminée</h3>
-          <p>La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré au candidat.</p>
+          <p>{retrocession ? "La fin de mission a été validée. La rétrocession d'honoraires peut maintenant être confirmée." : 'La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré au candidat.'}</p>
           {recruiterCanPay ? (
             <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Libération...' : 'Libérer le paiement'}</Button>
+              <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Validation...' : retrocession ? 'Valider la rétrocession' : 'Libérer le paiement'}</Button>
             </div>
           ) : null}
         </>

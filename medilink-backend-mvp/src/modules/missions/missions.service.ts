@@ -36,7 +36,11 @@ export class MissionsService {
       throw new BadRequestException('La date de fin doit être après la date de début.');
     }
 
-    if (dto.compensationMode === CompensationMode.RETROCESSION && !dto.retrocessionPercentage) {
+    if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
+      throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une mission.");
+    }
+
+    if (!dto.retrocessionPercentage) {
       throw new BadRequestException('Le pourcentage de retrocession est requis.');
     }
 
@@ -66,9 +70,9 @@ export class MissionsService {
         startTime: dto.startTime,
         endTime: dto.endTime,
         durationHours: dto.durationHours,
-        compensationMode: dto.compensationMode || CompensationMode.FIXED_AMOUNT,
-        retrocessionPercentage: dto.compensationMode === CompensationMode.RETROCESSION ? dto.retrocessionPercentage : undefined,
-        compensationAmount: dto.compensationAmount,
+        compensationMode: CompensationMode.RETROCESSION,
+        retrocessionPercentage: dto.retrocessionPercentage,
+        compensationAmount: undefined,
         compensationCurrency: dto.compensationCurrency || 'EUR',
         status: dto.publishNow ? MissionStatus.PUBLISHED : MissionStatus.DRAFT,
         publishedAt: dto.publishNow ? new Date() : undefined,
@@ -211,12 +215,22 @@ export class MissionsService {
   async update(user: RequestUser, missionId: string, dto: Partial<CreateMissionDto>) {
     await this.permissions.ensureMissionManager(user.id, missionId);
 
-    const { tags, publishNow, establishmentId, ...data } = dto as any;
+    const { tags, publishNow, establishmentId, compensationAmount, ...data } = dto as any;
+
+    if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
+      throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une mission.");
+    }
+
+    if (dto.compensationMode === CompensationMode.RETROCESSION && !dto.retrocessionPercentage) {
+      throw new BadRequestException('Le pourcentage de retrocession est requis.');
+    }
 
     const updated = await this.prisma.mission.update({
       where: { id: missionId },
       data: {
         ...data,
+        compensationMode: dto.compensationMode || dto.retrocessionPercentage ? CompensationMode.RETROCESSION : undefined,
+        compensationAmount: dto.compensationMode || dto.retrocessionPercentage ? null : undefined,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         endDate: dto.endDate ? new Date(dto.endDate) : undefined,
       },

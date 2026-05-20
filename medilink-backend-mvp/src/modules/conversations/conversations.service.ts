@@ -124,13 +124,15 @@ export class ConversationsService {
 
   async sendProposal(user: RequestUser, conversationId: string, dto: SendProposalDto) {
     const conversation = await this.ensureRecruiterForConversation(user, conversationId);
-    const compensationMode = dto.compensationMode || conversation.mission.compensationMode || CompensationMode.FIXED_AMOUNT;
-    const amount = compensationMode === CompensationMode.RETROCESSION ? 0 : dto.amount || 0;
-    const retrocessionPercentage = compensationMode === CompensationMode.RETROCESSION
-      ? dto.retrocessionPercentage || conversation.mission.retrocessionPercentage
-      : undefined;
+    if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
+      throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une proposition.");
+    }
 
-    if (compensationMode === CompensationMode.RETROCESSION && !retrocessionPercentage) {
+    const compensationMode = CompensationMode.RETROCESSION;
+    const amount = 0;
+    const retrocessionPercentage = dto.retrocessionPercentage || conversation.mission.retrocessionPercentage;
+
+    if (!retrocessionPercentage) {
       throw new BadRequestException('Le pourcentage de retrocession est requis.');
     }
 
