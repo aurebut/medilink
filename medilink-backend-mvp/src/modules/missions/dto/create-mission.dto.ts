@@ -1,4 +1,4 @@
-import { MissionType, RequiredLevel } from '@prisma/client';
+import { CompensationMode, MissionType, RequiredLevel } from '@prisma/client';
 import {
   IsArray,
   IsBoolean,
@@ -93,6 +93,16 @@ export class CreateMissionDto {
   @Min(1)
   @Max(72)
   durationHours?: number;
+
+  @IsOptional()
+  @IsEnum(CompensationMode)
+  compensationMode?: CompensationMode;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  retrocessionPercentage?: number;
 
   @IsOptional()
   @IsInt()

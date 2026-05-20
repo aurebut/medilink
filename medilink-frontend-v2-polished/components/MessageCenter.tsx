@@ -1,9 +1,9 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Conversation, Message } from '@/lib/types';
-import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
 
@@ -22,8 +22,10 @@ type WorkflowKind =
   | 'INVOICES_GENERATED';
 
 type ProposalPayload = {
-  amount: number;
+  compensationMode?: string;
+  amount?: number;
   currency?: string;
+  retrocessionPercentage?: number | null;
   startDate?: string;
   endDate?: string | null;
   startTime?: string | null;
@@ -37,8 +39,10 @@ type WorkflowPayload = {
 };
 
 type ProposalForm = {
+  compensationMode: string;
   amount: string;
   currency: string;
+  retrocessionPercentage: string;
   startDate: string;
   endDate: string;
   startTime: string;
@@ -72,6 +76,15 @@ function workflowLabel(kind: WorkflowKind) {
   return labels[kind];
 }
 
+function ChoiceSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="choice-section">
+      <div className="choice-section-title">{title}</div>
+      {children}
+    </section>
+  );
+}
+
 export function MessageCenter() {
   const { user } = useAuth();
   const [isMobile, setIsMobile] = useState(() => (
@@ -83,8 +96,10 @@ export function MessageCenter() {
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposal, setProposal] = useState<ProposalForm>({
+    compensationMode: 'RETROCESSION',
     amount: '',
     currency: 'EUR',
+    retrocessionPercentage: '',
     startDate: '',
     endDate: '',
     startTime: '',
@@ -171,8 +186,10 @@ export function MessageCenter() {
     void loadMessages(activeId);
     const current = conversations.find((c) => c.id === activeId);
     setProposal({
+      compensationMode: current?.mission?.compensationMode || 'RETROCESSION',
       amount: current?.mission?.compensationAmount ? String(current.mission.compensationAmount) : '',
       currency: current?.mission?.compensationCurrency || 'EUR',
+      retrocessionPercentage: current?.mission?.retrocessionPercentage ? String(current.mission.retrocessionPercentage) : '',
       startDate: current?.mission?.startDate ? current.mission.startDate.slice(0, 10) : '',
       endDate: current?.mission?.endDate ? current.mission.endDate.slice(0, 10) : '',
       startTime: current?.mission?.startTime || '',
@@ -228,8 +245,10 @@ export function MessageCenter() {
     setError(null);
     try {
       await api.post(`/conversations/${activeId}/proposal`, {
-        amount: Number(proposal.amount),
+        compensationMode: proposal.compensationMode,
+        amount: proposal.amount ? Number(proposal.amount) : undefined,
         currency: proposal.currency || 'EUR',
+        retrocessionPercentage: proposal.retrocessionPercentage ? Number(proposal.retrocessionPercentage) : undefined,
         startDate: proposal.startDate || undefined,
         endDate: proposal.endDate || undefined,
         startTime: proposal.startTime || undefined,
@@ -271,7 +290,12 @@ export function MessageCenter() {
       `Ville: ${active.mission?.city || ''}`,
       `Date: ${p.startDate ? formatDate(p.startDate) : ''}`,
       `Horaire: ${p.startTime || ''}${p.endTime ? ` - ${p.endTime}` : ''}`,
-      `Montant: ${formatMoney(p.amount, p.currency || 'EUR')}`,
+      `Rémunération: ${formatCompensation({
+        compensationMode: p.compensationMode,
+        retrocessionPercentage: p.retrocessionPercentage,
+        compensationAmount: p.amount,
+        compensationCurrency: p.currency || 'EUR',
+      })}`,
       '',
       kind === 'recruiter'
         ? 'Document généré après validation de fin de mission et confirmation du paiement.'
@@ -440,14 +464,30 @@ function WorkflowComposer({
         <Badge>Proposition finale</Badge>
         <h3>Détails de l'accord</h3>
       </div>
-      <div className="form-row">
-        <Field label="Montant">
-          <Input type="number" min="0" required value={proposal.amount} onChange={(e) => onChange({ amount: e.target.value })} />
+      <ChoiceSection title="Mode de rémunération">
+        <div className="choice-grid">
+          <button type="button" className={proposal.compensationMode === 'RETROCESSION' ? 'active' : ''} onClick={() => onChange({ compensationMode: 'RETROCESSION' })}>
+            Rétrocession d'honoraires
+          </button>
+          <button type="button" className={proposal.compensationMode === 'FIXED_AMOUNT' ? 'active' : ''} onClick={() => onChange({ compensationMode: 'FIXED_AMOUNT' })}>
+            Montant fixe
+          </button>
+        </div>
+      </ChoiceSection>
+      {proposal.compensationMode === 'FIXED_AMOUNT' ? (
+        <div className="form-row">
+          <Field label="Montant">
+            <Input type="number" min="0" required value={proposal.amount} onChange={(e) => onChange({ amount: e.target.value })} />
+          </Field>
+          <Field label="Devise">
+            <Input value={proposal.currency} onChange={(e) => onChange({ currency: e.target.value })} />
+          </Field>
+        </div>
+      ) : (
+        <Field label="Pourcentage de rétrocession">
+          <Input type="number" min="1" max="100" required value={proposal.retrocessionPercentage} onChange={(e) => onChange({ retrocessionPercentage: e.target.value })} />
         </Field>
-        <Field label="Devise">
-          <Input value={proposal.currency} onChange={(e) => onChange({ currency: e.target.value })} />
-        </Field>
-      </div>
+      )}
       <div className="form-row">
         <Field label="Date début">
           <Input type="date" value={proposal.startDate} onChange={(e) => onChange({ startDate: e.target.value })} />
@@ -515,6 +555,7 @@ function WorkflowMessageCard({
   onDownloadCandidate: () => void;
 }) {
   const proposal = workflow.proposal;
+  const retrocession = proposal?.compensationMode === 'RETROCESSION';
 
   return (
     <div className="workflow-card">
@@ -529,10 +570,15 @@ function WorkflowMessageCard({
         <>
           <h3>{active?.mission?.title || 'Mission'}</h3>
           <div className="workflow-summary">
-            <div><span>Montant</span><strong>{formatMoney(proposal.amount, proposal.currency || 'EUR')}</strong></div>
+            <div><span>Rémunération</span><strong>{formatCompensation({
+              compensationMode: proposal.compensationMode,
+              retrocessionPercentage: proposal.retrocessionPercentage,
+              compensationAmount: proposal.amount,
+              compensationCurrency: proposal.currency || 'EUR',
+            })}</strong></div>
             <div><span>Date</span><strong>{proposal.startDate ? formatDate(proposal.startDate) : '-'}</strong></div>
             <div><span>Horaire</span><strong>{proposal.startTime || '-'} {proposal.endTime ? `- ${proposal.endTime}` : ''}</strong></div>
-            <div><span>Paiement</span><strong>Bloqué par Medilink</strong></div>
+            <div><span>Modalité</span><strong>{retrocession ? 'Rétrocession après encaissement' : 'Bloqué par Medilink'}</strong></div>
           </div>
           {proposal.notes ? <p>{proposal.notes}</p> : null}
           {candidateCanAnswer ? (
@@ -546,11 +592,11 @@ function WorkflowMessageCard({
 
       {workflow.kind === 'PAYMENT_REQUIRED' ? (
         <>
-          <h3>Paiement requis</h3>
-          <p>Le candidat a accepté. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin.</p>
+          <h3>{retrocession ? 'Accord accepté' : 'Paiement requis'}</h3>
+          <p>{retrocession ? "Le candidat a accepté la rétrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le règlement selon les honoraires encaissés." : "Le candidat a accepté. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin."}</p>
           {recruiterCanSecure ? (
             <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Paiement...' : 'Payer et confirmer'}</Button>
+              <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Confirmation...' : retrocession ? 'Confirmer la mission' : 'Payer et confirmer'}</Button>
             </div>
           ) : null}
         </>
@@ -566,7 +612,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'FUNDS_SECURED' ? (
         <>
           <h3>Mission confirmée</h3>
-          <p>Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés au candidat après validation de la fin de mission.</p>
+          <p>{retrocession ? "La mission est confirmée avec une rémunération en rétrocession d'honoraires." : "Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés au candidat après validation de la fin de mission."}</p>
           {recruiterCanComplete ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}</Button>
@@ -589,8 +635,8 @@ function WorkflowMessageCard({
 
       {workflow.kind === 'PAYMENT_RELEASED' ? (
         <>
-          <h3>Paiement libéré</h3>
-          <p>Les fonds ont été libérés au candidat. Les factures et justificatifs peuvent être générés.</p>
+          <h3>{retrocession ? 'Rétrocession validée' : 'Paiement libéré'}</h3>
+          <p>{retrocession ? "La rétrocession d'honoraires a été validée. Les justificatifs peuvent être générés." : 'Les fonds ont été libérés au candidat. Les factures et justificatifs peuvent être générés.'}</p>
           {canGenerateInvoices ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>{busyAction === 'invoices' ? 'Génération...' : 'Générer les factures'}</Button>

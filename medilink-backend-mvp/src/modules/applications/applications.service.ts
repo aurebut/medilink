@@ -197,6 +197,8 @@ export class ApplicationsService {
             startTime: true,
             endTime: true,
             durationHours: true,
+            compensationMode: true,
+            retrocessionPercentage: true,
             compensationAmount: true,
             compensationCurrency: true,
             status: true,

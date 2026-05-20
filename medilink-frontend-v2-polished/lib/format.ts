@@ -21,6 +21,24 @@ export function formatMoney(amount?: number | null, currency = 'EUR') {
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
 }
 
+export function formatCompensation({
+  compensationMode,
+  retrocessionPercentage,
+  compensationAmount,
+  compensationCurrency,
+}: {
+  compensationMode?: string | null;
+  retrocessionPercentage?: number | null;
+  compensationAmount?: number | null;
+  compensationCurrency?: string | null;
+}) {
+  if (compensationMode === 'RETROCESSION') {
+    return retrocessionPercentage ? `${retrocessionPercentage}% de rétrocession d'honoraires` : 'Rétrocession d\'honoraires';
+  }
+
+  return formatMoney(compensationAmount, compensationCurrency || 'EUR');
+}
+
 export function initials(first?: string | null, last?: string | null, fallback = 'ML') {
   const a = first?.[0] || '';
   const b = last?.[0] || '';

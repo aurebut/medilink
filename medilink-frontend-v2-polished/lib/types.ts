@@ -17,6 +17,7 @@ export type EstablishmentMemberRole = 'OWNER' | 'ADMIN' | 'RECRUITER' | 'VIEWER'
 export type MissionType = 'GARDE' | 'REMPLACEMENT' | 'VACATION' | 'STAGE' | 'AIDE_OP';
 export type RequiredLevel = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
 export type MissionStatus = 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'FILLED' | 'ARCHIVED';
+export type CompensationMode = 'FIXED_AMOUNT' | 'RETROCESSION';
 export type ApplicationStatus = 'SUBMITTED' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'CANCELLED';
 export type MessageType = 'TEXT' | 'FILE' | 'SYSTEM';
 
@@ -115,6 +116,8 @@ export type Mission = {
   startTime?: string | null;
   endTime?: string | null;
   durationHours?: number | null;
+  compensationMode: CompensationMode;
+  retrocessionPercentage?: number | null;
   compensationAmount?: number | null;
   compensationCurrency: string;
   status: MissionStatus;

@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { api, isMockStorageUrl } from '@/lib/api';
 import type { CandidateProfileForApplication, Document } from '@/lib/types';
 import { documentTypeLabel, medicalStatusOptions, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: string) {
@@ -133,7 +133,7 @@ export default function EstablishmentCandidateProfilePage() {
             <div><span>Niveau</span><strong>{requiredLevelLabels(data.mission.requiredLevels, data.mission.requiredLevel)}</strong></div>
             <div><span>Date</span><strong>{formatDate(data.mission.startDate)}</strong></div>
             <div><span>Horaire</span><strong>{data.mission.startTime || '—'} → {data.mission.endTime || '—'}</strong></div>
-            <div><span>Rémunération</span><strong>{formatMoney(data.mission.compensationAmount, data.mission.compensationCurrency)}</strong></div>
+            <div><span>Rémunération</span><strong>{formatCompensation(data.mission)}</strong></div>
           </div>
 
           {data.application.coverMessage ? (

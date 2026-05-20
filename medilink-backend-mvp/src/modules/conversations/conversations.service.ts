@@ -1,7 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   AgreementEventType,
   ApplicationStatus,
+  CompensationMode,
   EscrowPaymentStatus,
   InvoiceType,
   MessageType,
@@ -123,6 +124,15 @@ export class ConversationsService {
 
   async sendProposal(user: RequestUser, conversationId: string, dto: SendProposalDto) {
     const conversation = await this.ensureRecruiterForConversation(user, conversationId);
+    const compensationMode = dto.compensationMode || conversation.mission.compensationMode || CompensationMode.FIXED_AMOUNT;
+    const amount = compensationMode === CompensationMode.RETROCESSION ? 0 : dto.amount || 0;
+    const retrocessionPercentage = compensationMode === CompensationMode.RETROCESSION
+      ? dto.retrocessionPercentage || conversation.mission.retrocessionPercentage
+      : undefined;
+
+    if (compensationMode === CompensationMode.RETROCESSION && !retrocessionPercentage) {
+      throw new BadRequestException('Le pourcentage de retrocession est requis.');
+    }
 
     const agreement = await this.prisma.missionAgreement.create({
       data: {
@@ -131,9 +141,11 @@ export class ConversationsService {
         missionId: conversation.missionId,
         candidateUserId: conversation.candidateUserId,
         establishmentId: conversation.establishmentId,
-        amount: dto.amount,
+        compensationMode,
+        retrocessionPercentage,
+        amount,
         currency: dto.currency || conversation.mission.compensationCurrency || 'EUR',
-        candidateAmount: dto.amount,
+        candidateAmount: amount,
         startDate: this.optionalDate(dto.startDate) || conversation.mission.startDate,
         endDate: this.optionalDate(dto.endDate) || conversation.mission.endDate,
         startTime: dto.startTime || conversation.mission.startTime,
@@ -480,6 +492,8 @@ export class ConversationsService {
     id: string;
     amount: number;
     currency: string;
+    compensationMode?: CompensationMode | null;
+    retrocessionPercentage?: number | null;
     startDate?: Date | null;
     endDate?: Date | null;
     startTime?: string | null;
@@ -490,6 +504,8 @@ export class ConversationsService {
       id: agreement.id,
       amount: agreement.amount,
       currency: agreement.currency,
+      compensationMode: agreement.compensationMode,
+      retrocessionPercentage: agreement.retrocessionPercentage,
       startDate: agreement.startDate,
       endDate: agreement.endDate,
       startTime: agreement.startTime,

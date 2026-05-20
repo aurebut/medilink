@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EstablishmentMemberRole, MissionStatus } from '@prisma/client';
+import { CompensationMode, EstablishmentMemberRole, MissionStatus } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -36,6 +36,10 @@ export class MissionsService {
       throw new BadRequestException('La date de fin doit être après la date de début.');
     }
 
+    if (dto.compensationMode === CompensationMode.RETROCESSION && !dto.retrocessionPercentage) {
+      throw new BadRequestException('Le pourcentage de retrocession est requis.');
+    }
+
     const establishmentId = await this.resolveEstablishmentId(user, dto);
 
     const mission = await this.prisma.mission.create({
@@ -62,6 +66,8 @@ export class MissionsService {
         startTime: dto.startTime,
         endTime: dto.endTime,
         durationHours: dto.durationHours,
+        compensationMode: dto.compensationMode || CompensationMode.FIXED_AMOUNT,
+        retrocessionPercentage: dto.compensationMode === CompensationMode.RETROCESSION ? dto.retrocessionPercentage : undefined,
         compensationAmount: dto.compensationAmount,
         compensationCurrency: dto.compensationCurrency || 'EUR',
         status: dto.publishNow ? MissionStatus.PUBLISHED : MissionStatus.DRAFT,

@@ -104,6 +104,11 @@ enum MissionStatus {
   ARCHIVED
 }
 
+enum CompensationMode {
+  FIXED_AMOUNT
+  RETROCESSION
+}
+
 enum ApplicationStatus {
   SUBMITTED
   VIEWED
@@ -369,6 +374,8 @@ model Mission {
   startTime           String?
   endTime             String?
   durationHours       Int?
+  compensationMode    CompensationMode @default(FIXED_AMOUNT)
+  retrocessionPercentage Int?
   compensationAmount  Int?
   compensationCurrency String       @default("EUR")
   status              MissionStatus @default(DRAFT)
@@ -510,6 +517,8 @@ model MissionAgreement {
   candidateUserId String
   establishmentId String
   status          MissionAgreementStatus @default(PROPOSED)
+  compensationMode CompensationMode       @default(FIXED_AMOUNT)
+  retrocessionPercentage Int?
   amount          Int
   currency        String                 @default("EUR")
   platformFee     Int                    @default(0)

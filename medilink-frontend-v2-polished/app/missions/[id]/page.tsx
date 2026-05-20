@@ -8,7 +8,7 @@ import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { Alert, Badge, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { api } from '@/lib/api';
-import { formatDate, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getMissionApplyPath } from '@/lib/mission-links';
 import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
@@ -138,7 +138,7 @@ export default function MissionPage() {
                   <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
                   <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
                   <div><span>Durée</span><strong>{mission.durationHours || '-'} h</strong></div>
-                  <div><span>Rémunération</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
+                  <div><span>Rémunération</span><strong>{formatCompensation(mission)}</strong></div>
                   <div><span>Localisation</span><strong>{mission.location || mission.city}</strong></div>
                 </div>
               </Card>

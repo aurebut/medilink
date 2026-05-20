@@ -6,7 +6,7 @@ import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
-import { formatDate, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLevelOptions } from '@/lib/labels';
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 
@@ -25,6 +25,7 @@ const initialForm = {
   missionType: 'GARDE' as MissionType,
   requiredLevel: 'INTERN' as RequiredLevel,
   requiredLevels: ['INTERN'] as RequiredLevel[],
+  compensationMode: 'RETROCESSION',
   compensationCurrency: 'EUR',
   publishNow: true,
 };
@@ -75,6 +76,9 @@ export default function NewMissionPage() {
       if (!form.startDate) return 'Choisis une date de début.';
       if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
     }
+    if (step === 5 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
+      return 'Indique le pourcentage de rétrocession.';
+    }
     return null;
   }
 
@@ -109,6 +113,7 @@ export default function NewMissionPage() {
       requiredLevel: form.requiredLevels?.[0] || form.requiredLevel,
       requiredLevels: form.requiredLevels?.length ? form.requiredLevels : [form.requiredLevel],
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
+      retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : undefined,
       compensationAmount: form.compensationAmount ? Number(form.compensationAmount) : undefined,
       tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
     };
@@ -360,17 +365,33 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Quelle rémunération afficher ?</h2>
-          <p>Le montant peut rester indicatif, mais il rend la mission beaucoup plus lisible.</p>
+          <h2>Quel mode de rémunération afficher ?</h2>
+          <p>Indique une rétrocession d'honoraires ou, si besoin, un montant fixe.</p>
         </div>
-        <div className="form-row">
-          <Field label="Montant">
-            <Input type="number" min={0} value={form.compensationAmount || ''} onChange={(e) => set('compensationAmount', e.target.value)} placeholder="650" />
+        <ChoiceSection title="Mode de rémunération">
+          <ChoiceGrid
+            value={form.compensationMode || 'RETROCESSION'}
+            options={[
+              { value: 'RETROCESSION', label: "Rétrocession d'honoraires" },
+              { value: 'FIXED_AMOUNT', label: 'Montant fixe' },
+            ]}
+            onChange={(value) => set('compensationMode', value)}
+          />
+        </ChoiceSection>
+        {form.compensationMode === 'FIXED_AMOUNT' ? (
+          <div className="form-row">
+            <Field label="Montant">
+              <Input type="number" min={0} value={form.compensationAmount || ''} onChange={(e) => set('compensationAmount', e.target.value)} placeholder="650" />
+            </Field>
+            <Field label="Devise">
+              <Input value={form.compensationCurrency || 'EUR'} onChange={(e) => set('compensationCurrency', e.target.value.toUpperCase())} />
+            </Field>
+          </div>
+        ) : (
+          <Field label="Pourcentage de rétrocession">
+            <Input type="number" min={1} max={100} value={form.retrocessionPercentage || ''} onChange={(e) => set('retrocessionPercentage', e.target.value)} placeholder="70" />
           </Field>
-          <Field label="Devise">
-            <Input value={form.compensationCurrency || 'EUR'} onChange={(e) => set('compensationCurrency', e.target.value.toUpperCase())} />
-          </Field>
-        </div>
+        )}
       </div>
     );
   }
@@ -533,7 +554,12 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
         <div><span>Date</span><strong>{form.startDate ? formatDate(form.startDate) : '-'}</strong></div>
         <div><span>Horaire</span><strong>{form.startTime || '-'} {form.endTime ? `- ${form.endTime}` : ''}</strong></div>
         <div><span>Durée</span><strong>{form.durationHours ? `${form.durationHours} h` : '-'}</strong></div>
-        <div><span>Rémunération</span><strong>{formatMoney(form.compensationAmount ? Number(form.compensationAmount) : null, form.compensationCurrency || 'EUR')}</strong></div>
+        <div><span>Rémunération</span><strong>{formatCompensation({
+          compensationMode: form.compensationMode,
+          retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : null,
+          compensationAmount: form.compensationAmount ? Number(form.compensationAmount) : null,
+          compensationCurrency: form.compensationCurrency || 'EUR',
+        })}</strong></div>
         <div><span>Logement</span><strong>{form.accommodationProvided === undefined ? '-' : form.accommodationProvided ? 'Oui' : 'Non'}</strong></div>
         <div><span>Parking</span><strong>{form.parkingAvailable === undefined ? '-' : form.parkingAvailable ? 'Oui' : 'Non'}</strong></div>
       </div>

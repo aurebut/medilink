@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { Mission } from '@/lib/types';
-import { formatDate, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from './MissionDeleteButton';
 import { MissionShareActions } from './MissionShareActions';
@@ -36,7 +36,7 @@ export function MissionCard({
         </div>
         <div className="mission-pay">
           <span className="small">Rémunération</span>
-          <strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong>
+          <strong>{formatCompensation(mission)}</strong>
         </div>
       </div>
 

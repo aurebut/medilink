@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { Application, Conversation, Mission } from '@/lib/types';
-import { formatDate, formatMoney } from '@/lib/format';
+import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
 import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
@@ -116,7 +116,7 @@ export default function ApplyMissionPage() {
             <div><span>Ville</span><strong>{mission.city}</strong></div>
             <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
             <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
-            <div><span>Rémunération</span><strong>{formatMoney(mission.compensationAmount, mission.compensationCurrency)}</strong></div>
+            <div><span>Rémunération</span><strong>{formatCompensation(mission)}</strong></div>
           </div>
         </Card>
       </div>

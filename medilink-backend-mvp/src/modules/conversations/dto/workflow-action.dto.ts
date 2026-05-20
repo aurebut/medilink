@@ -1,10 +1,22 @@
-import { IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { CompensationMode } from '@prisma/client';
+import { IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class SendProposalDto {
+  @IsOptional()
+  @IsEnum(CompensationMode)
+  compensationMode?: CompensationMode;
+
   @IsInt()
+  @IsOptional()
   @Min(0)
   @Max(1000000)
-  amount: number;
+  amount?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  retrocessionPercentage?: number;
 
   @IsOptional()
   @IsString()
