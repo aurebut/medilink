@@ -44,11 +44,11 @@ export class MissionsService {
       throw new BadRequestException('Le pourcentage de retrocession est requis.');
     }
 
-    const establishmentId = await this.resolveEstablishmentId(user, dto);
+    const establishment = await this.resolveEstablishment(user, dto);
 
     const mission = await this.prisma.mission.create({
       data: {
-        establishmentId,
+        establishmentId: establishment.id,
         createdById: user.id,
         title: dto.title,
         description: dto.description,
@@ -58,7 +58,10 @@ export class MissionsService {
         requiredLevels,
         location: dto.location,
         city: dto.city,
-        softwareUsed: dto.softwareUsed,
+        sector: dto.sector || establishment.sector,
+        patientType: dto.patientType || establishment.patientType,
+        softwareUsed: dto.softwareUsed || establishment.softwareUsed,
+        hasSecretary: dto.hasSecretary ?? establishment.hasSecretary,
         departmentInfo: dto.departmentInfo,
         teamInfo: dto.teamInfo,
         equipmentInfo: dto.equipmentInfo,
@@ -96,13 +99,19 @@ export class MissionsService {
     return mission;
   }
 
-  private async resolveEstablishmentId(user: RequestUser, dto: CreateMissionDto) {
+  private async resolveEstablishment(user: RequestUser, dto: CreateMissionDto) {
     if (!dto.establishmentId) {
       throw new BadRequestException('Un etablissement est requis pour creer une mission.');
     }
 
     await this.permissions.ensureEstablishmentMember(user.id, dto.establishmentId);
-    return dto.establishmentId;
+    const establishment = await this.prisma.establishment.findUnique({ where: { id: dto.establishmentId } });
+
+    if (!establishment) {
+      throw new BadRequestException('Etablissement introuvable.');
+    }
+
+    return establishment;
   }
 
   async search(dto: SearchMissionsDto) {
@@ -122,6 +131,10 @@ export class MissionsService {
     }
     if (dto.specialty) where.specialty = { contains: dto.specialty, mode: 'insensitive' };
     if (dto.city) where.city = { contains: dto.city, mode: 'insensitive' };
+    if (dto.sector) where.sector = dto.sector;
+    if (dto.patientType) where.patientType = { contains: dto.patientType, mode: 'insensitive' };
+    if (dto.softwareUsed) where.softwareUsed = { contains: dto.softwareUsed, mode: 'insensitive' };
+    if (dto.hasSecretary) where.hasSecretary = dto.hasSecretary === 'true';
     if (dto.dateFrom) where.startDate = { gte: new Date(dto.dateFrom) };
 
     if (dto.q) {
@@ -131,6 +144,9 @@ export class MissionsService {
           { description: { contains: dto.q, mode: 'insensitive' } },
           { specialty: { contains: dto.q, mode: 'insensitive' } },
           { city: { contains: dto.q, mode: 'insensitive' } },
+          { sector: { contains: dto.q, mode: 'insensitive' } },
+          { patientType: { contains: dto.q, mode: 'insensitive' } },
+          { softwareUsed: { contains: dto.q, mode: 'insensitive' } },
         ],
       });
     }

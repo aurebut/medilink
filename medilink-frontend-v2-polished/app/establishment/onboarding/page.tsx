@@ -7,6 +7,22 @@ import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 
+const sectorOptions = [
+  { value: 'SECTEUR_1', label: 'Secteur 1' },
+  { value: 'SECTEUR_2', label: 'Secteur 2' },
+  { value: 'SECTEUR_3', label: 'Secteur 3' },
+];
+
+function sectorLabel(value?: string | null) {
+  return sectorOptions.find((option) => option.value === value)?.label || value || 'Secteur non renseigné';
+}
+
+function booleanLabel(value?: boolean | null) {
+  if (value === true) return 'Secrétaire présent';
+  if (value === false) return 'Pas de secrétaire';
+  return 'Secrétariat non renseigné';
+}
+
 export default function EstablishmentOnboardingPage() {
   const { establishments, loading, reload } = useEstablishments();
   const [form, setForm] = useState<any>({ type: 'HOSPITAL', country: 'France' });
@@ -75,6 +91,13 @@ export default function EstablishmentOnboardingPage() {
                   {establishmentTypeLabel(establishment.type)} - {establishment.city || 'Ville non renseignée'}
                 </span>
                 <br />
+                <span className="small">
+                  {sectorLabel(establishment.sector)}
+                  {establishment.patientType ? ` - ${establishment.patientType}` : ''}
+                  {establishment.softwareUsed ? ` - ${establishment.softwareUsed}` : ''}
+                  {` - ${booleanLabel(establishment.hasSecretary)}`}
+                </span>
+                <br />
                 <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
                   {statusLabel(establishment.verificationStatus)}
                 </Badge>
@@ -104,6 +127,24 @@ export default function EstablishmentOnboardingPage() {
               <Field label="Ville"><Input value={form.city || ''} onChange={(e) => set('city', e.target.value)} /></Field>
               <Field label="Pays"><Input value={form.country || ''} onChange={(e) => set('country', e.target.value)} /></Field>
             </div>
+            <Field label="Secteur">
+              <Select value={form.sector || ''} onChange={(e) => set('sector', e.target.value)}>
+                <option value="">Non renseigné</option>
+                {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </Select>
+            </Field>
+            <Field label="Type de patientèle"><Input value={form.patientType || ''} onChange={(e) => set('patientType', e.target.value)} placeholder="Pédiatrie, adultes, gériatrie..." /></Field>
+            <Field label="Logiciel utilisé"><Input value={form.softwareUsed || ''} onChange={(e) => set('softwareUsed', e.target.value)} placeholder="Doctolib, Orbis, Hôpital Manager..." /></Field>
+            <Field label="Présence de secrétaire">
+              <Select
+                value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
+                onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
+              >
+                <option value="">Non renseigné</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </Select>
+            </Field>
             <Field label="Adresse"><Input value={form.address || ''} onChange={(e) => set('address', e.target.value)} /></Field>
             <div className="form-row">
               <Field label="Email"><Input type="email" value={form.email || ''} onChange={(e) => set('email', e.target.value)} /></Field>

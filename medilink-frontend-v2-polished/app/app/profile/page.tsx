@@ -108,7 +108,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="form-row">
-              <Field label="Orientation"><Input value={form.orientation || ''} onChange={(e) => set('orientation', e.target.value)} /></Field>
+              <Field label="Secteur"><Input value={form.orientation || ''} onChange={(e) => set('orientation', e.target.value)} /></Field>
               <Field label="Hôpital / faculté"><Input value={form.hospitalOrFaculty || ''} onChange={(e) => set('hospitalOrFaculty', e.target.value)} /></Field>
             </div>
 

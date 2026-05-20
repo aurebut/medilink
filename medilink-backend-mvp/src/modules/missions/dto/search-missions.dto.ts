@@ -1,6 +1,6 @@
 import { MissionType, RequiredLevel } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBooleanString, IsDateString, IsEnum, IsIn, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class SearchMissionsDto {
   @IsOptional()
@@ -18,6 +18,25 @@ export class SearchMissionsDto {
   @IsOptional()
   @IsString()
   city?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
+  sector?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  patientType?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  softwareUsed?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  hasSecretary?: string;
 
   @IsOptional()
   @IsString()

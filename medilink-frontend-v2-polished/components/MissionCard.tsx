@@ -8,6 +8,15 @@ import { MissionDeleteButton } from './MissionDeleteButton';
 import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
 
+function sectorLabel(value?: string | null) {
+  const labels: Record<string, string> = {
+    SECTEUR_1: 'Secteur 1',
+    SECTEUR_2: 'Secteur 2',
+    SECTEUR_3: 'Secteur 3',
+  };
+  return value ? labels[value] || value : null;
+}
+
 export function MissionCard({
   mission,
   applyHref,
@@ -46,6 +55,12 @@ export function MissionCard({
         <span>{mission.establishment?.name || 'Établissement'}</span>
         <span>-</span>
         <span>{mission.city}</span>
+        {mission.sector ? (
+          <>
+            <span>-</span>
+            <span>{sectorLabel(mission.sector)}</span>
+          </>
+        ) : null}
         <span>-</span>
         <span>{formatDate(mission.startDate)}</span>
         {mission.startTime ? (
@@ -56,9 +71,12 @@ export function MissionCard({
         ) : null}
       </div>
 
-      {mission.tags?.length ? (
+      {mission.tags?.length || mission.patientType || mission.softwareUsed || mission.hasSecretary != null ? (
         <div className="tag-list">
-          {mission.tags.map((tag) => <Badge key={tag.id} tone="neutral">#{tag.tag}</Badge>)}
+          {mission.patientType ? <Badge tone="neutral">{mission.patientType}</Badge> : null}
+          {mission.softwareUsed ? <Badge tone="neutral">{mission.softwareUsed}</Badge> : null}
+          {mission.hasSecretary != null ? <Badge tone="neutral">Secrétaire : {mission.hasSecretary ? 'oui' : 'non'}</Badge> : null}
+          {mission.tags?.map((tag) => <Badge key={tag.id} tone="neutral">#{tag.tag}</Badge>)}
         </div>
       ) : null}
 

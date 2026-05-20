@@ -79,6 +79,10 @@ export type Establishment = {
   address?: string | null;
   city?: string | null;
   country: string;
+  sector?: string | null;
+  patientType?: string | null;
+  softwareUsed?: string | null;
+  hasSecretary?: boolean | null;
   phone?: string | null;
   email?: string | null;
   website?: string | null;
@@ -104,7 +108,10 @@ export type Mission = {
   requiredLevels?: RequiredLevel[];
   location?: string | null;
   city: string;
+  sector?: string | null;
+  patientType?: string | null;
   softwareUsed?: string | null;
+  hasSecretary?: boolean | null;
   departmentInfo?: string | null;
   teamInfo?: string | null;
   equipmentInfo?: string | null;

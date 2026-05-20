@@ -1,5 +1,5 @@
 import { EstablishmentType } from '@prisma/client';
-import { IsEmail, IsEnum, IsOptional, IsString, IsUrl } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum, IsIn, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
 
 export class CreateEstablishmentDto {
   @IsString()
@@ -19,6 +19,25 @@ export class CreateEstablishmentDto {
   @IsOptional()
   @IsString()
   country?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
+  sector?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  patientType?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  softwareUsed?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  hasSecretary?: boolean;
 
   @IsOptional()
   @IsString()

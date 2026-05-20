@@ -4,9 +4,11 @@ import {
   IsBoolean,
   IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
+  MaxLength,
   Max,
   Min,
 } from 'class-validator';
@@ -47,7 +49,22 @@ export class CreateMissionDto {
 
   @IsOptional()
   @IsString()
+  @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
+  sector?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  patientType?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
   softwareUsed?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  hasSecretary?: boolean;
 
   @IsOptional()
   @IsString()

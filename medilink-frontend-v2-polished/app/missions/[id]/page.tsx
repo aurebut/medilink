@@ -14,6 +14,15 @@ import { getMissionApplyPath } from '@/lib/mission-links';
 import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
 
+function sectorLabel(value?: string | null) {
+  const labels: Record<string, string> = {
+    SECTEUR_1: 'Secteur 1',
+    SECTEUR_2: 'Secteur 2',
+    SECTEUR_3: 'Secteur 3',
+  };
+  return value ? labels[value] || value : '-';
+}
+
 export default function MissionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -60,7 +69,10 @@ export default function MissionPage() {
     ? applyPath
     : `/login?next=${encodeURIComponent(applyPath)}`;
   const hasContextDetails = Boolean(
+    mission?.sector ||
+    mission?.patientType ||
     mission?.softwareUsed ||
+    mission?.hasSecretary != null ||
     mission?.departmentInfo ||
     mission?.teamInfo ||
     mission?.equipmentInfo ||
@@ -140,6 +152,7 @@ export default function MissionPage() {
                   <div><span>Durée</span><strong>{mission.durationHours || '-'} h</strong></div>
                   <div><span>Rémunération</span><strong>{formatCompensation(mission)}</strong></div>
                   <div><span>Localisation</span><strong>{mission.location || mission.city}</strong></div>
+                  {mission.sector ? <div><span>Secteur</span><strong>{sectorLabel(mission.sector)}</strong></div> : null}
                 </div>
               </Card>
             </div>
@@ -148,7 +161,9 @@ export default function MissionPage() {
               <Card>
                 <h2>Contexte de la mission</h2>
                 <div className="info-list">
+                  {mission.patientType ? <div><span>Patientèle</span><strong>{mission.patientType}</strong></div> : null}
                   {mission.softwareUsed ? <div><span>Logiciel utilisé</span><strong>{mission.softwareUsed}</strong></div> : null}
+                  {mission.hasSecretary != null ? <div><span>Secrétaire</span><strong>{mission.hasSecretary ? 'Oui' : 'Non'}</strong></div> : null}
                   {mission.departmentInfo ? <div><span>Service</span><strong>{mission.departmentInfo}</strong></div> : null}
                   {mission.teamInfo ? <div><span>Équipe sur place</span><strong>{mission.teamInfo}</strong></div> : null}
                   {mission.equipmentInfo ? <div><span>Matériel disponible</span><strong>{mission.equipmentInfo}</strong></div> : null}

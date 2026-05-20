@@ -150,7 +150,7 @@ export default function EstablishmentCandidateProfilePage() {
         <Card>
           <h2>Informations professionnelles</h2>
           <div className="info-list">
-            <div><span>Orientation</span><strong>{profile?.orientation || '—'}</strong></div>
+            <div><span>Secteur</span><strong>{profile?.orientation || '—'}</strong></div>
             <div><span>Hôpital / faculté</span><strong>{profile?.hospitalOrFaculty || '—'}</strong></div>
             <div><span>Expérience</span><strong>{profile?.experienceYears != null ? `${profile.experienceYears} an(s)` : '—'}</strong></div>
             <div><span>Disponibilités</span><strong>{profile?.availabilityNotes || '—'}</strong></div>

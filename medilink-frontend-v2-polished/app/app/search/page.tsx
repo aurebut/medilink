@@ -7,10 +7,29 @@ import { missionTypeOptions, requiredLevelOptions } from '@/lib/labels';
 import { Alert, Button, Card, Field, Input, PageHeader, Select } from '@/components/ui';
 import { MissionCard } from '@/components/MissionCard';
 
+const emptyFilters = {
+  q: '',
+  city: '',
+  specialty: '',
+  missionType: '',
+  requiredLevel: '',
+  sector: '',
+  patientType: '',
+  softwareUsed: '',
+  hasSecretary: '',
+  dateFrom: '',
+};
+
+const sectorOptions = [
+  { value: 'SECTEUR_1', label: 'Secteur 1' },
+  { value: 'SECTEUR_2', label: 'Secteur 2' },
+  { value: 'SECTEUR_3', label: 'Secteur 3' },
+];
+
 export default function SearchMissionsPage() {
   const [items, setItems] = useState<Mission[]>([]);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState({ q: '', city: '', specialty: '', missionType: '', requiredLevel: '', dateFrom: '' });
+  const [filters, setFilters] = useState(emptyFilters);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -64,6 +83,25 @@ export default function SearchMissionsPage() {
             <Field label="Spécialité">
               <Input value={filters.specialty} onChange={(e) => set('specialty', e.target.value)} placeholder="Urgences" />
             </Field>
+            <Field label="Secteur">
+              <Select value={filters.sector} onChange={(e) => set('sector', e.target.value)}>
+                <option value="">Tous</option>
+                {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </Select>
+            </Field>
+            <Field label="Type de patientèle">
+              <Input value={filters.patientType} onChange={(e) => set('patientType', e.target.value)} placeholder="Pédiatrie, adultes..." />
+            </Field>
+            <Field label="Logiciel utilisé">
+              <Input value={filters.softwareUsed} onChange={(e) => set('softwareUsed', e.target.value)} placeholder="Doctolib, Orbis..." />
+            </Field>
+            <Field label="Présence de secrétaire">
+              <Select value={filters.hasSecretary} onChange={(e) => set('hasSecretary', e.target.value)}>
+                <option value="">Tous</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </Select>
+            </Field>
             <Field label="Type mission">
               <Select value={filters.missionType} onChange={(e) => set('missionType', e.target.value as MissionType)}>
                 <option value="">Tous</option>
@@ -84,7 +122,7 @@ export default function SearchMissionsPage() {
               <Button
                 type="button"
                 variant="light"
-                onClick={() => setFilters({ q: '', city: '', specialty: '', missionType: '', requiredLevel: '', dateFrom: '' })}
+                onClick={() => setFilters(emptyFilters)}
               >
                 Réinitialiser
               </Button>

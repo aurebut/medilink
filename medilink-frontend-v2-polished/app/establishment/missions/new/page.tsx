@@ -30,6 +30,16 @@ const initialForm = {
   publishNow: true,
 };
 
+const sectorOptions = [
+  { value: 'SECTEUR_1', label: 'Secteur 1' },
+  { value: 'SECTEUR_2', label: 'Secteur 2' },
+  { value: 'SECTEUR_3', label: 'Secteur 3' },
+];
+
+function sectorLabel(value?: string | null) {
+  return sectorOptions.find((option) => option.value === value)?.label || value || '-';
+}
+
 export default function NewMissionPage() {
   const { establishments, primary, loading } = useEstablishments();
   const [form, setForm] = useState<any>(initialForm);
@@ -58,6 +68,10 @@ export default function NewMissionPage() {
       ...current,
       city: current.city || selectedEstablishment.city || '',
       location: current.location || selectedEstablishment.address || '',
+      sector: selectedEstablishment.sector || '',
+      patientType: selectedEstablishment.patientType || '',
+      softwareUsed: selectedEstablishment.softwareUsed || '',
+      hasSecretary: selectedEstablishment.hasSecretary,
     }));
   }, [selectedEstablishment]);
 
@@ -210,6 +224,10 @@ export default function NewMissionPage() {
                     ...current,
                     city: next?.city || current.city || '',
                     location: next?.address || current.location || '',
+                    sector: next?.sector || '',
+                    patientType: next?.patientType || '',
+                    softwareUsed: next?.softwareUsed || '',
+                    hasSecretary: next?.hasSecretary,
                   }));
                 }}
               >
@@ -288,11 +306,24 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Ajoute le contexte terrain</h2>
           <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
         </div>
+        <Field label="Service ou unité">
+          <Input value={form.departmentInfo || ''} onChange={(e) => set('departmentInfo', e.target.value)} placeholder="Urgences adultes, bloc ambulatoire, cabinet de groupe..." />
+        </Field>
+        <Field label="Type de patientèle">
+          <Input value={form.patientType || ''} onChange={(e) => set('patientType', e.target.value)} placeholder="Pédiatrie, adultes, gériatrie..." />
+        </Field>
         <Field label="Logiciel utilisé">
           <Input value={form.softwareUsed || ''} onChange={(e) => set('softwareUsed', e.target.value)} placeholder="Doctolib, Orbis, Hôpital Manager..." />
         </Field>
-        <Field label="Service ou unité">
-          <Input value={form.departmentInfo || ''} onChange={(e) => set('departmentInfo', e.target.value)} placeholder="Urgences adultes, bloc ambulatoire, cabinet de groupe..." />
+        <Field label="Présence de secrétaire">
+          <Select
+            value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
+            onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
+          >
+            <option value="">Non précisé</option>
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </Select>
         </Field>
         <Field label="Équipe sur place">
           <Textarea value={form.teamInfo || ''} onChange={(e) => set('teamInfo', e.target.value)} placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..." />
@@ -313,6 +344,12 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         </div>
         <Field label="Ville">
           <Input required value={form.city || ''} onChange={(e) => set('city', e.target.value)} placeholder="Lyon" />
+        </Field>
+        <Field label="Secteur">
+          <Select value={form.sector || ''} onChange={(e) => set('sector', e.target.value)}>
+            <option value="">Non précisé</option>
+            {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </Select>
         </Field>
         <Field label="Lieu précis">
           <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
@@ -529,7 +566,10 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
       <div className="info-list">
         <div><span>Spécialité</span><strong>{form.specialty || '-'}</strong></div>
         <div><span>Ville</span><strong>{form.city || '-'}</strong></div>
+        <div><span>Secteur</span><strong>{sectorLabel(form.sector)}</strong></div>
+        <div><span>Patientèle</span><strong>{form.patientType || '-'}</strong></div>
         <div><span>Logiciel</span><strong>{form.softwareUsed || '-'}</strong></div>
+        <div><span>Secrétaire</span><strong>{form.hasSecretary === undefined || form.hasSecretary === null ? '-' : form.hasSecretary ? 'Oui' : 'Non'}</strong></div>
         <div><span>Service</span><strong>{form.departmentInfo || '-'}</strong></div>
         <div><span>Date</span><strong>{form.startDate ? formatDate(form.startDate) : '-'}</strong></div>
         <div><span>Horaire</span><strong>{form.startTime || '-'} {form.endTime ? `- ${form.endTime}` : ''}</strong></div>

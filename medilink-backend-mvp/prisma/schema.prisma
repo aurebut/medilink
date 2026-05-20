@@ -322,6 +322,10 @@ model Establishment {
   address            String?
   city               String?
   country            String             @default("France")
+  sector             String?
+  patientType        String?
+  softwareUsed       String?
+  hasSecretary       Boolean?
   phone              String?
   email              String?
   website            String?
@@ -334,6 +338,10 @@ model Establishment {
   members       EstablishmentMember[]
   missions      Mission[]
   conversations Conversation[]
+
+  @@index([sector])
+  @@index([patientType])
+  @@index([softwareUsed])
 }
 
 model EstablishmentMember {
@@ -362,7 +370,10 @@ model Mission {
   requiredLevels      RequiredLevel[] @default([])
   location            String?
   city                String
+  sector              String?
+  patientType         String?
   softwareUsed        String?
+  hasSecretary        Boolean?
   departmentInfo      String?
   teamInfo            String?
   equipmentInfo       String?
@@ -395,6 +406,9 @@ model Mission {
   @@index([missionType])
   @@index([specialty])
   @@index([city])
+  @@index([sector])
+  @@index([patientType])
+  @@index([softwareUsed])
   @@index([startDate])
 }
 
