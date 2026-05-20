@@ -15,7 +15,7 @@ export type EstablishmentType = 'HOSPITAL' | 'CLINIC' | 'CABINET' | 'MEDICAL_SER
 export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'SUSPENDED';
 export type EstablishmentMemberRole = 'OWNER' | 'ADMIN' | 'RECRUITER' | 'VIEWER';
 export type MissionType = 'GARDE' | 'REMPLACEMENT' | 'VACATION' | 'STAGE' | 'AIDE_OP';
-export type RequiredLevel = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR';
+export type RequiredLevel = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
 export type MissionStatus = 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'FILLED' | 'ARCHIVED';
 export type ApplicationStatus = 'SUBMITTED' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'CANCELLED';
 export type MessageType = 'TEXT' | 'FILE' | 'SYSTEM';
@@ -100,6 +100,7 @@ export type Mission = {
   missionType: MissionType;
   specialty: string;
   requiredLevel: RequiredLevel;
+  requiredLevels?: RequiredLevel[];
   location?: string | null;
   city: string;
   softwareUsed?: string | null;

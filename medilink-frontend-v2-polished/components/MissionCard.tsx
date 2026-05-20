@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { Mission } from '@/lib/types';
 import { formatDate, formatMoney } from '@/lib/format';
-import { missionTypeLabel, requiredLevelLabel, statusLabel } from '@/lib/labels';
+import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from './MissionDeleteButton';
 import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
@@ -29,7 +29,7 @@ export function MissionCard({
         <div className="grid" style={{ gap: 10 }}>
           <div className="actions">
             <Badge>{missionTypeLabel(mission.missionType)}</Badge>
-            <Badge tone="neutral">{requiredLevelLabel(mission.requiredLevel)}</Badge>
+            <Badge tone="neutral">{requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</Badge>
             <Badge tone={mission.status === 'PUBLISHED' ? 'success' : 'warning'}>{statusLabel(mission.status)}</Badge>
           </div>
           <h3>{mission.title}</h3>

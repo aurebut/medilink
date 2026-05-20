@@ -29,8 +29,14 @@ export class CreateMissionDto {
   @IsString()
   specialty: string;
 
+  @IsOptional()
   @IsEnum(RequiredLevel)
-  requiredLevel: RequiredLevel;
+  requiredLevel?: RequiredLevel;
+
+  @IsOptional()
+  @IsArray()
+  @IsEnum(RequiredLevel, { each: true })
+  requiredLevels?: RequiredLevel[];
 
   @IsOptional()
   @IsString()

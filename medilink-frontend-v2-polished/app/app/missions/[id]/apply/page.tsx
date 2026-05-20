@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { Application, Conversation, Mission } from '@/lib/types';
 import { formatDate, formatMoney } from '@/lib/format';
-import { missionTypeLabel, requiredLevelLabel } from '@/lib/labels';
+import { missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
 import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 type ApplyResult = {
@@ -108,7 +108,7 @@ export default function ApplyMissionPage() {
           <h2>Récapitulatif mission</h2>
           <div className="tag-list">
             <Badge>{missionTypeLabel(mission.missionType)}</Badge>
-            <Badge tone="neutral">{requiredLevelLabel(mission.requiredLevel)}</Badge>
+            <Badge tone="neutral">{requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</Badge>
           </div>
           <div className="info-list">
             <div><span>Mission</span><strong>{mission.title}</strong></div>

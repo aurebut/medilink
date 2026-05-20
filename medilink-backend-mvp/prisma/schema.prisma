@@ -91,6 +91,9 @@ enum RequiredLevel {
   INTERN
   JUNIOR_DOCTOR
   DOCTOR
+  NURSE
+  OPERATING_ROOM_ASSISTANT
+  OTHER
 }
 
 enum MissionStatus {
@@ -351,6 +354,7 @@ model Mission {
   missionType         MissionType
   specialty           String
   requiredLevel       RequiredLevel
+  requiredLevels      RequiredLevel[] @default([])
   location            String?
   city                String
   softwareUsed        String?

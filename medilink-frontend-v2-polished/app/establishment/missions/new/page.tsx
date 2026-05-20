@@ -7,7 +7,7 @@ import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
-import { missionTypeLabel, missionTypeOptions, requiredLevelLabel, requiredLevelOptions } from '@/lib/labels';
+import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLevelOptions } from '@/lib/labels';
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 
 const steps = [
@@ -24,6 +24,7 @@ const steps = [
 const initialForm = {
   missionType: 'GARDE' as MissionType,
   requiredLevel: 'INTERN' as RequiredLevel,
+  requiredLevels: ['INTERN'] as RequiredLevel[],
   compensationCurrency: 'EUR',
   publishNow: true,
 };
@@ -105,6 +106,8 @@ export default function NewMissionPage() {
     const payload = {
       ...form,
       establishmentId: selectedEstablishment?.id,
+      requiredLevel: form.requiredLevels?.[0] || form.requiredLevel,
+      requiredLevels: form.requiredLevels?.length ? form.requiredLevels : [form.requiredLevel],
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       compensationAmount: form.compensationAmount ? Number(form.compensationAmount) : undefined,
       tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
@@ -238,11 +241,14 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             onChange={(value) => set('missionType', value)}
           />
         </ChoiceSection>
-        <ChoiceSection title="Type de profil demandé">
-          <ChoiceGrid
-            value={form.requiredLevel}
+        <ChoiceSection title="Types de profils recherchés">
+          <MultiChoiceGrid
+            values={form.requiredLevels || []}
             options={requiredLevelOptions}
-            onChange={(value) => set('requiredLevel', value)}
+            onChange={(values) => {
+              set('requiredLevels', values);
+              set('requiredLevel', values[0]);
+            }}
           />
         </ChoiceSection>
       </div>
@@ -438,6 +444,40 @@ function ChoiceGrid({
   );
 }
 
+function MultiChoiceGrid({
+  values,
+  options,
+  onChange,
+}: {
+  values: string[];
+  options: Array<{ value: string; label: string }>;
+  onChange: (values: string[]) => void;
+}) {
+  function toggle(value: string) {
+    const next = values.includes(value)
+      ? values.filter((item) => item !== value)
+      : [...values, value];
+
+    onChange(next.length ? next : values);
+  }
+
+  return (
+    <div className="choice-grid">
+      {options.map((option) => (
+        <button
+          key={option.value}
+          type="button"
+          className={values.includes(option.value) ? 'active' : ''}
+          aria-pressed={values.includes(option.value)}
+          onClick={() => toggle(option.value)}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function BooleanChoice({
   label,
   value,
@@ -482,7 +522,7 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
       <h2>{form.title || 'Titre à définir'}</h2>
       <div className="tag-list">
         <Badge>{missionTypeLabel(form.missionType)}</Badge>
-        <Badge tone="neutral">{requiredLevelLabel(form.requiredLevel)}</Badge>
+        <Badge tone="neutral">{requiredLevelLabels(form.requiredLevels, form.requiredLevel)}</Badge>
         {tags.map((tag) => <Badge key={tag} tone="neutral">#{tag}</Badge>)}
       </div>
       <div className="info-list">

@@ -9,7 +9,7 @@ import { MissionShareActions } from '@/components/MissionShareActions';
 import { Alert, Badge, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatDate, formatMoney } from '@/lib/format';
-import { missionTypeLabel, requiredLevelLabel, statusLabel } from '@/lib/labels';
+import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getMissionApplyPath } from '@/lib/mission-links';
 import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
@@ -126,7 +126,7 @@ export default function MissionPage() {
                 <p>{mission.description || 'Aucune description.'}</p>
                 <div className="tag-list">
                   <Badge>{missionTypeLabel(mission.missionType)}</Badge>
-                  <Badge tone="neutral">{requiredLevelLabel(mission.requiredLevel)}</Badge>
+                  <Badge tone="neutral">{requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</Badge>
                   <Badge tone={mission.status === 'PUBLISHED' ? 'success' : 'warning'}>{statusLabel(mission.status)}</Badge>
                   {mission.tags?.map((tag) => <Badge key={tag.id} tone="neutral">#{tag.tag}</Badge>)}
                 </div>

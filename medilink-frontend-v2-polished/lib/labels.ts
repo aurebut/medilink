@@ -42,6 +42,9 @@ export const requiredLevelOptions: Array<{ value: RequiredLevel; label: string }
   { value: 'INTERN', label: 'Interne' },
   { value: 'JUNIOR_DOCTOR', label: 'Docteur junior' },
   { value: 'DOCTOR', label: 'Médecin' },
+  { value: 'NURSE', label: 'Infirmier / infirmière' },
+  { value: 'OPERATING_ROOM_ASSISTANT', label: 'Aide opératoire' },
+  { value: 'OTHER', label: 'Autre profil' },
 ];
 
 export function roleLabel(role?: UserRole) {
@@ -90,6 +93,11 @@ export function missionTypeLabel(value?: MissionType) {
 
 export function requiredLevelLabel(value?: RequiredLevel) {
   return requiredLevelOptions.find((x) => x.value === value)?.label || value || '—';
+}
+
+export function requiredLevelLabels(values?: RequiredLevel[] | null, fallback?: RequiredLevel | null) {
+  const selected = values?.length ? values : fallback ? [fallback] : [];
+  return selected.map((value) => requiredLevelLabel(value)).join(', ') || '—';
 }
 
 export function documentTypeLabel(value?: DocumentType) {

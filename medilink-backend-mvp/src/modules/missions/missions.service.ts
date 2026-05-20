@@ -18,6 +18,15 @@ export class MissionsService {
   async create(user: RequestUser, dto: CreateMissionDto) {
     const startDate = new Date(dto.startDate);
     const endDate = dto.endDate ? new Date(dto.endDate) : null;
+    const requiredLevels = dto.requiredLevels?.length
+      ? dto.requiredLevels
+      : dto.requiredLevel
+        ? [dto.requiredLevel]
+        : [];
+
+    if (!requiredLevels.length) {
+      throw new BadRequestException('Au moins un type de candidat est requis.');
+    }
 
     if (startDate < new Date()) {
       throw new BadRequestException('La date de début doit être dans le futur.');
@@ -37,7 +46,8 @@ export class MissionsService {
         description: dto.description,
         missionType: dto.missionType,
         specialty: dto.specialty,
-        requiredLevel: dto.requiredLevel,
+        requiredLevel: requiredLevels[0],
+        requiredLevels,
         location: dto.location,
         city: dto.city,
         softwareUsed: dto.softwareUsed,
@@ -89,21 +99,33 @@ export class MissionsService {
     const where: any = {
       status: MissionStatus.PUBLISHED,
     };
+    const andFilters: any[] = [];
 
     if (dto.missionType) where.missionType = dto.missionType;
-    if (dto.requiredLevel) where.requiredLevel = dto.requiredLevel;
+    if (dto.requiredLevel) {
+      andFilters.push({
+        OR: [
+          { requiredLevel: dto.requiredLevel },
+          { requiredLevels: { has: dto.requiredLevel } },
+        ],
+      });
+    }
     if (dto.specialty) where.specialty = { contains: dto.specialty, mode: 'insensitive' };
     if (dto.city) where.city = { contains: dto.city, mode: 'insensitive' };
     if (dto.dateFrom) where.startDate = { gte: new Date(dto.dateFrom) };
 
     if (dto.q) {
-      where.OR = [
-        { title: { contains: dto.q, mode: 'insensitive' } },
-        { description: { contains: dto.q, mode: 'insensitive' } },
-        { specialty: { contains: dto.q, mode: 'insensitive' } },
-        { city: { contains: dto.q, mode: 'insensitive' } },
-      ];
+      andFilters.push({
+        OR: [
+          { title: { contains: dto.q, mode: 'insensitive' } },
+          { description: { contains: dto.q, mode: 'insensitive' } },
+          { specialty: { contains: dto.q, mode: 'insensitive' } },
+          { city: { contains: dto.q, mode: 'insensitive' } },
+        ],
+      });
     }
+
+    if (andFilters.length) where.AND = andFilters;
 
     const [items, total] = await Promise.all([
       this.prisma.mission.findMany({

@@ -189,6 +189,7 @@ export class ApplicationsService {
             missionType: true,
             specialty: true,
             requiredLevel: true,
+            requiredLevels: true,
             location: true,
             city: true,
             startDate: true,
