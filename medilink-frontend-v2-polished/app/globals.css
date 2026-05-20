@@ -629,30 +629,6 @@ button { touch-action: manipulation; }
   background: var(--surface-blue);
   color: #1d4ed8;
 }
-.time-presets {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 7px;
-  min-width: 0;
-}
-.time-presets button {
-  min-height: 32px;
-  padding: 6px 9px;
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--text);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 800;
-}
-.time-presets button:hover,
-.time-presets button.active {
-  border-color: var(--primary);
-  background: var(--surface-blue);
-  color: #1d4ed8;
-}
 .publish-choice { display: grid; gap: 10px; }
 .publish-choice button { display: grid; gap: 5px; }
 .publish-choice span { color: var(--muted); font-size: 13px; font-weight: 650; line-height: 1.45; }
@@ -1156,15 +1132,6 @@ tbody tr:hover { background: #f9fafb; }
   }
   .wizard-step-content {
     gap: 14px;
-  }
-  .time-presets {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-  }
-  .time-presets button {
-    min-height: 36px;
-    padding: 7px 6px;
-    font-size: 12px;
   }
   .mission-top { flex-direction: column; }
   .mission-card h3 { font-size: 20px; }

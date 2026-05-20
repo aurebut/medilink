@@ -28,9 +28,6 @@ const initialForm = {
   publishNow: true,
 };
 
-const startTimePresets = ['08:00', '09:00', '14:00', '20:00'];
-const endTimePresets = ['12:00', '17:00', '20:00', '08:00'];
-
 export default function NewMissionPage() {
   const { establishments, primary, loading } = useEstablishments();
   const [form, setForm] = useState<any>(initialForm);
@@ -339,20 +336,12 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <Field label="Date fin"><Input type="date" value={form.endDate || ''} onChange={(e) => set('endDate', e.target.value)} /></Field>
         </div>
         <div className="form-row">
-          <TimeField
-            label="Heure début"
-            value={form.startTime || ''}
-            presets={startTimePresets}
-            placeholder="08:00"
-            onChange={(value) => set('startTime', value)}
-          />
-          <TimeField
-            label="Heure fin"
-            value={form.endTime || ''}
-            presets={endTimePresets}
-            placeholder="20:00"
-            onChange={(value) => set('endTime', value)}
-          />
+          <Field label="Heure début">
+            <Input type="time" value={form.startTime || ''} onChange={(e) => set('startTime', e.target.value)} />
+          </Field>
+          <Field label="Heure fin">
+            <Input type="time" value={form.endTime || ''} onChange={(e) => set('endTime', e.target.value)} />
+          </Field>
         </div>
         <Field label="Durée estimée en heures">
           <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
@@ -421,38 +410,6 @@ function ChoiceSection({ title, children }: { title: string; children: ReactNode
       <div className="choice-section-title">{title}</div>
       {children}
     </section>
-  );
-}
-
-function TimeField({
-  label,
-  value,
-  presets,
-  placeholder,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  presets: string[];
-  placeholder: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <Field label={label}>
-      <Input value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-      <div className="time-presets" aria-label={`Raccourcis ${label.toLowerCase()}`}>
-        {presets.map((preset) => (
-          <button
-            key={preset}
-            type="button"
-            className={value === preset ? 'active' : ''}
-            onClick={() => onChange(preset)}
-          >
-            {preset}
-          </button>
-        ))}
-      </div>
-    </Field>
   );
 }
 
