@@ -102,6 +102,13 @@ export type Mission = {
   requiredLevel: RequiredLevel;
   location?: string | null;
   city: string;
+  softwareUsed?: string | null;
+  departmentInfo?: string | null;
+  teamInfo?: string | null;
+  equipmentInfo?: string | null;
+  practicalInfo?: string | null;
+  accommodationProvided?: boolean | null;
+  parkingAvailable?: boolean | null;
   startDate: string;
   endDate?: string | null;
   startTime?: string | null;

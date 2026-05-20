@@ -59,6 +59,15 @@ export default function MissionPage() {
   const applyHref = user?.role === 'CANDIDATE'
     ? applyPath
     : `/login?next=${encodeURIComponent(applyPath)}`;
+  const hasContextDetails = Boolean(
+    mission?.softwareUsed ||
+    mission?.departmentInfo ||
+    mission?.teamInfo ||
+    mission?.equipmentInfo ||
+    mission?.practicalInfo ||
+    mission?.accommodationProvided != null ||
+    mission?.parkingAvailable != null,
+  );
 
   return (
     <main className="landing-page public-mission-page">
@@ -112,7 +121,7 @@ export default function MissionPage() {
             </section>
 
             <div className="grid-2">
-              <Card>
+              <Card className="mission-context-card">
                 <h2>Détails</h2>
                 <p>{mission.description || 'Aucune description.'}</p>
                 <div className="tag-list">
@@ -134,6 +143,25 @@ export default function MissionPage() {
                 </div>
               </Card>
             </div>
+
+            {hasContextDetails ? (
+              <Card>
+                <h2>Contexte de la mission</h2>
+                <div className="info-list">
+                  {mission.softwareUsed ? <div><span>Logiciel utilisé</span><strong>{mission.softwareUsed}</strong></div> : null}
+                  {mission.departmentInfo ? <div><span>Service</span><strong>{mission.departmentInfo}</strong></div> : null}
+                  {mission.teamInfo ? <div><span>Équipe sur place</span><strong>{mission.teamInfo}</strong></div> : null}
+                  {mission.equipmentInfo ? <div><span>Matériel disponible</span><strong>{mission.equipmentInfo}</strong></div> : null}
+                  {mission.practicalInfo ? <div><span>Accès</span><strong>{mission.practicalInfo}</strong></div> : null}
+                  {mission.accommodationProvided !== undefined && mission.accommodationProvided !== null ? (
+                    <div><span>Logement proposé</span><strong>{mission.accommodationProvided ? 'Oui' : 'Non'}</strong></div>
+                  ) : null}
+                  {mission.parkingAvailable !== undefined && mission.parkingAvailable !== null ? (
+                    <div><span>Parking disponible</span><strong>{mission.parkingAvailable ? 'Oui' : 'Non'}</strong></div>
+                  ) : null}
+                </div>
+              </Card>
+            ) : null}
           </>
         ) : null}
       </div>

@@ -13,6 +13,7 @@ import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 const steps = [
   { title: 'Type', helper: 'Cadre de la mission' },
   { title: 'Besoin', helper: 'Titre et spécialité' },
+  { title: 'Contexte', helper: 'Logiciel et équipe' },
   { title: 'Lieu', helper: 'Ville et adresse' },
   { title: 'Planning', helper: 'Dates et horaires' },
   { title: 'Budget', helper: 'Rémunération' },
@@ -69,10 +70,10 @@ export default function NewMissionPage() {
     if (step === 1 && (!form.title || !form.specialty)) {
       return 'Ajoute un titre et une spécialité pour continuer.';
     }
-    if (step === 2 && !form.city) {
+    if (step === 3 && !form.city) {
       return 'Indique au moins la ville de la mission.';
     }
-    if (step === 3) {
+    if (step === 4) {
       if (!form.startDate) return 'Choisis une date de début.';
       if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
     }
@@ -275,6 +276,29 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
+          <h2>Ajoute le contexte terrain</h2>
+          <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
+        </div>
+        <Field label="Logiciel utilisé">
+          <Input value={form.softwareUsed || ''} onChange={(e) => set('softwareUsed', e.target.value)} placeholder="Doctolib, Orbis, Hôpital Manager..." />
+        </Field>
+        <Field label="Service ou unité">
+          <Input value={form.departmentInfo || ''} onChange={(e) => set('departmentInfo', e.target.value)} placeholder="Urgences adultes, bloc ambulatoire, cabinet de groupe..." />
+        </Field>
+        <Field label="Équipe sur place">
+          <Textarea value={form.teamInfo || ''} onChange={(e) => set('teamInfo', e.target.value)} placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..." />
+        </Field>
+        <Field label="Matériel disponible">
+          <Textarea value={form.equipmentInfo || ''} onChange={(e) => set('equipmentInfo', e.target.value)} placeholder="Échographe, radio, box dédiés, aide opératoire..." />
+        </Field>
+      </div>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <div className="wizard-step-content">
+        <div>
           <h2>Où se déroule la mission ?</h2>
           <p>La ville est visible publiquement. Le lieu précis peut rester sobre si besoin.</p>
         </div>
@@ -284,11 +308,26 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Lieu précis">
           <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
         </Field>
+        <Field label="Infos pratiques d'accès">
+          <Textarea value={form.practicalInfo || ''} onChange={(e) => set('practicalInfo', e.target.value)} placeholder="Accès badge, entrée de nuit, transports, contact à l'arrivée..." />
+        </Field>
+        <ChoiceSection title="Options d'accueil">
+          <BooleanChoice
+            label="Logement proposé"
+            value={form.accommodationProvided}
+            onChange={(value) => set('accommodationProvided', value)}
+          />
+          <BooleanChoice
+            label="Parking disponible"
+            value={form.parkingAvailable}
+            onChange={(value) => set('parkingAvailable', value)}
+          />
+        </ChoiceSection>
       </div>
     );
   }
 
-  if (step === 3) {
+  if (step === 4) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -322,7 +361,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 4) {
+  if (step === 5) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -341,7 +380,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 5) {
+  if (step === 6) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -442,6 +481,38 @@ function ChoiceGrid({
   );
 }
 
+function BooleanChoice({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value?: boolean;
+  onChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="boolean-choice">
+      <span>{label}</span>
+      <div className="segmented-control">
+        <button
+          type="button"
+          className={value === true ? 'active' : ''}
+          onClick={() => onChange(true)}
+        >
+          Oui
+        </button>
+        <button
+          type="button"
+          className={value === false ? 'active' : ''}
+          onClick={() => onChange(false)}
+        >
+          Non
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function MissionDraftSummary({ form, compact = false }: { form: any; compact?: boolean }) {
   const tags = String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean);
 
@@ -460,10 +531,14 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
       <div className="info-list">
         <div><span>Spécialité</span><strong>{form.specialty || '-'}</strong></div>
         <div><span>Ville</span><strong>{form.city || '-'}</strong></div>
+        <div><span>Logiciel</span><strong>{form.softwareUsed || '-'}</strong></div>
+        <div><span>Service</span><strong>{form.departmentInfo || '-'}</strong></div>
         <div><span>Date</span><strong>{form.startDate ? formatDate(form.startDate) : '-'}</strong></div>
         <div><span>Horaire</span><strong>{form.startTime || '-'} {form.endTime ? `- ${form.endTime}` : ''}</strong></div>
         <div><span>Durée</span><strong>{form.durationHours ? `${form.durationHours} h` : '-'}</strong></div>
         <div><span>Rémunération</span><strong>{formatMoney(form.compensationAmount ? Number(form.compensationAmount) : null, form.compensationCurrency || 'EUR')}</strong></div>
+        <div><span>Logement</span><strong>{form.accommodationProvided === undefined ? '-' : form.accommodationProvided ? 'Oui' : 'Non'}</strong></div>
+        <div><span>Parking</span><strong>{form.parkingAvailable === undefined ? '-' : form.parkingAvailable ? 'Oui' : 'Non'}</strong></div>
       </div>
     </Card>
   );

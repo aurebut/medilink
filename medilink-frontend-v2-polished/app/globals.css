@@ -596,6 +596,39 @@ button { touch-action: manipulation; }
   color: #1d4ed8;
   box-shadow: 0 0 0 4px rgba(20,99,255,.08);
 }
+.boolean-choice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.boolean-choice > span {
+  color: var(--heading);
+  font-weight: 800;
+}
+.segmented-control {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(64px, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.segmented-control button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 850;
+}
+.segmented-control button.active {
+  background: var(--surface-blue);
+  color: #1d4ed8;
+}
 .time-presets {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -625,6 +658,7 @@ button { touch-action: manipulation; }
 .publish-choice span { color: var(--muted); font-size: 13px; font-weight: 650; line-height: 1.45; }
 .mission-draft-summary { position: sticky; top: 16px; }
 .mission-draft-summary.compact { position: static; box-shadow: none; }
+.mission-context-card { margin-top: 16px; }
 .summary-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 10px; }
 
 .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 750; background: var(--surface-blue); color: #1d4ed8; white-space: nowrap; }
@@ -1148,6 +1182,13 @@ tbody tr:hover { background: #f9fafb; }
   .mission-share > .actions { width: 100%; }
   .wizard-step-content h2 { font-size: 22px; }
   .choice-grid { grid-template-columns: 1fr; }
+  .boolean-choice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .segmented-control {
+    width: 100%;
+  }
   .wizard-actions {
     flex-direction: column-reverse;
   }

@@ -39,6 +39,34 @@ export class CreateMissionDto {
   @IsString()
   city: string;
 
+  @IsOptional()
+  @IsString()
+  softwareUsed?: string;
+
+  @IsOptional()
+  @IsString()
+  departmentInfo?: string;
+
+  @IsOptional()
+  @IsString()
+  teamInfo?: string;
+
+  @IsOptional()
+  @IsString()
+  equipmentInfo?: string;
+
+  @IsOptional()
+  @IsString()
+  practicalInfo?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  accommodationProvided?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  parkingAvailable?: boolean;
+
   @IsDateString()
   startDate: string;
 

@@ -353,6 +353,13 @@ model Mission {
   requiredLevel       RequiredLevel
   location            String?
   city                String
+  softwareUsed        String?
+  departmentInfo      String?
+  teamInfo            String?
+  equipmentInfo       String?
+  practicalInfo       String?
+  accommodationProvided Boolean?
+  parkingAvailable    Boolean?
   startDate           DateTime
   endDate             DateTime?
   startTime           String?
