@@ -30,8 +30,10 @@ export default function SearchMissionsPage() {
   const [items, setItems] = useState<Mission[]>([]);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState(emptyFilters);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const activeFilters = Object.values(filters).filter(Boolean).length;
 
   async function load() {
     setLoading(true);
@@ -59,6 +61,7 @@ export default function SearchMissionsPage() {
 
   function submit(e: FormEvent) {
     e.preventDefault();
+    setFiltersOpen(false);
     void load();
   }
 
@@ -70,10 +73,26 @@ export default function SearchMissionsPage() {
       />
 
       <div className="grid-main">
-        <Card>
-          <h2>Filtres</h2>
-          <p>Affinez la recherche selon votre disponibilité, votre niveau et votre localisation.</p>
-          <form className="form" onSubmit={submit}>
+        <Card className={`search-filters ${filtersOpen ? 'search-filters-open' : ''}`}>
+          <div className="search-filters-head">
+            <div>
+              <h2>Filtres</h2>
+              <p>{activeFilters > 0 ? `${activeFilters} filtre(s) actif(s)` : 'Affinez votre recherche'}</p>
+            </div>
+            <Button
+              type="button"
+              variant="light"
+              className="search-filters-toggle"
+              aria-expanded={filtersOpen}
+              aria-controls="mission-search-filters"
+              onClick={() => setFiltersOpen((open) => !open)}
+            >
+              {filtersOpen ? 'Masquer' : 'Afficher'}
+            </Button>
+          </div>
+          <div className="search-filters-body" id="mission-search-filters">
+            <p>Affinez la recherche selon votre disponibilité, votre niveau et votre localisation.</p>
+            <form className="form" onSubmit={submit}>
             <Field label="Recherche">
               <Input value={filters.q} onChange={(e) => set('q', e.target.value)} placeholder="Urgences, pédiatrie..." />
             </Field>
@@ -127,7 +146,8 @@ export default function SearchMissionsPage() {
                 Réinitialiser
               </Button>
             </div>
-          </form>
+            </form>
+          </div>
         </Card>
 
         <div className="grid">

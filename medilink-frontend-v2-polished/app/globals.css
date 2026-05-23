@@ -515,6 +515,16 @@ button { touch-action: manipulation; }
 .card h2, .card h3 { margin: 0 0 12px; color: var(--heading); letter-spacing: -.035em; }
 .card p { color: var(--muted); line-height: 1.65; }
 .card-highlight { background: var(--surface-blue); }
+.search-filters-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.search-filters-head h2 { margin-bottom: 4px; }
+.search-filters-head p { margin: 0; font-size: 13px; line-height: 1.35; }
+.search-filters-toggle { display: none; flex: 0 0 auto; }
+.search-filters-body { display: block; }
 .stat { display: flex; flex-direction: column; gap: 9px; }
 .stat strong { color: var(--heading); font-size: 32px; letter-spacing: -.025em; }
 .stat span { color: var(--muted); }
@@ -727,6 +737,23 @@ tbody tr:hover { background: #f9fafb; }
 @media (max-width: 980px) {
   .hero, .grid-main, .grid-2, .grid-3, .message-layout, .wizard-layout { grid-template-columns: 1fr; }
   .mission-draft-summary { position: static; }
+  .search-filters {
+    position: sticky;
+    top: 84px;
+    z-index: 8;
+  }
+  .search-filters-toggle { display: inline-flex; }
+  .search-filters-body {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .search-filters-open .search-filters-body {
+    display: grid;
+    gap: 12px;
+  }
+  .search-filters-body > p { display: none; }
   .landing-hero {
     min-height: 0;
     grid-template-columns: 1fr;
