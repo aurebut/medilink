@@ -10,14 +10,14 @@ import { Alert, Badge, Button, Card, Field, Select } from './ui';
 type UploadResponse = {
   documentId: string;
   storageKey: string;
-  provider: 'mock' | 's3';
+  provider: 'mock' | 'local' | 's3';
   uploadUrl: string;
   method: 'PUT';
   headers: Record<string, string>;
   expiresInSeconds: number;
 };
 
-type DownloadResponse = { provider: 'mock' | 's3'; downloadUrl: string; expiresInSeconds: number };
+type DownloadResponse = { provider: 'mock' | 'local' | 's3'; downloadUrl: string; expiresInSeconds: number };
 
 function statusTone(status: string) {
   if (status === 'APPROVED') return 'success';

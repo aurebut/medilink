@@ -57,7 +57,11 @@ export class DocumentsService {
       },
     });
 
-    const signed = await this.storage.createUploadUrl(storageKey, dto.mimeType);
+    const signed = await this.storage.createUploadUrl(
+      storageKey,
+      dto.mimeType,
+      dto.sizeBytes,
+    );
 
     await this.audit.log({
       actorUserId: user.id,
@@ -112,7 +116,11 @@ export class DocumentsService {
       throw new NotFoundException('Document introuvable.');
     }
 
-    const signed = await this.storage.createDownloadUrl(document.storageKey);
+    const signed = await this.storage.createDownloadUrl(
+      document.storageKey,
+      document.fileName,
+      document.mimeType,
+    );
 
     await this.audit.log({
       actorUserId: user.id,

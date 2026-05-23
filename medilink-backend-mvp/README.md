@@ -17,7 +17,7 @@ API : `http://localhost:4000/api`
 
 ## Notes importantes
 
-- `STORAGE_PROVIDER=mock` permet de développer sans vrai bucket. Pour la production, utiliser `STORAGE_PROVIDER=s3` avec un bucket privé.
+- `STORAGE_PROVIDER=local` permet de développer sans vrai bucket. Pour la production Vercel/Render/Supabase, utiliser `STORAGE_PROVIDER=s3` avec un bucket Supabase Storage privé et les clés S3 du projet.
 - Si `RESEND_API_KEY` est vide, les emails sont simulés et enregistrés en base.
 - Les permissions sensibles sont vérifiées côté backend : rôle, appartenance établissement, participant conversation, propriétaire document.
 - L’admin minimal repose sur le rôle `MEDILINK_ADMIN`. Pour créer le premier admin, modifier le rôle directement en base ou ajouter un seed.

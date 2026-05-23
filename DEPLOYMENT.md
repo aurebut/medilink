@@ -12,6 +12,8 @@ Create a free Supabase project, then copy the Postgres connection string.
 
 Use the pooled connection string if Supabase offers one. Prisma accepts both the direct and pooled Postgres URLs.
 
+Create a private Supabase Storage bucket for user documents, then create S3 access keys for that project. The backend uses signed S3-compatible URLs, so files go directly from the Vercel frontend to Supabase Storage while document metadata stays in Supabase Postgres.
+
 ## 2. Render API
 
 Create a new Render web service from this GitHub repository.
@@ -33,12 +35,21 @@ DATABASE_URL=YOUR_SUPABASE_POSTGRES_URL
 SESSION_COOKIE_NAME=medilink_session
 SESSION_SECRET=GENERATE_A_LONG_RANDOM_VALUE
 SESSION_MAX_AGE_DAYS=30
-STORAGE_PROVIDER=mock
+STORAGE_PROVIDER=s3
+S3_REGION=auto
+S3_ENDPOINT=https://YOUR_SUPABASE_PROJECT_REF.supabase.co/storage/v1/s3
+S3_BUCKET=YOUR_PRIVATE_STORAGE_BUCKET
+S3_ACCESS_KEY_ID=YOUR_SUPABASE_S3_ACCESS_KEY
+S3_SECRET_ACCESS_KEY=YOUR_SUPABASE_S3_SECRET_KEY
+S3_FORCE_PATH_STYLE=true
+SIGNED_URL_TTL_SECONDS=300
 RESEND_API_KEY=
 EMAIL_FROM=Medilink <no-reply@medilink.local>
 ```
 
 After the first deployment, copy the Render service URL.
+
+In Supabase Storage, allow your Vercel origin to upload with `PUT` and to read signed downloads with `GET`. At minimum the browser needs the `Content-Type` header allowed.
 
 ## 3. Vercel Frontend
 
@@ -61,4 +72,4 @@ After Vercel gives you the frontend URL, update Render's `FRONTEND_URL` with tha
 
 In production, the API sets the session cookie with `SameSite=None` and `Secure` so login works when the frontend is hosted on Vercel and the API is hosted on Render.
 
-For a real production app, replace `STORAGE_PROVIDER=mock` with S3-compatible storage and configure a real email sender.
+For a real production app, keep `STORAGE_PROVIDER=s3` with the private Supabase Storage bucket and configure a real email sender.
