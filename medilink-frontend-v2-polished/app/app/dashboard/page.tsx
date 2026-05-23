@@ -23,7 +23,7 @@ function documentTone(status: Document['verificationStatus']) {
 
 function formatMissionDate(application: Application) {
   const startDate = application.mission?.startDate;
-  if (!startDate) return 'Date a confirmer';
+  if (!startDate) return 'Date à confirmer';
   return formatDate(startDate);
 }
 
@@ -83,24 +83,24 @@ export default function CandidateDashboardPage() {
   const hasApplications = applications.length > 0;
 
   const nextStep = !profileReady
-    ? { label: 'Completer le profil', href: '/app/profile', helper: 'Un profil complet rassure les etablissements.' }
+    ? { label: 'Compléter le profil', href: '/app/profile', helper: 'Un profil complet rassure les établissements.' }
     : !documentsReady
-      ? { label: 'Verifier les documents', href: '/app/profile', helper: 'Gardez vos justificatifs prets avant de postuler.' }
+      ? { label: 'Vérifier les documents', href: '/app/profile', helper: 'Gardez vos justificatifs prêts avant de postuler.' }
       : !hasApplications
-        ? { label: 'Trouver une mission', href: '/app/search', helper: 'Votre dossier est pret a etre envoye.' }
+        ? { label: 'Trouver une mission', href: '/app/search', helper: 'Votre dossier est prêt à être envoyé.' }
         : { label: 'Suivre mes candidatures', href: '/app/applications', helper: 'Consultez les retours et relancez au bon moment.' };
 
   return (
     <>
       <PageHeader
         title={`Bonjour ${firstName}`}
-        description="Votre espace de pilotage pour prioriser les missions, garder un dossier solide et suivre les reponses."
+        description="Votre espace de pilotage pour prioriser les missions, garder un dossier solide et suivre les réponses."
         actions={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
       />
 
       <section className="dashboard-hero">
         <div className="dashboard-hero-copy">
-          <span className="dashboard-eyebrow">Priorite du jour</span>
+          <span className="dashboard-eyebrow">Priorité du jour</span>
           <h2>{nextStep.label}</h2>
           <p>{nextStep.helper}</p>
           <div className="actions">
@@ -128,20 +128,20 @@ export default function CandidateDashboardPage() {
       <div className="grid-3 dashboard-stat-grid">
         <StatCard
           label="Dossier candidat"
-          value={profileReady ? 'Pret' : `${completionScore}%`}
+          value={profileReady ? 'Prêt' : `${completionScore}%`}
           helper={<ProgressBar value={completionScore} />}
-          action={<LinkButton variant="secondary" href="/app/profile">Ameliorer</LinkButton>}
+          action={<LinkButton variant="secondary" href="/app/profile">Améliorer</LinkButton>}
         />
         <StatCard
           label="Documents"
           value={`${dashboard.approvedDocuments.length}/${documents.length || 0}`}
-          helper={`${dashboard.pendingDocuments.length} en attente - ${dashboard.blockedDocuments.length} a corriger`}
-          action={<LinkButton variant="secondary" href="/app/profile">Gerer</LinkButton>}
+          helper={`${dashboard.pendingDocuments.length} en attente - ${dashboard.blockedDocuments.length} à corriger`}
+          action={<LinkButton variant="secondary" href="/app/profile">Gérer</LinkButton>}
         />
         <StatCard
           label="Candidatures actives"
           value={dashboard.activeApplications.length}
-          helper={`${dashboard.acceptedApplications.length} acceptee(s) - ${applications.length} au total`}
+          helper={`${dashboard.acceptedApplications.length} acceptée(s) - ${applications.length} au total`}
           action={<LinkButton variant="secondary" href="/app/applications">Voir</LinkButton>}
         />
       </div>
@@ -150,8 +150,8 @@ export default function CandidateDashboardPage() {
         <Card className="dashboard-panel">
           <div className="toolbar">
             <div>
-              <h2>Candidatures recentes</h2>
-              <p className="small">Les dossiers qui meritent votre attention en premier.</p>
+              <h2>Candidatures récentes</h2>
+              <p className="small">Les dossiers qui méritent votre attention en premier.</p>
             </div>
             <LinkButton variant="light" href="/app/applications">Tout voir</LinkButton>
           </div>
@@ -161,7 +161,7 @@ export default function CandidateDashboardPage() {
                 <div key={application.id} className="dashboard-list-item">
                   <div>
                     <strong>{application.mission?.title || 'Mission'}</strong>
-                    <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement a confirmer'}</span>
+                    <span>{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
                   </div>
                   <div className="dashboard-list-meta">
                     <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
@@ -172,8 +172,8 @@ export default function CandidateDashboardPage() {
             </div>
           ) : (
             <div className="dashboard-empty">
-              <strong>Aucune candidature envoyee</strong>
-              <p>Explorez les missions ouvertes et gardez votre dossier pret pour candidater vite.</p>
+              <strong>Aucune candidature envoyée</strong>
+              <p>Explorez les missions ouvertes et gardez votre dossier prêt pour candidater vite.</p>
               <LinkButton variant="secondary" href="/app/search">Voir les missions</LinkButton>
             </div>
           )}
@@ -184,19 +184,19 @@ export default function CandidateDashboardPage() {
             <div className="toolbar">
               <div>
                 <h2>Prochaine mission</h2>
-                <p className="small">Votre prochain engagement confirme.</p>
+                <p className="small">Votre prochain engagement confirmé.</p>
               </div>
             </div>
             {dashboard.nextMission ? (
               <div className="dashboard-feature">
                 <span>{formatMissionDate(dashboard.nextMission)}</span>
-                <strong>{dashboard.nextMission.mission?.title || 'Mission acceptee'}</strong>
-                <p>{dashboard.nextMission.mission?.city || 'Lieu a confirmer'}</p>
+                <strong>{dashboard.nextMission.mission?.title || 'Mission acceptée'}</strong>
+                <p>{dashboard.nextMission.mission?.city || 'Lieu à confirmer'}</p>
               </div>
             ) : (
               <div className="dashboard-empty compact">
-                <strong>Aucune mission acceptee</strong>
-                <p>Les missions validees apparaitront ici.</p>
+                <strong>Aucune mission acceptée</strong>
+                <p>Les missions validées apparaîtront ici.</p>
               </div>
             )}
           </Card>
@@ -205,9 +205,9 @@ export default function CandidateDashboardPage() {
             <div className="toolbar">
               <div>
                 <h2>Documents sensibles</h2>
-                <p className="small">A surveiller pour eviter les blocages.</p>
+                <p className="small">À surveiller pour éviter les blocages.</p>
               </div>
-              <LinkButton variant="light" href="/app/profile">Gerer</LinkButton>
+              <LinkButton variant="light" href="/app/profile">Gérer</LinkButton>
             </div>
             {documents.length > 0 ? (
               <div className="dashboard-mini-list">
@@ -231,7 +231,7 @@ export default function CandidateDashboardPage() {
       <Card className="dashboard-panel dashboard-notifications">
         <div className="toolbar">
           <div>
-            <h2>Dernieres notifications</h2>
+            <h2>Dernières notifications</h2>
             <p className="small">Les alertes importantes de votre compte.</p>
           </div>
           <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
@@ -252,7 +252,7 @@ export default function CandidateDashboardPage() {
         ) : (
           <div className="dashboard-empty compact">
             <strong>Aucune notification</strong>
-            <p>Les reponses, messages et alertes de dossier apparaitront ici.</p>
+            <p>Les réponses, messages et alertes de dossier apparaîtront ici.</p>
           </div>
         )}
       </Card>
