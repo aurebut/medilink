@@ -1099,6 +1099,29 @@ tbody tr:hover { background: #f9fafb; }
 .workflow-card h3 { margin: 0; color: var(--heading); letter-spacing: -.025em; }
 .workflow-card p { margin: 0; color: var(--muted); line-height: 1.6; }
 .workflow-card-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.workflow-step-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+.workflow-step-panel strong {
+  display: block;
+  color: #1e3a8a;
+  font-size: 15px;
+}
+.workflow-step-panel span {
+  display: block;
+  margin-top: 3px;
+  color: #1d4ed8;
+  font-size: 13px;
+  line-height: 1.45;
+}
 .workflow-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .workflow-summary > div {
   padding: 11px;
@@ -1812,6 +1835,11 @@ tbody tr:hover { background: #f9fafb; }
   .message-layout-mobile-active .workflow-card {
     width: 100%;
     padding: 12px;
+  }
+  .workflow-step-panel {
+    align-items: stretch;
+    flex-direction: column;
+    margin: 0 12px 10px;
   }
   .workflow-summary { grid-template-columns: 1fr; }
   .info-list > div {

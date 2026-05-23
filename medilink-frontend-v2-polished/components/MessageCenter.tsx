@@ -450,6 +450,18 @@ export function MessageCenter() {
           <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
         </div>
 
+        <WorkflowStepPanel
+          state={state}
+          recruiter={recruiter}
+          busyAction={busyAction}
+          onSecure={() => runAction('secure', '/payment/secure')}
+          onComplete={() => runAction('complete', '/mission/complete')}
+          onPay={() => runAction('pay', '/payment/release')}
+          onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
+          onDownloadRecruiter={() => void downloadInvoice('recruiter')}
+          onDownloadCandidate={() => void downloadInvoice('candidate')}
+        />
+
         <div className="messages">
           {recruiter && !state.paymentRequired && !state.fundsSecured && !state.rejected ? (
             <WorkflowComposer
@@ -585,6 +597,117 @@ function WorkflowComposer({
       </div>
     </form>
   );
+}
+
+function WorkflowStepPanel({
+  state,
+  recruiter,
+  busyAction,
+  onSecure,
+  onComplete,
+  onPay,
+  onGenerateInvoices,
+  onDownloadRecruiter,
+  onDownloadCandidate,
+}: {
+  state: {
+    paymentRequired: boolean;
+    fundsSecured: boolean;
+    completed: boolean;
+    released: boolean;
+    invoices: boolean;
+  };
+  recruiter: boolean;
+  busyAction: string | null;
+  onSecure: () => void;
+  onComplete: () => void;
+  onPay: () => void;
+  onGenerateInvoices: () => void;
+  onDownloadRecruiter: () => void;
+  onDownloadCandidate: () => void;
+}) {
+  if (state.invoices) {
+    return (
+      <div className="workflow-step-panel">
+        <div>
+          <strong>Factures disponibles</strong>
+          <span>Les deux PDF de fin de mission sont prêts.</span>
+        </div>
+        <div className="actions">
+          <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadRecruiter}>
+            {busyAction === 'download-recruiter' ? 'Téléchargement...' : 'Facture recruteur PDF'}
+          </Button>
+          <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadCandidate}>
+            {busyAction === 'download-candidate' ? 'Téléchargement...' : 'Justificatif candidat PDF'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (state.released) {
+    return (
+      <div className="workflow-step-panel">
+        <div>
+          <strong>Rétrocession validée</strong>
+          <span>Les factures PDF peuvent maintenant être générées.</span>
+        </div>
+        <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>
+          {busyAction === 'invoices' ? 'Génération...' : 'Générer les factures PDF'}
+        </Button>
+      </div>
+    );
+  }
+
+  if (state.completed) {
+    return (
+      <div className="workflow-step-panel">
+        <div>
+          <strong>Mission terminée</strong>
+          <span>{recruiter ? 'Validez la rétrocession pour débloquer les factures.' : "En attente de validation de la rétrocession par l'établissement."}</span>
+        </div>
+        {recruiter ? (
+          <Button disabled={Boolean(busyAction)} onClick={onPay}>
+            {busyAction === 'pay' ? 'Validation...' : 'Valider la rétrocession'}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (state.fundsSecured) {
+    return (
+      <div className="workflow-step-panel">
+        <div>
+          <strong>Mission confirmée</strong>
+          <span>{recruiter ? 'Marquez la mission terminée une fois la prestation réalisée.' : "En attente de validation de fin de mission par l'établissement."}</span>
+        </div>
+        {recruiter ? (
+          <Button disabled={Boolean(busyAction)} onClick={onComplete}>
+            {busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (state.paymentRequired) {
+    return (
+      <div className="workflow-step-panel">
+        <div>
+          <strong>Accord accepté</strong>
+          <span>{recruiter ? 'Confirmez la mission pour passer à l’étape suivante.' : "En attente de confirmation de la mission par l'établissement."}</span>
+        </div>
+        {recruiter ? (
+          <Button disabled={Boolean(busyAction)} onClick={onSecure}>
+            {busyAction === 'secure' ? 'Confirmation...' : 'Confirmer la mission'}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 function WorkflowMessageCard({
