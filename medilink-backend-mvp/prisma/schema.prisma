@@ -29,6 +29,7 @@ enum MedicalStatus {
   INTERN
   JUNIOR_DOCTOR
   DOCTOR
+  REGULAR_LOCUM
   NURSE
   OPERATING_ROOM_ASSISTANT
   OTHER
@@ -254,6 +255,7 @@ model Profile {
   city                String?
   country             String?        @default("France")
   medicalStatus       MedicalStatus?
+  medicalStatusOther  String?
   specialty           String?
   orientation         String?
   hospitalOrFaculty   String?
@@ -261,6 +263,19 @@ model Profile {
   experienceYears     Int?
   actsPerformed       String[]       @default([])
   availabilityNotes   String?
+  preferredCities     String[]       @default([])
+  maxTravelRadiusKm   Int?
+  mobilityOptions     String[]       @default([])
+  acceptedMissionTypes String[]      @default([])
+  minimumCompensation Int?
+  preferredDurations  String[]       @default([])
+  refusedSchedules    String[]       @default([])
+  knownSoftware       String[]       @default([])
+  acceptedPatientTypes String[]      @default([])
+  secretaryRequired   Boolean?
+  accommodationRequired Boolean?
+  fastPaymentImportant Boolean?
+  acceptedPressureLevel String?
   completionScore     Int            @default(0)
   visibilityStatus    String         @default("PRIVATE")
   createdAt           DateTime       @default(now())

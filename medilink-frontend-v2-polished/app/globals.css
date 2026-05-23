@@ -521,6 +521,58 @@ button { touch-action: manipulation; }
 .profile-photo-controls { flex: 1; min-width: 0; }
 .profile-photo-controls h2 { margin-bottom: 4px; }
 .profile-photo-controls .field { margin: 12px 0; }
+.profile-preferences-section {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.profile-preferences-section h3 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 18px;
+  letter-spacing: 0;
+}
+.profile-choice-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.profile-choice-grid button {
+  min-height: 42px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.custom-choice-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.selected-custom-values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.selected-custom-values button {
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  background: var(--surface-blue);
+  color: #1d4ed8;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+.profile-boolean-choice {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
 .search-filters-head {
   display: flex;
   align-items: flex-start;
@@ -1227,6 +1279,8 @@ tbody tr:hover { background: #f9fafb; }
   .mission-share > .actions { width: 100%; }
   .wizard-step-content h2 { font-size: 22px; }
   .choice-grid { grid-template-columns: 1fr; }
+  .profile-choice-grid { grid-template-columns: 1fr; }
+  .custom-choice-row { grid-template-columns: 1fr; }
   .boolean-choice {
     align-items: stretch;
     flex-direction: column;

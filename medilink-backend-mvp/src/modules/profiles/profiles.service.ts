@@ -94,6 +94,8 @@ export class ProfilesService {
       data.city,
       data.medicalStatus,
       data.specialty,
+      data.acceptedMissionTypes?.length,
+      data.mobilityOptions?.length,
       data.hospitalOrFaculty,
       data.availabilityNotes,
     ];

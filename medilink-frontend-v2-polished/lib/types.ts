@@ -8,7 +8,7 @@ export type UserRole =
   | 'MEDILINK_SUPPORT';
 
 export type UserStatus = 'PENDING_EMAIL_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
-export type MedicalStatus = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
+export type MedicalStatus = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'REGULAR_LOCUM' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
 export type DocumentType = 'CV' | 'ATTESTATION' | 'CONVENTION' | 'DIPLOMA' | 'IDENTITY_DOCUMENT' | 'INSURANCE' | 'AVATAR' | 'MESSAGE_ATTACHMENT' | 'OTHER';
 export type DocumentVerificationStatus = 'UPLOAD_PENDING' | 'PENDING_VERIFICATION' | 'APPROVED' | 'REJECTED' | 'EXPIRED' | 'DELETED';
 export type EstablishmentType = 'HOSPITAL' | 'CLINIC' | 'CABINET' | 'MEDICAL_SERVICE' | 'AGENCY' | 'OTHER';
@@ -40,6 +40,7 @@ export type Profile = {
   city?: string | null;
   country?: string | null;
   medicalStatus?: MedicalStatus | null;
+  medicalStatusOther?: string | null;
   specialty?: string | null;
   orientation?: string | null;
   hospitalOrFaculty?: string | null;
@@ -47,6 +48,19 @@ export type Profile = {
   experienceYears?: number | null;
   actsPerformed: string[];
   availabilityNotes?: string | null;
+  preferredCities: string[];
+  maxTravelRadiusKm?: number | null;
+  mobilityOptions: string[];
+  acceptedMissionTypes: string[];
+  minimumCompensation?: number | null;
+  preferredDurations: string[];
+  refusedSchedules: string[];
+  knownSoftware: string[];
+  acceptedPatientTypes: string[];
+  secretaryRequired?: boolean | null;
+  accommodationRequired?: boolean | null;
+  fastPaymentImportant?: boolean | null;
+  acceptedPressureLevel?: string | null;
   completionScore: number;
   visibilityStatus: string;
   createdAt: string;
