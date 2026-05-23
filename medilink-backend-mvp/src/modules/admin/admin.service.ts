@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
+  DocumentType,
   DocumentVerificationStatus,
   MissionStatus,
   UserStatus,
@@ -53,7 +54,10 @@ export class AdminService {
 
   listDocuments(status?: DocumentVerificationStatus) {
     return this.prisma.document.findMany({
-      where: status ? { verificationStatus: status } : undefined,
+      where: {
+        documentType: { not: DocumentType.AVATAR },
+        ...(status ? { verificationStatus: status } : {}),
+      },
       include: { owner: { select: { id: true, email: true, profile: true } } },
       orderBy: { createdAt: 'desc' },
       take: 100,
@@ -63,6 +67,9 @@ export class AdminService {
   async approveDocument(admin: RequestUser, documentId: string) {
     const document = await this.prisma.document.findUnique({ where: { id: documentId } });
     if (!document) throw new NotFoundException('Document introuvable.');
+    if (document.documentType === DocumentType.AVATAR) {
+      throw new BadRequestException('La photo de profil ne passe pas par la validation admin.');
+    }
 
     const updated = await this.prisma.document.update({
       where: { id: documentId },
@@ -90,6 +97,9 @@ export class AdminService {
   async rejectDocument(admin: RequestUser, documentId: string, reason: string) {
     const document = await this.prisma.document.findUnique({ where: { id: documentId } });
     if (!document) throw new NotFoundException('Document introuvable.');
+    if (document.documentType === DocumentType.AVATAR) {
+      throw new BadRequestException('La photo de profil ne passe pas par la validation admin.');
+    }
 
     const updated = await this.prisma.document.update({
       where: { id: documentId },
