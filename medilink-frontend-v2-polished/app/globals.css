@@ -845,7 +845,7 @@ tbody tr:hover { background: #f9fafb; }
 .mission-card { display: grid; gap: 14px; position: relative; overflow: hidden; }
 .mission-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); }
 .mission-card-image { display: block; width: 100%; aspect-ratio: 16 / 7; overflow: hidden; border-radius: 8px; background: #e5eef8; }
-.search-results .mission-card-image,
+.search-results .mission-card-image { height: 150px; }
 .mission-list .mission-card-image { height: 96px; }
 .mission-card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .mission-card h3 { margin: 0; font-size: 22px; color: var(--heading); }
@@ -858,12 +858,19 @@ tbody tr:hover { background: #f9fafb; }
 .mission-share .input { min-width: min(100%, 360px); flex: 1 1 320px; }
 .mission-share > .actions { flex: 0 0 auto; }
 @media (min-width: 621px) {
-  .search-results .mission-card,
+  .search-results .mission-card {
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+  }
   .mission-list .mission-card {
     grid-template-columns: 128px minmax(0, 1fr);
     align-items: start;
   }
-  .search-results .mission-card-image,
+  .search-results .mission-card-image {
+    grid-row: 1 / span 5;
+    width: 220px;
+    height: 140px;
+  }
   .mission-list .mission-card-image {
     grid-row: 1 / span 5;
     width: 128px;
