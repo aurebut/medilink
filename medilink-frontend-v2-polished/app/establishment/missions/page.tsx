@@ -31,7 +31,7 @@ export default function EstablishmentMissionsPage() {
     <>
       <PageHeader
         title="Missions"
-        description="Toutes les missions de ton établissement, publiées ou en brouillon."
+        description="Toutes les missions de votre établissement, publiées ou en brouillon."
         actions={
           primary ? (
             <LinkButton href="/establishment/missions/new">Créer mission</LinkButton>
@@ -44,13 +44,13 @@ export default function EstablishmentMissionsPage() {
       {!primary ? (
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
-          <p>Crée d'abord un établissement pour pouvoir publier une mission et pré-remplir les informations de lieu.</p>
+          <p>Créez d'abord un établissement pour pouvoir publier une mission et pré-remplir les informations de lieu.</p>
           <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       ) : missions.length === 0 ? (
         <Card>
           <h2>Aucune mission</h2>
-          <p>Crée une mission pour la publier, la partager ou la gérer depuis cet espace.</p>
+          <p>Créez une mission pour la publier, la partager ou la gérer depuis cet espace.</p>
           <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
         </Card>
       ) : (

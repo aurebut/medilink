@@ -13,11 +13,13 @@ import {
   acceptedMissionTypeOptions,
   cityOptions,
   durationOptions,
+  equipmentOptions,
   establishmentDepartmentOptions,
   mobilityOptions,
   patientTypeOptions,
   refusedScheduleOptions,
   sectorOptions,
+  secretaryTypeOptions,
   softwareOptions,
   specialtyOptions,
 } from '@/lib/profile-options';
@@ -79,6 +81,10 @@ export default function NewMissionPage() {
       patientType: selectedEstablishment.patientType || '',
       softwareUsed: selectedEstablishment.softwareUsed || '',
       hasSecretary: selectedEstablishment.hasSecretary,
+      secretaryType: current.secretaryType || selectedEstablishment.secretaryType || '',
+      averagePatientsPerDay: current.averagePatientsPerDay ?? selectedEstablishment.averagePatientsPerDay ?? '',
+      isMultidisciplinary: current.isMultidisciplinary ?? selectedEstablishment.isMultidisciplinary,
+      equipmentAvailable: current.equipmentAvailable?.length ? current.equipmentAvailable : selectedEstablishment.equipmentAvailable || [],
     }));
   }, [selectedEstablishment]);
 
@@ -88,17 +94,17 @@ export default function NewMissionPage() {
 
   function validateCurrentStep() {
     if (step === 1 && (!form.title || !form.specialty)) {
-      return 'Ajoute un titre et une spécialité pour continuer.';
+      return 'Ajoutez un titre et une spécialité pour continuer.';
     }
     if (step === 3 && !form.city) {
-      return 'Indique au moins la ville de la mission.';
+      return 'Indiquez au moins la ville de la mission.';
     }
     if (step === 4) {
-      if (!form.startDate) return 'Choisis une date de début.';
+      if (!form.startDate) return 'Choisissez une date de début.';
       if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
     }
     if (step === 5 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
-      return 'Indique le pourcentage de rétrocession.';
+      return 'Indiquez le pourcentage de rétrocession.';
     }
     return null;
   }
@@ -137,6 +143,10 @@ export default function NewMissionPage() {
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : undefined,
       compensationAmount: undefined,
+      secretaryType: form.secretaryType || undefined,
+      averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? undefined : Number(form.averagePatientsPerDay),
+      isMultidisciplinary: form.isMultidisciplinary,
+      equipmentAvailable: cleanArray(form.equipmentAvailable),
       mobilityOptions: cleanArray(form.mobilityOptions),
       acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
       minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
@@ -176,7 +186,7 @@ export default function NewMissionPage() {
         />
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
-          <p>Crée d'abord une fiche établissement. Elle permettra de rattacher la mission, de pré-remplir la ville et le lieu, puis de recevoir les candidatures au bon endroit.</p>
+          <p>Créez d'abord une fiche établissement. Elle permettra de rattacher la mission, de pré-remplir la ville et le lieu, puis de recevoir les candidatures au bon endroit.</p>
           <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       </>
@@ -192,7 +202,7 @@ export default function NewMissionPage() {
         />
         <Card className="card-highlight">
           <h2>{createdMission.title}</h2>
-          <p>Copie ce lien pour le partager avec un candidat ou dans un message.</p>
+          <p>Copiez ce lien pour le partager avec un candidat ou dans un message.</p>
           <MissionShareActions missionId={createdMission.id} showUrl showPublicLink={false} />
           <div className="actions" style={{ marginTop: 12 }}>
             <LinkButton href="/establishment/missions">Voir mes missions</LinkButton>
@@ -207,7 +217,7 @@ export default function NewMissionPage() {
     <>
       <PageHeader
         title="Créer une mission"
-        description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisis un établissement pour rattacher la mission.'}
+        description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
       />
       <div className="wizard-layout">
         <Card className="wizard-panel">
@@ -242,6 +252,10 @@ export default function NewMissionPage() {
                     patientType: next?.patientType || '',
                     softwareUsed: next?.softwareUsed || '',
                     hasSecretary: next?.hasSecretary,
+                    secretaryType: next?.secretaryType || '',
+                    averagePatientsPerDay: next?.averagePatientsPerDay ?? '',
+                    isMultidisciplinary: next?.isMultidisciplinary,
+                    equipmentAvailable: next?.equipmentAvailable || [],
                   }));
                 }}
               >
@@ -269,8 +283,8 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Quel type de mission veux-tu publier ?</h2>
-          <p>Choisis le format et le niveau attendu pour cadrer la recherche des candidats.</p>
+          <h2>Quel type de mission voulez-vous publier ?</h2>
+          <p>Choisissez le format et le niveau attendu pour cadrer la recherche des candidats.</p>
         </div>
         <ChoiceSection title="Type de mission">
           <ChoiceGrid
@@ -297,7 +311,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Résume le besoin médical</h2>
+          <h2>Résumez le besoin médical</h2>
           <p>Un titre clair et une spécialité précise aident les bons profils à se projeter.</p>
         </div>
         <Field label="Titre de la mission">
@@ -315,7 +329,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Ajoute le contexte terrain</h2>
+          <h2>Ajoutez le contexte terrain</h2>
           <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
         </div>
         <SingleChoiceField label="Service ou unité" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
@@ -331,6 +345,23 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             <option value="false">Non</option>
           </Select>
         </Field>
+        <SingleChoiceField label="Type de secretariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
+        <div className="form-row">
+          <Field label="Patients par jour en moyenne">
+            <Input type="number" min={0} value={form.averagePatientsPerDay ?? ''} onChange={(e) => set('averagePatientsPerDay', e.target.value)} placeholder="Ex : 25" />
+          </Field>
+          <Field label="Cabinet pluridisciplinaire">
+            <Select
+              value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
+              onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
+            >
+              <option value="">Non precise</option>
+              <option value="true">Oui</option>
+              <option value="false">Non</option>
+            </Select>
+          </Field>
+        </div>
+        <MultiChoiceField label="Materiel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
         <Field label="Équipe sur place">
           <Textarea value={form.teamInfo || ''} onChange={(e) => set('teamInfo', e.target.value)} placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..." />
         </Field>
@@ -377,7 +408,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       <div className="wizard-step-content">
         <div>
           <h2>Quel est le planning ?</h2>
-          <p>Indique les dates et horaires utiles pour éviter les allers-retours.</p>
+          <p>Indiquez les dates et horaires utiles pour éviter les allers-retours.</p>
         </div>
         <div className="form-row">
           <Field label="Date début"><Input type="date" required value={form.startDate || ''} onChange={(e) => set('startDate', e.target.value)} /></Field>
@@ -404,7 +435,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       <div className="wizard-step-content">
         <div>
           <h2>Quel mode de rémunération afficher ?</h2>
-          <p>Indique le pourcentage de rétrocession d'honoraires affiché aux candidats.</p>
+          <p>Indiquez le pourcentage de rétrocession d'honoraires affiché aux candidats.</p>
         </div>
         <Field label="Pourcentage de rétrocession">
           <Input type="number" min={1} max={100} value={form.retrocessionPercentage || ''} onChange={(e) => set('retrocessionPercentage', e.target.value)} placeholder="70" />
@@ -417,8 +448,8 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Comment veux-tu la publier ?</h2>
-          <p>Ajoute quelques tags pour la recherche, puis choisis publication immédiate ou brouillon.</p>
+          <h2>Comment voulez-vous la publier ?</h2>
+          <p>Ajoutez quelques tags pour la recherche, puis choisissez publication immédiate ou brouillon.</p>
         </div>
         <Field label="Tags, séparés par virgule">
           <Input value={form.tagsText || ''} onChange={(e) => set('tagsText', e.target.value)} placeholder="urgent, nuit, week-end" />
@@ -442,7 +473,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           </button>
           <button type="button" className={!form.publishNow ? 'active' : ''} onClick={() => set('publishNow', false)}>
             <strong>Garder en brouillon</strong>
-            <span>Tu pourras finaliser avant de la rendre publique.</span>
+            <span>Vous pourrez finaliser avant de la rendre publique.</span>
           </button>
         </div>
       </div>
@@ -452,8 +483,8 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
   return (
     <div className="wizard-step-content">
       <div>
-        <h2>Vérifie avant publication</h2>
-        <p>Si tout est bon, crée la mission. Le lien partageable sera affiché juste après.</p>
+        <h2>Vérifiez avant publication</h2>
+        <p>Si tout est bon, créez la mission. Le lien partageable sera affiché juste après.</p>
       </div>
       <MissionDraftSummary form={form} compact />
     </div>

@@ -104,6 +104,23 @@ export const softwareOptions: ChoiceOption[] = [
   { value: 'DxCare', label: 'DxCare' },
 ];
 
+export const secretaryTypeOptions: ChoiceOption[] = [
+  { value: 'Presentiel', label: 'Presentiel' },
+  { value: 'Distanciel', label: 'Distanciel' },
+  { value: 'Mixte', label: 'Mixte' },
+];
+
+export const equipmentOptions: ChoiceOption[] = [
+  { value: 'ECG', label: 'ECG' },
+  { value: 'Echographe', label: 'Echographe' },
+  { value: 'Radiologie', label: 'Radiologie' },
+  { value: 'Biologie rapide', label: 'Biologie rapide' },
+  { value: 'Materiel de suture', label: 'Materiel de suture' },
+  { value: 'Salle de soins', label: 'Salle de soins' },
+  { value: 'Oxymetre', label: 'Oxymetre' },
+  { value: 'Defibrillateur', label: 'Defibrillateur' },
+];
+
 export const patientTypeOptions: ChoiceOption[] = [
   { value: 'Adultes', label: 'Adultes' },
   { value: 'Enfants', label: 'Enfants' },

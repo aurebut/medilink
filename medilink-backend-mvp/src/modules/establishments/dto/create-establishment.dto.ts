@@ -39,6 +39,24 @@ export class CreateEstablishmentDto {
   hasSecretary?: boolean;
 
   @IsOptional()
+  @IsString()
+  secretaryType?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  averagePatientsPerDay?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  isMultidisciplinary?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  equipmentAvailable?: string[];
+
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
   mobilityOptions?: string[];

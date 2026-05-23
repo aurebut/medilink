@@ -21,10 +21,10 @@ export default function EstablishmentDashboardPage() {
   if (!primary) {
     return (
       <>
-        <PageHeader title="Dashboard établissement" description="Commence par créer ton établissement pour publier des missions." />
+        <PageHeader title="Dashboard établissement" description="Commencez par créer votre établissement pour publier des missions." />
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
-          <p>Crée une fiche établissement pour publier des missions et recevoir des candidatures.</p>
+          <p>Créez une fiche établissement pour publier des missions et recevoir des candidatures.</p>
           <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       </>
@@ -38,7 +38,7 @@ export default function EstablishmentDashboardPage() {
     <>
       <PageHeader
         title={primary.name}
-        description="Vue d’ensemble de l’activité recrutement de ton établissement."
+        description="Vue d’ensemble de l’activité recrutement de votre établissement."
         actions={<LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>}
       />
 
@@ -51,7 +51,7 @@ export default function EstablishmentDashboardPage() {
       <div className="grid-2" style={{ marginTop: 16 }}>
         <Card>
           <h2>Actions rapides</h2>
-          <p>Crée une mission, consulte les candidatures et réponds aux messages depuis l’espace établissement.</p>
+          <p>Créez une mission, consultez les candidatures et répondez aux messages depuis l’espace établissement.</p>
           <div className="actions">
             <LinkButton href="/establishment/missions/new">Nouvelle mission</LinkButton>
             <LinkButton variant="light" href="/establishment/messages">Messagerie</LinkButton>

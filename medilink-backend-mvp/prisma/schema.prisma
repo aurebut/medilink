@@ -342,6 +342,10 @@ model Establishment {
   patientType        String?
   softwareUsed       String?
   hasSecretary       Boolean?
+  secretaryType      String?
+  averagePatientsPerDay Int?
+  isMultidisciplinary Boolean?
+  equipmentAvailable String[]            @default([])
   mobilityOptions    String[]            @default([])
   acceptedMissionTypes String[]          @default([])
   minimumCompensation Int?
@@ -417,6 +421,10 @@ model Mission {
   patientType         String?
   softwareUsed        String?
   hasSecretary        Boolean?
+  secretaryType       String?
+  averagePatientsPerDay Int?
+  isMultidisciplinary Boolean?
+  equipmentAvailable  String[]       @default([])
   mobilityOptions     String[]       @default([])
   acceptedMissionTypes String[]      @default([])
   minimumCompensation Int?

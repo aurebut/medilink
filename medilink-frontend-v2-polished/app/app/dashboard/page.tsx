@@ -36,7 +36,7 @@ export default function CandidateDashboardPage() {
     <>
       <PageHeader
         title={`Bonjour ${firstName}`}
-        description="Pilote ton profil, tes documents, tes candidatures et tes échanges depuis un seul espace."
+        description="Pilotez votre profil, vos documents, vos candidatures et vos échanges depuis un seul espace."
         actions={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
       />
 

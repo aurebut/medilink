@@ -55,14 +55,14 @@ export default function EstablishmentApplicationsPage() {
     <>
       <PageHeader
         title="Candidatures reçues"
-        description="Consulte les profils candidats, échange avec eux et prends une décision claire."
+        description="Consultez les profils candidats, échangez avec eux et prenez une décision claire."
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
 
       {!primary ? (
         <Card>
-          <p>Crée d’abord un établissement.</p>
+          <p>Créez d’abord un établissement.</p>
         </Card>
       ) : (
         <div className="table-wrap">

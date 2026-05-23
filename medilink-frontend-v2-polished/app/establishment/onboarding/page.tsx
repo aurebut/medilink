@@ -13,10 +13,12 @@ import {
   cityOptions,
   countryOptions,
   durationOptions,
+  equipmentOptions,
   mobilityOptions,
   patientTypeOptions,
   refusedScheduleOptions,
   sectorOptions,
+  secretaryTypeOptions,
   softwareOptions,
 } from '@/lib/profile-options';
 
@@ -53,6 +55,8 @@ export default function EstablishmentOnboardingPage() {
         mobilityOptions: cleanArray(form.mobilityOptions),
         acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
         minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
+        averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? undefined : Number(form.averagePatientsPerDay),
+        equipmentAvailable: cleanArray(form.equipmentAvailable),
         preferredDurations: cleanArray(form.preferredDurations),
         refusedSchedules: cleanArray(form.refusedSchedules),
         acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
@@ -91,7 +95,7 @@ export default function EstablishmentOnboardingPage() {
 
   return (
     <>
-      <PageHeader title="Etablissement" description="Cree ou consulte ton etablissement recruteur." />
+      <PageHeader title="Etablissement" description="Creez ou consultez votre etablissement recruteur." />
       <div className="grid-2">
         <Card>
           <h2>Mes etablissements</h2>
@@ -162,6 +166,23 @@ export default function EstablishmentOnboardingPage() {
                 <option value="false">Non</option>
               </Select>
             </Field>
+            <SingleChoiceField label="Type de secretariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
+            <div className="form-row">
+              <Field label="Patients par jour en moyenne">
+                <Input type="number" min={0} value={form.averagePatientsPerDay ?? ''} onChange={(e) => set('averagePatientsPerDay', e.target.value)} placeholder="Ex : 25" />
+              </Field>
+              <Field label="Cabinet pluridisciplinaire">
+                <Select
+                  value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
+                  onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
+                >
+                  <option value="">Non renseigne</option>
+                  <option value="true">Oui</option>
+                  <option value="false">Non</option>
+                </Select>
+              </Field>
+            </div>
+            <MultiChoiceField label="Materiel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
             <div className="profile-preferences-section">
               <h3>Criteres habituels de mission</h3>
               <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
@@ -180,7 +201,7 @@ export default function EstablishmentOnboardingPage() {
               <Field label="Telephone"><Input value={form.phone || ''} onChange={(e) => set('phone', e.target.value)} /></Field>
             </div>
             <Field label="Site web"><Input value={form.website || ''} onChange={(e) => set('website', e.target.value)} placeholder="https://..." /></Field>
-            <Field label="Description"><Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} /></Field>
+            <Field label="Description du cabinet"><Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Organisation du cabinet, ambiance, specialites presentes..." /></Field>
             <Button disabled={saving}>{saving ? 'Creation...' : 'Creer'}</Button>
           </form>
         </Card>

@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
   return <main className="auth-page"><form className="auth-card form" onSubmit={submit}>
     <Link className="brand" href="/"><span className="brand-mark">M</span><span>Médilink</span></Link>
     <h1>Mot de passe oublié</h1>
-    <p>Entre ton email. En mode mock, le lien apparaît dans les logs backend.</p>
+    <p>Entrez votre email. En mode mock, le lien apparaît dans les logs backend.</p>
     {message ? <Alert type="success">{message}</Alert> : null}{error ? <Alert type="error">{error}</Alert> : null}
     <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
     <Button>Envoyer le lien</Button>

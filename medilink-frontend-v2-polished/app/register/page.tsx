@@ -47,7 +47,7 @@ export default function RegisterPage() {
         <Link className="brand" href="/"><span className="brand-mark">M</span><span>Medilink</span></Link>
         <div>
           <h1>Créer un compte</h1>
-          <p>Choisis le type de compte pour accéder directement à ton espace.</p>
+          <p>Choisissez le type de compte pour accéder directement à votre espace.</p>
         </div>
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Type de compte">

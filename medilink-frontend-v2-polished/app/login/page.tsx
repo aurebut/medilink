@@ -36,7 +36,7 @@ function LoginForm() {
         <Link className="brand" href="/"><span className="brand-mark">M</span><span>Médilink</span></Link>
         <div>
           <h1>Connexion</h1>
-          <p>Connecte-toi pour accéder à ton espace candidat, établissement ou admin.</p>
+          <p>Connectez-vous pour accéder à votre espace candidat, établissement ou admin.</p>
         </div>
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
