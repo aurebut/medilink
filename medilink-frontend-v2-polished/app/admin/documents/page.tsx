@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, isMockStorageUrl } from '@/lib/api';
+import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentVerificationStatus } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
@@ -58,14 +58,18 @@ export default function AdminDocumentsPage() {
   }
 
   async function view(id: string) {
+    const previewWindow = openDocumentPreviewWindow();
+
     try {
       const res = await api.get<{ provider: string; downloadUrl: string }>(`/documents/${id}/download-url`);
       if (isMockStorageUrl(res.downloadUrl)) {
+        previewWindow?.close();
         alert('Storage mock : aucun fichier réel à ouvrir.');
         return;
       }
-      window.open(res.downloadUrl, '_blank', 'noopener,noreferrer');
+      showDocumentInPreview(res.downloadUrl, previewWindow);
     } catch (e: any) {
+      previewWindow?.close();
       setError(e.message);
     }
   }

@@ -83,3 +83,25 @@ export const api = {
 export function isMockStorageUrl(url?: string) {
   return Boolean(url?.startsWith('mock://'));
 }
+
+export function openDocumentPreviewWindow() {
+  if (typeof window === 'undefined') return null;
+
+  const previewWindow = window.open('', '_blank');
+  if (!previewWindow) return null;
+
+  previewWindow.document.write(
+    '<!doctype html><title>Document</title><body style="font-family:system-ui,sans-serif;padding:24px">Chargement du document...</body>',
+  );
+  previewWindow.document.close();
+  return previewWindow;
+}
+
+export function showDocumentInPreview(url: string, previewWindow: Window | null) {
+  if (previewWindow && !previewWindow.closed) {
+    previewWindow.location.href = url;
+    return;
+  }
+
+  window.location.href = url;
+}

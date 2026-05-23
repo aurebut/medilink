@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { api, isMockStorageUrl } from '@/lib/api';
+import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { CandidateProfileForApplication, Document } from '@/lib/types';
 import { documentTypeLabel, medicalStatusOptions, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
@@ -44,16 +44,20 @@ export default function EstablishmentCandidateProfilePage() {
   }, [applicationId]);
 
   async function openDocument(document: Document) {
+    const previewWindow = openDocumentPreviewWindow();
+
     try {
       const res = await api.get<{ provider: string; downloadUrl: string }>(`/documents/${document.id}/download-url`);
 
       if (isMockStorageUrl(res.downloadUrl)) {
+        previewWindow?.close();
         alert('Storage mock : aucun fichier réel à ouvrir en local.');
         return;
       }
 
-      window.open(res.downloadUrl, '_blank', 'noopener,noreferrer');
+      showDocumentInPreview(res.downloadUrl, previewWindow);
     } catch (e: any) {
+      previewWindow?.close();
       setError(e.message);
     }
   }

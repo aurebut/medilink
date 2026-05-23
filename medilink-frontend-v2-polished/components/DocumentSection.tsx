@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api, isMockStorageUrl } from '@/lib/api';
+import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeOptions, documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
@@ -82,14 +82,18 @@ export function DocumentSection() {
   }
 
   async function openDocument(documentId: string) {
+    const previewWindow = openDocumentPreviewWindow();
+
     try {
       const result = await api.get<DownloadResponse>(`/documents/${documentId}/download-url`);
       if (isMockStorageUrl(result.downloadUrl)) {
+        previewWindow?.close();
         alert('Storage en mode mock : aucun fichier réel à ouvrir. En production, une URL temporaire serait ouverte.');
         return;
       }
-      window.open(result.downloadUrl, '_blank', 'noopener,noreferrer');
+      showDocumentInPreview(result.downloadUrl, previewWindow);
     } catch (e: any) {
+      previewWindow?.close();
       setError(e.message);
     }
   }
