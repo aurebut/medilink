@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { api, getApiEventUrl } from '@/lib/api';
+import { api, getApiEventUrl, getApiUrl, getAuthToken } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateWithArticle } from '@/lib/grammar';
@@ -38,9 +38,19 @@ type ProposalPayload = {
   notes?: string;
 };
 
+type InvoicePayload = {
+  id: string;
+  type: 'RECRUITER_INVOICE' | 'CANDIDATE_RECEIPT';
+  number: string;
+  amount: number;
+  currency: string;
+  issuedAt: string;
+};
+
 type WorkflowPayload = {
   kind: WorkflowKind;
   proposal?: ProposalPayload;
+  invoices?: InvoicePayload[];
 };
 
 type ProposalForm = {
@@ -360,36 +370,32 @@ export function MessageCenter() {
     }
   }
 
-  function downloadInvoice(kind: 'recruiter' | 'candidate') {
-    if (!active || !lastProposal?.workflow?.proposal) return;
-    const p = lastProposal.workflow.proposal;
-    const title = kind === 'recruiter' ? 'Facture établissement' : 'Justificatif candidat';
-    const content = [
-      title,
-      '',
-      `Mission: ${active.mission?.title || ''}`,
-      `Établissement: ${active.establishment?.name || ''}`,
-      `Ville: ${active.mission?.city || ''}`,
-      `Date: ${p.startDate ? formatDate(p.startDate) : ''}`,
-      `Horaire: ${p.startTime || ''}${p.endTime ? ` - ${p.endTime}` : ''}`,
-      `Rémunération: ${formatCompensation({
-        compensationMode: p.compensationMode,
-        retrocessionPercentage: p.retrocessionPercentage,
-        compensationAmount: p.amount,
-        compensationCurrency: p.currency || 'EUR',
-      })}`,
-      '',
-      kind === 'recruiter'
-        ? 'Document généré après validation de fin de mission et confirmation du paiement.'
-        : `Document genere pour ${candidateWithArticle(activeCandidateProfile)} apres confirmation du paiement.`,
-    ].join('\n');
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = kind === 'recruiter' ? 'facture-etablissement.txt' : 'justificatif-candidat.txt';
-    link.click();
-    URL.revokeObjectURL(url);
+  async function downloadInvoice(kind: 'recruiter' | 'candidate') {
+    if (!activeId) return;
+    setBusyAction(`download-${kind}`);
+    setError(null);
+    try {
+      const token = getAuthToken();
+      const response = await fetch(getApiUrl(`/conversations/${activeId}/invoices/${kind}.pdf`), {
+        credentials: 'include',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error('Téléchargement de la facture impossible.');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="([^"]+)"/);
+      link.href = url;
+      link.download = match?.[1] || (kind === 'recruiter' ? 'facture-etablissement.pdf' : 'justificatif-candidat.pdf');
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyAction(null);
+    }
   }
 
   if (loading) return <Card><p className="muted">Chargement des conversations...</p></Card>;
@@ -482,8 +488,8 @@ export function MessageCenter() {
                   onComplete={() => runAction('complete', '/mission/complete')}
                   onPay={() => runAction('pay', '/payment/release')}
                   onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
-                  onDownloadRecruiter={() => downloadInvoice('recruiter')}
-                  onDownloadCandidate={() => downloadInvoice('candidate')}
+                  onDownloadRecruiter={() => void downloadInvoice('recruiter')}
+                  onDownloadCandidate={() => void downloadInvoice('candidate')}
                 />
               );
             }
@@ -722,8 +728,12 @@ function WorkflowMessageCard({
           <p>Les documents de fin de mission sont disponibles pour les deux parties.</p>
           {canDownloadInvoices ? (
             <div className="actions">
-              <Button variant="light" onClick={onDownloadRecruiter}>Facture recruteur</Button>
-              <Button variant="light" onClick={onDownloadCandidate}>Justificatif candidat</Button>
+              <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadRecruiter}>
+                {busyAction === 'download-recruiter' ? 'Téléchargement...' : 'Facture recruteur PDF'}
+              </Button>
+              <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadCandidate}>
+                {busyAction === 'download-candidate' ? 'Téléchargement...' : 'Justificatif candidat PDF'}
+              </Button>
             </div>
           ) : null}
         </>

@@ -1,4 +1,5 @@
-import { Body, Controller, Get, MessageEvent, Param, Post, Sse, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, MessageEvent, Param, Post, Res, Sse, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthGuard } from '../../common/guards/auth.guard';
@@ -74,6 +75,19 @@ export class ConversationsController {
   @Post(':id/invoices/generate')
   generateInvoices(@CurrentUser() user: RequestUser, @Param('id') id: string) {
     return this.conversations.generateInvoices(user, id);
+  }
+
+  @Get(':id/invoices/:type.pdf')
+  async downloadInvoice(
+    @CurrentUser() user: RequestUser,
+    @Param('id') id: string,
+    @Param('type') type: 'recruiter' | 'candidate',
+    @Res() response: Response,
+  ) {
+    const invoice = await this.conversations.downloadInvoicePdf(user, id, type);
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader('Content-Disposition', `attachment; filename="${invoice.fileName}"`);
+    response.send(invoice.buffer);
   }
 
   @Post(':id/read')

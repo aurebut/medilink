@@ -28,6 +28,10 @@ export function getApiEventUrl(path: string) {
   return url.toString();
 }
 
+export function getApiUrl(path: string) {
+  return `${API_URL}${path}`;
+}
+
 export function setAuthToken(token: string) {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(AUTH_TOKEN_KEY, token);

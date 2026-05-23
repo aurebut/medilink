@@ -20,6 +20,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { SendProposalDto } from './dto/workflow-action.dto';
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
+type InvoiceDownloadType = 'recruiter' | 'candidate';
 
 @Injectable()
 export class ConversationsService {
@@ -409,31 +410,9 @@ export class ConversationsService {
   async generateInvoices(user: RequestUser, conversationId: string) {
     await this.permissions.ensureConversationParticipant(user.id, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_RELEASED);
-    const payment = await this.prisma.escrowPayment.findUnique({ where: { agreementId: agreement.id } });
 
     const message = await this.prisma.$transaction(async (tx) => {
-      const count = await tx.invoice.count();
-      await tx.invoice.createMany({
-        data: [
-          {
-            agreementId: agreement.id,
-            paymentId: payment?.id,
-            type: InvoiceType.RECRUITER_INVOICE,
-            number: `ML-R-${String(count + 1).padStart(6, '0')}`,
-            amount: agreement.amount,
-            currency: agreement.currency,
-          },
-          {
-            agreementId: agreement.id,
-            paymentId: payment?.id,
-            type: InvoiceType.CANDIDATE_RECEIPT,
-            number: `ML-C-${String(count + 2).padStart(6, '0')}`,
-            amount: agreement.candidateAmount,
-            currency: agreement.currency,
-          },
-        ],
-        skipDuplicates: true,
-      });
+      const invoices = await this.ensureInvoicesTx(tx, agreement);
 
       await tx.agreementEvent.create({
         data: {
@@ -447,12 +426,72 @@ export class ConversationsService {
       return this.createWorkflowMessageTx(tx, user, conversationId, 'INVOICES_GENERATED', {
         agreementId: agreement.id,
         proposal: this.agreementPayload(agreement),
+        invoices: invoices.map((invoice) => ({
+          id: invoice.id,
+          type: invoice.type,
+          number: invoice.number,
+          amount: invoice.amount,
+          currency: invoice.currency,
+          issuedAt: invoice.issuedAt,
+        })),
       });
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
     await this.events.emitMessageCreated(conversationId, message);
     return message;
+  }
+
+  async downloadInvoicePdf(user: RequestUser, conversationId: string, type: InvoiceDownloadType) {
+    await this.permissions.ensureConversationParticipant(user.id, conversationId);
+    const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_RELEASED);
+    const invoiceType = type === 'recruiter' ? InvoiceType.RECRUITER_INVOICE : InvoiceType.CANDIDATE_RECEIPT;
+
+    const invoice = await this.prisma.$transaction(async (tx) => {
+      const invoices = await this.ensureInvoicesTx(tx, agreement);
+      return invoices.find((item) => item.type === invoiceType);
+    });
+
+    if (!invoice) throw new NotFoundException('Facture introuvable.');
+
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+      include: {
+        mission: true,
+        establishment: true,
+        application: { include: { candidate: { include: { profile: true } } } },
+      },
+    });
+
+    if (!conversation) throw new NotFoundException('Conversation introuvable.');
+
+    const candidateProfile = conversation.application.candidate.profile;
+    const candidateName = [candidateProfile?.firstName, candidateProfile?.lastName].filter(Boolean).join(' ') || conversation.application.candidate.email;
+    const title = type === 'recruiter' ? 'Facture etablissement' : 'Justificatif candidat';
+    const fileName = `${invoice.number}-${type === 'recruiter' ? 'facture-etablissement' : 'justificatif-candidat'}.pdf`;
+    const buffer = this.buildInvoicePdf([
+      title,
+      `Numero: ${invoice.number}`,
+      `Date d'emission: ${invoice.issuedAt.toLocaleDateString('fr-FR')}`,
+      '',
+      `Mission: ${conversation.mission.title}`,
+      `Etablissement: ${conversation.establishment.name}`,
+      `Candidat: ${candidateName}`,
+      `Ville: ${conversation.mission.city}`,
+      `Date mission: ${agreement.startDate ? agreement.startDate.toLocaleDateString('fr-FR') : '-'}`,
+      `Horaire: ${agreement.startTime || '-'}${agreement.endTime ? ` - ${agreement.endTime}` : ''}`,
+      '',
+      `Mode: ${agreement.compensationMode === CompensationMode.RETROCESSION ? "Retrocession d'honoraires" : 'Montant fixe'}`,
+      agreement.retrocessionPercentage ? `Retrocession: ${agreement.retrocessionPercentage}%` : null,
+      `Montant: ${invoice.amount.toLocaleString('fr-FR', { style: 'currency', currency: invoice.currency })}`,
+      '',
+      type === 'recruiter'
+        ? 'Document genere pour le recruteur apres validation de la mission.'
+        : 'Document genere pour le candidat apres validation de la mission.',
+      'Medilink - document genere automatiquement.',
+    ].filter(Boolean) as string[]);
+
+    return { buffer, fileName };
   }
 
   async markAsRead(user: RequestUser, conversationId: string) {
@@ -528,6 +567,86 @@ export class ConversationsService {
 
   private optionalDate(value?: string) {
     return value ? new Date(value) : undefined;
+  }
+
+  private async ensureInvoicesTx(tx: any, agreement: {
+    id: string;
+    amount: number;
+    candidateAmount: number;
+    currency: string;
+  }) {
+    const existingInvoices = await tx.invoice.findMany({
+      where: { agreementId: agreement.id },
+      orderBy: { issuedAt: 'asc' },
+    });
+    const invoices = [...existingInvoices];
+    const payment = await tx.escrowPayment.findUnique({ where: { agreementId: agreement.id } });
+
+    if (!invoices.some((invoice) => invoice.type === InvoiceType.RECRUITER_INVOICE)) {
+      const count = await tx.invoice.count();
+      invoices.push(await tx.invoice.create({
+        data: {
+          agreementId: agreement.id,
+          paymentId: payment?.id,
+          type: InvoiceType.RECRUITER_INVOICE,
+          number: `ML-R-${String(count + 1).padStart(6, '0')}`,
+          amount: agreement.amount,
+          currency: agreement.currency,
+        },
+      }));
+    }
+
+    if (!invoices.some((invoice) => invoice.type === InvoiceType.CANDIDATE_RECEIPT)) {
+      const count = await tx.invoice.count();
+      invoices.push(await tx.invoice.create({
+        data: {
+          agreementId: agreement.id,
+          paymentId: payment?.id,
+          type: InvoiceType.CANDIDATE_RECEIPT,
+          number: `ML-C-${String(count + 1).padStart(6, '0')}`,
+          amount: agreement.candidateAmount,
+          currency: agreement.currency,
+        },
+      }));
+    }
+
+    return invoices.sort((a, b) => a.issuedAt.getTime() - b.issuedAt.getTime());
+  }
+
+  private buildInvoicePdf(lines: string[]) {
+    const escapePdfText = (value: string) => value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[\\()]/g, '\\$&');
+    const textCommands = lines.map((line, index) => {
+      const size = index === 0 ? 20 : 11;
+      const leading = index === 0 ? 28 : 17;
+      const escaped = escapePdfText(line);
+      return index === 0
+        ? `BT /F1 ${size} Tf 54 770 Td (${escaped}) Tj ET`
+        : `BT /F1 ${size} Tf 54 ${770 - 28 - ((index - 1) * leading)} Td (${escaped}) Tj ET`;
+    }).join('\n');
+    const stream = `${textCommands}\n`;
+    const objects = [
+      '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
+      '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
+      '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj\n',
+      '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n',
+      `5 0 obj << /Length ${Buffer.byteLength(stream, 'utf8')} >> stream\n${stream}endstream endobj\n`,
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => {
+      offsets.push(Buffer.byteLength(pdf, 'utf8'));
+      pdf += object;
+    });
+    const xrefOffset = Buffer.byteLength(pdf, 'utf8');
+    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+    offsets.slice(1).forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    return Buffer.from(pdf, 'utf8');
   }
 
   private agreementPayload(agreement: {
