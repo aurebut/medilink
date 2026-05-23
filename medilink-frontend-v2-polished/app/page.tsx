@@ -1,5 +1,10 @@
+'use client';
+
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { Badge, Card, LinkButton } from '@/components/ui';
+
+/* ── Data ── */
 
 const painPoints = [
   'Informations de mission dispersées entre appels, mails et fichiers.',
@@ -8,12 +13,12 @@ const painPoints = [
 ];
 
 const productPillars = [
-  { title: 'Missions', detail: 'Publier un besoin court, clair et daté.' },
-  { title: 'Candidatures', detail: 'Suivre les profils et les statuts reçus.' },
-  { title: 'Documents', detail: 'Centraliser CV, diplômes et attestations.' },
-  { title: 'Messagerie', detail: 'Garder le contexte de chaque échange.' },
-  { title: 'Proposition', detail: 'Formaliser le montant et les conditions.' },
-  { title: 'Paiement', detail: 'Sécuriser la confirmation de mission.' },
+  { icon: '📋', title: 'Missions', detail: 'Publier un besoin court, clair et daté.' },
+  { icon: '👤', title: 'Candidatures', detail: 'Suivre les profils et les statuts reçus.' },
+  { icon: '📄', title: 'Documents', detail: 'Centraliser CV, diplômes et attestations.' },
+  { icon: '💬', title: 'Messagerie', detail: 'Garder le contexte de chaque échange.' },
+  { icon: '🤝', title: 'Proposition', detail: 'Formaliser le montant et les conditions.' },
+  { icon: '🔒', title: 'Paiement', detail: 'Sécuriser la confirmation de mission.' },
 ];
 
 const candidateFlow = [
@@ -27,7 +32,7 @@ const establishmentFlow = [
   'Publie une mission courte avec les conditions attendues.',
   'Consulte les candidatures et les documents utiles.',
   'Échange avec les profils retenus dans le bon contexte.',
-  'Confirme l’accord, le paiement et la fin de mission.',
+  'Confirme l\u2019accord, le paiement et la fin de mission.',
 ];
 
 const workflowSteps = [
@@ -45,32 +50,115 @@ const candidates = [
   { name: 'Lina Moreau', detail: 'Médecine générale · Profil complet', status: 'Nouveau' },
 ];
 
+const stats = [
+  { value: 500, suffix: '+', label: 'Missions publiées' },
+  { value: 1200, suffix: '+', label: 'Professionnels inscrits' },
+  { value: 98, suffix: '%', label: 'Taux de satisfaction' },
+];
+
+/* ── Animated Counter ── */
+
+function AnimatedCounter({
+  target,
+  suffix,
+  visible,
+}: {
+  target: number;
+  suffix: string;
+  visible: boolean;
+}) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!visible) return;
+    let current = 0;
+    const increment = target / 125;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [visible, target]);
+
+  return (
+    <strong>
+      {count.toLocaleString('fr-FR')}
+      {suffix}
+    </strong>
+  );
+}
+
+/* ── Page ── */
+
 export default function HomePage() {
+  const statsRef = useRef<HTMLDivElement>(null);
+  const [statsVisible, setStatsVisible] = useState(false);
+
+  useEffect(() => {
+    /* Scroll reveal */
+    const revealObserver = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add('revealed');
+        }),
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' },
+    );
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+    /* Stats trigger */
+    const statsObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStatsVisible(true);
+          statsObserver.disconnect();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    if (statsRef.current) statsObserver.observe(statsRef.current);
+
+    return () => {
+      revealObserver.disconnect();
+      statsObserver.disconnect();
+    };
+  }, []);
+
   return (
     <main className="landing-page">
       <div className="container">
+        {/* ═══ NAV ═══ */}
         <nav className="public-nav">
           <Link href="/" className="brand">
             <span className="brand-mark">M</span>
             <span>Médilink</span>
           </Link>
           <div className="nav-actions">
-            <LinkButton variant="light" href="/login">Connexion</LinkButton>
+            <LinkButton variant="light" href="/login">
+              Connexion
+            </LinkButton>
             <LinkButton href="/register">Créer un compte</LinkButton>
           </div>
         </nav>
 
+        {/* ═══ HERO ═══ */}
         <section className="hero landing-hero">
           <div className="hero-copy landing-hero-copy">
             <div className="kicker">Remplacement médical</div>
             <h1>Remplacements médicaux, sans les échanges dispersés.</h1>
             <p>
-              Médilink centralise les missions courtes, les candidatures, les documents, la messagerie
-              et le paiement sécurisé entre établissements et professionnels de santé.
+              Médilink centralise les missions courtes, les candidatures, les documents, la
+              messagerie et le paiement sécurisé entre établissements et professionnels de santé.
             </p>
             <div className="actions">
               <LinkButton href="/register">Publier ou trouver une mission</LinkButton>
-              <LinkButton variant="light" href="/login">Se connecter</LinkButton>
+              <LinkButton variant="light" href="/login">
+                Se connecter
+              </LinkButton>
             </div>
             <div className="landing-proof">
               <span>Pour les gardes, remplacements, vacations et renforts ponctuels.</span>
@@ -116,7 +204,9 @@ export default function HomePage() {
                     <strong>{candidate.name}</strong>
                     <span>{candidate.detail}</span>
                   </div>
-                  <Badge tone={candidate.status === 'Retenue' ? 'success' : 'neutral'}>{candidate.status}</Badge>
+                  <Badge tone={candidate.status === 'Retenue' ? 'success' : 'neutral'}>
+                    {candidate.status}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -126,12 +216,15 @@ export default function HomePage() {
                 <span>Accord final</span>
                 <strong>Proposition envoyée</strong>
               </div>
-              <p>Le montant, les horaires et les conditions restent rattachés à la conversation.</p>
+              <p>
+                Le montant, les horaires et les conditions restent rattachés à la conversation.
+              </p>
             </div>
           </aside>
         </section>
 
-        <section className="landing-split">
+        {/* ═══ PROBLEM ═══ */}
+        <section className="landing-split reveal">
           <div className="section-heading">
             <div className="kicker">Le problème</div>
             <h2>Une mission courte implique souvent trop de canaux.</h2>
@@ -146,7 +239,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="landing-section">
+        {/* ═══ FEATURES ═══ */}
+        <section className="landing-section reveal">
           <div className="section-heading">
             <div className="kicker">La réponse Médilink</div>
             <h2>Un espace unique pour suivre ce qui compte.</h2>
@@ -159,6 +253,7 @@ export default function HomePage() {
           <div className="pillar-grid">
             {productPillars.map((pillar) => (
               <Card key={pillar.title} className="pillar-card">
+                <div className="pillar-icon">{pillar.icon}</div>
                 <strong>{pillar.title}</strong>
                 <p>{pillar.detail}</p>
               </Card>
@@ -166,7 +261,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="landing-section">
+        {/* ═══ TWO PATHS ═══ */}
+        <section className="landing-section reveal">
           <div className="section-heading">
             <div className="kicker">Deux parcours</div>
             <h2>Le même fil de mission, vu par chaque côté.</h2>
@@ -189,7 +285,9 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <LinkButton variant="light" href="/register">Je cherche une mission</LinkButton>
+              <LinkButton variant="light" href="/register">
+                Je cherche une mission
+              </LinkButton>
             </Card>
 
             <Card className="audience-card">
@@ -208,17 +306,21 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              <LinkButton variant="light" href="/register">Je publie une mission</LinkButton>
+              <LinkButton variant="light" href="/register">
+                Je publie une mission
+              </LinkButton>
             </Card>
           </div>
         </section>
 
-        <section className="workflow-band">
+        {/* ═══ WORKFLOW ═══ */}
+        <section className="workflow-band reveal">
           <div className="section-heading">
             <div className="kicker">Cycle complet</div>
-            <h2>De l’annonce au justificatif, le suivi reste lisible.</h2>
+            <h2>De l&apos;annonce au justificatif, le suivi reste lisible.</h2>
             <p>
-              Chaque étape garde sa place dans un parcours simple, traçable et partagé entre les parties.
+              Chaque étape garde sa place dans un parcours simple, traçable et partagé entre les
+              parties.
             </p>
           </div>
           <div className="workflow-rail">
@@ -231,17 +333,70 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="landing-cta">
+        {/* ═══ STATS ═══ */}
+        <div className="landing-stats reveal" ref={statsRef}>
+          {stats.map((s) => (
+            <Card key={s.label} className="landing-stat-card">
+              <AnimatedCounter target={s.value} suffix={s.suffix} visible={statsVisible} />
+              <span>{s.label}</span>
+            </Card>
+          ))}
+        </div>
+
+        {/* ═══ CTA ═══ */}
+        <section className="landing-cta reveal">
           <div>
             <div className="kicker">Médilink</div>
             <h2>Une plateforme sobre pour organiser les missions médicales courtes.</h2>
           </div>
           <div className="actions">
             <LinkButton href="/register">Créer un compte</LinkButton>
-            <LinkButton variant="light" href="/login">Connexion</LinkButton>
+            <LinkButton variant="light" href="/login">
+              Connexion
+            </LinkButton>
           </div>
         </section>
       </div>
+
+      {/* ═══ FOOTER ═══ */}
+      <footer className="landing-footer">
+        <div className="container">
+          <div className="landing-footer-grid">
+            <div className="landing-footer-brand">
+              <Link href="/" className="brand">
+                <span className="brand-mark">M</span>
+                <span>Médilink</span>
+              </Link>
+              <p>
+                La plateforme de référence pour organiser des remplacements et missions médicales
+                courtes, de la recherche du profil jusqu&apos;au paiement final.
+              </p>
+            </div>
+            <div className="landing-footer-col">
+              <h4>Plateforme</h4>
+              <Link href="/register">Missions</Link>
+              <Link href="/register">Candidatures</Link>
+              <Link href="/register">Documents</Link>
+              <Link href="/register">Messagerie</Link>
+            </div>
+            <div className="landing-footer-col">
+              <h4>Ressources</h4>
+              <Link href="#">À propos</Link>
+              <Link href="#">Contact</Link>
+              <Link href="#">FAQ</Link>
+            </div>
+            <div className="landing-footer-col">
+              <h4>Légal</h4>
+              <Link href="#">CGU</Link>
+              <Link href="#">Confidentialité</Link>
+              <Link href="#">Mentions légales</Link>
+            </div>
+          </div>
+          <div className="landing-footer-bottom">
+            <p>© 2025 Médilink. Tous droits réservés.</p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
