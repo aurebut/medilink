@@ -175,7 +175,7 @@ export default function SearchMissionsPage() {
           </div>
         </Card>
 
-        <div className="grid">
+        <div className="grid search-results">
           {error ? <Alert type="error">{error}</Alert> : null}
           <div className="toolbar">
             <div>
