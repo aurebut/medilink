@@ -66,6 +66,7 @@ export default function MissionPage() {
   }, [authLoading, id, user?.role]);
 
   const applyPath = useMemo(() => getMissionApplyPath(id), [id]);
+  const homeHref = !authLoading && user ? defaultRouteForUser(user) : '/';
   const applyHref = user?.role === 'CANDIDATE'
     ? applyPath
     : `/login?next=${encodeURIComponent(applyPath)}`;
@@ -86,7 +87,7 @@ export default function MissionPage() {
     <main className="landing-page public-mission-page">
       <div className="container">
         <nav className="public-nav">
-          <Link href="/" className="brand">
+          <Link href={homeHref} className="brand">
             <span className="brand-mark">M</span>
             <span>Medilink</span>
           </Link>
