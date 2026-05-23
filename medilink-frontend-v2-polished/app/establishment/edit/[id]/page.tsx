@@ -121,7 +121,20 @@ export default function EditEstablishmentPage() {
         actions={<LinkButton href="/establishment/onboarding" variant="light">Retour</LinkButton>}
       />
 
-      <div className="grid-2">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <Card>
+          <h2>Photos de l'établissement</h2>
+          <p className="text-secondary" style={{ marginBottom: 24 }}>
+            Ces photos seront visibles par les candidats lors de la consultation de vos missions. La photo marquée "Principale" sera affichée en premier.
+          </p>
+
+          <EstablishmentPhotoManager
+            establishmentId={establishment.id}
+            photos={establishment.photos}
+            onChanged={reload}
+          />
+        </Card>
+
         <Card>
           <h2>Informations générales</h2>
           {message ? <Alert type="success">{message}</Alert> : null}
@@ -289,19 +302,6 @@ export default function EditEstablishmentPage() {
           ) : (
             <p>Initialisation du formulaire...</p>
           )}
-        </Card>
-
-        <Card>
-          <h2>Photos de l'établissement</h2>
-          <p className="text-secondary" style={{ marginBottom: 24 }}>
-            Ces photos seront visibles par les candidats lors de la consultation de vos missions. La photo marquée "Principale" sera affichée en premier.
-          </p>
-
-          <EstablishmentPhotoManager
-            establishmentId={establishment.id}
-            photos={establishment.photos}
-            onChanged={reload}
-          />
         </Card>
       </div>
     </>
