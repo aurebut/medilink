@@ -77,7 +77,9 @@ export default function SearchMissionsPage() {
           <div className="search-filters-head">
             <div>
               <h2>Filtres</h2>
-              <p>{activeFilters > 0 ? `${activeFilters} filtre(s) actif(s)` : 'Affinez votre recherche'}</p>
+              <p>
+                {activeFilters > 0 ? <span className="search-filters-count">{activeFilters} actif(s)</span> : 'Affinez votre recherche'}
+              </p>
             </div>
             <Button
               type="button"
@@ -85,10 +87,9 @@ export default function SearchMissionsPage() {
               className="search-filters-toggle"
               aria-expanded={filtersOpen}
               aria-controls="mission-search-filters"
+              aria-label={filtersOpen ? 'Masquer les filtres' : 'Afficher les filtres'}
               onClick={() => setFiltersOpen((open) => !open)}
-            >
-              {filtersOpen ? 'Masquer' : 'Afficher'}
-            </Button>
+            />
           </div>
           <div className="search-filters-body" id="mission-search-filters">
             <p>Affinez la recherche selon votre disponibilité, votre niveau et votre localisation.</p>

@@ -523,7 +523,38 @@ button { touch-action: manipulation; }
 }
 .search-filters-head h2 { margin-bottom: 4px; }
 .search-filters-head p { margin: 0; font-size: 13px; line-height: 1.35; }
-.search-filters-toggle { display: none; flex: 0 0 auto; }
+.search-filters-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--surface-blue);
+  color: #1d4ed8;
+  font-weight: 800;
+}
+.search-filters-toggle {
+  display: none;
+  flex: 0 0 auto;
+  position: relative;
+  width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 999px;
+}
+.search-filters-toggle::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform .18s ease;
+}
+.search-filters-open .search-filters-toggle::before {
+  transform: translateY(2px) rotate(225deg);
+}
 .search-filters-body { display: block; }
 .stat { display: flex; flex-direction: column; gap: 9px; }
 .stat strong { color: var(--heading); font-size: 32px; letter-spacing: -.025em; }
