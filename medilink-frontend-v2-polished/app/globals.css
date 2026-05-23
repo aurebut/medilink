@@ -973,7 +973,7 @@ tbody tr:hover { background: #f9fafb; }
   }
   .topbar .actions { justify-content: flex-end; }
   .content { padding: 18px; }
-  .form-row { grid-template-columns: 1fr; }
+  .form-row { display: flex; flex-direction: column; gap: 14px; }
   .page-header { flex-direction: column; }
   .message-layout { height: auto; min-height: 0; }
   .conversation-list { max-height: 320px; }
