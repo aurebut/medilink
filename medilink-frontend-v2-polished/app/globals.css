@@ -1262,12 +1262,34 @@ tbody tr:hover { background: #f9fafb; }
     min-width: 0;
   }
   .public-mission-hero {
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
     flex-direction: column;
     padding: 24px 0 18px;
   }
   .public-mission-photo { width: 100%; flex-basis: auto; order: -1; }
   .public-mission-hero h1 { font-size: 34px; }
+  .public-mission-hero .hero-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .public-mission-hero .section-heading {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  .mission-share {
+    justify-content: center;
+  }
+  .mission-share .input {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
   .mission-share > .actions { width: 100%; }
   .wizard-step-content h2 { font-size: 22px; }
   .choice-grid { grid-template-columns: 1fr; }
