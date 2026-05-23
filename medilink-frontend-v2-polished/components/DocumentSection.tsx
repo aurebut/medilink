@@ -128,12 +128,12 @@ export function DocumentSection() {
         <div className="actions"><Button onClick={upload} disabled={!file || submitting}>{submitting ? 'Upload...' : 'Envoyer le document'}</Button></div>
       </div>
       <div className="divider" />
-      {loading ? <p className="muted">Chargement des documents...</p> : documents.length === 0 ? <p className="muted">Aucun document pour le moment.</p> : (
+      {loading ? <p className="muted">Chargement des documents...</p> : documents.filter((doc) => doc.documentType !== 'AVATAR').length === 0 ? <p className="muted">Aucun document pour le moment.</p> : (
         <div className="table-wrap">
           <table>
             <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajouté</th><th>Actions</th></tr></thead>
             <tbody>
-              {documents.map((doc) => <tr key={doc.id}>
+              {documents.filter((doc) => doc.documentType !== 'AVATAR').map((doc) => <tr key={doc.id}>
                 <td>{documentTypeLabel(doc.documentType)}</td>
                 <td><strong>{doc.fileName}</strong>{doc.rejectionReason ? <div className="small">Motif : {doc.rejectionReason}</div> : null}</td>
                 <td><Badge tone={statusTone(doc.verificationStatus) as any}>{statusLabel(doc.verificationStatus)}</Badge></td>

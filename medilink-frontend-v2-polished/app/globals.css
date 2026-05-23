@@ -515,6 +515,12 @@ button { touch-action: manipulation; }
 .card h2, .card h3 { margin: 0 0 12px; color: var(--heading); letter-spacing: -.035em; }
 .card p { color: var(--muted); line-height: 1.65; }
 .card-highlight { background: var(--surface-blue); }
+.profile-photo-panel { display: flex; gap: 18px; align-items: center; }
+.profile-photo-preview { width: 112px; height: 112px; border-radius: 999px; overflow: hidden; background: #e0ecff; color: #1d4ed8; display: grid; place-items: center; font-size: 32px; font-weight: 900; flex: 0 0 auto; border: 1px solid var(--border); }
+.profile-photo-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.profile-photo-controls { flex: 1; min-width: 0; }
+.profile-photo-controls h2 { margin-bottom: 4px; }
+.profile-photo-controls .field { margin: 12px 0; }
 .search-filters-head {
   display: flex;
   align-items: flex-start;

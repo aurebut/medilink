@@ -20,6 +20,12 @@ const ALLOWED_MIME_TYPES = [
   'image/webp',
 ];
 
+const ALLOWED_AVATAR_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+];
+
 @Injectable()
 export class DocumentsService {
   constructor(
@@ -167,6 +173,13 @@ export class DocumentsService {
   private validateFile(dto: CreateUploadUrlDto) {
     if (!ALLOWED_MIME_TYPES.includes(dto.mimeType)) {
       throw new BadRequestException('Type de fichier non autorisé.');
+    }
+
+    if (
+      dto.documentType === DocumentType.AVATAR &&
+      !ALLOWED_AVATAR_MIME_TYPES.includes(dto.mimeType)
+    ) {
+      throw new BadRequestException('La photo de profil doit etre une image.');
     }
 
     if (dto.documentType === DocumentType.AVATAR && dto.sizeBytes > 3 * 1024 * 1024) {

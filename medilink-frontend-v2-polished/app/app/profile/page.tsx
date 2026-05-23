@@ -1,17 +1,30 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, isMockStorageUrl } from '@/lib/api';
 import type { MedicalStatus, Profile } from '@/lib/types';
 import { medicalStatusOptions } from '@/lib/labels';
 import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
 
+type UploadResponse = {
+  documentId: string;
+  storageKey: string;
+  provider: 'mock' | 'local' | 's3';
+  uploadUrl: string;
+  method: 'PUT';
+  headers: Record<string, string>;
+  expiresInSeconds: number;
+};
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [form, setForm] = useState<any>({});
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarInputKey, setAvatarInputKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -62,6 +75,53 @@ export default function ProfilePage() {
     }
   }
 
+  async function uploadAvatar() {
+    if (!avatarFile) return;
+
+    setUploadingAvatar(true);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const upload = await api.post<UploadResponse>('/documents/upload-url', {
+        documentType: 'AVATAR',
+        fileName: avatarFile.name,
+        mimeType: avatarFile.type || 'application/octet-stream',
+        sizeBytes: avatarFile.size,
+      });
+
+      if (!isMockStorageUrl(upload.uploadUrl)) {
+        const put = await fetch(upload.uploadUrl, {
+          method: upload.method,
+          headers: upload.headers,
+          body: avatarFile,
+        });
+
+        if (!put.ok) throw new Error('Upload de la photo impossible.');
+      }
+
+      await api.post(`/documents/${upload.documentId}/confirm-upload`, {});
+      const updated = await api.get<Profile>('/me/profile');
+      setProfile(updated);
+      setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
+      setAvatarFile(null);
+      setAvatarInputKey((key) => key + 1);
+      setMessage('Photo de profil mise à jour.');
+    } catch (e: any) {
+      setError(e.message || 'Erreur upload photo.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
+  const initials = `${form.firstName || ''} ${form.lastName || ''}`
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase() || 'ML';
+
   return (
     <>
       <PageHeader
@@ -71,6 +131,32 @@ export default function ProfilePage() {
 
       <div className="grid-main">
         <Card className="card-highlight">
+          <div className="profile-photo-panel">
+            <div className="profile-photo-preview">
+              {profile.avatarUrl ? (
+                <img src={profile.avatarUrl} alt="Photo de profil" />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
+            <div className="profile-photo-controls">
+              <h2>Photo de profil</h2>
+              <p className="small">JPG, PNG ou WebP, 3 Mo maximum.</p>
+              <Field label="Image">
+                <input
+                  key={avatarInputKey}
+                  className="input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                />
+              </Field>
+              <Button type="button" disabled={!avatarFile || uploadingAvatar} onClick={uploadAvatar}>
+                {uploadingAvatar ? 'Upload...' : 'Mettre à jour la photo'}
+              </Button>
+            </div>
+          </div>
+          <div className="divider" />
           <h2>Complétion</h2>
           <div className="stat">
             <strong>{profile.completionScore}%</strong>

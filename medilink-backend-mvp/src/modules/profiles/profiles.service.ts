@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DocumentType, DocumentVerificationStatus } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
+import { StorageService } from '../documents/storage.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
@@ -8,6 +10,7 @@ export class ProfilesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
 
   async getMyProfile(userId: string) {
@@ -23,7 +26,27 @@ export class ProfilesService {
   });
 }
 
-    return profile;
+    const avatar = await this.prisma.document.findFirst({
+      where: {
+        userId,
+        documentType: DocumentType.AVATAR,
+        verificationStatus: DocumentVerificationStatus.APPROVED,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!avatar) return profile;
+
+    const signed = await this.storage.createDownloadUrl(
+      avatar.storageKey,
+      avatar.fileName,
+      avatar.mimeType,
+    );
+
+    return {
+      ...profile,
+      avatarUrl: signed.downloadUrl,
+    };
   }
 
   async updateMyProfile(userId: string, dto: UpdateProfileDto) {
