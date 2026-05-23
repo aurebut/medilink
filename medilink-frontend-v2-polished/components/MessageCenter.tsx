@@ -676,6 +676,10 @@ function WorkflowMessageCard({
               <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Confirmation...' : retrocession ? 'Confirmer la mission' : 'Payer et confirmer'}</Button>
             </div>
           ) : null}
+          <div className="workflow-next-step">
+            <strong>Factures PDF</strong>
+            <span>Disponibles après confirmation de la mission, fin de mission, puis validation de la rétrocession.</span>
+          </div>
         </>
       ) : null}
 

@@ -1108,6 +1108,23 @@ tbody tr:hover { background: #f9fafb; }
 }
 .workflow-summary span { display: block; margin-bottom: 4px; color: var(--muted); font-size: 12px; font-weight: 800; }
 .workflow-summary strong { color: var(--heading); font-size: 14px; }
+.workflow-next-step {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.workflow-next-step strong {
+  color: var(--heading);
+  font-size: 14px;
+}
+.workflow-next-step span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
 .workflow-form { justify-self: stretch; }
 
 .empty-illustration { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; background: var(--surface-blue); color: var(--primary); font-weight: 900; margin-bottom: 10px; }
