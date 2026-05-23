@@ -535,16 +535,6 @@ button { touch-action: manipulation; }
   font-size: 18px;
   letter-spacing: 0;
 }
-.profile-choice-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.profile-choice-grid button {
-  min-height: 42px;
-  padding: 10px 11px;
-  border-radius: 10px;
-  text-align: center;
-  overflow-wrap: anywhere;
-}
 .custom-choice-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -555,6 +545,7 @@ button { touch-action: manipulation; }
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  min-height: 0;
 }
 .selected-custom-values button {
   border: 1px solid #bfdbfe;
@@ -565,6 +556,7 @@ button { touch-action: manipulation; }
   font-size: 13px;
   font-weight: 800;
   padding: 7px 10px;
+  line-height: 1.2;
 }
 .profile-boolean-choice {
   min-height: 74px;
@@ -1279,7 +1271,6 @@ tbody tr:hover { background: #f9fafb; }
   .mission-share > .actions { width: 100%; }
   .wizard-step-content h2 { font-size: 22px; }
   .choice-grid { grid-template-columns: 1fr; }
-  .profile-choice-grid { grid-template-columns: 1fr; }
   .custom-choice-row { grid-template-columns: 1fr; }
   .boolean-choice {
     align-items: stretch;

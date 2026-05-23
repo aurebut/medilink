@@ -381,43 +381,53 @@ function cleanArray(value: unknown): string[] {
   return safeArray(value).map((item) => item.trim()).filter(Boolean);
 }
 
-function toggleValue(values: string[], value: string) {
-  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
-}
-
 function MultiChoiceField({ label, values, options, onChange }: { label: string; values: string[]; options: ChoiceOption[]; onChange: (values: string[]) => void }) {
+  const [selectedValue, setSelectedValue] = useState('');
   const [customValue, setCustomValue] = useState('');
   const [customOpen, setCustomOpen] = useState(false);
-  const customValues = values.filter((value) => !options.some((option) => option.value === value));
+  const availableOptions = options.filter((option) => !values.includes(option.value));
+
+  function addValue(value: string) {
+    if (value === '__OTHER__') {
+      setCustomOpen(true);
+      setSelectedValue('');
+      return;
+    }
+
+    if (value && !values.includes(value)) {
+      onChange([...values, value]);
+    }
+    setSelectedValue('');
+  }
 
   function addCustomValue() {
     const next = customValue.trim();
     if (!next) return;
     onChange(values.includes(next) ? values : [...values, next]);
     setCustomValue('');
+    setCustomOpen(false);
   }
 
   return (
     <div className="field">
       <span className="label">{label}</span>
-      <div className="choice-grid profile-choice-grid">
-        {options.map((option) => (
-          <button key={option.value} type="button" className={values.includes(option.value) ? 'active' : ''} aria-pressed={values.includes(option.value)} onClick={() => onChange(toggleValue(values, option.value))}>
-            {option.label}
-          </button>
-        ))}
-        <button type="button" className={customOpen ? 'active' : ''} onClick={() => setCustomOpen((open) => !open)}>Autre</button>
-      </div>
+      <Select value={selectedValue} onChange={(e) => addValue(e.target.value)}>
+        <option value="">Ajouter une option</option>
+        {availableOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        <option value="__OTHER__">Autre</option>
+      </Select>
       {customOpen ? (
         <div className="custom-choice-row">
           <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Ajouter une reponse libre" />
           <Button type="button" variant="secondary" onClick={addCustomValue}>Ajouter</Button>
         </div>
       ) : null}
-      {customValues.length ? (
+      {values.length ? (
         <div className="selected-custom-values">
-          {customValues.map((value) => (
-            <button key={value} type="button" onClick={() => onChange(values.filter((item) => item !== value))}>{value} x</button>
+          {values.map((value) => (
+            <button key={value} type="button" onClick={() => onChange(values.filter((item) => item !== value))}>
+              {options.find((option) => option.value === value)?.label || value} x
+            </button>
           ))}
         </div>
       ) : null}
@@ -430,31 +440,34 @@ function SingleChoiceField({ label, value, options, onChange }: { label: string;
   const [customOpen, setCustomOpen] = useState(isCustom);
   const [customValue, setCustomValue] = useState(isCustom ? value : '');
 
+  function selectValue(next: string) {
+    if (next === '__OTHER__') {
+      setCustomOpen(true);
+      return;
+    }
+
+    onChange(next);
+    setCustomOpen(false);
+  }
+
   function applyCustomValue() {
     const next = customValue.trim();
-    if (next) onChange(next);
+    if (next) {
+      onChange(next);
+      setCustomOpen(false);
+    }
   }
 
   return (
     <div className="field">
       <span className="label">{label}</span>
-      <div className="choice-grid profile-choice-grid">
+      <Select value={customOpen || isCustom ? '__OTHER__' : value} onChange={(e) => selectValue(e.target.value)}>
+        <option value="">Selectionner</option>
         {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            className={value === option.value ? 'active' : ''}
-            aria-pressed={value === option.value}
-            onClick={() => {
-              onChange(option.value);
-              setCustomOpen(false);
-            }}
-          >
-            {option.label}
-          </button>
+          <option key={option.value} value={option.value}>{option.label}</option>
         ))}
-        <button type="button" className={customOpen || isCustom ? 'active' : ''} onClick={() => setCustomOpen((open) => !open)}>Autre</button>
-      </div>
+        <option value="__OTHER__">Autre</option>
+      </Select>
       {customOpen ? (
         <div className="custom-choice-row">
           <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Entrer un texte libre" />
