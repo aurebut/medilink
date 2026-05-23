@@ -109,28 +109,30 @@ export default function MissionPage() {
           <>
             <section className="public-mission-hero">
               <PhotoCarousel photos={mission?.establishment?.photos} alt={mission.establishment?.name} />
-              <div className="section-heading">
-                <div className="kicker">{canManageMission ? 'Mission établissement' : 'Mission médicale'}</div>
-                <h1>{mission.title}</h1>
-                <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
-              </div>
-              <div className="actions">
-                {canManageMission ? (
-                  <>
-                    <LinkButton variant="light" href="/establishment/missions">Retour aux missions</LinkButton>
-                    {mission.status === 'PUBLISHED' ? (
-                      <MissionShareActions missionId={mission.id} showUrl showPublicLink={false} />
-                    ) : null}
-                    <MissionDeleteButton
-                      mission={mission}
-                      onDeleted={() => router.push('/establishment/missions')}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
-                  </>
-                )}
+              <div className="hero-info">
+                <div className="section-heading">
+                  <div className="kicker">{canManageMission ? 'Mission établissement' : 'Mission médicale'}</div>
+                  <h1>{mission.title}</h1>
+                  <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
+                </div>
+                <div className="actions">
+                  {canManageMission ? (
+                    <>
+                      <LinkButton variant="light" href="/establishment/missions">Retour aux missions</LinkButton>
+                      {mission.status === 'PUBLISHED' ? (
+                        <MissionShareActions missionId={mission.id} showUrl showPublicLink={false} />
+                      ) : null}
+                      <MissionDeleteButton
+                        mission={mission}
+                        onDeleted={() => router.push('/establishment/missions')}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
+                    </>
+                  )}
+                </div>
               </div>
             </section>
 

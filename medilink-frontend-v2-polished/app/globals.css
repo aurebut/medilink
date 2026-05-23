@@ -1717,4 +1717,50 @@ tbody tr:hover { background: #f9fafb; }
   transform: scale(1.2);
 }
 
+/* Version PC : Mise en page style Fiche Produit (deux colonnes) */
+@media (min-width: 621px) {
+  .public-mission-hero {
+    display: grid !important;
+    grid-template-columns: min(45%, 480px) 1fr !important;
+    gap: 36px !important;
+    align-items: center !important;
+    padding: 42px 0 28px !important;
+  }
+  .public-mission-photo.photo-carousel {
+    flex: none !important;
+    order: 1 !important; /* Carrousel à gauche (colonne 1) */
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 16 / 10 !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+  }
+  .public-mission-hero .hero-info {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 24px !important;
+    order: 2 !important; /* Détails et boutons à droite (colonne 2) */
+  }
+  .public-mission-hero .section-heading {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    text-align: left !important;
+  }
+  .public-mission-hero .section-heading h1 {
+    font-size: 42px !important;
+    line-height: 1.1 !important;
+  }
+  .public-mission-hero .actions {
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+  }
+}
+
+
 
