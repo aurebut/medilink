@@ -54,7 +54,7 @@ export default function EstablishmentMissionsPage() {
           <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
         </Card>
       ) : (
-        <div className="grid">
+        <div className="grid mission-list">
           {missions.map((m) => (
             <MissionCard
               key={m.id}
