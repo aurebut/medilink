@@ -1,10 +1,31 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import type { Application, Document, Notification, Profile } from '@/lib/types';
-import { Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
+import { formatDate, formatDateTime } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
+import type { Application, Document, Notification, Profile } from '@/lib/types';
+import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
+
+function applicationTone(status: Application['status']) {
+  if (status === 'ACCEPTED') return 'success';
+  if (status === 'REJECTED' || status === 'WITHDRAWN' || status === 'CANCELLED') return 'danger';
+  if (status === 'VIEWED') return 'warning';
+  return 'neutral';
+}
+
+function documentTone(status: Document['verificationStatus']) {
+  if (status === 'APPROVED') return 'success';
+  if (status === 'REJECTED' || status === 'EXPIRED') return 'danger';
+  if (status === 'PENDING_VERIFICATION' || status === 'UPLOAD_PENDING') return 'warning';
+  return 'neutral';
+}
+
+function formatMissionDate(application: Application) {
+  const startDate = application.mission?.startDate;
+  if (!startDate) return 'Date a confirmer';
+  return formatDate(startDate);
+}
 
 export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -27,71 +48,214 @@ export default function CandidateDashboardPage() {
     }).finally(() => setLoading(false));
   }, []);
 
+  const dashboard = useMemo(() => {
+    const sortedApplications = [...applications].sort((a, b) => {
+      return new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
+    });
+    const unreadNotifications = notifications.filter((n) => !n.readAt);
+    const approvedDocuments = documents.filter((d) => d.verificationStatus === 'APPROVED');
+    const pendingDocuments = documents.filter((d) => ['PENDING_VERIFICATION', 'UPLOAD_PENDING'].includes(d.verificationStatus));
+    const blockedDocuments = documents.filter((d) => ['REJECTED', 'EXPIRED'].includes(d.verificationStatus));
+    const activeApplications = applications.filter((a) => !['REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(a.status));
+    const acceptedApplications = applications.filter((a) => a.status === 'ACCEPTED');
+    const nextMission = [...acceptedApplications]
+      .filter((a) => a.mission?.startDate)
+      .sort((a, b) => new Date(a.mission!.startDate).getTime() - new Date(b.mission!.startDate).getTime())[0];
+
+    return {
+      sortedApplications,
+      unreadNotifications,
+      approvedDocuments,
+      pendingDocuments,
+      blockedDocuments,
+      activeApplications,
+      acceptedApplications,
+      nextMission,
+    };
+  }, [applications, documents, notifications]);
+
   if (loading) return <LoadingCard />;
 
   const firstName = profile?.firstName || 'Bienvenue';
-  const approvedDocuments = documents.filter((d) => d.verificationStatus === 'APPROVED').length;
+  const completionScore = profile?.completionScore || 0;
+  const profileReady = completionScore >= 80;
+  const documentsReady = documents.length > 0 && dashboard.blockedDocuments.length === 0 && dashboard.pendingDocuments.length === 0;
+  const hasApplications = applications.length > 0;
+
+  const nextStep = !profileReady
+    ? { label: 'Completer le profil', href: '/app/profile', helper: 'Un profil complet rassure les etablissements.' }
+    : !documentsReady
+      ? { label: 'Verifier les documents', href: '/app/profile', helper: 'Gardez vos justificatifs prets avant de postuler.' }
+      : !hasApplications
+        ? { label: 'Trouver une mission', href: '/app/search', helper: 'Votre dossier est pret a etre envoye.' }
+        : { label: 'Suivre mes candidatures', href: '/app/applications', helper: 'Consultez les retours et relancez au bon moment.' };
 
   return (
     <>
       <PageHeader
         title={`Bonjour ${firstName}`}
-        description="Pilotez votre profil, vos documents, vos candidatures et vos échanges depuis un seul espace."
+        description="Votre espace de pilotage pour prioriser les missions, garder un dossier solide et suivre les reponses."
         actions={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
       />
 
-      <div className="grid-3">
+      <section className="dashboard-hero">
+        <div className="dashboard-hero-copy">
+          <span className="dashboard-eyebrow">Priorite du jour</span>
+          <h2>{nextStep.label}</h2>
+          <p>{nextStep.helper}</p>
+          <div className="actions">
+            <LinkButton href={nextStep.href}>Continuer</LinkButton>
+            <LinkButton variant="light" href="/app/messages">Ouvrir la messagerie</LinkButton>
+          </div>
+        </div>
+        <div className="dashboard-readiness">
+          <div>
+            <span>Profil</span>
+            <strong>{completionScore}%</strong>
+            <ProgressBar value={completionScore} />
+          </div>
+          <div>
+            <span>Documents valides</span>
+            <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
+          </div>
+          <div>
+            <span>Notifications non lues</span>
+            <strong>{dashboard.unreadNotifications.length}</strong>
+          </div>
+        </div>
+      </section>
+
+      <div className="grid-3 dashboard-stat-grid">
         <StatCard
-          label="Profil complété"
-          value={`${profile?.completionScore || 0}%`}
-          helper={<ProgressBar value={profile?.completionScore || 0} />}
-          action={<LinkButton variant="secondary" href="/app/profile">Compléter</LinkButton>}
+          label="Dossier candidat"
+          value={profileReady ? 'Pret' : `${completionScore}%`}
+          helper={<ProgressBar value={completionScore} />}
+          action={<LinkButton variant="secondary" href="/app/profile">Ameliorer</LinkButton>}
         />
         <StatCard
-          label="Documents validés"
-          value={`${approvedDocuments}/${documents.length}`}
-          helper="CV, attestations et justificatifs"
-          action={<LinkButton variant="secondary" href="/app/profile">Gérer</LinkButton>}
+          label="Documents"
+          value={`${dashboard.approvedDocuments.length}/${documents.length || 0}`}
+          helper={`${dashboard.pendingDocuments.length} en attente - ${dashboard.blockedDocuments.length} a corriger`}
+          action={<LinkButton variant="secondary" href="/app/profile">Gerer</LinkButton>}
         />
         <StatCard
-          label="Candidatures"
-          value={applications.length}
-          helper="Suivi des missions postulées"
+          label="Candidatures actives"
+          value={dashboard.activeApplications.length}
+          helper={`${dashboard.acceptedApplications.length} acceptee(s) - ${applications.length} au total`}
           action={<LinkButton variant="secondary" href="/app/applications">Voir</LinkButton>}
         />
       </div>
 
-      <div className="grid-2" style={{ marginTop: 16 }}>
-        <Card>
+      <div className="dashboard-main">
+        <Card className="dashboard-panel">
           <div className="toolbar">
-            <h2>Dernières candidatures</h2>
+            <div>
+              <h2>Candidatures recentes</h2>
+              <p className="small">Les dossiers qui meritent votre attention en premier.</p>
+            </div>
             <LinkButton variant="light" href="/app/applications">Tout voir</LinkButton>
           </div>
-          {applications.slice(0, 5).map((a) => (
-            <p key={a.id}>
-              <strong>{a.mission?.title || 'Mission'}</strong>
-              <br />
-              <span className="small">{statusLabel(a.status)} · {a.mission?.city || 'Ville non renseignée'}</span>
-            </p>
-          ))}
-          {applications.length === 0 ? <p>Aucune candidature pour le moment.</p> : null}
+          {dashboard.sortedApplications.length > 0 ? (
+            <div className="dashboard-list">
+              {dashboard.sortedApplications.slice(0, 5).map((application) => (
+                <div key={application.id} className="dashboard-list-item">
+                  <div>
+                    <strong>{application.mission?.title || 'Mission'}</strong>
+                    <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement a confirmer'}</span>
+                  </div>
+                  <div className="dashboard-list-meta">
+                    <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
+                    <span className="small">{formatMissionDate(application)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="dashboard-empty">
+              <strong>Aucune candidature envoyee</strong>
+              <p>Explorez les missions ouvertes et gardez votre dossier pret pour candidater vite.</p>
+              <LinkButton variant="secondary" href="/app/search">Voir les missions</LinkButton>
+            </div>
+          )}
         </Card>
 
-        <Card>
-          <div className="toolbar">
-            <h2>Notifications</h2>
-            <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
-          </div>
-          {notifications.slice(0, 5).map((n) => (
-            <p key={n.id}>
-              <strong>{n.title}</strong>
-              <br />
-              <span className="small">{n.body}</span>
-            </p>
-          ))}
-          {notifications.length === 0 ? <p>Aucune notification.</p> : null}
-        </Card>
+        <div className="dashboard-side">
+          <Card className="dashboard-panel">
+            <div className="toolbar">
+              <div>
+                <h2>Prochaine mission</h2>
+                <p className="small">Votre prochain engagement confirme.</p>
+              </div>
+            </div>
+            {dashboard.nextMission ? (
+              <div className="dashboard-feature">
+                <span>{formatMissionDate(dashboard.nextMission)}</span>
+                <strong>{dashboard.nextMission.mission?.title || 'Mission acceptee'}</strong>
+                <p>{dashboard.nextMission.mission?.city || 'Lieu a confirmer'}</p>
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucune mission acceptee</strong>
+                <p>Les missions validees apparaitront ici.</p>
+              </div>
+            )}
+          </Card>
+
+          <Card className="dashboard-panel">
+            <div className="toolbar">
+              <div>
+                <h2>Documents sensibles</h2>
+                <p className="small">A surveiller pour eviter les blocages.</p>
+              </div>
+              <LinkButton variant="light" href="/app/profile">Gerer</LinkButton>
+            </div>
+            {documents.length > 0 ? (
+              <div className="dashboard-mini-list">
+                {[...dashboard.blockedDocuments, ...dashboard.pendingDocuments, ...dashboard.approvedDocuments].slice(0, 4).map((document) => (
+                  <div key={document.id}>
+                    <span>{document.fileName}</span>
+                    <Badge tone={documentTone(document.verificationStatus)}>{statusLabel(document.verificationStatus)}</Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucun document</strong>
+                <p>Ajoutez CV, attestations et justificatifs depuis le profil.</p>
+              </div>
+            )}
+          </Card>
+        </div>
       </div>
+
+      <Card className="dashboard-panel dashboard-notifications">
+        <div className="toolbar">
+          <div>
+            <h2>Dernieres notifications</h2>
+            <p className="small">Les alertes importantes de votre compte.</p>
+          </div>
+          <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
+        </div>
+        {notifications.length > 0 ? (
+          <div className="dashboard-notification-grid">
+            {notifications.slice(0, 3).map((notification) => (
+              <div key={notification.id} className="dashboard-notification">
+                <div className="actions">
+                  <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
+                  <span className="small">{formatDateTime(notification.createdAt)}</span>
+                </div>
+                <strong>{notification.title}</strong>
+                <p>{notification.body}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="dashboard-empty compact">
+            <strong>Aucune notification</strong>
+            <p>Les reponses, messages et alertes de dossier apparaitront ici.</p>
+          </div>
+        )}
+      </Card>
     </>
   );
 }
