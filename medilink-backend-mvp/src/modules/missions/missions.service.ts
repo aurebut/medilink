@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CompensationMode, EstablishmentMemberRole, MissionStatus } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { StorageService } from '../documents/storage.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
@@ -13,6 +14,7 @@ export class MissionsService {
     private readonly prisma: PrismaService,
     private readonly permissions: PermissionsService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
 
   async create(user: RequestUser, dto: CreateMissionDto) {
@@ -85,7 +87,7 @@ export class MissionsService {
             }
           : undefined,
       },
-      include: { tags: true, establishment: true },
+      include: this.missionInclude,
     });
 
     await this.audit.log({
@@ -96,7 +98,7 @@ export class MissionsService {
       metadata: { status: mission.status },
     });
 
-    return mission;
+    return this.withSignedEstablishmentPhotos(mission);
   }
 
   private async resolveEstablishment(user: RequestUser, dto: CreateMissionDto) {
@@ -162,7 +164,7 @@ export class MissionsService {
     const [items, total] = await Promise.all([
       this.prisma.mission.findMany({
         where,
-        include: { tags: true, establishment: true },
+        include: this.missionInclude,
         orderBy: { startDate: 'asc' },
         take: dto.limit || 20,
         skip: dto.offset || 0,
@@ -170,7 +172,7 @@ export class MissionsService {
       this.prisma.mission.count({ where }),
     ]);
 
-    return { items, total };
+    return { items: await this.withSignedEstablishmentPhotos(items), total };
   }
 
   async findMine(user: RequestUser, establishmentId?: string) {
@@ -183,14 +185,16 @@ export class MissionsService {
     if (establishmentId) {
       await this.permissions.ensureEstablishmentMember(user.id, establishmentId, manageableRoles);
 
-      return this.prisma.mission.findMany({
+      const missions = await this.prisma.mission.findMany({
         where: { establishmentId },
-        include: { tags: true, establishment: true },
+        include: this.missionInclude,
         orderBy: { createdAt: 'desc' },
       });
+
+      return this.withSignedEstablishmentPhotos(missions);
     }
 
-    return this.prisma.mission.findMany({
+    const missions = await this.prisma.mission.findMany({
       where: {
         establishment: {
           members: {
@@ -201,9 +205,11 @@ export class MissionsService {
           },
         },
       },
-      include: { tags: true, establishment: true },
+      include: this.missionInclude,
       orderBy: { createdAt: 'desc' },
     });
+
+    return this.withSignedEstablishmentPhotos(missions);
   }
 
   async getMine(user: RequestUser, missionId: string) {
@@ -211,27 +217,27 @@ export class MissionsService {
 
     const mission = await this.prisma.mission.findUnique({
       where: { id: missionId },
-      include: { tags: true, establishment: true },
+      include: this.missionInclude,
     });
 
     if (!mission) {
       throw new NotFoundException('Mission introuvable.');
     }
 
-    return mission;
+    return this.withSignedEstablishmentPhotos(mission);
   }
 
   async getPublic(id: string) {
     const mission = await this.prisma.mission.findUnique({
       where: { id },
-      include: { tags: true, establishment: true },
+      include: this.missionInclude,
     });
 
     if (!mission || mission.status !== MissionStatus.PUBLISHED) {
       throw new NotFoundException('Mission introuvable.');
     }
 
-    return mission;
+    return this.withSignedEstablishmentPhotos(mission);
   }
 
   async update(user: RequestUser, missionId: string, dto: Partial<CreateMissionDto>) {
@@ -256,7 +262,7 @@ export class MissionsService {
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         endDate: dto.endDate ? new Date(dto.endDate) : undefined,
       },
-      include: { tags: true, establishment: true },
+      include: this.missionInclude,
     });
 
     await this.audit.log({
@@ -266,7 +272,7 @@ export class MissionsService {
       entityId: missionId,
     });
 
-    return updated;
+    return this.withSignedEstablishmentPhotos(updated);
   }
 
   async setStatus(user: RequestUser, missionId: string, status: MissionStatus) {
@@ -307,5 +313,53 @@ export class MissionsService {
     });
 
     return { deleted: true };
+  }
+
+  private get missionInclude() {
+    return {
+      tags: true,
+      establishment: {
+        include: {
+          photos: {
+            where: { uploadedAt: { not: null } },
+            orderBy: [
+              { isPrimary: 'desc' as const },
+              { orderIndex: 'asc' as const },
+              { createdAt: 'asc' as const },
+            ],
+            take: 1,
+          },
+        },
+      },
+    };
+  }
+
+  private async withSignedEstablishmentPhotos(value: any): Promise<any> {
+    if (Array.isArray(value)) {
+      return Promise.all(value.map((mission) => this.withSignedEstablishmentPhotos(mission)));
+    }
+
+    const mission = value;
+    const photos = mission?.establishment?.photos;
+    if (!photos?.length) return mission;
+
+    const signedPhotos = await Promise.all(
+      photos.map(async (photo: any) => {
+        const signed = await this.storage.createDownloadUrl(
+          photo.storageKey,
+          photo.fileName,
+          photo.mimeType,
+        );
+        return { ...photo, url: signed.downloadUrl };
+      }),
+    );
+
+    return {
+      ...mission,
+      establishment: {
+        ...mission.establishment,
+        photos: signedPhotos,
+      },
+    };
   }
 }

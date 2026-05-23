@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManager';
 import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 
 const sectorOptions = [
@@ -101,6 +102,12 @@ export default function EstablishmentOnboardingPage() {
                 <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
                   {statusLabel(establishment.verificationStatus)}
                 </Badge>
+                <div className="divider" />
+                <EstablishmentPhotoManager
+                  establishmentId={establishment.id}
+                  photos={establishment.photos}
+                  onChanged={reload}
+                />
               </div>
               <Button
                 type="button"

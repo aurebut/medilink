@@ -1,11 +1,16 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EstablishmentMemberRole } from '@prisma/client';
+import { randomUUID } from 'crypto';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { StorageService } from '../documents/storage.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddMemberDto } from './dto/add-member.dto';
+import { CreateEstablishmentPhotoUploadDto } from './dto/create-establishment-photo-upload.dto';
 import { CreateEstablishmentDto } from './dto/create-establishment.dto';
+
+const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 @Injectable()
 export class EstablishmentsService {
@@ -13,6 +18,7 @@ export class EstablishmentsService {
     private readonly prisma: PrismaService,
     private readonly permissions: PermissionsService,
     private readonly audit: AuditService,
+    private readonly storage: StorageService,
   ) {}
 
   async create(user: RequestUser, dto: CreateEstablishmentDto) {
@@ -57,11 +63,13 @@ export class EstablishmentsService {
   }
 
   async listMine(userId: string) {
-    return this.prisma.establishment.findMany({
+    const establishments = await this.prisma.establishment.findMany({
       where: { members: { some: { userId } } },
-      include: { members: true },
+      include: { members: true, photos: this.photoInclude },
       orderBy: { createdAt: 'desc' },
     });
+
+    return Promise.all(establishments.map((item) => this.withSignedPhotoUrls(item)));
   }
 
   async update(user: RequestUser, establishmentId: string, dto: Partial<CreateEstablishmentDto>) {
@@ -156,5 +164,170 @@ export class EstablishmentsService {
     });
 
     return member;
+  }
+
+  async listPhotos(user: RequestUser, establishmentId: string) {
+    await this.ensureCanManagePhotos(user.id, establishmentId);
+    const photos = await this.prisma.establishmentPhoto.findMany({
+      where: { establishmentId, uploadedAt: { not: null } },
+      orderBy: [{ isPrimary: 'desc' }, { orderIndex: 'asc' }, { createdAt: 'asc' }],
+    });
+
+    return Promise.all(photos.map((photo) => this.withSignedPhotoUrl(photo)));
+  }
+
+  async createPhotoUploadUrl(
+    user: RequestUser,
+    establishmentId: string,
+    dto: CreateEstablishmentPhotoUploadDto,
+  ) {
+    await this.ensureCanManagePhotos(user.id, establishmentId);
+    this.validatePhoto(dto);
+
+    const safeFileName = dto.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const storageKey = `establishments/${establishmentId}/${randomUUID()}-${safeFileName}`;
+
+    const photo = await this.prisma.establishmentPhoto.create({
+      data: {
+        establishmentId,
+        fileName: safeFileName,
+        storageKey,
+        mimeType: dto.mimeType,
+        sizeBytes: dto.sizeBytes,
+      },
+    });
+
+    const signed = await this.storage.createUploadUrl(storageKey, dto.mimeType, dto.sizeBytes);
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.photo_upload_url_created',
+      entityType: 'establishment',
+      entityId: establishmentId,
+      metadata: { photoId: photo.id, mimeType: dto.mimeType },
+    });
+
+    return { photoId: photo.id, storageKey, ...signed };
+  }
+
+  async confirmPhotoUpload(user: RequestUser, establishmentId: string, photoId: string) {
+    await this.ensureCanManagePhotos(user.id, establishmentId);
+    const photo = await this.findPhoto(establishmentId, photoId);
+    const existingUploaded = await this.prisma.establishmentPhoto.count({
+      where: { establishmentId, uploadedAt: { not: null } },
+    });
+
+    const updated = await this.prisma.establishmentPhoto.update({
+      where: { id: photo.id },
+      data: {
+        uploadedAt: new Date(),
+        isPrimary: existingUploaded === 0 ? true : photo.isPrimary,
+      },
+    });
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.photo_upload_confirmed',
+      entityType: 'establishment',
+      entityId: establishmentId,
+      metadata: { photoId },
+    });
+
+    return this.withSignedPhotoUrl(updated);
+  }
+
+  async setPrimaryPhoto(user: RequestUser, establishmentId: string, photoId: string) {
+    await this.ensureCanManagePhotos(user.id, establishmentId);
+    await this.findPhoto(establishmentId, photoId);
+
+    await this.prisma.$transaction([
+      this.prisma.establishmentPhoto.updateMany({
+        where: { establishmentId },
+        data: { isPrimary: false },
+      }),
+      this.prisma.establishmentPhoto.update({
+        where: { id: photoId },
+        data: { isPrimary: true },
+      }),
+    ]);
+
+    return this.listPhotos(user, establishmentId);
+  }
+
+  async deletePhoto(user: RequestUser, establishmentId: string, photoId: string) {
+    await this.ensureCanManagePhotos(user.id, establishmentId);
+    const photo = await this.findPhoto(establishmentId, photoId);
+
+    await this.prisma.establishmentPhoto.delete({ where: { id: photo.id } });
+
+    const firstPhoto = await this.prisma.establishmentPhoto.findFirst({
+      where: { establishmentId, uploadedAt: { not: null } },
+      orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
+    });
+
+    if (photo.isPrimary && firstPhoto) {
+      await this.prisma.establishmentPhoto.update({
+        where: { id: firstPhoto.id },
+        data: { isPrimary: true },
+      });
+    }
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.photo_deleted',
+      entityType: 'establishment',
+      entityId: establishmentId,
+      metadata: { photoId },
+    });
+
+    return { deleted: true };
+  }
+
+  async withSignedPhotoUrls<T extends { photos?: any[] }>(establishment: T): Promise<T> {
+    if (!establishment.photos?.length) return establishment;
+
+    const photos = await Promise.all(
+      establishment.photos.map((photo) => this.withSignedPhotoUrl(photo)),
+    );
+
+    return { ...establishment, photos };
+  }
+
+  private async withSignedPhotoUrl<T extends { storageKey: string; fileName: string; mimeType: string }>(photo: T) {
+    const signed = await this.storage.createDownloadUrl(photo.storageKey, photo.fileName, photo.mimeType);
+    return { ...photo, url: signed.downloadUrl };
+  }
+
+  private get photoInclude() {
+    return {
+      where: { uploadedAt: { not: null } },
+      orderBy: [{ isPrimary: 'desc' as const }, { orderIndex: 'asc' as const }, { createdAt: 'asc' as const }],
+    };
+  }
+
+  private async ensureCanManagePhotos(userId: string, establishmentId: string) {
+    return this.permissions.ensureEstablishmentMember(userId, establishmentId, [
+      EstablishmentMemberRole.OWNER,
+      EstablishmentMemberRole.ADMIN,
+      EstablishmentMemberRole.RECRUITER,
+    ]);
+  }
+
+  private async findPhoto(establishmentId: string, photoId: string) {
+    const photo = await this.prisma.establishmentPhoto.findFirst({
+      where: { id: photoId, establishmentId },
+    });
+
+    if (!photo) {
+      throw new NotFoundException('Photo introuvable.');
+    }
+
+    return photo;
+  }
+
+  private validatePhoto(dto: CreateEstablishmentPhotoUploadDto) {
+    if (!ALLOWED_PHOTO_MIME_TYPES.includes(dto.mimeType)) {
+      throw new BadRequestException('La photo doit etre une image JPG, PNG ou WebP.');
+    }
   }
 }

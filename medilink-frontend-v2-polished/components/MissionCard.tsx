@@ -31,9 +31,15 @@ export function MissionCard({
   onDeleted?: (missionId: string) => void;
 }) {
   const detailHref = `/missions/${mission.id}`;
+  const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
 
   return (
     <Card className="mission-card">
+      {establishmentPhoto ? (
+        <Link className="mission-card-image" href={detailHref} aria-label={`Voir ${mission.title}`}>
+          <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
+        </Link>
+      ) : null}
       <div className="mission-top">
         <div className="grid" style={{ gap: 10 }}>
           <div className="actions">

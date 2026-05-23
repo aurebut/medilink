@@ -338,10 +338,30 @@ model Establishment {
   members       EstablishmentMember[]
   missions      Mission[]
   conversations Conversation[]
+  photos        EstablishmentPhoto[]
 
   @@index([sector])
   @@index([patientType])
   @@index([softwareUsed])
+}
+
+model EstablishmentPhoto {
+  id              String    @id @default(uuid())
+  establishmentId String
+  fileName        String
+  storageKey      String    @unique
+  mimeType        String
+  sizeBytes       Int
+  orderIndex      Int       @default(0)
+  isPrimary       Boolean   @default(false)
+  uploadedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@index([establishmentId])
+  @@index([isPrimary])
 }
 
 model EstablishmentMember {

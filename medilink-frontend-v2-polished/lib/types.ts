@@ -72,6 +72,21 @@ export type Document = {
   owner?: { id: string; email: string; profile?: Profile | null };
 };
 
+export type EstablishmentPhoto = {
+  id: string;
+  establishmentId: string;
+  fileName: string;
+  storageKey: string;
+  mimeType: string;
+  sizeBytes: number;
+  orderIndex: number;
+  isPrimary: boolean;
+  uploadedAt?: string | null;
+  url?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Establishment = {
   id: string;
   name: string;
@@ -91,6 +106,7 @@ export type Establishment = {
   verificationStatus: VerificationStatus;
   createdAt: string;
   updatedAt: string;
+  photos?: EstablishmentPhoto[];
   members?: Array<{ id: string; establishmentId: string; userId: string; role: EstablishmentMemberRole; user?: CurrentUser }>;
 };
 

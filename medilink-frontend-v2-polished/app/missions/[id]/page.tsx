@@ -68,6 +68,7 @@ export default function MissionPage() {
   const applyHref = user?.role === 'CANDIDATE'
     ? applyPath
     : `/login?next=${encodeURIComponent(applyPath)}`;
+  const establishmentPhoto = mission?.establishment?.photos?.[0]?.url;
   const hasContextDetails = Boolean(
     mission?.sector ||
     mission?.patientType ||
@@ -107,6 +108,11 @@ export default function MissionPage() {
         {!loading && !authLoading && mission ? (
           <>
             <section className="public-mission-hero">
+              {establishmentPhoto ? (
+                <div className="public-mission-photo">
+                  <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
+                </div>
+              ) : null}
               <div className="section-heading">
                 <div className="kicker">{canManageMission ? 'Mission établissement' : 'Mission médicale'}</div>
                 <h1>{mission.title}</h1>
