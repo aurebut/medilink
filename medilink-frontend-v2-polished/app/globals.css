@@ -1225,15 +1225,65 @@ tbody tr:hover { background: #f9fafb; }
   .message-layout-mobile {
     min-height: calc(100dvh - 158px);
   }
+  .message-layout-mobile-active {
+    position: fixed;
+    inset: 68px 0 0;
+    z-index: 45;
+    height: auto;
+    min-height: 0;
+    gap: 0;
+    background: #f7f9fb;
+  }
   .message-layout-mobile .conversation-list,
   .message-layout-mobile .message-pane {
     min-height: calc(100dvh - 158px);
+  }
+  .message-layout-mobile-active .message-pane {
+    width: 100%;
+    min-height: 0;
+    height: calc(100dvh - 68px);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    background: #fff;
+  }
+  .message-layout-mobile-active .message-pane > .toolbar {
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 62px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(14px);
+  }
+  .message-layout-mobile-active .message-heading h2 {
+    font-size: 16px;
+    line-height: 1.2;
+  }
+  .message-layout-mobile-active .message-heading .small {
+    font-size: 12px;
+  }
+  .message-layout-mobile-active .message-pane > .toolbar > .badge {
+    flex: 0 0 auto;
+    max-width: 130px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.15;
   }
   .message-layout-mobile .message-pane {
     padding-bottom: 0;
   }
   .message-layout-mobile .messages {
     padding: 10px 0;
+  }
+  .message-layout-mobile-active .messages {
+    min-height: 0;
+    padding: 12px;
+    gap: 10px;
+    background: #f7f9fb;
+    overscroll-behavior: contain;
   }
   .message-heading {
     width: 100%;
@@ -1256,6 +1306,10 @@ tbody tr:hover { background: #f9fafb; }
     overflow-wrap: anywhere;
   }
   .message { max-width: 92%; }
+  .message-layout-mobile-active .message {
+    max-width: 86%;
+    padding: 10px 12px;
+  }
   .message-form {
     grid-template-columns: 1fr;
     position: sticky;
@@ -1267,9 +1321,34 @@ tbody tr:hover { background: #f9fafb; }
   .message-form .textarea {
     min-height: 48px;
   }
+  .message-layout-mobile-active .message-form {
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 8px;
+    position: static;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    margin: 0;
+    border-top: 1px solid var(--line);
+    background: rgba(255,255,255,.98);
+  }
+  .message-layout-mobile-active .message-form .textarea {
+    min-height: 42px;
+    max-height: 92px;
+    resize: none;
+  }
+  .message-layout-mobile-active .message-form .btn {
+    width: auto;
+    min-height: 42px;
+    padding: 0 12px;
+  }
   .workflow-card {
     border-radius: var(--radius);
     padding: 14px;
+  }
+  .message-layout-mobile-active .workflow-card {
+    width: 100%;
+    padding: 12px;
   }
   .workflow-summary { grid-template-columns: 1fr; }
   .info-list > div {

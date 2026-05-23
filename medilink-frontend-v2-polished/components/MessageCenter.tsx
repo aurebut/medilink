@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Conversation, Message } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
@@ -100,6 +100,7 @@ export function MessageCenter() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const active = useMemo(() => conversations.find((c) => c.id === activeId) || null, [conversations, activeId]);
   const workflows = useMemo(() => messages.map((m) => ({ message: m, workflow: parseWorkflow(m) })).filter((x) => x.workflow), [messages]);
@@ -194,6 +195,10 @@ export function MessageCenter() {
     const timer = setInterval(() => void loadMessages(activeId), MESSAGE_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
   }, [activeId]);
+  useEffect(() => {
+    if (!activeId) return;
+    messagesEndRef.current?.scrollIntoView({ block: 'end' });
+  }, [activeId, messages.length]);
   useEffect(() => {
     const timer = setInterval(() => void loadConversations(), CONVERSATION_POLL_INTERVAL_MS);
     return () => clearInterval(timer);
@@ -311,7 +316,7 @@ export function MessageCenter() {
   const showMessagePane = !isMobile || Boolean(activeId);
 
   return (
-    <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''}`}>
+    <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
       {showConversationList ? <Card className="conversation-list">
         <div className="toolbar">
           <div>
@@ -405,6 +410,7 @@ export function MessageCenter() {
               </div>
             );
           })}
+          <div ref={messagesEndRef} aria-hidden="true" />
         </div>
 
         <div className="message-form">
