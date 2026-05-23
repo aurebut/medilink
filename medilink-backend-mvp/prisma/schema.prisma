@@ -497,6 +497,7 @@ model Message {
   id             String      @id @default(uuid())
   conversationId String
   senderUserId   String
+  clientRequestId String?
   body           String
   messageType    MessageType @default(TEXT)
   readAt         DateTime?
@@ -509,6 +510,7 @@ model Message {
   attachments  MessageAttachment[]
 
   @@index([conversationId, createdAt])
+  @@unique([conversationId, senderUserId, clientRequestId])
 }
 
 model MessageAttachment {

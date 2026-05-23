@@ -7,6 +7,7 @@ import {
   InvoiceType,
   MessageType,
   MissionAgreementStatus,
+  Prisma,
   UserRole,
 } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
@@ -14,6 +15,7 @@ import { AuditService } from '../audit/audit.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { ConversationEventsService } from './conversation-events.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { SendProposalDto } from './dto/workflow-action.dto';
 
@@ -26,6 +28,7 @@ export class ConversationsService {
     private readonly permissions: PermissionsService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    private readonly events: ConversationEventsService,
   ) {}
 
   async list(user: RequestUser) {
@@ -92,25 +95,56 @@ export class ConversationsService {
   async sendMessage(user: RequestUser, conversationId: string, dto: SendMessageDto) {
     await this.permissions.ensureConversationParticipant(user.id, conversationId);
 
-    const message = await this.prisma.$transaction(async (tx) => {
-      const created = await tx.message.create({
-        data: {
+    if (dto.clientRequestId) {
+      const existing = await this.prisma.message.findFirst({
+        where: {
           conversationId,
           senderUserId: user.id,
-          body: dto.body,
-          messageType: MessageType.TEXT,
+          clientRequestId: dto.clientRequestId,
+          deletedAt: null,
         },
       });
 
-      await tx.conversation.update({
-        where: { id: conversationId },
-        data: { lastMessageAt: new Date() },
-      });
+      if (existing) return existing;
+    }
 
-      return created;
-    });
+    let message;
+    try {
+      message = await this.prisma.$transaction(async (tx) => {
+        const created = await tx.message.create({
+          data: {
+            conversationId,
+            senderUserId: user.id,
+            clientRequestId: dto.clientRequestId,
+            body: dto.body,
+            messageType: MessageType.TEXT,
+          },
+        });
+
+        await tx.conversation.update({
+          where: { id: conversationId },
+          data: { lastMessageAt: new Date() },
+        });
+
+        return created;
+      });
+    } catch (error) {
+      if (dto.clientRequestId && error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const existing = await this.prisma.message.findFirst({
+          where: {
+            conversationId,
+            senderUserId: user.id,
+            clientRequestId: dto.clientRequestId,
+            deletedAt: null,
+          },
+        });
+        if (existing) return existing;
+      }
+      throw error;
+    }
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     await this.audit.log({
       actorUserId: user.id,
       action: 'message.created',
@@ -219,6 +253,7 @@ export class ConversationsService {
 
     await this.notifications.notifyApplicationStatusChanged(conversation.applicationId, ApplicationStatus.ACCEPTED);
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -263,6 +298,7 @@ export class ConversationsService {
 
     await this.notifications.notifyApplicationStatusChanged(conversation.applicationId, ApplicationStatus.REJECTED);
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -299,6 +335,7 @@ export class ConversationsService {
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -329,6 +366,7 @@ export class ConversationsService {
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -364,6 +402,7 @@ export class ConversationsService {
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -412,6 +451,7 @@ export class ConversationsService {
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 
@@ -527,6 +567,7 @@ export class ConversationsService {
     );
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
     return message;
   }
 

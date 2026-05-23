@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, MessageEvent, Param, Post, Sse, UseGuards } from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { RequestUser } from '../../common/types/request-user.type';
+import { ConversationEventsService } from './conversation-events.service';
 import { ConversationsService } from './conversations.service';
 import { SendMessageDto } from './dto/send-message.dto';
 import { SendProposalDto } from './dto/workflow-action.dto';
@@ -9,11 +11,19 @@ import { SendProposalDto } from './dto/workflow-action.dto';
 @Controller('conversations')
 @UseGuards(AuthGuard)
 export class ConversationsController {
-  constructor(private readonly conversations: ConversationsService) {}
+  constructor(
+    private readonly conversations: ConversationsService,
+    private readonly events: ConversationEventsService,
+  ) {}
 
   @Get()
   list(@CurrentUser() user: RequestUser) {
     return this.conversations.list(user);
+  }
+
+  @Sse('events')
+  eventsStream(@CurrentUser() user: RequestUser): Observable<MessageEvent> {
+    return this.events.streamForUser(user.id);
   }
 
   @Get(':id')

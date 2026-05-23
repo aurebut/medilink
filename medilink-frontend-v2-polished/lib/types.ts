@@ -169,6 +169,7 @@ export type Message = {
   id: string;
   conversationId: string;
   senderUserId: string;
+  clientRequestId?: string | null;
   body: string;
   messageType: MessageType;
   readAt?: string | null;

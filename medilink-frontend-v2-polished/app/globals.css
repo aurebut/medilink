@@ -734,6 +734,7 @@ tbody tr:hover { background: #f9fafb; }
 .messages { flex: 1; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 14px 2px; }
 .message { max-width: 72%; border-radius: 12px 12px 12px 4px; padding: 12px 14px; background: #f3f4f6; border: 1px solid #e5e7eb; }
 .message.mine { margin-left: auto; background: #eff6ff; border-color: #bfdbfe; border-radius: 12px 12px 4px 12px; }
+.message.pending { opacity: .72; }
 .message.system { margin: 0 auto; max-width: 90%; background: #fff7ed; color: #9a3412; border-color: #fed7aa; font-size: 13px; border-radius: 999px; }
 .message-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding-top: 12px; border-top: 1px solid var(--line); }
 .message-form .textarea { min-height: 54px; max-height: 110px; }

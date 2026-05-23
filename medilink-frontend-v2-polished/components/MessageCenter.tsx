@@ -1,17 +1,21 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, getApiEventUrl } from '@/lib/api';
 import type { Conversation, Message } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
-const MESSAGE_POLL_INTERVAL_MS = 2000;
-const CONVERSATION_POLL_INTERVAL_MS = 5000;
 
 type ConversationWithLast = Conversation & { messages?: Message[] };
+type ChatMessage = Message & { localStatus?: 'pending' };
+type RealtimeEvent = {
+  type: 'message.created';
+  conversationId: string;
+  message: Message;
+};
 type WorkflowKind =
   | 'FINAL_PROPOSAL'
   | 'PAYMENT_REQUIRED'
@@ -63,6 +67,37 @@ function isRecruiterRole(role?: string) {
   return Boolean(role && role !== 'CANDIDATE');
 }
 
+function createClientRequestId() {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function mergeMessages(current: ChatMessage[], incoming: ChatMessage[]) {
+  const byId = new Map<string, ChatMessage>();
+  const byClientRequest = new Map<string, ChatMessage>();
+
+  [...current, ...incoming].forEach((message) => {
+    const clientKey = message.clientRequestId
+      ? `${message.conversationId}:${message.senderUserId}:${message.clientRequestId}`
+      : null;
+    const existing = clientKey ? byClientRequest.get(clientKey) : null;
+
+    if (existing) {
+      const preferred = existing.localStatus === 'pending' && message.localStatus !== 'pending' ? message : existing;
+      byId.delete(existing.id);
+      byId.set(preferred.id, preferred);
+      byClientRequest.set(clientKey!, preferred);
+      return;
+    }
+
+    byId.set(message.id, message);
+    if (clientKey) byClientRequest.set(clientKey, message);
+  });
+
+  return Array.from(byId.values()).sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+}
+
 function workflowLabel(kind: WorkflowKind) {
   const labels: Record<WorkflowKind, string> = {
     FINAL_PROPOSAL: 'Proposition finale',
@@ -83,7 +118,7 @@ export function MessageCenter() {
   ));
   const [conversations, setConversations] = useState<ConversationWithLast[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
   const [proposal, setProposal] = useState<ProposalForm>({
@@ -100,7 +135,11 @@ export function MessageCenter() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyAction, setBusyAction] = useState<string | null>(null);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const activeIdRef = useRef<string | null>(null);
+  const sendingMessageRef = useRef(false);
+  activeIdRef.current = activeId;
 
   const active = useMemo(() => conversations.find((c) => c.id === activeId) || null, [conversations, activeId]);
   const workflows = useMemo(() => messages.map((m) => ({ message: m, workflow: parseWorkflow(m) })).filter((x) => x.workflow), [messages]);
@@ -155,7 +194,9 @@ export function MessageCenter() {
   async function loadMessages(id: string) {
     try {
       const data = await api.get<Message[]>(`/conversations/${id}/messages`);
-      setMessages(data);
+      if (activeIdRef.current === id) {
+        setMessages((prev) => mergeMessages(prev, data));
+      }
       await api.post(`/conversations/${id}/read`, {});
     } catch (e: any) {
       setError(e.message);
@@ -176,6 +217,7 @@ export function MessageCenter() {
   useEffect(() => { void loadConversations(); }, []);
   useEffect(() => {
     if (!activeId) return;
+    setMessages([]);
     void loadMessages(activeId);
     const current = conversations.find((c) => c.id === activeId);
     setProposal({
@@ -191,18 +233,9 @@ export function MessageCenter() {
     });
   }, [activeId]);
   useEffect(() => {
-    if (!activeId) return undefined;
-    const timer = setInterval(() => void loadMessages(activeId), MESSAGE_POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [activeId]);
-  useEffect(() => {
     if (!activeId) return;
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
   }, [activeId, messages.length]);
-  useEffect(() => {
-    const timer = setInterval(() => void loadConversations(), CONVERSATION_POLL_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [activeId]);
   useEffect(() => {
     function refreshWhenVisible() {
       if (document.visibilityState !== 'visible') return;
@@ -217,21 +250,71 @@ export function MessageCenter() {
       window.removeEventListener('focus', refreshWhenVisible);
     };
   }, [activeId]);
+  useEffect(() => {
+    const source = new EventSource(getApiEventUrl('/conversations/events'), { withCredentials: true });
+
+    source.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data) as RealtimeEvent;
+        if (payload.type !== 'message.created') return;
+
+        if (activeIdRef.current === payload.conversationId) {
+          setMessages((prev) => mergeMessages(prev, [payload.message]));
+          void api.post(`/conversations/${payload.conversationId}/read`, {});
+        }
+
+        api.get<ConversationWithLast[]>('/conversations')
+          .then(setConversations)
+          .catch((e: any) => setError(e.message));
+      } catch {
+        // Ignore malformed realtime payloads; the next focus refresh will recover state.
+      }
+    };
+
+    return () => source.close();
+  }, []);
 
   async function refresh() {
     if (activeId) await loadMessages(activeId);
     await loadConversations();
   }
 
-  async function send() {
-    if (!activeId || !body.trim()) return;
+  async function send(e?: FormEvent) {
+    e?.preventDefault();
+    const messageBody = body.trim();
+    if (!activeId || !messageBody || sendingMessageRef.current) return;
+
+    const conversationId = activeId;
+    const clientRequestId = createClientRequestId();
+    const pendingMessage: ChatMessage = {
+      id: `pending-${clientRequestId}`,
+      conversationId,
+      senderUserId: user?.id || '',
+      clientRequestId,
+      body: messageBody,
+      messageType: 'TEXT',
+      createdAt: new Date().toISOString(),
+      localStatus: 'pending',
+    };
+
+    sendingMessageRef.current = true;
+    setSendingMessage(true);
+    setError(null);
+    setBody('');
+    setMessages((prev) => mergeMessages(prev, [pendingMessage]));
     try {
-      const created = await api.post<Message>(`/conversations/${activeId}/messages`, { body: body.trim() });
-      setMessages((prev) => [...prev, created]);
-      setBody('');
+      const created = await api.post<Message>(`/conversations/${conversationId}/messages`, { body: messageBody, clientRequestId });
+      if (activeIdRef.current === conversationId) {
+        setMessages((prev) => mergeMessages(prev, [created]));
+      }
       await loadConversations();
     } catch (e: any) {
+      setMessages((prev) => prev.filter((message) => message.clientRequestId !== clientRequestId));
+      if (activeIdRef.current === conversationId) setBody(messageBody);
       setError(e.message);
+    } finally {
+      sendingMessageRef.current = false;
+      setSendingMessage(false);
     }
   }
 
@@ -404,19 +487,19 @@ export function MessageCenter() {
             const mine = m.senderUserId === user?.id;
             const system = m.messageType === 'SYSTEM';
             return (
-              <div key={m.id} className={`message ${mine ? 'mine' : ''} ${system ? 'system' : ''}`}>
+              <div key={m.id} className={`message ${mine ? 'mine' : ''} ${system ? 'system' : ''} ${m.localStatus === 'pending' ? 'pending' : ''}`}>
                 <div>{m.body}</div>
-                <div className="small">{formatDateTime(m.createdAt)}</div>
+                <div className="small">{m.localStatus === 'pending' ? 'Envoi...' : formatDateTime(m.createdAt)}</div>
               </div>
             );
           })}
           <div ref={messagesEndRef} aria-hidden="true" />
         </div>
 
-        <div className="message-form">
-          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." />
-          <Button onClick={send}>Envoyer</Button>
-        </div>
+        <form className="message-form" onSubmit={send}>
+          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." disabled={sendingMessage} />
+          <Button disabled={sendingMessage || !body.trim()}>{sendingMessage ? 'Envoi...' : 'Envoyer'}</Button>
+        </form>
       </Card> : null}
     </div>
   );

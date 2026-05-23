@@ -26,7 +26,8 @@ export class AuthGuard implements CanActivate {
       typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
         ? authHeader.slice('Bearer '.length).trim()
         : undefined;
-    const rawToken = req.cookies?.[cookieName] || bearerToken;
+    const queryToken = typeof req.query?.access_token === 'string' ? req.query.access_token : undefined;
+    const rawToken = req.cookies?.[cookieName] || bearerToken || queryToken;
 
     if (!rawToken) {
       throw new UnauthorizedException('Authentification requise.');

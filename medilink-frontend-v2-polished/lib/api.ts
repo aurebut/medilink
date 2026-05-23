@@ -21,6 +21,13 @@ export function getAuthToken() {
   return window.localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
+export function getApiEventUrl(path: string) {
+  const token = getAuthToken();
+  const url = new URL(`${API_URL}${path}`);
+  if (token) url.searchParams.set('access_token', token);
+  return url.toString();
+}
+
 export function setAuthToken(token: string) {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(AUTH_TOKEN_KEY, token);
