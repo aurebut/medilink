@@ -18,6 +18,8 @@ const emptyFilters = {
   softwareUsed: '',
   hasSecretary: '',
   dateFrom: '',
+  retrocessionMin: '',
+  retrocessionMax: '',
 };
 
 const sectorOptions = [
@@ -137,6 +139,28 @@ export default function SearchMissionsPage() {
             <Field label="À partir du">
               <Input type="date" value={filters.dateFrom} onChange={(e) => set('dateFrom', e.target.value)} />
             </Field>
+            <div className="form-row">
+              <Field label="Rétrocession minimum">
+                <Input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={filters.retrocessionMin}
+                  onChange={(e) => set('retrocessionMin', e.target.value)}
+                  placeholder="70"
+                />
+              </Field>
+              <Field label="Rétrocession maximum">
+                <Input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={filters.retrocessionMax}
+                  onChange={(e) => set('retrocessionMax', e.target.value)}
+                  placeholder="90"
+                />
+              </Field>
+            </div>
             <div className="actions">
               <Button disabled={loading}>{loading ? 'Recherche...' : 'Rechercher'}</Button>
               <Button

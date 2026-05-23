@@ -136,6 +136,12 @@ export class MissionsService {
     if (dto.softwareUsed) where.softwareUsed = { contains: dto.softwareUsed, mode: 'insensitive' };
     if (dto.hasSecretary) where.hasSecretary = dto.hasSecretary === 'true';
     if (dto.dateFrom) where.startDate = { gte: new Date(dto.dateFrom) };
+    if (dto.retrocessionMin || dto.retrocessionMax) {
+      where.retrocessionPercentage = {
+        ...(dto.retrocessionMin ? { gte: dto.retrocessionMin } : {}),
+        ...(dto.retrocessionMax ? { lte: dto.retrocessionMax } : {}),
+      };
+    }
 
     if (dto.q) {
       andFilters.push({

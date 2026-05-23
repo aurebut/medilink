@@ -51,6 +51,20 @@ export class SearchMissionsDto {
   @IsInt()
   @Min(1)
   @Max(100)
+  retrocessionMin?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  retrocessionMax?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @IsOptional()
