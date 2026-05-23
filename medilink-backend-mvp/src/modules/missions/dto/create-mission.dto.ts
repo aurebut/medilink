@@ -4,7 +4,6 @@ import {
   IsBoolean,
   IsDateString,
   IsEnum,
-  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -49,7 +48,6 @@ export class CreateMissionDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
   sector?: string;
 
   @IsOptional()
@@ -65,6 +63,41 @@ export class CreateMissionDto {
   @IsOptional()
   @IsBoolean()
   hasSecretary?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  mobilityOptions?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedMissionTypes?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  minimumCompensation?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  preferredDurations?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  refusedSchedules?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedPatientTypes?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  knownSoftware?: string[];
 
   @IsOptional()
   @IsString()

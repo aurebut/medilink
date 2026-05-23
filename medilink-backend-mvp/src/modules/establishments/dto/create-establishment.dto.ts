@@ -1,5 +1,5 @@
 import { EstablishmentType } from '@prisma/client';
-import { IsBoolean, IsEmail, IsEnum, IsIn, IsOptional, IsString, IsUrl, MaxLength } from 'class-validator';
+import { IsArray, IsBoolean, IsEmail, IsEnum, IsInt, IsOptional, IsString, IsUrl, MaxLength, Min } from 'class-validator';
 
 export class CreateEstablishmentDto {
   @IsString()
@@ -22,7 +22,6 @@ export class CreateEstablishmentDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
   sector?: string;
 
   @IsOptional()
@@ -38,6 +37,41 @@ export class CreateEstablishmentDto {
   @IsOptional()
   @IsBoolean()
   hasSecretary?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  mobilityOptions?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedMissionTypes?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  minimumCompensation?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  preferredDurations?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  refusedSchedules?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedPatientTypes?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  knownSoftware?: string[];
 
   @IsOptional()
   @IsString()

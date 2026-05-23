@@ -342,6 +342,13 @@ model Establishment {
   patientType        String?
   softwareUsed       String?
   hasSecretary       Boolean?
+  mobilityOptions    String[]            @default([])
+  acceptedMissionTypes String[]          @default([])
+  minimumCompensation Int?
+  preferredDurations String[]            @default([])
+  refusedSchedules   String[]            @default([])
+  acceptedPatientTypes String[]          @default([])
+  knownSoftware      String[]            @default([])
   phone              String?
   email              String?
   website            String?
@@ -410,6 +417,13 @@ model Mission {
   patientType         String?
   softwareUsed        String?
   hasSecretary        Boolean?
+  mobilityOptions     String[]       @default([])
+  acceptedMissionTypes String[]      @default([])
+  minimumCompensation Int?
+  preferredDurations  String[]       @default([])
+  refusedSchedules    String[]       @default([])
+  acceptedPatientTypes String[]      @default([])
+  knownSoftware       String[]       @default([])
   departmentInfo      String?
   teamInfo            String?
   equipmentInfo       String?

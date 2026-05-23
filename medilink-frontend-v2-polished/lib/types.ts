@@ -114,6 +114,13 @@ export type Establishment = {
   patientType?: string | null;
   softwareUsed?: string | null;
   hasSecretary?: boolean | null;
+  mobilityOptions?: string[];
+  acceptedMissionTypes?: string[];
+  minimumCompensation?: number | null;
+  preferredDurations?: string[];
+  refusedSchedules?: string[];
+  acceptedPatientTypes?: string[];
+  knownSoftware?: string[];
   phone?: string | null;
   email?: string | null;
   website?: string | null;
@@ -144,6 +151,13 @@ export type Mission = {
   patientType?: string | null;
   softwareUsed?: string | null;
   hasSecretary?: boolean | null;
+  mobilityOptions?: string[];
+  acceptedMissionTypes?: string[];
+  minimumCompensation?: number | null;
+  preferredDurations?: string[];
+  refusedSchedules?: string[];
+  acceptedPatientTypes?: string[];
+  knownSoftware?: string[];
   departmentInfo?: string | null;
   teamInfo?: string | null;
   equipmentInfo?: string | null;

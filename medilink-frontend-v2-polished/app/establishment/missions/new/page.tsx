@@ -4,10 +4,23 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLevelOptions } from '@/lib/labels';
+import {
+  acceptedMissionTypeOptions,
+  cityOptions,
+  durationOptions,
+  establishmentDepartmentOptions,
+  mobilityOptions,
+  patientTypeOptions,
+  refusedScheduleOptions,
+  sectorOptions,
+  softwareOptions,
+  specialtyOptions,
+} from '@/lib/profile-options';
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 
 const steps = [
@@ -29,12 +42,6 @@ const initialForm = {
   compensationCurrency: 'EUR',
   publishNow: true,
 };
-
-const sectorOptions = [
-  { value: 'SECTEUR_1', label: 'Secteur 1' },
-  { value: 'SECTEUR_2', label: 'Secteur 2' },
-  { value: 'SECTEUR_3', label: 'Secteur 3' },
-];
 
 function sectorLabel(value?: string | null) {
   return sectorOptions.find((option) => option.value === value)?.label || value || '-';
@@ -130,6 +137,13 @@ export default function NewMissionPage() {
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : undefined,
       compensationAmount: undefined,
+      mobilityOptions: cleanArray(form.mobilityOptions),
+      acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
+      minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
+      preferredDurations: cleanArray(form.preferredDurations),
+      refusedSchedules: cleanArray(form.refusedSchedules),
+      acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
+      knownSoftware: cleanArray(form.knownSoftware),
       tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
     };
     delete payload.tagsText;
@@ -289,9 +303,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Titre de la mission">
           <Input required value={form.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Garde aux urgences - nuit" />
         </Field>
-        <Field label="Spécialité">
-          <Input required value={form.specialty || ''} onChange={(e) => set('specialty', e.target.value)} placeholder="Urgences, médecine générale..." />
-        </Field>
+        <SingleChoiceField required label="Spécialité" value={form.specialty || ''} options={specialtyOptions} onChange={(value) => set('specialty', value)} />
         <Field label="Description">
           <Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Contexte, équipe sur place, attentes principales..." />
         </Field>
@@ -306,15 +318,9 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Ajoute le contexte terrain</h2>
           <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
         </div>
-        <Field label="Service ou unité">
-          <Input value={form.departmentInfo || ''} onChange={(e) => set('departmentInfo', e.target.value)} placeholder="Urgences adultes, bloc ambulatoire, cabinet de groupe..." />
-        </Field>
-        <Field label="Type de patientèle">
-          <Input value={form.patientType || ''} onChange={(e) => set('patientType', e.target.value)} placeholder="Pédiatrie, adultes, gériatrie..." />
-        </Field>
-        <Field label="Logiciel utilisé">
-          <Input value={form.softwareUsed || ''} onChange={(e) => set('softwareUsed', e.target.value)} placeholder="Doctolib, Orbis, Hôpital Manager..." />
-        </Field>
+        <SingleChoiceField label="Service ou unité" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
+        <SingleChoiceField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
+        <SingleChoiceField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
         <Field label="Présence de secrétaire">
           <Select
             value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
@@ -342,15 +348,8 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Où se déroule la mission ?</h2>
           <p>La ville est visible publiquement. Le lieu précis peut rester sobre si besoin.</p>
         </div>
-        <Field label="Ville">
-          <Input required value={form.city || ''} onChange={(e) => set('city', e.target.value)} placeholder="Lyon" />
-        </Field>
-        <Field label="Secteur">
-          <Select value={form.sector || ''} onChange={(e) => set('sector', e.target.value)}>
-            <option value="">Non précisé</option>
-            {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </Select>
-        </Field>
+        <SingleChoiceField required label="Ville" value={form.city || ''} options={cityOptions} onChange={(value) => set('city', value)} />
+        <SingleChoiceField label="Secteur" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
         <Field label="Lieu précis">
           <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
         </Field>
@@ -395,6 +394,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Durée estimée en heures">
           <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
         </Field>
+        <SingleChoiceField label="Format de durée" value={form.preferredDuration || ''} options={durationOptions} onChange={(value) => set('preferredDuration', value)} />
       </div>
     );
   }
@@ -423,6 +423,18 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Tags, séparés par virgule">
           <Input value={form.tagsText || ''} onChange={(e) => set('tagsText', e.target.value)} placeholder="urgent, nuit, week-end" />
         </Field>
+        <MultiChoiceField label="Types de missions associés" values={form.acceptedMissionTypes || []} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
+        <div className="profile-preferences-section">
+          <h3>Criteres proposes</h3>
+          <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
+          <MultiChoiceField label="Durees proposees" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+          <MultiChoiceField label="Horaires non proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+          <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
+          <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
+          <Field label="Remuneration minimale indicative (EUR)">
+            <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
+          </Field>
+        </div>
         <div className="publish-choice">
           <button type="button" className={form.publishNow ? 'active' : ''} onClick={() => set('publishNow', true)}>
             <strong>Publier maintenant</strong>
@@ -455,6 +467,14 @@ function ChoiceSection({ title, children }: { title: string; children: ReactNode
       {children}
     </section>
   );
+}
+
+function safeArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+}
+
+function cleanArray(value: unknown): string[] {
+  return safeArray(value).map((item) => item.trim()).filter(Boolean);
 }
 
 function ChoiceGrid({
