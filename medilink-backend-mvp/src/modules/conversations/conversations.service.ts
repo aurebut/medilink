@@ -43,7 +43,7 @@ export class ConversationsService {
       },
       include: {
         mission: true,
-        application: true,
+        application: { include: { candidate: { include: { profile: true } } } },
         establishment: true,
         participants: true,
         agreements: {

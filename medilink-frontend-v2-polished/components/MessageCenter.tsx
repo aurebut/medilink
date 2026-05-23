@@ -2,8 +2,9 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { api, getApiEventUrl } from '@/lib/api';
-import type { Conversation, Message } from '@/lib/types';
+import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
+import { candidateContractedArticle, candidateHas, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
 
@@ -163,6 +164,7 @@ export function MessageCenter() {
   const recruiter = isRecruiterRole(user?.role);
   const candidate = user?.role === 'CANDIDATE';
   const currentRetrocession = lastProposal?.workflow?.proposal?.compensationMode === 'RETROCESSION';
+  const activeCandidateProfile = active?.application?.candidate?.profile;
   const currentStatus = state.invoices
     ? 'Factures disponibles'
     : state.released
@@ -379,7 +381,7 @@ export function MessageCenter() {
       '',
       kind === 'recruiter'
         ? 'Document généré après validation de fin de mission et confirmation du paiement.'
-        : 'Document généré pour le candidat après confirmation du paiement.',
+        : `Document genere pour ${candidateWithArticle(activeCandidateProfile)} apres confirmation du paiement.`,
     ].join('\n');
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -392,7 +394,7 @@ export function MessageCenter() {
 
   if (loading) return <Card><p className="muted">Chargement des conversations...</p></Card>;
   if (conversations.length === 0) {
-    return <EmptyState title="Aucune conversation" description="Les conversations sont créées automatiquement lorsqu'un candidat postule à une mission." />;
+    return <EmptyState title="Aucune conversation" description="Les conversations sont creees automatiquement quand une candidature est envoyee." />;
   }
 
   const showConversationList = !isMobile || !activeId;
@@ -453,6 +455,7 @@ export function MessageCenter() {
               onCancel={() => setProposalOpen(false)}
               onChange={(next) => setProposal((prev) => ({ ...prev, ...next }))}
               onSubmit={submitProposal}
+              candidateLabel={candidateWithArticle(activeCandidateProfile)}
             />
           ) : null}
 
@@ -465,6 +468,7 @@ export function MessageCenter() {
                   workflow={workflow}
                   createdAt={m.createdAt}
                   active={active}
+                  candidateProfile={activeCandidateProfile}
                   candidateCanAnswer={candidate && workflow.kind === 'FINAL_PROPOSAL' && !state.paymentRequired && !state.fundsSecured && !state.rejected}
                   recruiterCanSecure={recruiter && workflow.kind === 'PAYMENT_REQUIRED' && !state.fundsSecured}
                   recruiterCanComplete={recruiter && workflow.kind === 'FUNDS_SECURED' && !state.completed}
@@ -514,6 +518,7 @@ function WorkflowComposer({
   onCancel,
   onChange,
   onSubmit,
+  candidateLabel,
 }: {
   open: boolean;
   proposal: ProposalForm;
@@ -523,6 +528,7 @@ function WorkflowComposer({
   onCancel: () => void;
   onChange: (next: Partial<ProposalForm>) => void;
   onSubmit: (e: FormEvent) => void;
+  candidateLabel: string;
 }) {
   if (!open) {
     return (
@@ -530,7 +536,7 @@ function WorkflowComposer({
         <div>
           <Badge>{hasProposal ? 'Proposition envoyée' : 'Prochaine étape'}</Badge>
           <h3>{hasProposal ? 'Envoyer une nouvelle proposition finale' : 'Formaliser une proposition finale'}</h3>
-          <p>La proposition apparaîtra dans le fil avec les boutons d'acceptation côté candidat.</p>
+          <p>La proposition apparaitra dans le fil avec les boutons d'acceptation cote {candidateLabel}.</p>
         </div>
         <div className="actions">
           <Button onClick={onOpen}>{hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition'}</Button>
@@ -579,6 +585,7 @@ function WorkflowMessageCard({
   workflow,
   createdAt,
   active,
+  candidateProfile,
   candidateCanAnswer,
   recruiterCanSecure,
   recruiterCanComplete,
@@ -598,6 +605,7 @@ function WorkflowMessageCard({
   workflow: WorkflowPayload;
   createdAt: string;
   active: ConversationWithLast | null;
+  candidateProfile?: Pick<Profile, 'candidateGender'> | null;
   candidateCanAnswer: boolean;
   recruiterCanSecure: boolean;
   recruiterCanComplete: boolean;
@@ -616,6 +624,9 @@ function WorkflowMessageCard({
 }) {
   const proposal = workflow.proposal;
   const retrocession = proposal?.compensationMode === 'RETROCESSION';
+  const candidateLabel = candidateWithArticle(candidateProfile);
+  const candidateHasLabel = candidateHas(candidateProfile);
+  const candidateTargetLabel = candidateContractedArticle(candidateProfile);
 
   return (
     <div className="workflow-card">
@@ -653,7 +664,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_REQUIRED' ? (
         <>
           <h3>{retrocession ? 'Accord accepté' : 'Paiement requis'}</h3>
-          <p>{retrocession ? "Le candidat a accepté la rétrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le règlement selon les honoraires encaissés." : "Le candidat a accepté. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin."}</p>
+          <p>{retrocession ? `${candidateHasLabel} accepte la retrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le reglement selon les honoraires encaisses.` : `${candidateHasLabel} accepte. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'a la fin.`}</p>
           {recruiterCanSecure ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Confirmation...' : retrocession ? 'Confirmer la mission' : 'Payer et confirmer'}</Button>
@@ -665,14 +676,14 @@ function WorkflowMessageCard({
       {workflow.kind === 'PROPOSAL_REJECTED' ? (
         <>
           <h3>Proposition refusée</h3>
-          <p>La proposition finale a été refusée. Le recruteur peut discuter avec le candidat puis envoyer une nouvelle proposition.</p>
+          <p>La proposition finale a ete refusee. Le recruteur peut discuter avec {candidateLabel} puis envoyer une nouvelle proposition.</p>
         </>
       ) : null}
 
       {workflow.kind === 'FUNDS_SECURED' ? (
         <>
           <h3>Mission confirmée</h3>
-          <p>{retrocession ? "La mission est confirmée avec une rémunération en rétrocession d'honoraires." : "Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés au candidat après validation de la fin de mission."}</p>
+          <p>{retrocession ? "La mission est confirmee avec une remuneration en retrocession d'honoraires." : `Le paiement du recruteur est securise par Medilink. Les fonds seront liberes ${candidateTargetLabel} apres validation de la fin de mission.`}</p>
           {recruiterCanComplete ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}</Button>
@@ -684,7 +695,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'MISSION_COMPLETED' ? (
         <>
           <h3>Mission terminée</h3>
-          <p>{retrocession ? "La fin de mission a été validée. La rétrocession d'honoraires peut maintenant être confirmée." : 'La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré au candidat.'}</p>
+          <p>{retrocession ? "La fin de mission a ete validee. La retrocession d'honoraires peut maintenant etre confirmee." : `La fin de mission a ete validee. Le paiement securise peut maintenant etre libere ${candidateTargetLabel}.`}</p>
           {recruiterCanPay ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Validation...' : retrocession ? 'Valider la rétrocession' : 'Libérer le paiement'}</Button>
@@ -696,7 +707,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_RELEASED' ? (
         <>
           <h3>{retrocession ? 'Rétrocession validée' : 'Paiement libéré'}</h3>
-          <p>{retrocession ? "La rétrocession d'honoraires a été validée. Les justificatifs peuvent être générés." : 'Les fonds ont été libérés au candidat. Les factures et justificatifs peuvent être générés.'}</p>
+          <p>{retrocession ? "La retrocession d'honoraires a ete validee. Les justificatifs peuvent etre generes." : `Les fonds ont ete liberes ${candidateTargetLabel}. Les factures et justificatifs peuvent etre generes.`}</p>
           {canGenerateInvoices ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>{busyAction === 'invoices' ? 'Génération...' : 'Générer les factures'}</Button>

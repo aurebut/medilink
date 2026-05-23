@@ -81,6 +81,8 @@ export class ApplicationsService {
       throw new ConflictException('Vous avez déjà postulé à cette mission.');
     }
 
+    const profile = await this.prisma.profile.findUnique({ where: { userId: user.id } });
+    const candidateArticle = profile?.candidateGender === 'FEMININE' ? 'La candidate' : 'Le candidat';
     const recruiterUserId = mission.createdById;
 
     const result = await this.prisma.$transaction(async (tx) => {
@@ -125,7 +127,7 @@ export class ApplicationsService {
           conversationId: conversation.id,
           senderUserId: user.id,
           messageType: MessageType.SYSTEM,
-          body: 'Le candidat a postulé à la mission.',
+          body: `${candidateArticle} a postule a la mission.`,
         },
       });
 

@@ -6,6 +6,7 @@ import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview
 import type { CandidateProfileForApplication, Document } from '@/lib/types';
 import { documentTypeLabel, medicalStatusOptions, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
+import { candidateHas, candidateNoun } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: string) {
@@ -69,12 +70,14 @@ export default function EstablishmentCandidateProfilePage() {
   const profile = data.candidate.profile;
   const documents = data.candidate.documents || [];
   const fullName = `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || data.candidate.email;
+  const candidateLabel = candidateNoun(profile);
+  const candidateHasLabel = candidateHas(profile);
 
   return (
     <>
       <PageHeader
         title={fullName}
-        description="Profil candidat consultable dans le cadre d’une candidature reçue."
+        description={`Profil ${candidateLabel} consultable dans le cadre d'une candidature recue.`}
         actions={
           <>
             <LinkButton variant="light" href="/establishment/applications">Retour</LinkButton>
@@ -198,7 +201,7 @@ export default function EstablishmentCandidateProfilePage() {
         <div className="actions" style={{ justifyContent: 'space-between' }}>
           <div>
             <h2>Documents validés</h2>
-            <p className="muted">Documents consultables car le candidat a postulé à une mission de votre établissement.</p>
+            <p className="muted">Documents consultables car {candidateHasLabel} postule a une mission de votre etablissement.</p>
           </div>
           <Badge tone="success">{documents.length} document(s)</Badge>
         </div>
