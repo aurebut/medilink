@@ -91,6 +91,7 @@ export class ProfilesService {
     const fields = [
       data.firstName,
       data.lastName,
+      data.candidateGender,
       data.city,
       data.medicalStatus,
       data.specialty,

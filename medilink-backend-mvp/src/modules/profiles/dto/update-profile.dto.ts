@@ -3,6 +3,7 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -18,6 +19,10 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsIn(['FEMININE', 'MASCULINE'])
+  candidateGender?: string;
 
   @IsOptional()
   @IsString()

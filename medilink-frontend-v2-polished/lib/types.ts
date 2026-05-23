@@ -8,6 +8,7 @@ export type UserRole =
   | 'MEDILINK_SUPPORT';
 
 export type UserStatus = 'PENDING_EMAIL_VERIFICATION' | 'ACTIVE' | 'SUSPENDED' | 'DELETED';
+export type CandidateGender = 'FEMININE' | 'MASCULINE';
 export type MedicalStatus = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'REGULAR_LOCUM' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
 export type DocumentType = 'CV' | 'ATTESTATION' | 'CONVENTION' | 'DIPLOMA' | 'IDENTITY_DOCUMENT' | 'INSURANCE' | 'AVATAR' | 'MESSAGE_ATTACHMENT' | 'OTHER';
 export type DocumentVerificationStatus = 'UPLOAD_PENDING' | 'PENDING_VERIFICATION' | 'APPROVED' | 'REJECTED' | 'EXPIRED' | 'DELETED';
@@ -36,6 +37,7 @@ export type Profile = {
   userId: string;
   firstName?: string | null;
   lastName?: string | null;
+  candidateGender?: CandidateGender | null;
   avatarUrl?: string | null;
   city?: string | null;
   country?: string | null;

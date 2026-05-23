@@ -251,6 +251,7 @@ model Profile {
   userId              String         @unique
   firstName           String?
   lastName            String?
+  candidateGender     String?
   avatarUrl           String?
   city                String?
   country             String?        @default("France")

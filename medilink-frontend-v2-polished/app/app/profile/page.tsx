@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api, isMockStorageUrl } from '@/lib/api';
-import type { MedicalStatus, Profile } from '@/lib/types';
+import type { CandidateGender, MedicalStatus, Profile } from '@/lib/types';
 import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
 
@@ -142,6 +142,7 @@ export default function ProfilePage() {
     const payload = {
       firstName: form.firstName || undefined,
       lastName: form.lastName || undefined,
+      candidateGender: form.candidateGender || undefined,
       city: form.city || undefined,
       country: form.country || undefined,
       medicalStatus: form.medicalStatus || undefined,
@@ -284,23 +285,34 @@ export default function ProfilePage() {
             </div>
 
             <div className="form-row">
+              <Field label="Sexe / accord grammatical">
+                <Select value={form.candidateGender || ''} onChange={(e) => set('candidateGender', e.target.value as CandidateGender)}>
+                  <option value="">Selectionner</option>
+                  <option value="FEMININE">Feminin</option>
+                  <option value="MASCULINE">Masculin</option>
+                </Select>
+              </Field>
               <Field label="Ville"><Input value={form.city || ''} onChange={(e) => set('city', e.target.value)} /></Field>
-              <Field label="Pays"><Input value={form.country || 'France'} onChange={(e) => set('country', e.target.value)} /></Field>
             </div>
 
             <div className="form-row">
+              <Field label="Pays"><Input value={form.country || 'France'} onChange={(e) => set('country', e.target.value)} /></Field>
               <Field label="Statut medical">
                 <Select value={form.medicalStatus || ''} onChange={(e) => set('medicalStatus', e.target.value as MedicalStatus)}>
                   <option value="">Selectionner</option>
                   {candidateMedicalStatusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </Select>
               </Field>
+            </div>
+
+            <div className="form-row">
               <SingleChoiceField
                 label="Specialite"
                 value={form.specialty || ''}
                 options={specialtyOptions}
                 onChange={(value) => set('specialty', value)}
               />
+              <Field label="Secteur"><Input value={form.orientation || ''} onChange={(e) => set('orientation', e.target.value)} /></Field>
             </div>
 
             {form.medicalStatus === 'OTHER' ? (
@@ -309,10 +321,7 @@ export default function ProfilePage() {
               </Field>
             ) : null}
 
-            <div className="form-row">
-              <Field label="Secteur"><Input value={form.orientation || ''} onChange={(e) => set('orientation', e.target.value)} /></Field>
-              <Field label="Hopital / faculte"><Input value={form.hospitalOrFaculty || ''} onChange={(e) => set('hospitalOrFaculty', e.target.value)} /></Field>
-            </div>
+            <Field label="Hopital / faculte"><Input value={form.hospitalOrFaculty || ''} onChange={(e) => set('hospitalOrFaculty', e.target.value)} /></Field>
 
             <div className="form-row">
               <Field label="Annees d'experience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
