@@ -141,7 +141,9 @@ export default function MissionPage() {
                 <div className="tag-list">
                   <Badge>{missionTypeLabel(mission.missionType)}</Badge>
                   <Badge tone="neutral">{requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</Badge>
-                  <Badge tone={mission.status === 'PUBLISHED' ? 'success' : 'warning'}>{statusLabel(mission.status)}</Badge>
+                  {canManageMission && (
+                    <Badge tone={mission.status === 'PUBLISHED' ? 'success' : 'warning'}>{statusLabel(mission.status)}</Badge>
+                  )}
                   {mission.tags?.map((tag) => <Badge key={tag.id} tone="neutral">#{tag.tag}</Badge>)}
                 </div>
               </Card>
