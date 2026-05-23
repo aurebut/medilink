@@ -122,8 +122,8 @@ export default function EstablishmentOnboardingPage() {
                 </Badge>
                 <div className="divider" />
                 <div style={{ marginTop: 8 }}>
-                  <LinkButton href={`/establishment/photos/${establishment.id}`} variant="secondary">
-                    Gérer les photos ({establishment.photos?.length || 0})
+                  <LinkButton href={`/establishment/edit/${establishment.id}`} variant="secondary">
+                    Modifier l'établissement ({establishment.photos?.length || 0})
                   </LinkButton>
                 </div>
               </div>
