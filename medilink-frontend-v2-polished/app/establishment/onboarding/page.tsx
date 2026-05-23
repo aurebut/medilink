@@ -5,9 +5,8 @@ import { api } from '@/lib/api';
 import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManager';
 import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
-import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import {
   acceptedMissionTypeOptions,
   cityOptions,
@@ -122,11 +121,11 @@ export default function EstablishmentOnboardingPage() {
                   {statusLabel(establishment.verificationStatus)}
                 </Badge>
                 <div className="divider" />
-                <EstablishmentPhotoManager
-                  establishmentId={establishment.id}
-                  photos={establishment.photos}
-                  onChanged={reload}
-                />
+                <div style={{ marginTop: 8 }}>
+                  <LinkButton href={`/establishment/photos/${establishment.id}`} variant="secondary">
+                    Gérer les photos ({establishment.photos?.length || 0})
+                  </LinkButton>
+                </div>
               </div>
               <Button
                 type="button"
