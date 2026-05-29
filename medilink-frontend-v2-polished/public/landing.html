@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MédiLink — La plateforme de remplacement en médecine générale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1929;--navy-2:#112238;--navy-3:#1A3355;
+  --blue:#1A52A0;--blue-lt:#2D6CC8;
+  --teal:#0E8A7A;--teal-lt:#14A896;
+  --ivory:#F8F7F3;--white:#fff;
+  --gray-1:#F2F4F8;--gray-2:#E4E9F2;--gray-3:#C8D2E4;--gray-4:#8A9AB8;--gray-5:#4A5A72;
+  --text:#0F1E32;--text-2:#3A4A62;--text-3:#6A7A92;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:36px}
+.nav-mark{width:34px;height:34px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center}
+.nav-mark svg{width:18px;height:18px;fill:none;stroke:#AACBE8;stroke-width:2;stroke-linecap:round}
+.nav-name{font-family:var(--serif);font-size:20px;color:var(--navy);letter-spacing:0}
+.nav-name em{font-style:italic;color:var(--blue)}
+.nav-links{display:flex;gap:2px}
+.nav-link{font-size:13px;color:var(--text-2);padding:6px 12px;border-radius:8px;text-decoration:none;transition:color .15s,background .15s}
+.nav-link:hover{color:var(--navy);background:var(--gray-1)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap}
+.btn-ghost{background:transparent;color:var(--text-2)}
+.btn-ghost:hover{background:var(--gray-1);color:var(--navy)}
+.btn-primary{background:var(--navy);color:#C8DFF5}
+.btn-primary:hover{background:var(--navy-2)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-lt)}
+.btn-lg{font-size:15px;padding:12px 28px;border-radius:10px}
+.btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
+.btn-outline:hover{background:var(--navy);color:#C8DFF5}
+
+/* HERO */
+.hero{min-height:92vh;display:flex;align-items:center;padding:80px 40px 60px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18}
+.hero-blob-1{width:600px;height:500px;background:var(--blue);top:-100px;left:-100px}
+.hero-blob-2{width:500px;height:500px;background:var(--teal);bottom:-80px;right:-80px}
+.hero-blob-3{width:400px;height:300px;background:#7AAAD8;top:30%;left:30%}
+.hero-grid{display:none}
+/* Two-col layout */
+.hero-layout{position:relative;z-index:1;width:100%;max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:56px}
+.hero-inner{flex:0 0 520px;max-width:520px;text-align:left}
+.hero-mockup{flex:1;min-width:0;position:relative}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(26,82,160,.08);border:1px solid rgba(26,82,160,.14);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--blue);margin-bottom:28px}
+.hero-eyebrow-dot{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* ── Global grid background ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(26,82,160,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(26,82,160,.045) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+nav,section,footer,.search-section{position:relative;z-index:1;}
+
+/* ── Scroll reveal ── */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .65s ease, transform .65s ease;
+}
+.reveal.visible{
+  opacity:1;
+  transform:none;
+}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+
+/* ── Mockup 3D scroll animation ── */
+#mockup-wrap {
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+}
+.laptop {
+  transform-origin: center bottom;
+  transform: rotateX(52deg) rotateY(-8deg) scale(.82);
+  opacity: 0;
+  transition: none; /* driven by JS */
+  will-change: transform, opacity;
+  filter: drop-shadow(0 32px 64px rgba(11,25,41,.22));
+}
+.laptop.landed {
+  /* final state once fully revealed */
+}
+
+/* ── Mockup section ── */
+.mockup-section{
+  padding:80px 40px 80px;
+  display:flex;
+  justify-content:center;
+}
+.mockup-section-inner{
+  max-width:900px;
+  width:100%;
+}
+.hero-h{font-family:var(--serif);font-size:clamp(36px,4.5vw,62px);color:var(--navy);line-height:1.05;letter-spacing:0;margin-bottom:22px}
+.hero-h em{font-style:italic;color:var(--blue)}
+.hero-sub{font-size:17px;color:var(--text-3);max-width:460px;margin:0 0 36px;line-height:1.6}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
+.hero-stats{display:flex;gap:36px;flex-wrap:wrap}
+.hero-stat-num{font-family:var(--serif);font-size:32px;color:var(--navy);font-weight:400}
+.hero-stat-label{font-size:12px;color:var(--text-3);margin-top:2px}
+/* Laptop mockup */
+.laptop{position:relative;width:100%;max-width:620px}
+.laptop-body{background:var(--navy);border-radius:14px 14px 0 0;padding:10px 10px 0;box-shadow:0 24px 80px rgba(11,25,41,.28)}
+.laptop-cam{width:6px;height:6px;background:#1A3355;border-radius:50%;margin:0 auto 8px}
+.laptop-screen{background:var(--ivory);border-radius:8px;overflow:hidden;aspect-ratio:16/10;position:relative}
+.laptop-base{background:var(--navy-2);height:14px;border-radius:0 0 4px 4px;position:relative}
+.laptop-base::after{content:'';display:block;width:60px;height:5px;background:#112238;border-radius:0 0 4px 4px;margin:0 auto}
+.laptop-stand{width:80px;height:6px;background:#0D1624;border-radius:0 0 8px 8px;margin:0 auto}
+/* Mini dashboard inside screen */
+.dash-mini{width:100%;height:100%;display:flex;background:var(--ivory);font-size:0;overflow:hidden}
+.dash-side{width:44px;background:var(--navy);flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:5px}
+.dash-side-dot{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.08)}
+.dash-side-dot.active{background:rgba(26,82,160,.4)}
+.dash-side-logo{width:24px;height:24px;background:var(--blue);border-radius:6px;margin-bottom:8px}
+.dash-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dash-top{height:32px;background:#fff;border-bottom:1px solid var(--gray-2);display:flex;align-items:center;padding:0 12px;gap:6px}
+.dash-top-pill{height:14px;border-radius:10px;background:var(--gray-2)}
+.dash-content{flex:1;padding:10px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;gap:7px;overflow:hidden}
+.dash-card{background:#fff;border:1px solid var(--gray-2);border-radius:7px;padding:8px 9px}
+.dash-card-wide{grid-column:1/3}
+.dash-card-tall{grid-row:1/3}
+.dash-num{font-family:var(--serif);font-size:20px;color:var(--navy)}
+.dash-bar{height:3px;border-radius:2px;margin-top:4px}
+.dash-bar-blue{background:var(--blue);width:60%}
+.dash-bar-teal{background:var(--teal);width:80%}
+.dash-bar-lt{background:var(--gray-2);width:45%}
+.dash-row{height:18px;border-radius:4px;background:var(--gray-1);margin-bottom:5px}
+.dash-row:last-child{margin-bottom:0;width:70%}
+.dash-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dash-line{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+.dash-label{display:block;height:8px;border-radius:4px;background:var(--gray-2)}
+.dash-badge{display:inline-block;height:12px;border-radius:10px;background:var(--blue);opacity:.2;width:40px;margin-top:4px}
+.dash-mini-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--gray-1)}
+.dash-mini-row:last-child{border-bottom:none;margin-bottom:0}
+.dash-av{width:18px;height:18px;border-radius:50%;background:var(--gray-2);flex-shrink:0}
+.dash-text-sm{flex:1;height:7px;border-radius:3px;background:var(--gray-2)}
+.dash-text-xs{width:30px;height:7px;border-radius:3px;background:var(--gray-1)}
+
+/* SEARCH BAR */
+.search-section{padding:0 40px;margin-top:-28px;position:relative;z-index:10}
+.search-bar-wrap{max-width:900px;margin:0 auto;background:var(--white);border-radius:16px;padding:8px;box-shadow:0 8px 32px rgba(11,25,41,.12);border:1px solid var(--gray-2);display:flex;gap:0;align-items:center}
+.search-field{flex:1;display:flex;align-items:center;gap:10px;padding:8px 16px;border-right:1px solid var(--gray-2)}
+.search-field:last-of-type{border-right:none}
+.search-field svg{width:16px;height:16px;stroke:var(--gray-4);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
+.search-field input,.search-field select{flex:1;border:none;outline:none;font-family:var(--sans);font-size:13px;color:var(--text);background:transparent}
+.search-field input::placeholder,.search-field select{color:var(--text-3)}
+.search-field select{appearance:none;cursor:pointer}
+.search-btn{background:var(--navy);color:#C8DFF5;font-family:var(--sans);font-size:13px;font-weight:500;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:background .15s;flex-shrink:0}
+.search-btn:hover{background:var(--navy-2)}
+.search-btn svg{width:15px;height:15px;stroke:#AACBE8;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* HOW IT WORKS */
+.how{padding:80px 40px;max-width:1200px;margin:0 auto}
+.how-header{text-align:center;margin-bottom:60px}
+.section-h{font-family:var(--serif);font-size:clamp(28px,3.5vw,42px);color:var(--navy);font-weight:400;letter-spacing:0;line-height:1.2}
+.section-sub{font-size:15px;color:var(--text-3);margin-top:8px}
+.how-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.how-step{background:var(--white);border:1px solid var(--gray-2);border-radius:16px;padding:22px 18px;position:relative;transition:box-shadow .2s,transform .2s}
+.how-step:hover{box-shadow:0 8px 32px rgba(11,25,41,.10);transform:translateY(-3px)}
+.how-step-num{font-family:var(--serif);font-size:36px;color:var(--gray-2);font-weight:400;line-height:1;margin-bottom:10px}
+.how-step-icon{width:38px;height:38px;background:var(--gray-1);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.how-step-icon svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.6;stroke-linecap:round}
+.how-step h3{font-family:var(--serif);font-size:17px;color:var(--navy);font-weight:400;margin-bottom:6px}
+.how-step p{font-size:12px;color:var(--text-3);line-height:1.55}
+
+/* PROFILES */
+.profiles{padding:0 40px 100px}
+.profiles-inner{max-width:1100px;margin:0 auto}
+.profiles-header{text-align:center;margin-bottom:48px}
+.profiles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.profile-card{border-radius:20px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s}
+.profile-card:hover{transform:translateY(-4px)}
+.profile-card.card-etudiant{background:linear-gradient(135deg,#112238 0%,#1A3355 100%)}
+.profile-card.card-interne{background:linear-gradient(135deg,#0B3A32 0%,#0E8A7A 100%)}
+.profile-card.card-docteur{background:linear-gradient(135deg,#1A3A70 0%,#2D6CC8 100%)}
+.profile-card-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:12px;font-weight:500}
+.profile-card h3{font-family:var(--serif);font-size:26px;font-weight:400;margin-bottom:10px;letter-spacing:0}
+.profile-card p{font-size:13px;opacity:.7;line-height:1.6;margin-bottom:24px}
+.profile-card-features{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+.profile-card-feature{display:flex;align-items:center;gap:8px;font-size:12px;opacity:.8}
+.profile-card-feature::before{content:'';width:5px;height:5px;background:currentColor;border-radius:50%;opacity:.5;flex-shrink:0}
+.profile-card-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;text-decoration:none;color:#fff;transition:background .15s}
+.profile-card-cta:hover{background:rgba(255,255,255,.25)}
+
+/* MISSIONS PREVIEW */
+.missions-preview{padding:0 40px 100px}
+.missions-inner{max-width:1100px;margin:0 auto}
+.missions-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
+.missions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.mission-card{background:var(--white);border:1px solid var(--gray-2);border-radius:16px;padding:20px 22px;transition:border-color .15s,box-shadow .15s,transform .15s;cursor:pointer}
+.mission-card:hover{border-color:#7AAAD8;box-shadow:0 4px 16px rgba(11,25,41,.08);transform:translateY(-2px)}
+.mission-card.featured{border-color:rgba(26,82,160,.3);background:linear-gradient(135deg,#fff 85%,#F0F6FF)}
+.mc-spec{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:500;margin-bottom:6px}
+.mc-title{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:8px;line-height:1.3}
+.mc-remun{font-family:var(--serif);font-size:22px;color:var(--navy);font-weight:400;margin-bottom:10px}
+.mc-meta{font-size:12px;color:var(--text-3);display:flex;flex-direction:column;gap:3px;margin-bottom:14px}
+.mc-meta span{display:flex;align-items:center;gap:6px}
+.mc-meta svg{width:12px;height:12px;stroke:var(--gray-3);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
+.mc-footer{display:flex;align-items:center;gap:6px;padding-top:12px;border-top:1px solid var(--gray-1)}
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px}
+.tag-blue{background:#E8F0FC;color:var(--blue)}
+.tag-teal{background:#E0F5F2;color:var(--teal)}
+.tag-amber{background:#FDF3E0;color:#8A6010}
+.tag-slate{background:var(--gray-1);color:var(--gray-5)}
+.mc-apply{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:500;background:var(--navy);color:#C8DFF5;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;transition:opacity .15s}
+.mc-apply:hover{opacity:.8}
+
+/* TRUST */
+.trust{background:var(--navy);padding:80px 40px;text-align:center}
+.trust-inner{max-width:900px;margin:0 auto}
+.trust h2{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);color:#fff;font-weight:400;letter-spacing:0;margin-bottom:16px}
+.trust-sub{font-size:15px;color:#7A9AB8;margin-bottom:48px}
+.trust-logos{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:48px;opacity:.45}
+.trust-logo{font-family:var(--serif);font-size:18px;color:#fff;font-style:italic}
+.trust-testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:left}
+.testimonial{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
+.testimonial-text{font-size:13px;color:#A8C0D8;line-height:1.7;margin-bottom:16px;font-style:italic}
+.testimonial-author{display:flex;align-items:center;gap:10px}
+.testimonial-av{width:36px;height:36px;border-radius:50%;background:var(--navy-3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;color:#AACBE8;flex-shrink:0}
+.testimonial-name{font-size:13px;font-weight:500;color:#fff}
+.testimonial-role{font-size:11px;color:#5A7A98}
+
+/* CTA BAND */
+.cta-band{padding:80px 40px;text-align:center}
+.cta-band-inner{max-width:680px;margin:0 auto;background:var(--white);border:1px solid var(--gray-2);border-radius:24px;padding:56px 48px;box-shadow:0 12px 40px rgba(11,25,41,.08)}
+.cta-band h2{font-family:var(--serif);font-size:clamp(26px,3vw,40px);color:var(--navy);font-weight:400;letter-spacing:0;margin-bottom:12px}
+.cta-band p{font-size:15px;color:var(--text-3);margin-bottom:32px}
+.cta-band-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{background:var(--navy);padding:60px 40px 32px}
+.footer-inner{max-width:1100px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand p{font-size:13px;color:#5A7A98;line-height:1.7;margin-top:12px;max-width:260px}
+.footer-col h4{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:#3A5A78;margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;color:#5A7A98;text-decoration:none;margin-bottom:8px;transition:color .15s}
+.footer-col a:hover{color:#AACBE8}
+.footer-bottom{border-top:1px solid #1A3355;padding-top:24px;display:flex;align-items:center;justify-content:space-between}
+.footer-copy{font-size:12px;color:#3A5A78}
+.footer-links{display:flex;gap:20px}
+.footer-links a{font-size:12px;color:#3A5A78;text-decoration:none}
+.footer-links a:hover{color:#AACBE8}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .6s ease both}
+.fade-up-1{animation-delay:.1s}
+.fade-up-2{animation-delay:.2s}
+.fade-up-3{animation-delay:.3s}
+.fade-up-4{animation-delay:.4s}
+
+@media (max-width: 980px){
+  nav{height:auto;min-height:60px;padding:10px 24px;gap:12px;flex-wrap:wrap}
+  .nav-logo{margin-right:auto}
+  .nav-links{order:3;width:100%;justify-content:center;overflow-x:auto;padding-top:4px}
+  .nav-link{flex:0 0 auto}
+  .hero{min-height:auto;padding:72px 24px 56px}
+  .hero-layout{display:block;max-width:760px}
+  .hero-inner{flex:1 1 auto;max-width:680px}
+  .hero-sub{margin-left:auto;margin-right:auto}
+  .search-section{padding:0 24px;margin-top:-18px}
+  .how,.mockup-section,.trust,.cta-band,footer{padding-left:24px;padding-right:24px}
+  .profiles,.missions-preview{padding-left:24px;padding-right:24px}
+  .how-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .profiles-grid,.missions-grid,.trust-testimonials{grid-template-columns:1fr 1fr}
+  .missions-header{align-items:flex-start;gap:16px}
+  .footer-top{grid-template-columns:1fr 1fr;gap:32px}
+}
+
+@media (max-width: 720px){
+  body::before{background-size:36px 36px}
+  nav{position:relative;padding:12px 18px}
+  .nav-links{display:none}
+  .nav-right{width:100%;margin-left:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .nav-right .btn{justify-content:center;padding:9px 12px}
+  .hero{padding:52px 18px 44px}
+  .hero-h{font-size:clamp(34px,10vw,46px);line-height:1.08;margin-bottom:18px}
+  .hero-h br{display:none}
+  .hero-sub{font-size:16px;line-height:1.55;margin-bottom:28px}
+  .hero-ctas{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:34px}
+  .hero-ctas .btn{justify-content:center;width:100%}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
+  .hero-stat-num{font-size:26px}
+  .hero-stat-label{font-size:11px;line-height:1.35}
+  .hero-blob{filter:blur(60px);opacity:.14}
+  .search-section{padding:0 18px;margin-top:0}
+  .search-bar-wrap{display:grid;grid-template-columns:1fr;padding:10px;border-radius:18px;gap:6px}
+  .search-field{border-right:none;border-bottom:1px solid var(--gray-2);padding:12px 10px}
+  .search-field:last-of-type{border-bottom:none}
+  .search-btn{width:100%;justify-content:center;margin-top:4px;padding:13px 18px}
+  .mockup-section{padding:44px 18px 52px;overflow:hidden}
+  .laptop{max-width:560px}
+  .laptop-body{padding:7px 7px 0;border-radius:12px 12px 0 0}
+  .dash-side{width:34px}
+  .dash-content{grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+  .dash-card-tall{grid-row:auto}
+  .how{padding:56px 18px}
+  .how-header,.profiles-header{margin-bottom:32px}
+  .how-steps,.profiles-grid,.missions-grid,.trust-testimonials{grid-template-columns:1fr}
+  .how-step,.profile-card,.mission-card,.testimonial{border-radius:14px}
+  .profiles{padding:0 18px 64px}
+  .profile-card{padding:26px 22px}
+  .missions-preview{padding:0 18px 64px}
+  .missions-header{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:22px}
+  .missions-header .btn{justify-content:center;width:100%}
+  .mc-footer{flex-wrap:wrap}
+  .mc-apply{width:100%;margin:8px 0 0;padding:9px 14px}
+  .trust{padding:58px 18px}
+  .trust-sub{margin-bottom:32px;line-height:1.6}
+  .trust-logos{gap:16px;margin-bottom:32px}
+  .trust-logo{font-size:16px}
+  .cta-band{padding:56px 18px}
+  .cta-band-inner{padding:34px 22px;border-radius:18px}
+  .cta-band-btns{display:grid;grid-template-columns:1fr}
+  .cta-band-btns .btn{justify-content:center;width:100%}
+  footer{padding:46px 18px 28px}
+  .footer-top{grid-template-columns:1fr;gap:28px;margin-bottom:34px}
+  .footer-bottom{display:grid;grid-template-columns:1fr;gap:14px}
+  .footer-links{flex-wrap:wrap;gap:12px 18px}
+}
+
+@media (max-width: 420px){
+  .nav-right{grid-template-columns:1fr}
+  .btn-lg{font-size:14px;padding:11px 18px}
+  .hero-stats{grid-template-columns:1fr;gap:14px}
+  .hero-stat-num{font-size:30px}
+  .section-h{font-size:30px}
+  .dash-side{display:none}
+  .dash-content{grid-template-columns:1fr}
+  .dash-card-wide{grid-column:auto}
+  .dash-card,.dash-card[style]{grid-row:auto!important}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/">
+    <div class="nav-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5" fill="#AACBE8" stroke="none"/></svg>
+    </div>
+    <span class="nav-name">Médi<em>Link</em></span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="/app/search">Missions</a>
+    <a class="nav-link" href="#">Cabinets &amp; Maisons de santé</a>
+    <a class="nav-link" href="#">Comment ça marche</a>
+    <a class="nav-link" href="#">À propos</a>
+  </div>
+  <div class="nav-right">
+    <a class="btn btn-ghost" href="/login">Se connecter</a>
+    <a class="btn btn-primary" href="/register">Créer un compte</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-layout">
+    <div class="hero-inner" style="max-width:680px;text-align:center;margin:0 auto">
+      <h1 class="hero-h fade-up fade-up-1">Une plateforme de remplacement<br>faite <em>par et pour</em><br>les médecins généralistes</h1>
+      <p class="hero-sub fade-up fade-up-2">MédiLink met en relation les médecins remplaçants avec les cabinets et maisons de santé qui en ont besoin. Un vivier qualifié, une expérience pensée du terrain.</p>
+      <div class="hero-ctas fade-up fade-up-3" style="justify-content:center">
+        <a class="btn btn-primary btn-lg" href="/register">Trouver une mission</a>
+        <a class="btn btn-outline btn-lg" href="#">Je suis un cabinet</a>
+      </div>
+      <div class="hero-stats fade-up fade-up-4" style="justify-content:center">
+        <div><div class="hero-stat-num">2 800+</div><div class="hero-stat-label">Missions publiées</div></div>
+        <div><div class="hero-stat-num">1 200</div><div class="hero-stat-label">Médecins remplaçants</div></div>
+        <div><div class="hero-stat-num">640</div><div class="hero-stat-label">Cabinets partenaires</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH BAR -->
+<div class="search-section">
+  <div class="search-bar-wrap">
+    <div class="search-field" style="flex:1.5">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      <input type="text" placeholder="Spécialité, établissement…"/>
+    </div>
+    <div class="search-field">
+      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <input type="text" placeholder="Ville, département"/>
+    </div>
+    <div class="search-field">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <select><option value="">Type de mission</option><option>Garde</option><option>Remplacement</option><option>Vacation</option><option>Aide opératoire</option></select>
+    </div>
+    <button class="search-btn" onclick="location.href='/app/search'">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+      Rechercher
+    </button>
+  </div>
+</div>
+
+<!-- MOCKUP SECTION -->
+<div class="mockup-section">
+  <div class="mockup-section-inner" id="mockup-wrap">
+    <div class="laptop" style="max-width:900px;margin:0 auto">
+      <div class="laptop-body">
+        <div class="laptop-cam"></div>
+        <div class="laptop-screen">
+          <div class="dash-mini">
+            <div class="dash-side">
+              <div class="dash-side-logo"></div>
+              <div class="dash-side-dot active"></div>
+              <div class="dash-side-dot"></div>
+              <div class="dash-side-dot"></div>
+              <div class="dash-side-dot"></div>
+              <div style="margin-top:auto"><div class="dash-side-dot"></div></div>
+            </div>
+            <div class="dash-main">
+              <div class="dash-top">
+                <div class="dash-top-pill" style="width:60px"></div>
+                <div style="margin-left:auto;display:flex;gap:5px">
+                  <div class="dash-top-pill" style="width:50px;background:#EAF0FC"></div>
+                  <div style="width:18px;height:18px;border-radius:50%;background:#C8D8EE"></div>
+                </div>
+              </div>
+              <div class="dash-content">
+                <div class="dash-card dash-card-wide">
+                  <div class="dash-label" style="width:120px;margin-bottom:5px;background:#0B1929;opacity:.12"></div>
+                  <div class="dash-label" style="width:80px;margin-bottom:8px"></div>
+                  <div style="display:flex;gap:5px;margin-top:4px">
+                    <div style="height:20px;width:80px;border-radius:5px;background:var(--navy);opacity:.85"></div>
+                    <div style="height:20px;width:70px;border-radius:5px;background:var(--gray-1);border:1px solid var(--gray-2)"></div>
+                  </div>
+                </div>
+                <div class="dash-card">
+                  <div class="dash-label" style="width:50px;margin-bottom:6px"></div>
+                  <div class="dash-num" style="font-size:22px;line-height:1">4</div>
+                  <div class="dash-bar dash-bar-blue" style="margin-top:6px"></div>
+                </div>
+                <div class="dash-card dash-card-wide" style="grid-row:2">
+                  <div class="dash-label" style="width:90px;margin-bottom:8px"></div>
+                  <div class="dash-mini-row">
+                    <div class="dash-dot" style="background:#1A52A0"></div>
+                    <div class="dash-text-sm"></div>
+                    <div class="dash-text-xs"></div>
+                    <div style="width:28px;height:12px;border-radius:10px;background:#E8F0FC"></div>
+                  </div>
+                  <div class="dash-mini-row">
+                    <div class="dash-dot" style="background:#0E8A7A"></div>
+                    <div class="dash-text-sm"></div>
+                    <div class="dash-text-xs"></div>
+                    <div style="width:28px;height:12px;border-radius:10px;background:#E0F5F2"></div>
+                  </div>
+                  <div class="dash-mini-row">
+                    <div class="dash-dot" style="background:#C89A3A"></div>
+                    <div class="dash-text-sm"></div>
+                    <div class="dash-text-xs"></div>
+                    <div style="width:28px;height:12px;border-radius:10px;background:#FDF3E0"></div>
+                  </div>
+                </div>
+                <div class="dash-card" style="grid-row:2">
+                  <div class="dash-label" style="width:50px;margin-bottom:6px"></div>
+                  <div class="dash-num" style="font-size:22px;line-height:1">11</div>
+                  <div class="dash-bar dash-bar-teal" style="margin-top:6px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="laptop-base"></div>
+      <div class="laptop-stand"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="how" style="padding-top:80px">
+  <div class="how-header">
+    <h2 class="section-h">Cinq étapes.</h2>
+    <p class="section-sub">De la création de compte à la réalisation de la mission, tout est guidé et simplifié.</p>
+  </div>
+  <div class="how-steps">
+    <div class="how-step reveal">
+      <div class="how-step-num">01</div>
+      <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+      <h3>Créez votre compte</h3>
+      <p>Inscrivez-vous en 2 minutes avec votre email. Votre compte est sécurisé et votre identité vérifiée par notre équipe sous 48h.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="how-step-num">02</div>
+      <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></div>
+      <h3>Complétez votre profil</h3>
+      <p>Renseignez votre RPPS, vos documents, vos disponibilités et votre secteur géographique. Plus votre profil est complet, plus vous êtes visible.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="how-step-num">03</div>
+      <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></div>
+      <h3>Cherchez une mission</h3>
+      <p>Parcourez les offres filtrées par lieu, durée et rémunération. Toutes publiées par des cabinets vérifiés.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="how-step-num">04</div>
+      <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+      <h3>Postulez en un clic</h3>
+      <p>Candidatez depuis la fiche mission et échangez avec le cabinet via la messagerie intégrée.</p>
+    </div>
+    <div class="how-step reveal">
+      <div class="how-step-num">05</div>
+      <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <h3>Réalisez la mission</h3>
+      <p>Intervenez au cabinet en toute sérénité et évaluez votre expérience pour construire votre réputation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE TYPES -->
+<section class="profiles">
+  <div class="profiles-inner">
+    <div class="profiles-header">
+      <h2 class="section-h">Une plateforme pensée<br><em style="font-family:var(--serif);font-style:italic">par des généralistes</em></h2>
+      <p class="section-sub">MédiLink a été co-construit avec des médecins généralistes remplaçants et installés. Chaque fonctionnalité répond à un besoin réel du terrain.</p>
+    </div>
+    <div class="profiles-grid">
+      <div class="profile-card card-etudiant reveal">
+        <div class="profile-card-label">Pour les remplaçants</div>
+        <h3>Médecin remplaçant</h3>
+        <p>Accédez à un vivier de missions qualifiées, gérez votre agenda et construisez votre réputation de remplaçant fiable.</p>
+        <div class="profile-card-features">
+          <div class="profile-card-feature">Missions vérifiées et rémunérées</div>
+          <div class="profile-card-feature">Gestion des disponibilités intégrée</div>
+          <div class="profile-card-feature">Messagerie directe avec les cabinets</div>
+          <div class="profile-card-feature">Suivi des candidatures en temps réel</div>
+        </div>
+        <a class="profile-card-cta" href="/register">Commencer →</a>
+      </div>
+      <div class="profile-card card-interne reveal reveal-delay-1">
+        <div class="profile-card-label">Pour les cabinets</div>
+        <h3>Cabinet &amp; Maison de santé</h3>
+        <p>Trouvez rapidement un remplaçant qualifié pour vos congés, arrêts maladie ou pics d'activité. Sans intermédiaire.</p>
+        <div class="profile-card-features">
+          <div class="profile-card-feature">Vivier de remplaçants qualifiés</div>
+          <div class="profile-card-feature">Publication d'offre en 3 minutes</div>
+          <div class="profile-card-feature">Profils vérifiés et notés</div>
+          <div class="profile-card-feature">Messagerie et contrat intégrés</div>
+        </div>
+        <a class="profile-card-cta" href="/register">Commencer →</a>
+      </div>
+      <div class="profile-card card-docteur reveal reveal-delay-2">
+        <div class="profile-card-label">Notre promesse</div>
+        <h3>Conçu avec des médecins</h3>
+        <p>Chaque fonctionnalité a été imaginée avec des généralistes remplaçants et installés pour répondre aux vrais besoins du terrain.</p>
+        <div class="profile-card-features">
+          <div class="profile-card-feature">Zéro commission sur les honoraires</div>
+          <div class="profile-card-feature">Données médicales 100% sécurisées</div>
+          <div class="profile-card-feature">Support dédié aux médecins</div>
+          <div class="profile-card-feature">Mises à jour guidées par les retours terrain</div>
+        </div>
+        <a class="profile-card-cta" href="/register">Commencer →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MISSIONS PREVIEW -->
+<section class="missions-preview">
+  <div class="missions-inner">
+    <div class="missions-header">
+      <div>
+        <h2 class="section-h">Missions à la une</h2>
+        <p class="section-sub">Publiées cette semaine</p>
+      </div>
+      <a class="btn btn-outline" href="/app/search">Voir toutes les missions →</a>
+    </div>
+    <div class="missions-grid">
+      <div class="mission-card featured reveal">
+        <div class="mc-spec">Médecine générale</div>
+        <div class="mc-title">Garde de nuit — Soins intensifs</div>
+        <div class="mc-remun">480 €</div>
+        <div class="mc-meta">
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>CHU Pitié-Salpêtrière</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Paris 13e</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>15 avr. · Nuit 20h–8h</span>
+        </div>
+        <div class="mc-footer">
+          <span class="tag tag-blue">Interne</span>
+          <span class="tag tag-teal">Encadrée</span>
+          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+        </div>
+      </div>
+      <div class="mission-card">
+        <div class="mc-spec">Cardiologie</div>
+        <div class="mc-title">Remplacement cabinet libéral</div>
+        <div class="mc-remun">340 €</div>
+        <div class="mc-meta">
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Cabinet Dr. Moreau</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Versailles (78)</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>20 avr. · 1 journée</span>
+        </div>
+        <div class="mc-footer">
+          <span class="tag tag-blue">Interne</span>
+          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+        </div>
+      </div>
+      <div class="mission-card">
+        <div class="mc-spec">Urgences</div>
+        <div class="mc-title">Remplacement journée complète</div>
+        <div class="mc-remun">520 €</div>
+        <div class="mc-meta">
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Maison de santé des Lilas</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Montreuil (93)</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>22 avr. · Nuit 20h–8h</span>
+        </div>
+        <div class="mc-footer">
+          <span class="tag tag-blue">Médecin thésé</span>
+          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust">
+  <div class="trust-inner">
+    <h2>Des médecins qui nous font confiance</h2>
+    <p class="trust-sub">Plus de 640 cabinets de médecine générale utilisent MédiLink pour trouver leurs remplaçants. Des généralistes qui nous ont aidé à construire la plateforme depuis le premier jour.</p>
+    <div class="trust-logos">
+      <span class="trust-logo">URPS MG Île-de-France</span>
+      <span class="trust-logo">CSMF</span>
+      <span class="trust-logo">Maison de santé des Lilas</span>
+      <span class="trust-logo">SML</span>
+      <span class="trust-logo">REAGJIR</span>
+      <span class="trust-logo">ReAGJIR Île-de-France</span>
+    </div>
+    <div class="trust-testimonials">
+      <div class="testimonial">
+        <div class="testimonial-text">« En tant que remplaçante, MédiLink m'a changé la vie. Je trouve des missions qualifiées sans passer des heures au téléphone. »</div>
+        <div class="testimonial-author">
+          <div class="testimonial-av">CL</div>
+          <div><div class="testimonial-name">Camille L.</div><div class="testimonial-role">Médecin remplaçante · Paris</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-text">« J'ai publié mon besoin de remplacement un mardi matin, le candidat était confirmé le soir même. Impressionnant. »</div>
+        <div class="testimonial-author">
+          <div class="testimonial-av">TM</div>
+          <div><div class="testimonial-name">Thomas M.</div><div class="testimonial-role">Médecin installé · Lyon</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-text">« La plateforme a clairement été pensée par des gens qui connaissent le terrain. Rien de superflu, tout ce qu'il faut. »</div>
+        <div class="testimonial-author">
+          <div class="testimonial-av">SR</div>
+          <div><div class="testimonial-name">Sophie R.</div><div class="testimonial-role">Médecin remplaçante · Bordeaux</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="cta-band-inner">
+    <h2>Rejoignez la communauté MédiLink</h2>
+    <p>Remplaçant ou cabinet, inscrivez-vous gratuitement et accédez à des centaines de missions de médecine générale vérifiées partout en France.</p>
+    <div class="cta-band-btns">
+      <a class="btn btn-primary btn-lg" href="/register">Je crée mon compte</a>
+      <a class="btn btn-ghost btn-lg" href="/login">J'ai déjà un compte</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div style="width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AACBE8" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5" fill="#AACBE8" stroke="none"/></svg></div>
+          <span style="font-family:var(--serif);font-size:18px;color:#fff">Médi<em style="font-style:italic;color:#7AAAD8">Link</em></span>
+        </div>
+        <p>La plateforme de remplacement en médecine générale, conçue par et pour les médecins généralistes.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Candidats</h4>
+        <a href="#">Comment ça marche</a>
+        <a href="/app/search">Rechercher une mission</a>
+        <a href="/register">Créer un profil</a>
+        <a href="#">Guide du remplaçant</a>
+      </div>
+      <div class="footer-col">
+        <h4>Cabinets</h4>
+        <a href="#">Publier une offre</a>
+        <a href="#">Trouver un remplaçant</a>
+        <a href="#">Solutions MSP</a>
+        <a href="#">Nous contacter</a>
+      </div>
+      <div class="footer-col">
+        <h4>MédiLink</h4>
+        <a href="#">À propos</a>
+        <a href="#">Blog</a>
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 MédiLink. Tous droits réservés.</span>
+      <div class="footer-links">
+        <a href="#">CGU</a>
+        <a href="#">Confidentialité</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+// ── Standard scroll reveal ──
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// ── Laptop scroll-driven 3D animation ──
+const laptopEl  = document.querySelector('.laptop');
+const wrapEl    = document.getElementById('mockup-wrap');
+
+function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+function lerp(a, b, t)      { return a + (b - a) * t; }
+
+function onScroll() {
+  if (!wrapEl || !laptopEl) return;
+
+  const rect    = wrapEl.getBoundingClientRect();
+  const wh      = window.innerHeight;
+
+  // progress: 0 when top of section enters viewport bottom, 1 when fully centered
+  const start   = wh;           // section top at viewport bottom
+  const end     = wh * 0.1;    // section top near midscreen = lands when centered
+  const raw     = (start - rect.top) / (start - end);
+  const progress = clamp(raw, 0, 1);
+
+  // Eased progress (ease-out cubic)
+  const t = 1 - Math.pow(1 - progress, 2.2);
+
+  // Interpolate transforms
+  const rotX  = lerp(52,  0, t);     // from tilted back to flat
+  const rotY  = lerp(-8,  0, t);     // slight yaw corrects to straight
+  const scale = lerp(.80, 1, t);     // grows from small to full size
+  const opac  = clamp(lerp(0, 1, t * 1.1), 0, 1); // fade in at same pace
+
+  laptopEl.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
+  laptopEl.style.opacity   = opac;
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', onScroll);
+onScroll(); // init on load
+</script>
+</body>
+</html>
