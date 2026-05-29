@@ -9,34 +9,34 @@ import { useAuth } from './AuthProvider';
 type NavItem = { href: string; label: string; icon: string };
 
 const candidateNav: NavItem[] = [
-  { href: '/app/dashboard', label: 'Dashboard', icon: '⌂' },
-  { href: '/app/profile', label: 'Mon profil', icon: '◉' },
-  { href: '/app/search', label: 'Recherche', icon: '⌕' },
-  { href: '/app/applications', label: 'Candidatures', icon: '✓' },
-  { href: '/app/messages', label: 'Messagerie', icon: '✉' },
-  { href: '/app/notifications', label: 'Notifications', icon: '•' },
+  { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/app/profile', label: 'Mon profil', icon: 'P' },
+  { href: '/app/search', label: 'Recherche', icon: 'R' },
+  { href: '/app/applications', label: 'Candidatures', icon: 'C' },
+  { href: '/app/messages', label: 'Messagerie', icon: 'M' },
+  { href: '/app/notifications', label: 'Notifications', icon: 'N' },
 ];
 
 const establishmentNav: NavItem[] = [
-  { href: '/establishment/dashboard', label: 'Dashboard', icon: '⌂' },
-  { href: '/establishment/onboarding', label: 'Établissement', icon: '◆' },
-  { href: '/establishment/missions', label: 'Missions', icon: '≡' },
-  { href: '/establishment/missions/new', label: 'Créer mission', icon: '+' },
-  { href: '/establishment/applications', label: 'Candidatures', icon: '✓' },
-  { href: '/establishment/messages', label: 'Messagerie', icon: '✉' },
+  { href: '/establishment/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/establishment/onboarding', label: 'Etablissement', icon: 'E' },
+  { href: '/establishment/missions', label: 'Missions', icon: 'M' },
+  { href: '/establishment/missions/new', label: 'Creer mission', icon: '+' },
+  { href: '/establishment/applications', label: 'Candidatures', icon: 'C' },
+  { href: '/establishment/messages', label: 'Messagerie', icon: 'M' },
 ];
 
 const adminNav: NavItem[] = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: '⌂' },
-  { href: '/admin/users', label: 'Utilisateurs', icon: '◉' },
-  { href: '/admin/documents', label: 'Documents', icon: '□' },
-  { href: '/admin/establishments', label: 'Établissements', icon: '◆' },
-  { href: '/admin/missions', label: 'Missions', icon: '≡' },
+  { href: '/admin/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/admin/users', label: 'Utilisateurs', icon: 'U' },
+  { href: '/admin/documents', label: 'Documents', icon: 'F' },
+  { href: '/admin/establishments', label: 'Etablissements', icon: 'E' },
+  { href: '/admin/missions', label: 'Missions', icon: 'M' },
 ];
 
 function areaLabel(area: 'candidate' | 'establishment' | 'admin') {
   if (area === 'candidate') return 'Espace candidat';
-  if (area === 'establishment') return 'Espace établissement';
+  if (area === 'establishment') return 'Espace etablissement';
   return 'Administration';
 }
 
@@ -117,7 +117,7 @@ export function AppShell({
         <div className="sidebar-head">
           <Link href={userHomeHref} className="brand">
             <span className="brand-mark">M</span>
-            <span>Medilink</span>
+            <span>MediLink</span>
           </Link>
           <button
             type="button"
@@ -167,11 +167,11 @@ export function AppShell({
                 <span className="menu-arrow">&gt;</span>
               </Link>
               <Link href={userAccountHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
-                <span>Paramètres du compte</span>
+                <span>Parametres du compte</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
               <button type="button" className="account-menu-item danger" onClick={onLogout}>
-                <span>Déconnexion</span>
+                <span>Deconnexion</span>
                 <span className="menu-arrow">&gt;</span>
               </button>
             </div>
@@ -195,16 +195,16 @@ export function AppShell({
                   <span className="menu-arrow">&gt;</span>
                 </Link>
                 <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
-                  <span>Paramètres du compte</span>
+                  <span>Parametres du compte</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
                 <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
-                  <span>Sécurité et mot de passe</span>
+                  <span>Securite et mot de passe</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
               </div>
               <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
-                <span>Déconnexion</span>
+                <span>Deconnexion</span>
                 <span className="menu-arrow">&gt;</span>
               </button>
             </div>
@@ -232,7 +232,7 @@ export function AppShell({
         <header className="topbar">
           <div className="topbar-title">
             <strong>{areaLabel(area)}</strong>
-            <div className="small">Plateforme Medilink</div>
+            <div className="small">Plateforme MediLink</div>
           </div>
         </header>
         <div className="content">{children}</div>
