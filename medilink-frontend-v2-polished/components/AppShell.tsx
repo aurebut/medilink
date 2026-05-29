@@ -117,7 +117,9 @@ export function AppShell({
         <div className="sidebar-head">
           <Link href={userHomeHref} className="brand">
             <span className="brand-mark">M</span>
-            <span>MediLink</span>
+            <span>
+              Medi<em>Link</em>
+            </span>
           </Link>
           <button
             type="button"
