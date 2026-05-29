@@ -2394,6 +2394,29 @@ tbody tr:hover { background: #FAFBFD; }
 }
 .shell > .sidebar .sidebar-footer,
 .sidebar-footer {
+  position: relative;
+  z-index: 90;
+  pointer-events: auto;
+}
+.shell > .sidebar .user-chip,
+.user-chip {
+  position: relative;
+  z-index: 91;
+}
+.shell > .sidebar .account-menu,
+.account-menu {
+  position: fixed;
+  top: 74px;
+  right: 40px;
+  left: auto;
+  bottom: auto;
+  z-index: 1000;
+  width: 300px;
+  max-width: calc(100vw - 28px);
+  pointer-events: auto;
+}
+.shell > .sidebar .sidebar-footer,
+.sidebar-footer {
   display: grid;
   flex: 0 0 auto;
   width: min(260px, 25vw);

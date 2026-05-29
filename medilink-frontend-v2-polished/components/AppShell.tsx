@@ -217,7 +217,11 @@ export function AppShell({
             className={`user-chip ${accountMenuOpen ? 'open' : ''}`}
             aria-haspopup="menu"
             aria-expanded={accountMenuOpen}
-            onClick={() => setAccountMenuOpen((open) => !open)}
+            onMouseDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              setAccountMenuOpen((open) => !open);
+            }}
           >
             <span className="avatar">{initials(user?.email)}</span>
             <span className="truncate">
