@@ -8,7 +8,7 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { createReadStream, createWriteStream } from 'fs';
-import { mkdir } from 'fs/promises';
+import { access, mkdir } from 'fs/promises';
 import { isAbsolute, relative, resolve } from 'path';
 import { Transform } from 'stream';
 import { pipeline } from 'stream/promises';
@@ -168,8 +168,10 @@ export class StorageService {
     await pipeline(stream, meter, createWriteStream(target));
   }
 
-  openLocalObject(payload: SignedStoragePayload) {
-    return createReadStream(this.localPath(payload.key));
+  async openLocalObject(payload: SignedStoragePayload) {
+    const target = this.localPath(payload.key);
+    await access(target);
+    return createReadStream(target);
   }
 
   private sign(payload: SignedStoragePayload) {

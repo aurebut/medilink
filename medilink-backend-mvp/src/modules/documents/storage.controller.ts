@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Put,
   Req,
@@ -21,20 +22,40 @@ export class StorageController {
       await this.storage.saveLocalObject(payload, req);
       return { ok: true };
     } catch {
-      throw new BadRequestException('URL upload invalide ou expirée.');
+      throw new BadRequestException('URL upload invalide ou expiree.');
     }
   }
 
   @Get('download/:token')
-  download(@Param('token') token: string, @Res() res: Response) {
+  async download(@Param('token') token: string, @Res() res: Response) {
+    let payload: ReturnType<StorageService['verifyToken']>;
+
     try {
-      const payload = this.storage.verifyToken(token, 'download');
-      const fileName = (payload.fileName || 'document').replace(/[^\w.-]/g, '_');
-      res.setHeader('Content-Type', payload.mimeType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
-      this.storage.openLocalObject(payload).pipe(res);
+      payload = this.storage.verifyToken(token, 'download');
     } catch {
-      throw new BadRequestException('URL download invalide ou expirée.');
+      throw new BadRequestException('URL download invalide ou expiree.');
     }
+
+    const fileName = (payload.fileName || 'document').replace(/[^\w.-]/g, '_');
+    let stream: Awaited<ReturnType<StorageService['openLocalObject']>>;
+
+    try {
+      stream = await this.storage.openLocalObject(payload);
+    } catch {
+      throw new NotFoundException('Fichier introuvable.');
+    }
+
+    res.setHeader('Content-Type', payload.mimeType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+
+    stream.on('error', () => {
+      if (!res.headersSent) {
+        res.status(404).send('Fichier introuvable.');
+        return;
+      }
+      res.destroy();
+    });
+
+    stream.pipe(res);
   }
 }
