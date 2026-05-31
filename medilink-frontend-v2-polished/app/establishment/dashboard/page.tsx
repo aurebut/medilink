@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Mission } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader, StatCard } from '@/components/ui';
+import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -91,9 +91,10 @@ export default function EstablishmentDashboardPage() {
 
   if (dashboardLoading) return <LoadingCard label="Chargement de votre activité..." />;
 
-  const establishmentReady = primary.verificationStatus === 'VERIFIED';
+  const completionScore = primary.completionScore || 0;
+  const establishmentReady = completionScore >= 80;
   const nextStep = !establishmentReady
-    ? { label: 'Finaliser votre fiche', href: '/establishment/onboarding', helper: 'Complétez les informations de votre établissement pour inspirer confiance aux candidats.' }
+    ? { label: 'Finaliser votre fiche', href: `/establishment/edit/${primary.id}`, helper: 'Complétez les informations de votre établissement pour inspirer confiance aux candidats.' }
     : missions.length === 0
       ? { label: 'Publier votre première mission', href: '/establishment/missions/new', helper: 'Créez une offre claire pour commencer à recevoir des candidatures qualifiées.' }
       : dashboard.pendingApplications.length > 0
@@ -119,8 +120,9 @@ export default function EstablishmentDashboardPage() {
         </div>
         <div className="dashboard-readiness">
           <div>
-            <span>Statut établissement</span>
-            <strong>{statusLabel(primary.verificationStatus)}</strong>
+            <span>Profil établissement</span>
+            <strong>{completionScore}%</strong>
+            <ProgressBar value={completionScore} />
           </div>
           <div>
             <span>Missions publiées</span>
@@ -135,6 +137,12 @@ export default function EstablishmentDashboardPage() {
 
       <div className="grid-3 dashboard-stat-grid">
         <StatCard
+          label="Profil établissement"
+          value={`${completionScore}%`}
+          helper={<ProgressBar value={completionScore} />}
+          action={<LinkButton variant="secondary" href={`/establishment/edit/${primary.id}`}>Améliorer</LinkButton>}
+        />
+        <StatCard
           label="Missions actives"
           value={dashboard.publishedMissions.length}
           helper={`${dashboard.draftMissions.length} brouillon(s) - ${missions.length} au total`}
@@ -145,12 +153,6 @@ export default function EstablishmentDashboardPage() {
           value={applications.length}
           helper={`${dashboard.pendingApplications.length} à traiter - ${dashboard.acceptedApplications.length} acceptée(s)`}
           action={<LinkButton variant="secondary" href="/establishment/applications">Voir</LinkButton>}
-        />
-        <StatCard
-          label="Membres"
-          value={primary.members?.length || 1}
-          helper="Équipe rattachée au compte"
-          action={<LinkButton variant="secondary" href="/establishment/onboarding">Configurer</LinkButton>}
         />
       </div>
 
@@ -219,7 +221,7 @@ export default function EstablishmentDashboardPage() {
                 <h2>Fiche établissement</h2>
                 <p className="small">Les repères visibles par votre équipe.</p>
               </div>
-              <LinkButton variant="light" href="/establishment/onboarding">Modifier</LinkButton>
+              <LinkButton variant="light" href={`/establishment/edit/${primary.id}`}>Modifier</LinkButton>
             </div>
             <div className="dashboard-feature">
               <span>{statusLabel(primary.verificationStatus)}</span>

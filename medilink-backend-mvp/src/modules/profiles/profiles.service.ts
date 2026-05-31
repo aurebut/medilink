@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DocumentType, DocumentVerificationStatus } from '@prisma/client';
+import { calculateCompletionScore } from '../../common/utils/completion.util';
 import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -20,11 +21,20 @@ export class ProfilesService {
     });
 
     if (!profile) {
-  profile = await this.prisma.profile.create({
-    data: { userId },
-    include: { userSkills: { include: { skill: true } } },
-  });
-}
+      profile = await this.prisma.profile.create({
+        data: { userId },
+        include: { userSkills: { include: { skill: true } } },
+      });
+    }
+
+    const completionScore = this.computeCompletionScore(profile);
+    if (profile.completionScore !== completionScore) {
+      await this.prisma.profile.update({
+        where: { id: profile.id },
+        data: { completionScore },
+      });
+      profile = { ...profile, completionScore };
+    }
 
     const avatar = await this.prisma.document.findFirst({
       where: {
@@ -50,8 +60,8 @@ export class ProfilesService {
   }
 
   async updateMyProfile(userId: string, dto: UpdateProfileDto) {
-    await this.ensureProfile(userId);
-    const completionScore = this.computeCompletionScore(dto);
+    const existing = await this.ensureProfile(userId);
+    const completionScore = this.computeCompletionScore({ ...existing, ...dto });
 
     const profile = await this.prisma.profile.update({
       where: { userId },
@@ -79,11 +89,21 @@ export class ProfilesService {
 
   async assertMinimumCompletion(userId: string, minimum = 40) {
     const profile = await this.prisma.profile.findUnique({ where: { userId } });
-    if (!profile || profile.completionScore < minimum) {
+    const completionScore = profile ? this.computeCompletionScore(profile) : 0;
+
+    if (!profile || completionScore < minimum) {
       throw new NotFoundException(
         `Profil incomplet. Score minimum requis : ${minimum}%.`,
       );
     }
+
+    if (profile.completionScore !== completionScore) {
+      return this.prisma.profile.update({
+        where: { id: profile.id },
+        data: { completionScore },
+      });
+    }
+
     return profile;
   }
 
@@ -95,13 +115,30 @@ export class ProfilesService {
       data.city,
       data.medicalStatus,
       data.specialty,
-      data.acceptedMissionTypes?.length,
-      data.mobilityOptions?.length,
+      data.orientation,
       data.hospitalOrFaculty,
+      data.bio,
+      data.experienceYears,
+      data.actsPerformed,
       data.availabilityNotes,
+      data.preferredCities,
+      data.maxTravelRadiusKm,
+      data.mobilityOptions,
+      data.acceptedMissionTypes,
+      data.minimumCompensation,
+      data.preferredDurations,
+      data.knownSoftware,
+      data.acceptedPatientTypes,
+      data.secretaryRequired,
+      data.accommodationRequired,
+      data.fastPaymentImportant,
+      data.acceptedPressureLevel,
     ];
 
-    const filled = fields.filter(Boolean).length;
-    return Math.round((filled / fields.length) * 100);
+    if (data.medicalStatus === 'OTHER') {
+      fields.push(data.medicalStatusOther);
+    }
+
+    return calculateCompletionScore(fields);
   }
 }

@@ -2,6 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable, NotFoundException 
 import { EstablishmentMemberRole } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { RequestUser } from '../../common/types/request-user.type';
+import { calculateCompletionScore } from '../../common/utils/completion.util';
 import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -70,7 +71,7 @@ export class EstablishmentsService {
       entityId: establishment.id,
     });
 
-    return establishment;
+    return this.withSignedPhotoUrls({ ...establishment, photos: [] });
   }
 
   async listMine(userId: string) {
@@ -92,6 +93,7 @@ export class EstablishmentsService {
     const updated = await this.prisma.establishment.update({
       where: { id: establishmentId },
       data: dto,
+      include: { photos: this.photoInclude },
     });
 
     await this.audit.log({
@@ -101,7 +103,7 @@ export class EstablishmentsService {
       entityId: updated.id,
     });
 
-    return updated;
+    return this.withSignedPhotoUrls(updated);
   }
 
   async delete(user: RequestUser, establishmentId: string) {
@@ -294,14 +296,15 @@ export class EstablishmentsService {
     return { deleted: true };
   }
 
-  async withSignedPhotoUrls<T extends { photos?: any[] }>(establishment: T): Promise<T> {
-    if (!establishment.photos?.length) return establishment;
+  async withSignedPhotoUrls<T extends { photos?: any[] }>(establishment: T): Promise<T & { completionScore: number }> {
+    const completionScore = this.computeCompletionScore(establishment);
+    if (!establishment.photos?.length) return { ...establishment, completionScore };
 
     const photos = await Promise.all(
       establishment.photos.map((photo) => this.withSignedPhotoUrl(photo)),
     );
 
-    return { ...establishment, photos };
+    return { ...establishment, photos, completionScore };
   }
 
   private async withSignedPhotoUrl<T extends { storageKey: string; fileName: string; mimeType: string }>(photo: T) {
@@ -340,5 +343,39 @@ export class EstablishmentsService {
     if (!ALLOWED_PHOTO_MIME_TYPES.includes(dto.mimeType)) {
       throw new BadRequestException('La photo doit etre une image JPG, PNG ou WebP.');
     }
+  }
+
+  private computeCompletionScore(data: Record<string, any>) {
+    const fields = [
+      data.name,
+      data.type,
+      data.city,
+      data.country,
+      data.sector,
+      data.patientType,
+      data.softwareUsed,
+      data.hasSecretary,
+      data.averagePatientsPerDay,
+      data.isMultidisciplinary,
+      data.equipmentAvailable,
+      data.mobilityOptions,
+      data.acceptedMissionTypes,
+      data.minimumCompensation,
+      data.preferredDurations,
+      data.acceptedPatientTypes,
+      data.knownSoftware,
+      data.address,
+      data.email,
+      data.phone,
+      data.website,
+      data.description,
+      data.photos,
+    ];
+
+    if (data.hasSecretary === true) {
+      fields.push(data.secretaryType);
+    }
+
+    return calculateCompletionScore(fields);
   }
 }

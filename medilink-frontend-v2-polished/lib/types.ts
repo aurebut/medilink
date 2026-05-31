@@ -130,6 +130,7 @@ export type Establishment = {
   website?: string | null;
   logoUrl?: string | null;
   description?: string | null;
+  completionScore: number;
   verificationStatus: VerificationStatus;
   createdAt: string;
   updatedAt: string;

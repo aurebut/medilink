@@ -6,7 +6,7 @@ import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
-import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import {
   acceptedMissionTypeOptions,
   cityOptions,
@@ -120,6 +120,11 @@ export default function EstablishmentOnboardingPage() {
                 <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
                   {statusLabel(establishment.verificationStatus)}
                 </Badge>
+                <div className="stat" style={{ marginTop: 12 }}>
+                  <span>Complétion du profil</span>
+                  <strong>{establishment.completionScore}%</strong>
+                  <ProgressBar value={establishment.completionScore} />
+                </div>
                 <div className="divider" />
                 <div style={{ marginTop: 8 }}>
                   <LinkButton href={`/establishment/edit/${establishment.id}`} variant="secondary">
