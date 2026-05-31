@@ -1306,9 +1306,7 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .mission-draft-summary { position: static; }
   .search-filters {
-    position: sticky;
-    top: 84px;
-    z-index: 8;
+    position: static;
   }
   .search-filters-toggle { display: inline-flex; }
   .search-filters-body {
