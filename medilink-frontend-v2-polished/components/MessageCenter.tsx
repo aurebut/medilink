@@ -5,7 +5,7 @@ import { api, getApiEventUrl, getApiUrl, getAuthToken } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateWithArticle } from '@/lib/grammar';
-import { Alert, Badge, Button, Card, EmptyState, Field, Input, Textarea } from './ui';
+import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
@@ -398,7 +398,7 @@ export function MessageCenter() {
     }
   }
 
-  if (loading) return <Card><p className="muted">Chargement des conversations...</p></Card>;
+  if (loading) return <LoadingCard label="Chargement des conversations..." />;
   if (conversations.length === 0) {
     return <EmptyState title="Aucune conversation" description="Les conversations sont creees automatiquement quand une candidature est envoyee." />;
   }

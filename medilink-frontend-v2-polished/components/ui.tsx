@@ -100,9 +100,35 @@ export function EmptyState({ title, description, action }: { title: string; desc
 
 export function LoadingCard({ label = 'Chargement...' }: { label?: string }) {
   return (
-    <Card>
-      <p className="muted">{label}</p>
-    </Card>
+    <div className="loading-state" role="status" aria-live="polite">
+      <div className="loading-emblem" aria-hidden="true">
+        <span className="loading-ring" />
+        <span className="loading-mark">M</span>
+      </div>
+      <LoadingCopy label={label} />
+    </div>
+  );
+}
+
+export function LoadingInline({ label = 'Chargement...' }: { label?: string }) {
+  return (
+    <div className="loading-inline" role="status" aria-live="polite">
+      <span className="loading-inline-pulse" aria-hidden="true" />
+      <LoadingCopy label={label} />
+    </div>
+  );
+}
+
+function LoadingCopy({ label }: { label: string }) {
+  return (
+    <span className="loading-copy">
+      <span>{label.replace(/\.{3}$/, '')}</span>
+      <span className="loading-dots" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+    </span>
   );
 }
 

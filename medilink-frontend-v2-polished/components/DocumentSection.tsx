@@ -5,7 +5,7 @@ import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview
 import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeOptions, documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
-import { Alert, Badge, Button, Card, Field, Select } from './ui';
+import { Alert, Badge, Button, Card, Field, LoadingInline, Select } from './ui';
 
 type UploadResponse = {
   documentId: string;
@@ -128,7 +128,7 @@ export function DocumentSection() {
         <div className="actions"><Button onClick={upload} disabled={!file || submitting}>{submitting ? 'Upload...' : 'Envoyer le document'}</Button></div>
       </div>
       <div className="divider" />
-      {loading ? <p className="muted">Chargement des documents...</p> : documents.filter((doc) => doc.documentType !== 'AVATAR').length === 0 ? <p className="muted">Aucun document pour le moment.</p> : (
+      {loading ? <LoadingInline label="Chargement des documents..." /> : documents.filter((doc) => doc.documentType !== 'AVATAR').length === 0 ? <p className="muted">Aucun document pour le moment.</p> : (
         <div className="table-wrap">
           <table>
             <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajouté</th><th>Actions</th></tr></thead>
