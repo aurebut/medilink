@@ -3071,25 +3071,6 @@ td {
   border-radius: 999px;
   animation: loading-spin 1.25s linear infinite;
 }
-.loading-mark {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 10px;
-  background: var(--navy);
-  color: #AACBE8;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: .02em;
-  box-shadow: 0 6px 14px rgba(11,25,41,.14);
-}
-.loading-emblem.compact .loading-mark {
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  font-size: 10px;
-}
 .loading-inline {
   display: grid;
   width: fit-content;
@@ -3105,9 +3086,7 @@ td {
     margin: 30px auto;
   }
   .loading-emblem { width: 44px; height: 44px; }
-  .loading-mark { width: 31px; height: 31px; border-radius: 9px; font-size: 12px; }
   .loading-emblem.compact { width: 34px; height: 34px; }
-  .loading-emblem.compact .loading-mark { width: 23px; height: 23px; font-size: 9px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .loading-ring { animation: none; }

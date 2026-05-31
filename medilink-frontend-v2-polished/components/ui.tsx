@@ -118,7 +118,6 @@ function LoadingEmblem({ compact = false }: { compact?: boolean }) {
   return (
     <span className={`loading-emblem ${compact ? 'compact' : ''}`} aria-hidden="true">
       <span className="loading-ring" />
-      <span className="loading-mark">M</span>
     </span>
   );
 }
