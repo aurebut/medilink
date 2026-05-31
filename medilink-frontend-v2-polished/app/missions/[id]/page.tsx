@@ -88,7 +88,6 @@ export default function MissionPage() {
       <div className="container">
         <nav className="public-nav">
           <Link href={homeHref} className="brand">
-            <span className="brand-mark">M</span>
             <span>Medilink</span>
           </Link>
           <div className="nav-actions">

@@ -19,7 +19,7 @@ function ResetPasswordForm() {
   }
 
   return <main className="auth-page"><form className="auth-card form" onSubmit={submit}>
-    <Link className="brand" href="/"><span className="brand-mark">M</span><span>Médilink</span></Link>
+    <Link className="brand" href="/"><span>Médilink</span></Link>
     <h1>Nouveau mot de passe</h1>
     {message ? <Alert type="success">{message}</Alert> : null}{error ? <Alert type="error">{error}</Alert> : null}
     <Field label="Nouveau mot de passe"><Input type="password" required minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></Field>

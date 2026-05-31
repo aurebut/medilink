@@ -23,8 +23,6 @@ body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-f
 /* NAV */
 nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0}
 .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:36px}
-.nav-mark{width:34px;height:34px;background:var(--navy);border-radius:9px;display:flex;align-items:center;justify-content:center}
-.nav-mark svg{width:18px;height:18px;fill:none;stroke:#AACBE8;stroke-width:2;stroke-linecap:round}
 .nav-name{font-family:var(--serif);font-size:20px;color:var(--navy);letter-spacing:0}
 .nav-name em{font-style:italic;color:var(--blue)}
 .nav-links{display:flex;gap:2px}
@@ -133,7 +131,6 @@ section,footer,.search-section{position:relative;z-index:1;}
 .dash-side{width:44px;background:var(--navy);flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:5px}
 .dash-side-dot{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.08)}
 .dash-side-dot.active{background:rgba(26,82,160,.4)}
-.dash-side-logo{width:24px;height:24px;background:var(--blue);border-radius:6px;margin-bottom:8px}
 .dash-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .dash-top{height:32px;background:#fff;border-bottom:1px solid var(--gray-2);display:flex;align-items:center;padding:0 12px;gap:6px}
 .dash-top-pill{height:14px;border-radius:10px;background:var(--gray-2)}
@@ -293,7 +290,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
   body::before{background-size:36px 36px}
   nav{padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
   .nav-logo{min-width:0;margin-right:0}
-  .nav-mark{width:32px;height:32px;border-radius:8px}
   .nav-name{font-size:19px}
   .nav-links{display:none}
   .nav-right{width:auto;margin-left:0;display:flex;align-items:center;gap:6px}
@@ -364,9 +360,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <!-- NAV -->
 <nav>
   <a class="nav-logo" href="/">
-    <div class="nav-mark">
-      <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5" fill="#AACBE8" stroke="none"/></svg>
-    </div>
     <span class="nav-name">Médi<em>Link</em></span>
   </a>
   <div class="nav-links">
@@ -437,7 +430,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="laptop-screen">
           <div class="dash-mini">
             <div class="dash-side">
-              <div class="dash-side-logo"></div>
               <div class="dash-side-dot active"></div>
               <div class="dash-side-dot"></div>
               <div class="dash-side-dot"></div>
@@ -706,7 +698,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
     <div class="footer-top">
       <div class="footer-brand">
         <div style="display:flex;align-items:center;gap:9px">
-          <div style="width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AACBE8" stroke-width="2" stroke-linecap="round"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5" fill="#AACBE8" stroke="none"/></svg></div>
           <span style="font-family:var(--serif);font-size:18px;color:#fff">Médi<em style="font-style:italic;color:#7AAAD8">Link</em></span>
         </div>
         <p>La plateforme de remplacement en médecine générale, conçue par et pour les médecins généralistes.</p>

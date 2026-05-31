@@ -19,7 +19,7 @@ function VerifyEmailStatus() {
   }, [token]);
 
   return <main className="auth-page"><div className="auth-card form">
-    <Link className="brand" href="/"><span className="brand-mark">M</span><span>Médilink</span></Link>
+    <Link className="brand" href="/"><span>Médilink</span></Link>
     <h1>Vérification email</h1>
     {error ? <Alert type="error">{error}</Alert> : <Alert type="success">{message}</Alert>}
     <LinkButton href="/login">Aller à la connexion</LinkButton>
