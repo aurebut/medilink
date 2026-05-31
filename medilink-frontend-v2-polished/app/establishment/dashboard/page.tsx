@@ -30,7 +30,7 @@ export default function EstablishmentDashboardPage() {
   const { primary, loading } = useEstablishments();
   const [applications, setApplications] = useState<Application[]>([]);
   const [missions, setMissions] = useState<Mission[]>([]);
-  const [dashboardLoading, setDashboardLoading] = useState(false);
+  const [dashboardLoading, setDashboardLoading] = useState(true);
 
   useEffect(() => {
     if (!primary) {
