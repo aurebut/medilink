@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input, Select } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
 
@@ -42,13 +43,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="auth-page">
-      <form className="auth-card form" onSubmit={submit}>
-        <Link className="brand" href="/"><span className="brand-mark">M</span><span>Medilink</span></Link>
-        <div>
-          <h1>Créer un compte</h1>
-          <p>Choisissez le type de compte pour accéder directement à votre espace.</p>
-        </div>
+    <AuthPage
+      eyebrow="Bienvenue sur MédiLink"
+      title="Créer un compte"
+      description="Rejoignez la plateforme pensée pour les remplacements en médecine générale."
+      onSubmit={submit}
+      footer={<Link href="/login" className="small auth-card-footer-strong">J&apos;ai déjà un compte</Link>}
+    >
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Type de compte">
           <Select value={accountType} onChange={(e) => setAccountType(e.target.value as any)}>
@@ -60,12 +61,10 @@ export default function RegisterPage() {
           <Field label="Prénom"><Input value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
           <Field label="Nom"><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
         </div>
-        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
-        <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
-        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
+        <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>
+        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8 caractères minimum" /></Field>
         <Button block disabled={loading}>{loading ? 'Création...' : 'Créer le compte'}</Button>
-        <Link href="/login" className="small">J'ai déjà un compte</Link>
-      </form>
-    </main>
+    </AuthPage>
   );
 }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
 
@@ -31,23 +32,23 @@ function LoginForm() {
   }
 
   return (
-    <main className="auth-page">
-      <form className="auth-card form" onSubmit={submit}>
-        <Link className="brand" href="/"><span className="brand-mark">M</span><span>Médilink</span></Link>
-        <div>
-          <h1>Connexion</h1>
-          <p>Connectez-vous pour accéder à votre espace candidat, établissement ou admin.</p>
-        </div>
+    <AuthPage
+      eyebrow="Ravi de vous revoir"
+      title="Connexion"
+      description="Retrouvez vos missions, vos candidatures et vos échanges en quelques secondes."
+      onSubmit={submit}
+      footer={(
+        <>
+          <Link href="/forgot-password" className="small">Mot de passe oublié ?</Link>
+          <Link href="/register" className="small auth-card-footer-strong">Créer un compte</Link>
+        </>
+      )}
+    >
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
-        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Votre mot de passe" /></Field>
         <Button block disabled={loading}>{loading ? 'Connexion...' : 'Se connecter'}</Button>
-        <div className="actions">
-          <Link href="/forgot-password" className="small">Mot de passe oublié ?</Link>
-          <Link href="/register" className="small">Créer un compte</Link>
-        </div>
-      </form>
-    </main>
+    </AuthPage>
   );
 }
 
