@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
-import { Alert, Badge, Button, EmptyState, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, EmptyState, LoadingCard, PageHeader } from '@/components/ui';
 
 export default function NotificationsPage() {
   const [items, setItems] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
@@ -15,10 +16,14 @@ export default function NotificationsPage() {
       setItems(await api.get<Notification[]>('/notifications'));
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+
+  if (loading) return <LoadingCard label="Chargement des notifications..." />;
 
   async function read(id: string) {
     try {

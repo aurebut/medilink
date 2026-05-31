@@ -19,18 +19,22 @@ function tone(status: string) {
 export default function EstablishmentApplicationsPage() {
   const { primary, loading } = useEstablishments();
   const [items, setItems] = useState<Application[]>([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   async function load() {
     if (!primary) return;
 
+    setApplicationsLoading(true);
     try {
       setError(null);
       const data = await api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`);
       setItems(data);
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setApplicationsLoading(false);
     }
   }
 
@@ -49,7 +53,7 @@ export default function EstablishmentApplicationsPage() {
     }
   }
 
-  if (loading) return <LoadingCard />;
+  if (loading || (primary && applicationsLoading)) return <LoadingCard label="Chargement des candidatures..." />;
 
   return (
     <>

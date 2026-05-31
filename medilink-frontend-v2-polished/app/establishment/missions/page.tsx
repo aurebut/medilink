@@ -10,22 +10,26 @@ import { Alert, Card, LinkButton, LoadingCard, PageHeader } from '@/components/u
 export default function EstablishmentMissionsPage() {
   const { primary, loading } = useEstablishments();
   const [missions, setMissions] = useState<Mission[]>([]);
+  const [missionsLoading, setMissionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   async function loadMissions() {
     if (!primary) return;
 
+    setMissionsLoading(true);
     try {
       setError(null);
       setMissions(await api.get<Mission[]>(`/missions/mine?establishmentId=${primary.id}`));
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setMissionsLoading(false);
     }
   }
 
   useEffect(() => { void loadMissions(); }, [primary]);
 
-  if (loading) return <LoadingCard />;
+  if (loading || (primary && missionsLoading)) return <LoadingCard label="Chargement des missions..." />;
 
   return (
     <>

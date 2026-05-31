@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Mission, MissionType, Paginated, RequiredLevel } from '@/lib/types';
 import { missionTypeOptions, requiredLevelOptions } from '@/lib/labels';
-import { Alert, Button, Card, Field, Input, PageHeader, Select } from '@/components/ui';
+import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { MissionCard } from '@/components/MissionCard';
 
 const emptyFilters = {
@@ -34,7 +34,7 @@ export default function SearchMissionsPage() {
   const [filters, setFilters] = useState(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const activeFilters = Object.values(filters).filter(Boolean).length;
 
   async function load() {
@@ -177,14 +177,20 @@ export default function SearchMissionsPage() {
 
         <div className="grid search-results">
           {error ? <Alert type="error">{error}</Alert> : null}
-          <div className="toolbar">
-            <div>
-              <strong>{total} résultat(s)</strong>
-              <div className="small">Missions publiées disponibles</div>
-            </div>
-          </div>
-          {items.map((mission) => <MissionCard key={mission.id} mission={mission} applyHref={`/app/missions/${mission.id}/apply`} />)}
-          {!loading && items.length === 0 ? <Card><p>Aucune mission publiée ne correspond aux filtres.</p></Card> : null}
+          {loading ? (
+            <LoadingCard label="Chargement des missions..." />
+          ) : (
+            <>
+              <div className="toolbar">
+                <div>
+                  <strong>{total} résultat(s)</strong>
+                  <div className="small">Missions publiées disponibles</div>
+                </div>
+              </div>
+              {items.map((mission) => <MissionCard key={mission.id} mission={mission} applyHref={`/app/missions/${mission.id}/apply`} />)}
+              {!loading && items.length === 0 ? <Card><p>Aucune mission publiée ne correspond aux filtres.</p></Card> : null}
+            </>
+          )}
         </div>
       </div>
     </>
