@@ -95,7 +95,6 @@ export default function CandidateDashboardPage() {
       <PageHeader
         title={`Bonjour ${firstName}`}
         description="Votre espace de pilotage pour prioriser les missions, garder un dossier solide et suivre les réponses."
-        actions={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
       />
 
       <section className="dashboard-hero">
