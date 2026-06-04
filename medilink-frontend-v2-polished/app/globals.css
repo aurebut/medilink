@@ -1272,21 +1272,30 @@ tbody tr:hover { background: #FAFBFD; }
 }
 .desktop-workflow-timeline {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(132px, 180px);
+  align-items: start;
   gap: 12px;
   margin: 0 0 12px;
   padding: 14px;
   border: 1px solid rgba(26,82,160,.16);
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(26,82,160,.06), #fff 72%);
+  overflow: hidden;
 }
 .desktop-workflow-steps {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(112px, 1fr));
+  min-width: 0;
+  display: flex;
   gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 4px 10px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
 }
 .desktop-workflow-step {
   --step-color: #9AA7B8;
   --step-bg: #F2F4F8;
+  flex: 0 0 clamp(176px, 23vw, 238px);
   min-width: 0;
   display: grid;
   gap: 8px;
@@ -1296,17 +1305,9 @@ tbody tr:hover { background: #FAFBFD; }
   border-radius: 12px;
   background: #fff;
   position: relative;
+  overflow: hidden;
+  scroll-snap-align: start;
 }
-.desktop-workflow-step::after {
-  content: "";
-  position: absolute;
-  top: 21px;
-  right: -10px;
-  width: 10px;
-  height: 2px;
-  background: #D8DEE8;
-}
-.desktop-workflow-step:last-child::after { display: none; }
 .desktop-workflow-step.is-done {
   --step-color: #0B6F62;
   --step-bg: rgba(14,138,122,.12);
@@ -1361,6 +1362,7 @@ tbody tr:hover { background: #FAFBFD; }
   color: var(--heading);
   font-size: 14px;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 .desktop-workflow-title span {
   width: fit-content;
@@ -1376,6 +1378,7 @@ tbody tr:hover { background: #FAFBFD; }
   color: var(--muted);
   font-size: 12px;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 .desktop-workflow-actions {
   display: grid;
@@ -1385,6 +1388,7 @@ tbody tr:hover { background: #FAFBFD; }
 .desktop-workflow-actions .mobile-workflow-option,
 .desktop-workflow-refresh .mobile-workflow-option {
   width: 100%;
+  min-width: 0;
   min-height: 42px;
   display: grid;
   gap: 2px;
@@ -1401,12 +1405,14 @@ tbody tr:hover { background: #FAFBFD; }
   color: var(--heading);
   font-size: 12px;
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 .desktop-workflow-actions .mobile-workflow-option span,
 .desktop-workflow-refresh .mobile-workflow-option span {
   color: var(--muted);
   font-size: 11px;
   line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 .desktop-workflow-actions .mobile-workflow-option.is-success {
   border-color: rgba(14,138,122,.24);
@@ -1422,8 +1428,8 @@ tbody tr:hover { background: #FAFBFD; }
   cursor: not-allowed;
 }
 .desktop-workflow-refresh {
-  width: min(220px, 100%);
-  justify-self: end;
+  width: 100%;
+  justify-self: stretch;
 }
 .workflow-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
 .workflow-summary > div {
@@ -1489,9 +1495,6 @@ tbody tr:hover { background: #FAFBFD; }
   .pillar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .audience-grid { grid-template-columns: 1fr; }
   .workflow-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .desktop-workflow-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .desktop-workflow-step::after { display: none; }
-  .desktop-workflow-refresh { justify-self: stretch; }
   .landing-stats { grid-template-columns: 1fr; }
   .landing-cta { align-items: flex-start; flex-direction: column; }
   .landing-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
