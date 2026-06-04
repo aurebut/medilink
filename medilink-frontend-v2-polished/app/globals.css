@@ -3388,7 +3388,9 @@ td {
 
   .new-mission-page .wizard-panel {
     gap: 12px;
+    max-height: calc(100dvh - 148px);
     padding: 12px;
+    overflow: hidden;
     border-radius: 12px;
   }
 
@@ -3438,6 +3440,7 @@ td {
 
   .new-mission-page .wizard-form {
     gap: 12px;
+    min-height: 0;
   }
 
   .new-mission-page .field {
@@ -3461,6 +3464,11 @@ td {
 
   .new-mission-page .wizard-step-content {
     gap: 11px;
+    min-height: 0;
+    max-height: calc(100dvh - 360px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 2px;
   }
 
   .new-mission-page .wizard-step-content h2 {
@@ -3524,11 +3532,35 @@ td {
     position: sticky;
     z-index: 8;
     bottom: 0;
+    flex: 0 0 auto;
     margin: 0 -12px -12px;
     padding: 10px 12px max(10px, env(safe-area-inset-bottom));
     border-top: 1px solid var(--line);
     background: rgba(255,255,255,.94);
     backdrop-filter: blur(10px);
+  }
+}
+
+@media (max-width: 620px) and (max-height: 740px) {
+  .new-mission-page .page-header {
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+  }
+
+  .new-mission-page .page-header h1 {
+    font-size: 25px;
+  }
+
+  .new-mission-page .page-header p {
+    display: none;
+  }
+
+  .new-mission-page .wizard-panel {
+    max-height: calc(100dvh - 112px);
+  }
+
+  .new-mission-page .wizard-step-content {
+    max-height: calc(100dvh - 300px);
   }
 }
 
