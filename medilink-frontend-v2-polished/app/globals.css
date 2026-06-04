@@ -1222,6 +1222,9 @@ tbody tr:hover { background: #FAFBFD; }
 .message-heading { min-width: 0; display: flex; align-items: flex-start; gap: 10px; }
 .message-heading h2 { overflow-wrap: anywhere; }
 .mobile-conversation-back { display: none; flex: 0 0 auto; }
+.message-toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 0 0 auto; }
+.mobile-workflow-toggle { display: none; flex: 0 0 auto; }
+.mobile-workflow-menu { display: none; }
 .messages { flex: 1; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 14px 2px; }
 .message { max-width: 72%; border-radius: 12px 12px 12px 4px; padding: 12px 14px; background: #F2F4F8; border: 1px solid #E4E9F2; }
 .message.mine { margin-left: auto; background: rgba(26,82,160,.08); border-color: rgba(26,82,160,.18); border-radius: 12px 12px 4px 12px; }
@@ -1973,6 +1976,7 @@ tbody tr:hover { background: #FAFBFD; }
     box-shadow: none;
     padding: 0;
     background: #fff;
+    position: relative;
   }
   .message-layout-mobile-active .message-pane > .toolbar {
     flex: 0 0 auto;
@@ -1997,6 +2001,102 @@ tbody tr:hover { background: #FAFBFD; }
     white-space: normal;
     text-align: center;
     line-height: 1.15;
+  }
+  .message-layout-mobile-active .message-toolbar-actions {
+    max-width: 48%;
+  }
+  .message-layout-mobile-active .message-toolbar-actions > .badge {
+    max-width: 112px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .message-layout-mobile-active .mobile-workflow-toggle {
+    display: inline-flex;
+    min-height: 36px;
+    padding: 0 10px;
+  }
+  .message-layout-mobile-active .mobile-workflow-menu {
+    display: grid;
+    gap: 10px;
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    z-index: 6;
+    padding: 12px;
+    border: 1px solid rgba(18,35,58,.12);
+    border-radius: 14px;
+    background: rgba(255,255,255,.98);
+    box-shadow: 0 18px 42px rgba(18,35,58,.16);
+  }
+  .mobile-workflow-menu-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .mobile-workflow-menu-head span,
+  .mobile-workflow-option span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .mobile-workflow-menu-head strong {
+    display: block;
+    margin-top: 2px;
+    color: var(--heading);
+    font-size: 15px;
+  }
+  .mobile-workflow-close {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--text);
+    font-size: 20px;
+    line-height: 1;
+  }
+  .mobile-workflow-options {
+    display: grid;
+    gap: 8px;
+  }
+  .mobile-workflow-option {
+    width: 100%;
+    min-height: 58px;
+    display: grid;
+    gap: 3px;
+    text-align: left;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--text);
+  }
+  .mobile-workflow-option strong {
+    color: var(--heading);
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .mobile-workflow-option.is-success {
+    border-color: rgba(14,138,122,.24);
+    background: rgba(14,138,122,.08);
+  }
+  .mobile-workflow-option.is-danger {
+    border-color: #FECACA;
+    background: #FEF3F2;
+  }
+  .mobile-workflow-option.is-primary {
+    border-color: rgba(26,82,160,.18);
+    background: rgba(26,82,160,.08);
+  }
+  .mobile-workflow-option:disabled {
+    opacity: .55;
   }
   .message-layout-mobile .message-pane {
     padding-bottom: 0;
@@ -2075,6 +2175,10 @@ tbody tr:hover { background: #FAFBFD; }
   .message-layout-mobile-active .workflow-card {
     width: 100%;
     padding: 12px;
+  }
+  .message-layout-mobile-active .workflow-step-panel,
+  .message-layout-mobile-active .workflow-composer-prompt {
+    display: none;
   }
   .workflow-step-panel {
     align-items: stretch;

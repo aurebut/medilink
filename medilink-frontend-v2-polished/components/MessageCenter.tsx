@@ -53,6 +53,16 @@ type WorkflowPayload = {
   invoices?: InvoicePayload[];
 };
 
+type MobileWorkflowOption = {
+  label: string;
+  description: string;
+  busyLabel?: string;
+  tone?: 'primary' | 'light' | 'danger' | 'success';
+  disabled?: boolean;
+  busy?: boolean;
+  onSelect: () => void;
+};
+
 type ProposalForm = {
   compensationMode: string;
   amount: string;
@@ -132,6 +142,7 @@ export function MessageCenter() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
+  const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
   const [proposal, setProposal] = useState<ProposalForm>({
     compensationMode: 'RETROCESSION',
     amount: '',
@@ -229,6 +240,7 @@ export function MessageCenter() {
   useEffect(() => { void loadConversations(); }, []);
   useEffect(() => {
     if (!activeId) return;
+    setMobileOptionsOpen(false);
     setMessages([]);
     void loadMessages(activeId);
     const current = conversations.find((c) => c.id === activeId);
@@ -244,6 +256,9 @@ export function MessageCenter() {
       notes: '',
     });
   }, [activeId]);
+  useEffect(() => {
+    if (!isMobile) setMobileOptionsOpen(false);
+  }, [isMobile]);
   useEffect(() => {
     if (!activeId) return;
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
@@ -405,6 +420,109 @@ export function MessageCenter() {
 
   const showConversationList = !isMobile || !activeId;
   const showMessagePane = !isMobile || Boolean(activeId);
+  const candidateCanAnswerLatest = candidate && Boolean(lastProposal) && !state.paymentRequired && !state.fundsSecured && !state.rejected;
+  const mobileWorkflowOptions: MobileWorkflowOption[] = [
+    ...(recruiter && !state.paymentRequired && !state.fundsSecured && !state.rejected
+      ? [{
+          label: state.hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition',
+          description: 'Préparer les conditions finales dans la conversation.',
+          busy: busyAction === 'proposal',
+          busyLabel: 'Préparation...',
+          onSelect: () => setProposalOpen(true),
+        } satisfies MobileWorkflowOption]
+      : []),
+    ...(candidateCanAnswerLatest
+      ? [
+          {
+            label: 'Accepter la proposition',
+            description: 'Valider les conditions finales de la mission.',
+            tone: 'success',
+            disabled: Boolean(busyAction),
+            busy: busyAction === 'accept',
+            busyLabel: 'Acceptation...',
+            onSelect: () => runAction('accept', '/proposal/accept'),
+          },
+          {
+            label: 'Refuser la proposition',
+            description: 'Refuser et continuer l’échange dans le chat.',
+            tone: 'danger',
+            disabled: Boolean(busyAction),
+            busy: busyAction === 'reject',
+            busyLabel: 'Refus...',
+            onSelect: () => runAction('reject', '/proposal/reject'),
+          },
+        ] satisfies MobileWorkflowOption[]
+      : []),
+    ...(state.paymentRequired && recruiter
+      ? [{
+          label: 'Confirmer la mission',
+          description: 'Passer à l’étape de mission confirmée.',
+          disabled: Boolean(busyAction),
+          busy: busyAction === 'secure',
+          busyLabel: 'Confirmation...',
+          onSelect: () => runAction('secure', '/payment/secure'),
+        } satisfies MobileWorkflowOption]
+      : []),
+    ...(state.fundsSecured && recruiter
+      ? [{
+          label: 'Marquer terminée',
+          description: 'Indiquer que la prestation est réalisée.',
+          disabled: Boolean(busyAction),
+          busy: busyAction === 'complete',
+          busyLabel: 'Validation...',
+          onSelect: () => runAction('complete', '/mission/complete'),
+        } satisfies MobileWorkflowOption]
+      : []),
+    ...(state.completed && recruiter
+      ? [{
+          label: 'Valider la rétrocession',
+          description: 'Débloquer la génération des justificatifs.',
+          disabled: Boolean(busyAction),
+          busy: busyAction === 'pay',
+          busyLabel: 'Validation...',
+          onSelect: () => runAction('pay', '/payment/release'),
+        } satisfies MobileWorkflowOption]
+      : []),
+    ...(state.released
+      ? [{
+          label: 'Générer les factures',
+          description: 'Créer les PDF de fin de mission.',
+          disabled: Boolean(busyAction),
+          busy: busyAction === 'invoices',
+          busyLabel: 'Génération...',
+          onSelect: () => runAction('invoices', '/invoices/generate'),
+        } satisfies MobileWorkflowOption]
+      : []),
+    ...(state.invoices
+      ? [
+          {
+            label: 'Facture recruteur PDF',
+            description: 'Télécharger la facture établissement.',
+            tone: 'light',
+            disabled: Boolean(busyAction),
+            busy: busyAction === 'download-recruiter',
+            busyLabel: 'Téléchargement...',
+            onSelect: () => void downloadInvoice('recruiter'),
+          },
+          {
+            label: 'Justificatif candidat PDF',
+            description: 'Télécharger le justificatif candidat.',
+            tone: 'light',
+            disabled: Boolean(busyAction),
+            busy: busyAction === 'download-candidate',
+            busyLabel: 'Téléchargement...',
+            onSelect: () => void downloadInvoice('candidate'),
+          },
+        ] satisfies MobileWorkflowOption[]
+      : []),
+    {
+      label: 'Actualiser',
+      description: 'Recharger les messages et le suivi.',
+      tone: 'light',
+      disabled: Boolean(busyAction),
+      onSelect: () => void refresh(),
+    },
+  ];
 
   return (
     <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -447,8 +565,29 @@ export function MessageCenter() {
               <div className="small">{active?.establishment?.name} - {active?.mission?.city}</div>
             </div>
           </div>
-          <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+          <div className="message-toolbar-actions">
+            <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+            {isMobile ? (
+              <Button
+                type="button"
+                variant="light"
+                className="mobile-workflow-toggle"
+                aria-expanded={mobileOptionsOpen}
+                onClick={() => setMobileOptionsOpen((open) => !open)}
+              >
+                Options
+              </Button>
+            ) : null}
+          </div>
         </div>
+
+        {isMobile && mobileOptionsOpen ? (
+          <MobileWorkflowMenu
+            status={currentStatus}
+            options={mobileWorkflowOptions}
+            onClose={() => setMobileOptionsOpen(false)}
+          />
+        ) : null}
 
         <WorkflowStepPanel
           state={state}
@@ -550,7 +689,7 @@ function WorkflowComposer({
 }) {
   if (!open) {
     return (
-      <div className="workflow-card">
+      <div className="workflow-card workflow-composer-card workflow-composer-prompt">
         <div>
           <Badge>{hasProposal ? 'Proposition envoyée' : 'Prochaine étape'}</Badge>
           <h3>{hasProposal ? 'Envoyer une nouvelle proposition finale' : 'Formaliser une proposition finale'}</h3>
@@ -564,7 +703,7 @@ function WorkflowComposer({
   }
 
   return (
-    <form className="workflow-card workflow-form" onSubmit={onSubmit}>
+    <form className="workflow-card workflow-form workflow-composer-card" onSubmit={onSubmit}>
       <div>
         <Badge>Proposition finale</Badge>
         <h3>Détails de l'accord</h3>
@@ -596,6 +735,47 @@ function WorkflowComposer({
         <Button type="button" variant="light" onClick={onCancel}>Annuler</Button>
       </div>
     </form>
+  );
+}
+
+function MobileWorkflowMenu({
+  status,
+  options,
+  onClose,
+}: {
+  status: string;
+  options: MobileWorkflowOption[];
+  onClose: () => void;
+}) {
+  return (
+    <div className="mobile-workflow-menu">
+      <div className="mobile-workflow-menu-head">
+        <div>
+          <span>Suivi</span>
+          <strong>{status}</strong>
+        </div>
+        <button type="button" className="mobile-workflow-close" aria-label="Fermer les options" onClick={onClose}>
+          ×
+        </button>
+      </div>
+      <div className="mobile-workflow-options">
+        {options.map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            className={`mobile-workflow-option ${option.tone ? `is-${option.tone}` : ''}`}
+            disabled={option.disabled || option.busy}
+            onClick={() => {
+              onClose();
+              option.onSelect();
+            }}
+          >
+            <strong>{option.busy && option.busyLabel ? option.busyLabel : option.label}</strong>
+            <span>{option.description}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
