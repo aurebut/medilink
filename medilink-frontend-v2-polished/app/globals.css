@@ -2018,30 +2018,36 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .message-layout-mobile-active .mobile-workflow-menu {
     display: grid;
-    gap: 10px;
+    gap: 12px;
     position: absolute;
     top: 70px;
     left: 10px;
     right: 10px;
     z-index: 6;
-    padding: 12px;
+    max-height: min(72dvh, 620px);
+    overflow: auto;
+    padding: 14px;
     border: 1px solid rgba(18,35,58,.12);
-    border-radius: 14px;
+    border-radius: 16px;
     background: rgba(255,255,255,.98);
-    box-shadow: 0 18px 42px rgba(18,35,58,.16);
+    box-shadow: 0 22px 54px rgba(18,35,58,.18);
+    overscroll-behavior: contain;
   }
   .mobile-workflow-menu-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
   }
-  .mobile-workflow-menu-head span,
-  .mobile-workflow-option span {
+  .mobile-workflow-menu-head span {
     display: block;
     color: var(--muted);
     font-size: 12px;
     line-height: 1.35;
+    font-weight: 700;
+    text-transform: uppercase;
   }
   .mobile-workflow-menu-head strong {
     display: block;
@@ -2062,17 +2068,133 @@ tbody tr:hover { background: #FAFBFD; }
     font-size: 20px;
     line-height: 1;
   }
-  .mobile-workflow-options {
+  .mobile-workflow-timeline {
     display: grid;
+    gap: 0;
+  }
+  .mobile-timeline-step {
+    --step-color: #9AA7B8;
+    --step-bg: #F2F4F8;
+    position: relative;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 10px;
+    padding: 0 0 14px;
+  }
+  .mobile-timeline-step::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 25px;
+    bottom: 0;
+    width: 2px;
+    background: #E4E9F2;
+  }
+  .mobile-timeline-step:last-child {
+    padding-bottom: 0;
+  }
+  .mobile-timeline-step:last-child::before {
+    display: none;
+  }
+  .mobile-timeline-step.is-done {
+    --step-color: #0B6F62;
+    --step-bg: rgba(14,138,122,.12);
+  }
+  .mobile-timeline-step.is-current {
+    --step-color: var(--blue);
+    --step-bg: rgba(26,82,160,.11);
+  }
+  .mobile-timeline-step.is-waiting {
+    --step-color: #8A4B00;
+    --step-bg: #FFF7E6;
+  }
+  .mobile-timeline-step.is-rejected {
+    --step-color: #B42318;
+    --step-bg: #FEF3F2;
+  }
+  .mobile-timeline-marker {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--step-color);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 0 0 4px var(--step-bg);
+  }
+  .mobile-timeline-marker::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--step-color);
+  }
+  .mobile-timeline-step.is-locked .mobile-timeline-marker {
+    border-color: #D4DAE4;
+    box-shadow: none;
+  }
+  .mobile-timeline-step.is-locked .mobile-timeline-marker::after {
+    background: #D4DAE4;
+  }
+  .mobile-timeline-content {
+    min-width: 0;
+    display: grid;
+    gap: 6px;
+    padding: 9px 10px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+  }
+  .mobile-timeline-step.is-current .mobile-timeline-content {
+    border-color: rgba(26,82,160,.24);
+    background: linear-gradient(180deg, rgba(26,82,160,.08), #fff 58%);
+  }
+  .mobile-timeline-step.is-done .mobile-timeline-content {
+    border-color: rgba(14,138,122,.20);
+  }
+  .mobile-timeline-step.is-rejected .mobile-timeline-content {
+    border-color: #FECACA;
+    background: #FFF8F8;
+  }
+  .mobile-timeline-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 8px;
   }
+  .mobile-timeline-title strong {
+    color: var(--heading);
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  .mobile-timeline-title span {
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: var(--step-bg);
+    color: var(--step-color);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .mobile-timeline-content p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .mobile-workflow-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 3px;
+  }
   .mobile-workflow-option {
-    width: 100%;
-    min-height: 58px;
+    flex: 1 1 132px;
+    min-height: 48px;
     display: grid;
     gap: 3px;
     text-align: left;
-    padding: 10px 12px;
+    padding: 9px 10px;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: #fff;
@@ -2080,8 +2202,14 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .mobile-workflow-option strong {
     color: var(--heading);
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.2;
+  }
+  .mobile-workflow-option span {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.3;
   }
   .mobile-workflow-option.is-success {
     border-color: rgba(14,138,122,.24);
@@ -2097,6 +2225,13 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .mobile-workflow-option:disabled {
     opacity: .55;
+  }
+  .mobile-workflow-footer {
+    padding-top: 10px;
+    border-top: 1px solid var(--line);
+  }
+  .mobile-workflow-footer .mobile-workflow-option {
+    width: 100%;
   }
   .message-layout-mobile .message-pane {
     padding-bottom: 0;

@@ -63,6 +63,14 @@ type MobileWorkflowOption = {
   onSelect: () => void;
 };
 
+type MobileTimelineStep = {
+  key: string;
+  title: string;
+  description: string;
+  status: 'done' | 'current' | 'waiting' | 'locked' | 'rejected';
+  options?: MobileWorkflowOption[];
+};
+
 type ProposalForm = {
   compensationMode: string;
   amount: string;
@@ -421,103 +429,187 @@ export function MessageCenter() {
   const showConversationList = !isMobile || !activeId;
   const showMessagePane = !isMobile || Boolean(activeId);
   const candidateCanAnswerLatest = candidate && Boolean(lastProposal) && !state.paymentRequired && !state.fundsSecured && !state.rejected;
-  const mobileWorkflowOptions: MobileWorkflowOption[] = [];
-
-  if (state.invoices) {
-    mobileWorkflowOptions.push(
-      {
-        label: 'Facture recruteur PDF',
-        description: 'Télécharger la facture établissement.',
-        tone: 'light',
-        disabled: Boolean(busyAction),
-        busy: busyAction === 'download-recruiter',
-        busyLabel: 'Téléchargement...',
-        onSelect: () => void downloadInvoice('recruiter'),
-      },
-      {
-        label: 'Justificatif candidat PDF',
-        description: 'Télécharger le justificatif candidat.',
-        tone: 'light',
-        disabled: Boolean(busyAction),
-        busy: busyAction === 'download-candidate',
-        busyLabel: 'Téléchargement...',
-        onSelect: () => void downloadInvoice('candidate'),
-      },
-    );
-  } else if (state.released) {
-    mobileWorkflowOptions.push({
-      label: 'Générer les factures',
-      description: 'Créer les PDF de fin de mission.',
-      disabled: Boolean(busyAction),
-      busy: busyAction === 'invoices',
-      busyLabel: 'Génération...',
-      onSelect: () => runAction('invoices', '/invoices/generate'),
-    });
-  } else if (state.completed && recruiter) {
-    mobileWorkflowOptions.push({
-      label: 'Valider la rétrocession',
-      description: 'Débloquer la génération des justificatifs.',
-      disabled: Boolean(busyAction),
-      busy: busyAction === 'pay',
-      busyLabel: 'Validation...',
-      onSelect: () => runAction('pay', '/payment/release'),
-    });
-  } else if (state.fundsSecured && recruiter) {
-    mobileWorkflowOptions.push({
-      label: 'Marquer terminée',
-      description: 'Indiquer que la prestation est réalisée.',
-      disabled: Boolean(busyAction),
-      busy: busyAction === 'complete',
-      busyLabel: 'Validation...',
-      onSelect: () => runAction('complete', '/mission/complete'),
-    });
-  } else if (state.paymentRequired && recruiter) {
-    mobileWorkflowOptions.push({
-      label: 'Confirmer la mission',
-      description: 'Passer à l’étape de mission confirmée.',
-      disabled: Boolean(busyAction),
-      busy: busyAction === 'secure',
-      busyLabel: 'Confirmation...',
-      onSelect: () => runAction('secure', '/payment/secure'),
-    });
-  } else if (candidateCanAnswerLatest) {
-    mobileWorkflowOptions.push(
-      {
-        label: 'Accepter la proposition',
-        description: 'Valider les conditions finales de la mission.',
-        tone: 'success',
-        disabled: Boolean(busyAction),
-        busy: busyAction === 'accept',
-        busyLabel: 'Acceptation...',
-        onSelect: () => runAction('accept', '/proposal/accept'),
-      },
-      {
-        label: 'Refuser la proposition',
-        description: 'Refuser et continuer l’échange dans le chat.',
-        tone: 'danger',
-        disabled: Boolean(busyAction),
-        busy: busyAction === 'reject',
-        busyLabel: 'Refus...',
-        onSelect: () => runAction('reject', '/proposal/reject'),
-      },
-    );
-  } else if (recruiter && !state.fundsSecured) {
-    mobileWorkflowOptions.push({
-      label: state.hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition',
-      description: 'Préparer les conditions finales dans la conversation.',
-      busy: busyAction === 'proposal',
-      busyLabel: 'Préparation...',
-      onSelect: () => setProposalOpen(true),
-    });
-  }
-
-  mobileWorkflowOptions.push({
+  const proposalAction: MobileWorkflowOption = {
+    label: state.rejected ? 'Nouvelle proposition' : state.hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition',
+    description: 'Préparer les conditions finales dans la conversation.',
+    busy: busyAction === 'proposal',
+    busyLabel: 'Préparation...',
+    onSelect: () => setProposalOpen(true),
+  };
+  const acceptAction: MobileWorkflowOption = {
+    label: 'Accepter',
+    description: 'Valider les conditions finales.',
+    tone: 'success',
+    disabled: Boolean(busyAction),
+    busy: busyAction === 'accept',
+    busyLabel: 'Acceptation...',
+    onSelect: () => runAction('accept', '/proposal/accept'),
+  };
+  const rejectAction: MobileWorkflowOption = {
+    label: 'Refuser',
+    description: 'Continuer l’échange dans le chat.',
+    tone: 'danger',
+    disabled: Boolean(busyAction),
+    busy: busyAction === 'reject',
+    busyLabel: 'Refus...',
+    onSelect: () => runAction('reject', '/proposal/reject'),
+  };
+  const refreshAction: MobileWorkflowOption = {
     label: 'Actualiser',
     description: 'Recharger les messages et le suivi.',
     tone: 'light',
     disabled: Boolean(busyAction),
     onSelect: () => void refresh(),
-  });
+  };
+  const mobileTimelineSteps: MobileTimelineStep[] = [
+    {
+      key: 'proposal',
+      title: 'Proposition',
+      description: state.rejected
+        ? 'La dernière proposition a été refusée.'
+        : state.hasProposal
+          ? 'Les conditions ont été envoyées.'
+          : recruiter
+            ? 'Préparez les conditions finales.'
+            : 'En attente de la proposition.',
+      status: state.rejected ? 'rejected' : state.hasProposal ? 'done' : 'current',
+      options: recruiter && !state.paymentRequired && !state.fundsSecured ? [proposalAction] : undefined,
+    },
+    {
+      key: 'agreement',
+      title: 'Accord candidat',
+      description: state.rejected
+        ? 'Il faut échanger puis renvoyer une proposition.'
+        : state.paymentRequired || state.fundsSecured || state.completed || state.released || state.invoices
+          ? 'La proposition est acceptée.'
+          : state.hasProposal
+            ? candidate
+              ? 'Vous pouvez accepter ou refuser.'
+              : 'En attente de réponse du candidat.'
+            : 'Visible après la proposition.',
+      status: state.rejected
+        ? 'locked'
+        : state.paymentRequired || state.fundsSecured || state.completed || state.released || state.invoices
+          ? 'done'
+          : state.hasProposal
+            ? 'current'
+            : 'locked',
+      options: candidateCanAnswerLatest ? [acceptAction, rejectAction] : undefined,
+    },
+    {
+      key: 'confirm',
+      title: 'Confirmation',
+      description: state.fundsSecured || state.completed || state.released || state.invoices
+        ? 'La mission est confirmée.'
+        : state.paymentRequired
+          ? recruiter
+            ? 'Confirmez la mission.'
+            : 'En attente de confirmation par l’établissement.'
+          : 'Disponible après acceptation.',
+      status: state.fundsSecured || state.completed || state.released || state.invoices
+        ? 'done'
+        : state.paymentRequired
+          ? 'current'
+          : 'locked',
+      options: state.paymentRequired && recruiter ? [{
+        label: 'Confirmer la mission',
+        description: 'Passer à l’étape suivante.',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'secure',
+        busyLabel: 'Confirmation...',
+        onSelect: () => runAction('secure', '/payment/secure'),
+      }] : undefined,
+    },
+    {
+      key: 'complete',
+      title: 'Fin de mission',
+      description: state.completed || state.released || state.invoices
+        ? 'La fin de mission est validée.'
+        : state.fundsSecured
+          ? recruiter
+            ? 'Marquez la prestation réalisée.'
+            : 'En attente de validation de fin de mission.'
+          : 'Disponible après confirmation.',
+      status: state.completed || state.released || state.invoices
+        ? 'done'
+        : state.fundsSecured
+          ? 'current'
+          : 'locked',
+      options: state.fundsSecured && recruiter ? [{
+        label: 'Marquer terminée',
+        description: 'Valider la prestation.',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'complete',
+        busyLabel: 'Validation...',
+        onSelect: () => runAction('complete', '/mission/complete'),
+      }] : undefined,
+    },
+    {
+      key: 'release',
+      title: 'Rétrocession',
+      description: state.released || state.invoices
+        ? 'La rétrocession est validée.'
+        : state.completed
+          ? recruiter
+            ? 'Validez la rétrocession.'
+            : 'En attente de validation par l’établissement.'
+          : 'Disponible après fin de mission.',
+      status: state.released || state.invoices
+        ? 'done'
+        : state.completed
+          ? 'current'
+          : 'locked',
+      options: state.completed && recruiter ? [{
+        label: 'Valider',
+        description: 'Débloquer les justificatifs.',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'pay',
+        busyLabel: 'Validation...',
+        onSelect: () => runAction('pay', '/payment/release'),
+      }] : undefined,
+    },
+    {
+      key: 'invoices',
+      title: 'Factures',
+      description: state.invoices
+        ? 'Les PDF sont disponibles.'
+        : state.released
+          ? 'Les PDF peuvent être générés.'
+          : 'Disponibles en fin de parcours.',
+      status: state.invoices ? 'done' : state.released ? 'current' : 'locked',
+      options: state.invoices
+        ? [
+            {
+              label: 'Facture recruteur',
+              description: 'PDF établissement.',
+              tone: 'light',
+              disabled: Boolean(busyAction),
+              busy: busyAction === 'download-recruiter',
+              busyLabel: 'Téléchargement...',
+              onSelect: () => void downloadInvoice('recruiter'),
+            },
+            {
+              label: 'Justificatif candidat',
+              description: 'PDF candidat.',
+              tone: 'light',
+              disabled: Boolean(busyAction),
+              busy: busyAction === 'download-candidate',
+              busyLabel: 'Téléchargement...',
+              onSelect: () => void downloadInvoice('candidate'),
+            },
+          ]
+        : state.released
+          ? [{
+              label: 'Générer les factures',
+              description: 'Créer les PDF.',
+              disabled: Boolean(busyAction),
+              busy: busyAction === 'invoices',
+              busyLabel: 'Génération...',
+              onSelect: () => runAction('invoices', '/invoices/generate'),
+            }]
+          : undefined,
+    },
+  ];
 
   return (
     <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -579,7 +671,8 @@ export function MessageCenter() {
         {isMobile && mobileOptionsOpen ? (
           <MobileWorkflowMenu
             status={currentStatus}
-            options={mobileWorkflowOptions}
+            steps={mobileTimelineSteps}
+            refreshAction={refreshAction}
             onClose={() => setMobileOptionsOpen(false)}
           />
         ) : null}
@@ -597,7 +690,7 @@ export function MessageCenter() {
         />
 
         <div className="messages">
-          {recruiter && !state.paymentRequired && !state.fundsSecured && !state.rejected ? (
+          {recruiter && !state.paymentRequired && !state.fundsSecured ? (
             <WorkflowComposer
               open={proposalOpen}
               proposal={proposal}
@@ -735,11 +828,13 @@ function WorkflowComposer({
 
 function MobileWorkflowMenu({
   status,
-  options,
+  steps,
+  refreshAction,
   onClose,
 }: {
   status: string;
-  options: MobileWorkflowOption[];
+  steps: MobileTimelineStep[];
+  refreshAction: MobileWorkflowOption;
   onClose: () => void;
 }) {
   return (
@@ -753,24 +848,65 @@ function MobileWorkflowMenu({
           ×
         </button>
       </div>
-      <div className="mobile-workflow-options">
-        {options.map((option) => (
-          <button
-            key={option.label}
-            type="button"
-            className={`mobile-workflow-option ${option.tone ? `is-${option.tone}` : ''}`}
-            disabled={option.disabled || option.busy}
-            onClick={() => {
-              onClose();
-              option.onSelect();
-            }}
-          >
-            <strong>{option.busy && option.busyLabel ? option.busyLabel : option.label}</strong>
-            <span>{option.description}</span>
-          </button>
+      <div className="mobile-workflow-timeline">
+        {steps.map((step) => (
+          <div key={step.key} className={`mobile-timeline-step is-${step.status}`}>
+            <div className="mobile-timeline-marker" aria-hidden="true" />
+            <div className="mobile-timeline-content">
+              <div className="mobile-timeline-title">
+                <strong>{step.title}</strong>
+                <span>{timelineStatusLabel(step.status)}</span>
+              </div>
+              <p>{step.description}</p>
+              {step.options?.length ? (
+                <div className="mobile-workflow-options">
+                  {step.options.map((option) => (
+                    <MobileWorkflowOptionButton key={option.label} option={option} onClose={onClose} />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
         ))}
       </div>
+      <div className="mobile-workflow-footer">
+        <MobileWorkflowOptionButton option={refreshAction} onClose={onClose} />
+      </div>
     </div>
+  );
+}
+
+function timelineStatusLabel(status: MobileTimelineStep['status']) {
+  const labels: Record<MobileTimelineStep['status'], string> = {
+    done: 'Fait',
+    current: 'En cours',
+    waiting: 'Attente',
+    locked: 'À venir',
+    rejected: 'Refusé',
+  };
+  return labels[status];
+}
+
+function MobileWorkflowOptionButton({
+  option,
+  onClose,
+}: {
+  option: MobileWorkflowOption;
+  onClose: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`mobile-workflow-option ${option.tone ? `is-${option.tone}` : ''}`}
+      disabled={option.disabled || option.busy}
+      onClick={() => {
+        onClose();
+        option.onSelect();
+      }}
+    >
+      <strong>{option.busy && option.busyLabel ? option.busyLabel : option.label}</strong>
+      <span>{option.description}</span>
+    </button>
   );
 }
 
