@@ -914,6 +914,20 @@ function DesktopWorkflowTimeline({
 }) {
   return (
     <div className="desktop-workflow-timeline" aria-label="Suivi de mission">
+      <div className="desktop-workflow-head">
+        <div>
+          <span>Parcours de mission</span>
+          <strong>Suivi opérationnel</strong>
+        </div>
+        <button
+          type="button"
+          className="desktop-workflow-refresh-button"
+          disabled={refreshAction.disabled || refreshAction.busy}
+          onClick={refreshAction.onSelect}
+        >
+          {refreshAction.busy && refreshAction.busyLabel ? refreshAction.busyLabel : refreshAction.label}
+        </button>
+      </div>
       <div className="desktop-workflow-steps">
         {steps.map((step) => (
           <div key={step.key} className={`desktop-workflow-step is-${step.status}`}>
@@ -934,9 +948,6 @@ function DesktopWorkflowTimeline({
             </div>
           </div>
         ))}
-      </div>
-      <div className="desktop-workflow-refresh">
-        <MobileWorkflowOptionButton option={refreshAction} onClose={() => undefined} />
       </div>
     </div>
   );
