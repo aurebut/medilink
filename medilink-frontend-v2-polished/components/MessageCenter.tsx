@@ -421,108 +421,103 @@ export function MessageCenter() {
   const showConversationList = !isMobile || !activeId;
   const showMessagePane = !isMobile || Boolean(activeId);
   const candidateCanAnswerLatest = candidate && Boolean(lastProposal) && !state.paymentRequired && !state.fundsSecured && !state.rejected;
-  const mobileWorkflowOptions: MobileWorkflowOption[] = [
-    ...(recruiter && !state.paymentRequired && !state.fundsSecured && !state.rejected
-      ? [{
-          label: state.hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition',
-          description: 'Préparer les conditions finales dans la conversation.',
-          busy: busyAction === 'proposal',
-          busyLabel: 'Préparation...',
-          onSelect: () => setProposalOpen(true),
-        } satisfies MobileWorkflowOption]
-      : []),
-    ...(candidateCanAnswerLatest
-      ? [
-          {
-            label: 'Accepter la proposition',
-            description: 'Valider les conditions finales de la mission.',
-            tone: 'success',
-            disabled: Boolean(busyAction),
-            busy: busyAction === 'accept',
-            busyLabel: 'Acceptation...',
-            onSelect: () => runAction('accept', '/proposal/accept'),
-          },
-          {
-            label: 'Refuser la proposition',
-            description: 'Refuser et continuer l’échange dans le chat.',
-            tone: 'danger',
-            disabled: Boolean(busyAction),
-            busy: busyAction === 'reject',
-            busyLabel: 'Refus...',
-            onSelect: () => runAction('reject', '/proposal/reject'),
-          },
-        ] satisfies MobileWorkflowOption[]
-      : []),
-    ...(state.paymentRequired && recruiter
-      ? [{
-          label: 'Confirmer la mission',
-          description: 'Passer à l’étape de mission confirmée.',
-          disabled: Boolean(busyAction),
-          busy: busyAction === 'secure',
-          busyLabel: 'Confirmation...',
-          onSelect: () => runAction('secure', '/payment/secure'),
-        } satisfies MobileWorkflowOption]
-      : []),
-    ...(state.fundsSecured && recruiter
-      ? [{
-          label: 'Marquer terminée',
-          description: 'Indiquer que la prestation est réalisée.',
-          disabled: Boolean(busyAction),
-          busy: busyAction === 'complete',
-          busyLabel: 'Validation...',
-          onSelect: () => runAction('complete', '/mission/complete'),
-        } satisfies MobileWorkflowOption]
-      : []),
-    ...(state.completed && recruiter
-      ? [{
-          label: 'Valider la rétrocession',
-          description: 'Débloquer la génération des justificatifs.',
-          disabled: Boolean(busyAction),
-          busy: busyAction === 'pay',
-          busyLabel: 'Validation...',
-          onSelect: () => runAction('pay', '/payment/release'),
-        } satisfies MobileWorkflowOption]
-      : []),
-    ...(state.released
-      ? [{
-          label: 'Générer les factures',
-          description: 'Créer les PDF de fin de mission.',
-          disabled: Boolean(busyAction),
-          busy: busyAction === 'invoices',
-          busyLabel: 'Génération...',
-          onSelect: () => runAction('invoices', '/invoices/generate'),
-        } satisfies MobileWorkflowOption]
-      : []),
-    ...(state.invoices
-      ? [
-          {
-            label: 'Facture recruteur PDF',
-            description: 'Télécharger la facture établissement.',
-            tone: 'light',
-            disabled: Boolean(busyAction),
-            busy: busyAction === 'download-recruiter',
-            busyLabel: 'Téléchargement...',
-            onSelect: () => void downloadInvoice('recruiter'),
-          },
-          {
-            label: 'Justificatif candidat PDF',
-            description: 'Télécharger le justificatif candidat.',
-            tone: 'light',
-            disabled: Boolean(busyAction),
-            busy: busyAction === 'download-candidate',
-            busyLabel: 'Téléchargement...',
-            onSelect: () => void downloadInvoice('candidate'),
-          },
-        ] satisfies MobileWorkflowOption[]
-      : []),
-    {
-      label: 'Actualiser',
-      description: 'Recharger les messages et le suivi.',
-      tone: 'light',
+  const mobileWorkflowOptions: MobileWorkflowOption[] = [];
+
+  if (state.invoices) {
+    mobileWorkflowOptions.push(
+      {
+        label: 'Facture recruteur PDF',
+        description: 'Télécharger la facture établissement.',
+        tone: 'light',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'download-recruiter',
+        busyLabel: 'Téléchargement...',
+        onSelect: () => void downloadInvoice('recruiter'),
+      },
+      {
+        label: 'Justificatif candidat PDF',
+        description: 'Télécharger le justificatif candidat.',
+        tone: 'light',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'download-candidate',
+        busyLabel: 'Téléchargement...',
+        onSelect: () => void downloadInvoice('candidate'),
+      },
+    );
+  } else if (state.released) {
+    mobileWorkflowOptions.push({
+      label: 'Générer les factures',
+      description: 'Créer les PDF de fin de mission.',
       disabled: Boolean(busyAction),
-      onSelect: () => void refresh(),
-    },
-  ];
+      busy: busyAction === 'invoices',
+      busyLabel: 'Génération...',
+      onSelect: () => runAction('invoices', '/invoices/generate'),
+    });
+  } else if (state.completed && recruiter) {
+    mobileWorkflowOptions.push({
+      label: 'Valider la rétrocession',
+      description: 'Débloquer la génération des justificatifs.',
+      disabled: Boolean(busyAction),
+      busy: busyAction === 'pay',
+      busyLabel: 'Validation...',
+      onSelect: () => runAction('pay', '/payment/release'),
+    });
+  } else if (state.fundsSecured && recruiter) {
+    mobileWorkflowOptions.push({
+      label: 'Marquer terminée',
+      description: 'Indiquer que la prestation est réalisée.',
+      disabled: Boolean(busyAction),
+      busy: busyAction === 'complete',
+      busyLabel: 'Validation...',
+      onSelect: () => runAction('complete', '/mission/complete'),
+    });
+  } else if (state.paymentRequired && recruiter) {
+    mobileWorkflowOptions.push({
+      label: 'Confirmer la mission',
+      description: 'Passer à l’étape de mission confirmée.',
+      disabled: Boolean(busyAction),
+      busy: busyAction === 'secure',
+      busyLabel: 'Confirmation...',
+      onSelect: () => runAction('secure', '/payment/secure'),
+    });
+  } else if (candidateCanAnswerLatest) {
+    mobileWorkflowOptions.push(
+      {
+        label: 'Accepter la proposition',
+        description: 'Valider les conditions finales de la mission.',
+        tone: 'success',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'accept',
+        busyLabel: 'Acceptation...',
+        onSelect: () => runAction('accept', '/proposal/accept'),
+      },
+      {
+        label: 'Refuser la proposition',
+        description: 'Refuser et continuer l’échange dans le chat.',
+        tone: 'danger',
+        disabled: Boolean(busyAction),
+        busy: busyAction === 'reject',
+        busyLabel: 'Refus...',
+        onSelect: () => runAction('reject', '/proposal/reject'),
+      },
+    );
+  } else if (recruiter && !state.fundsSecured) {
+    mobileWorkflowOptions.push({
+      label: state.hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition',
+      description: 'Préparer les conditions finales dans la conversation.',
+      busy: busyAction === 'proposal',
+      busyLabel: 'Préparation...',
+      onSelect: () => setProposalOpen(true),
+    });
+  }
+
+  mobileWorkflowOptions.push({
+    label: 'Actualiser',
+    description: 'Recharger les messages et le suivi.',
+    tone: 'light',
+    disabled: Boolean(busyAction),
+    onSelect: () => void refresh(),
+  });
 
   return (
     <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
