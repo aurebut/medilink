@@ -214,7 +214,7 @@ export default function NewMissionPage() {
   }
 
   return (
-    <>
+    <div className="new-mission-page">
       <PageHeader
         title="Créer une mission"
         description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
@@ -274,7 +274,7 @@ export default function NewMissionPage() {
           </form>
         </Card>
       </div>
-    </>
+    </div>
   );
 }
 
