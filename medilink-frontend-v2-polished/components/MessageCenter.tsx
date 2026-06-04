@@ -461,7 +461,7 @@ export function MessageCenter() {
     disabled: Boolean(busyAction),
     onSelect: () => void refresh(),
   };
-  const mobileTimelineSteps: MobileTimelineStep[] = [
+  const workflowTimelineSteps: MobileTimelineStep[] = [
     {
       key: 'proposal',
       title: 'Proposition',
@@ -671,23 +671,18 @@ export function MessageCenter() {
         {isMobile && mobileOptionsOpen ? (
           <MobileWorkflowMenu
             status={currentStatus}
-            steps={mobileTimelineSteps}
+            steps={workflowTimelineSteps}
             refreshAction={refreshAction}
             onClose={() => setMobileOptionsOpen(false)}
           />
         ) : null}
 
-        <WorkflowStepPanel
-          state={state}
-          recruiter={recruiter}
-          busyAction={busyAction}
-          onSecure={() => runAction('secure', '/payment/secure')}
-          onComplete={() => runAction('complete', '/mission/complete')}
-          onPay={() => runAction('pay', '/payment/release')}
-          onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
-          onDownloadRecruiter={() => void downloadInvoice('recruiter')}
-          onDownloadCandidate={() => void downloadInvoice('candidate')}
-        />
+        {!isMobile ? (
+          <DesktopWorkflowTimeline
+            steps={workflowTimelineSteps}
+            refreshAction={refreshAction}
+          />
+        ) : null}
 
         <div className="messages">
           {recruiter && !state.paymentRequired && !state.fundsSecured ? (
@@ -907,6 +902,43 @@ function MobileWorkflowOptionButton({
       <strong>{option.busy && option.busyLabel ? option.busyLabel : option.label}</strong>
       <span>{option.description}</span>
     </button>
+  );
+}
+
+function DesktopWorkflowTimeline({
+  steps,
+  refreshAction,
+}: {
+  steps: MobileTimelineStep[];
+  refreshAction: MobileWorkflowOption;
+}) {
+  return (
+    <div className="desktop-workflow-timeline" aria-label="Suivi de mission">
+      <div className="desktop-workflow-steps">
+        {steps.map((step) => (
+          <div key={step.key} className={`desktop-workflow-step is-${step.status}`}>
+            <div className="desktop-workflow-marker" aria-hidden="true" />
+            <div className="desktop-workflow-copy">
+              <div className="desktop-workflow-title">
+                <strong>{step.title}</strong>
+                <span>{timelineStatusLabel(step.status)}</span>
+              </div>
+              <p>{step.description}</p>
+              {step.options?.length ? (
+                <div className="desktop-workflow-actions">
+                  {step.options.map((option) => (
+                    <MobileWorkflowOptionButton key={option.label} option={option} onClose={() => undefined} />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="desktop-workflow-refresh">
+        <MobileWorkflowOptionButton option={refreshAction} onClose={() => undefined} />
+      </div>
+    </div>
   );
 }
 
