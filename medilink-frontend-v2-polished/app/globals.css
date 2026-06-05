@@ -5450,12 +5450,37 @@ td {
     width: 100%;
   }
 
+  .billing-table table,
+  .billing-table tbody,
+  .billing-table tr,
+  .billing-table td {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .billing-table table {
+    min-width: 0;
+  }
+
+  .billing-table tr {
+    overflow: hidden;
+  }
+
+  .billing-table td {
+    overflow: hidden;
+  }
+
   .billing-table .billing-row-pending {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0 8px;
+    width: 100%;
+    max-width: 100%;
     margin-bottom: 6px;
     border-radius: 10px;
+    box-sizing: border-box;
   }
 
   .billing-table .billing-row-pending td {
