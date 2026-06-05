@@ -1621,6 +1621,30 @@ button { touch-action: manipulation; }
   display: grid;
   gap: 12px;
 }
+.agenda-saved-note {
+  display: grid;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid rgba(14,138,122,.18);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(14,138,122,.08), rgba(26,82,160,.04)),
+    #fff;
+}
+.agenda-saved-note span {
+  display: block;
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.agenda-saved-note p {
+  margin: 6px 0 0;
+  color: var(--heading);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
 .agenda-detail-event {
   display: grid;
   gap: 9px;

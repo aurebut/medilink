@@ -47,6 +47,7 @@ export default function CandidateAgendaPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
+  const [noteEditing, setNoteEditing] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,7 +61,9 @@ export default function CandidateAgendaPage() {
   }, []);
 
   useEffect(() => {
-    setDraftNote(notes[selectedDay] || '');
+    const savedNote = notes[selectedDay] || '';
+    setDraftNote(savedNote);
+    setNoteEditing(!savedNote);
   }, [notes, selectedDay]);
 
   useEffect(() => {
@@ -114,6 +117,7 @@ export default function CandidateAgendaPage() {
     const next = { ...notes, [selectedDay]: draftNote.trim() };
     if (!next[selectedDay]) delete next[selectedDay];
     setNotes(next);
+    setNoteEditing(!next[selectedDay]);
     window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
   }
 
@@ -122,6 +126,7 @@ export default function CandidateAgendaPage() {
     delete next[selectedDay];
     setDraftNote('');
     setNotes(next);
+    setNoteEditing(true);
     window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
   }
 
@@ -275,18 +280,33 @@ export default function CandidateAgendaPage() {
               )}
 
               <div className="agenda-note-editor">
-                <label className="field">
-                  <span className="label">Note du jour</span>
-                  <Textarea
-                    value={draftNote}
-                    onChange={(event) => setDraftNote(event.target.value)}
-                    placeholder="Ex : appeler le secrétariat, préparer documents, indisponible l’après-midi..."
-                  />
-                </label>
-                <div className="actions">
-                  <Button type="button" onClick={saveNote}>Enregistrer</Button>
-                  {notes[selectedDay] ? <Button type="button" variant="light" onClick={clearNote}>Effacer</Button> : null}
-                </div>
+                {notes[selectedDay] && !noteEditing ? (
+                  <div className="agenda-saved-note">
+                    <div>
+                      <span>Note du jour</span>
+                      <p>{notes[selectedDay]}</p>
+                    </div>
+                    <div className="actions">
+                      <Button type="button" variant="light" onClick={() => setNoteEditing(true)}>Modifier</Button>
+                      <Button type="button" variant="light" onClick={clearNote}>Effacer</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <label className="field">
+                      <span className="label">Note du jour</span>
+                      <Textarea
+                        value={draftNote}
+                        onChange={(event) => setDraftNote(event.target.value)}
+                        placeholder="Ex : appeler le secrétariat, préparer documents, indisponible l’après-midi..."
+                      />
+                    </label>
+                    <div className="actions">
+                      <Button type="button" onClick={saveNote}>Enregistrer</Button>
+                      {notes[selectedDay] ? <Button type="button" variant="light" onClick={() => { setDraftNote(notes[selectedDay]); setNoteEditing(false); }}>Annuler</Button> : null}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : null}
