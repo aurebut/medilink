@@ -46,6 +46,7 @@ export default function CandidateAgendaPage() {
   const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -136,6 +137,14 @@ export default function CandidateAgendaPage() {
     setSelectedDay(dateKey(today));
   }
 
+  function onCalendarTouchEnd(clientX: number) {
+    if (touchStartX === null) return;
+    const delta = clientX - touchStartX;
+    setTouchStartX(null);
+    if (Math.abs(delta) < 48) return;
+    goToMonth(delta < 0 ? 1 : -1);
+  }
+
   if (loading) return <LoadingCard />;
 
   return (
@@ -188,13 +197,21 @@ export default function CandidateAgendaPage() {
             </div>
           </div>
 
-          <div key={`${dateKey(calendarMonth)}-${calendarAnimation}`} className={`agenda-calendar agenda-calendar-${calendarAnimation}`}>
+          <div
+            key={`${dateKey(calendarMonth)}-${calendarAnimation}`}
+            className={`agenda-calendar agenda-calendar-${calendarAnimation}`}
+            onTouchStart={(event) => setTouchStartX(event.touches[0]?.clientX ?? null)}
+            onTouchEnd={(event) => onCalendarTouchEnd(event.changedTouches[0]?.clientX ?? touchStartX ?? 0)}
+          >
             {weekDayLabels.map((day) => (
               <div key={day} className="agenda-weekday">{day}</div>
             ))}
             {calendarDays.map((day) => {
               const dayEvents = eventsByDay.get(day.key) || [];
               const hasNote = Boolean(notes[day.key]);
+              if (!day.inMonth) {
+                return <div key={day.key} className="agenda-day agenda-day-outside" aria-hidden="true" />;
+              }
               return (
                 <button
                   key={day.key}
