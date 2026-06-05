@@ -2,20 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementTone, conversationForApplication, latestAgreement, missionDateValue, sortByMissionDate } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementTone, conversationForApplication, dateKey, latestAgreement, missionDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Profile } from '@/lib/types';
-import { Badge, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
-
-const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-
-function toDateKey(value?: string | null) {
-  if (!value) return 'undated';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return 'undated';
-  return date.toISOString().slice(0, 10);
-}
+import { Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -42,11 +33,32 @@ function monthLabel(date: Date) {
   return new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(date);
 }
 
+function addMonths(date: Date, count: number) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1);
+}
+
 export default function CandidateAgendaPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [draftNote, setDraftNote] = useState('');
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem('medilink_candidate_agenda_notes');
+      if (stored) setNotes(JSON.parse(stored));
+    } catch {
+      setNotes({});
+    }
+  }, []);
+
+  useEffect(() => {
+    setDraftNote(notes[selectedDay] || '');
+  }, [notes, selectedDay]);
 
   useEffect(() => {
     Promise.all([
@@ -83,16 +95,32 @@ export default function CandidateAgendaPage() {
   const upcomingEvents = events.filter((event) => event.upcoming).slice(0, 8);
   const acceptedEvents = events.filter((event) => event.application.status === 'ACCEPTED');
   const proposalEvents = events.filter((event) => latestAgreement(event.conversation)?.status === 'PROPOSED');
-  const calendarAnchor = upcomingEvents.find((event) => event.date)?.date ? new Date(upcomingEvents.find((event) => event.date)!.date!) : new Date();
-  const calendarDays = useMemo(() => buildCalendarDays(calendarAnchor), [calendarAnchor]);
+  const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
     events.forEach((event) => {
-      const key = toDateKey(event.date);
+      const key = dateKey(event.date);
       map.set(key, [...(map.get(key) || []), event]);
     });
     return map;
   }, [events]);
+  const selectedEvents = eventsByDay.get(selectedDay) || [];
+  const selectedDate = selectedDay === 'undated' ? null : new Date(`${selectedDay}T12:00:00`);
+
+  function saveNote() {
+    const next = { ...notes, [selectedDay]: draftNote.trim() };
+    if (!next[selectedDay]) delete next[selectedDay];
+    setNotes(next);
+    window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
+  }
+
+  function clearNote() {
+    const next = { ...notes };
+    delete next[selectedDay];
+    setDraftNote('');
+    setNotes(next);
+    window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
+  }
 
   if (loading) return <LoadingCard />;
 
@@ -133,22 +161,43 @@ export default function CandidateAgendaPage() {
           <div className="agenda-calendar-head">
             <div>
               <span>Calendrier</span>
-              <h2>{monthLabel(calendarAnchor)}</h2>
+              <h2>{monthLabel(calendarMonth)}</h2>
               <p className="small">Missions, propositions et candidatures datées.</p>
             </div>
-            <LinkButton href="/app/missions" variant="light">Voir les missions</LinkButton>
+            <div className="agenda-month-actions">
+              <Button type="button" variant="light" onClick={() => setCalendarMonth((month) => addMonths(month, -1))}>Mois précédent</Button>
+              <Button
+                type="button"
+                variant="light"
+                onClick={() => {
+                  const today = new Date();
+                  setCalendarMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+                  setSelectedDay(dateKey(today));
+                }}
+              >
+                Aujourd’hui
+              </Button>
+              <Button type="button" variant="light" onClick={() => setCalendarMonth((month) => addMonths(month, 1))}>Mois suivant</Button>
+            </div>
           </div>
 
           <div className="agenda-calendar">
-            {weekDays.map((day) => (
+            {weekDayLabels.map((day) => (
               <div key={day} className="agenda-weekday">{day}</div>
             ))}
             {calendarDays.map((day) => {
               const dayEvents = eventsByDay.get(day.key) || [];
+              const hasNote = Boolean(notes[day.key]);
               return (
-                <div key={day.key} className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''}`}>
+                <button
+                  key={day.key}
+                  type="button"
+                  className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
+                  onClick={() => setSelectedDay(day.key)}
+                >
                   <div className="agenda-day-number">{day.date.getDate()}</div>
                   <div className="agenda-day-events">
+                    {hasNote ? <span className="agenda-note-dot">Note</span> : null}
                     {dayEvents.slice(0, 3).map(({ application, agreement }) => (
                       <div key={application.id} className={`agenda-event is-${agreementTone(agreement?.status)}`}>
                         <strong>{application.mission?.title || 'Mission'}</strong>
@@ -157,13 +206,61 @@ export default function CandidateAgendaPage() {
                     ))}
                     {dayEvents.length > 3 ? <span className="agenda-more">+{dayEvents.length - 3}</span> : null}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         </Card>
 
         <div className="agenda-side">
+          <Card className="agenda-detail-card">
+            <div className="toolbar">
+              <div>
+                <h2>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</h2>
+                <p className="small">Détails, événements et note personnelle.</p>
+              </div>
+              <Badge tone={selectedEvents.length ? 'warning' : 'neutral'}>{selectedEvents.length} événement(s)</Badge>
+            </div>
+
+            {selectedEvents.length > 0 ? (
+              <div className="agenda-detail-events">
+                {selectedEvents.map(({ application, agreement, conversation }) => (
+                  <div key={application.id} className="agenda-detail-event">
+                    <div>
+                      <strong>{application.mission?.title || 'Mission'}</strong>
+                      <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
+                    </div>
+                    <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
+                    <div className="actions">
+                      {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
+                      {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucun événement</strong>
+                <p>Vous pouvez quand même ajouter une note pour cette journée.</p>
+              </div>
+            )}
+
+            <div className="agenda-note-editor">
+              <label className="field">
+                <span className="label">Note du jour</span>
+                <Textarea
+                  value={draftNote}
+                  onChange={(event) => setDraftNote(event.target.value)}
+                  placeholder="Ex : appeler le secrétariat, préparer documents, indisponible l’après-midi..."
+                />
+              </label>
+              <div className="actions">
+                <Button type="button" onClick={saveNote}>Enregistrer la note</Button>
+                {notes[selectedDay] ? <Button type="button" variant="light" onClick={clearNote}>Effacer</Button> : null}
+              </div>
+            </div>
+          </Card>
+
           <Card className="dashboard-panel">
             <div className="toolbar">
               <div>

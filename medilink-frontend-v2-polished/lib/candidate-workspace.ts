@@ -1,5 +1,7 @@
 import type { Application, Conversation, MissionAgreement, MissionAgreementStatus } from './types';
 
+export const weekDayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
 export function latestAgreement(conversation?: Conversation | null) {
   return conversation?.agreements?.[0] || null;
 }
@@ -67,4 +69,49 @@ export function sortByMissionDate<T extends { date?: string | null }>(items: T[]
     const bTime = b.date ? new Date(b.date).getTime() : Number.MAX_SAFE_INTEGER;
     return aTime - bTime;
   });
+}
+
+export function dateKey(value?: string | Date | null) {
+  if (!value) return 'undated';
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return 'undated';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+export function startOfWeek(value: Date) {
+  const date = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  const mondayOffset = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() - mondayOffset);
+  return date;
+}
+
+export function addDays(value: Date, count: number) {
+  const date = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  date.setDate(date.getDate() + count);
+  return date;
+}
+
+export function buildWeek(start: Date) {
+  return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+}
+
+export function buildWeekCarousel(anchor = new Date(), weekCount = 8) {
+  const firstWeek = startOfWeek(anchor);
+  return Array.from({ length: weekCount }, (_, index) => {
+    const start = addDays(firstWeek, index * 7);
+    return {
+      key: dateKey(start),
+      start,
+      days: buildWeek(start),
+    };
+  });
+}
+
+export function weekRangeLabel(start: Date) {
+  const end = addDays(start, 6);
+  const dayFormatter = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' });
+  return `${dayFormatter.format(start)} - ${dayFormatter.format(end)}`;
 }

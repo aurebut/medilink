@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementNextStep, agreementTone, candidateAmountLabel, conversationForApplication, latestAgreement, missionDateValue } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
@@ -36,6 +36,10 @@ function formatShortDate(value?: string | null) {
   } catch {
     return value;
   }
+}
+
+function dayNumber(value: Date) {
+  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric' }).format(value);
 }
 
 export default function CandidateDashboardPage() {
@@ -91,6 +95,12 @@ export default function CandidateDashboardPage() {
     const nextMission = [...acceptedApplications]
       .filter((a) => a.mission?.startDate)
       .sort((a, b) => new Date(a.mission!.startDate).getTime() - new Date(b.mission!.startDate).getTime())[0];
+    const missionRowsByDay = new Map<string, typeof missionRows>();
+    missionRows.forEach((row) => {
+      const key = dateKey(row.date);
+      missionRowsByDay.set(key, [...(missionRowsByDay.get(key) || []), row]);
+    });
+    const weekCarousel = buildWeekCarousel(new Date(), 8);
 
     return {
       sortedApplications,
@@ -106,6 +116,8 @@ export default function CandidateDashboardPage() {
       confirmedMissions,
       nextAgendaItem,
       nextMission,
+      missionRowsByDay,
+      weekCarousel,
     };
   }, [applications, conversations, documents, notifications]);
 
@@ -137,6 +149,49 @@ export default function CandidateDashboardPage() {
       />
 
       <div className="candidate-dashboard">
+        <Card className="dashboard-week-card">
+          <div className="dashboard-section-head">
+            <div>
+              <span>Agenda</span>
+              <h2>Semaine à venir</h2>
+            </div>
+            <LinkButton variant="light" href="/app/agenda">Agenda complet</LinkButton>
+          </div>
+          <div className="week-carousel" aria-label="Semaines à venir">
+            {dashboard.weekCarousel.map((week, weekIndex) => (
+              <div key={week.key} className="week-panel">
+                <div className="week-panel-head">
+                  <strong>{weekIndex === 0 ? 'Cette semaine' : weekRangeLabel(week.start)}</strong>
+                  <span>{weekIndex === 0 ? weekRangeLabel(week.start) : `${weekIndex + 1}e semaine`}</span>
+                </div>
+                <div className="week-grid">
+                  {week.days.map((day, index) => {
+                    const rows = dashboard.missionRowsByDay.get(dateKey(day)) || [];
+                    const today = dateKey(day) === dateKey(new Date());
+                    return (
+                      <div key={dateKey(day)} className={`week-day ${today ? 'today' : ''}`}>
+                        <div className="week-day-head">
+                          <span>{weekDayLabels[index]}</span>
+                          <strong>{dayNumber(day)}</strong>
+                        </div>
+                        <div className="week-day-body">
+                          {rows.slice(0, 2).map(({ application, agreement }) => (
+                            <div key={application.id} className={`week-event is-${agreementTone(agreement?.status)}`}>
+                              <strong>{application.mission?.title || 'Mission'}</strong>
+                              <span>{application.mission?.startTime || agreementLabel(agreement?.status)}</span>
+                            </div>
+                          ))}
+                          {rows.length > 2 ? <span className="week-more">+{rows.length - 2}</span> : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
         <section className="dashboard-command-grid">
           <Card className="dashboard-priority-card">
             <span className="dashboard-eyebrow">Priorité du jour</span>

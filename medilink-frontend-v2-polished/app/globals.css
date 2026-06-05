@@ -1097,6 +1097,17 @@ button { touch-action: manipulation; }
   justify-content: space-between;
   gap: 14px;
 }
+.agenda-month-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.agenda-month-actions .btn {
+  min-height: 36px;
+  padding: 8px 11px;
+  font-size: 13px;
+}
 .dashboard-section-head h2,
 .agenda-calendar-head h2 {
   margin: 4px 0 0;
@@ -1166,6 +1177,137 @@ button { touch-action: manipulation; }
 .dashboard-notification-list .dashboard-notification {
   min-height: 0;
 }
+.dashboard-week-card {
+  display: grid;
+  gap: 16px;
+  overflow: hidden;
+}
+.week-carousel {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 2px 12px;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26,82,160,.30) transparent;
+}
+.week-panel {
+  flex: 0 0 100%;
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+  scroll-snap-align: start;
+}
+.week-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.week-panel-head strong {
+  color: var(--heading);
+  font-size: 16px;
+}
+.week-panel-head span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--line);
+}
+.week-day {
+  min-height: 150px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  background: #fff;
+}
+.week-day.today {
+  box-shadow: inset 0 0 0 2px rgba(14,138,122,.42);
+}
+.week-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.week-day-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.week-day-head strong {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--heading);
+  font-size: 14px;
+}
+.week-day.today .week-day-head strong {
+  background: rgba(14,138,122,.12);
+  color: var(--teal);
+}
+.week-day-body {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+.week-event {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--blue);
+  border-radius: 8px;
+  background: rgba(26,82,160,.06);
+}
+.week-event.is-success {
+  border-left-color: var(--teal);
+  background: rgba(14,138,122,.08);
+}
+.week-event.is-warning {
+  border-left-color: var(--warning);
+  background: rgba(183,110,0,.08);
+}
+.week-event.is-danger {
+  border-left-color: var(--danger);
+  background: #FEF3F2;
+}
+.week-event strong,
+.week-event span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.week-event strong {
+  color: var(--heading);
+  font-size: 12px;
+  line-height: 1.2;
+}
+.week-event span,
+.week-more {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.2;
+}
+.week-more {
+  font-weight: 800;
+}
 .agenda-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr);
@@ -1196,6 +1338,11 @@ button { touch-action: manipulation; }
   text-transform: uppercase;
 }
 .agenda-day {
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   min-height: 116px;
   display: grid;
   align-content: start;
@@ -1209,6 +1356,15 @@ button { touch-action: manipulation; }
 }
 .agenda-day.today {
   box-shadow: inset 0 0 0 2px rgba(14,138,122,.42);
+}
+.agenda-day.selected {
+  position: relative;
+  z-index: 1;
+  box-shadow: inset 0 0 0 2px rgba(26,82,160,.50);
+}
+.agenda-day:focus-visible {
+  outline: 3px solid rgba(26,82,160,.22);
+  outline-offset: -3px;
 }
 .agenda-day-number {
   width: 28px;
@@ -1275,9 +1431,46 @@ button { touch-action: manipulation; }
   padding-left: 4px;
   font-weight: 800;
 }
+.agenda-note-dot {
+  width: fit-content;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: rgba(14,138,122,.10);
+  color: var(--teal);
+  font-size: 10px;
+  font-weight: 900;
+}
 .agenda-side {
   display: grid;
   gap: 16px;
+}
+.agenda-detail-card,
+.agenda-detail-events,
+.agenda-note-editor {
+  display: grid;
+  gap: 12px;
+}
+.agenda-detail-event {
+  display: grid;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+.agenda-detail-event strong,
+.agenda-detail-event span {
+  display: block;
+}
+.agenda-detail-event strong {
+  color: var(--heading);
+  line-height: 1.3;
+}
+.agenda-detail-event span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
 }
 .workspace-list {
   display: grid;
@@ -1870,6 +2063,9 @@ tbody tr:hover { background: #FAFBFD; }
   .dashboard-focus-card,
   .dashboard-missions-panel {
     min-height: 0;
+  }
+  .week-panel {
+    flex-basis: min(980px, 100%);
   }
   .workspace-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3724,8 +3920,30 @@ td {
   .dashboard-priority-card h2 {
     font-size: 32px;
   }
+  .dashboard-week-card {
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+  .week-carousel {
+    margin: 0 -2px;
+  }
+  .week-panel {
+    flex-basis: 760px;
+  }
+  .week-day {
+    min-height: 126px;
+    padding: 9px;
+  }
+  .week-day-head {
+    display: grid;
+    gap: 5px;
+  }
   .agenda-calendar-card {
     overflow-x: auto;
+  }
+  .agenda-calendar-head,
+  .agenda-month-actions {
+    justify-content: flex-start;
   }
   .agenda-calendar {
     min-width: 720px;
