@@ -5460,6 +5460,8 @@ td {
 
   .billing-table .billing-row-pending td {
     padding: 7px 10px;
+    font-size: 11px;
+    line-height: 1.2;
   }
 
   .billing-table .billing-row-pending td:nth-child(1),
@@ -5476,6 +5478,7 @@ td {
 
   .billing-table .billing-row-pending td:nth-child(4) {
     color: var(--muted);
+    font-size: 10px;
     font-weight: 650;
   }
 
@@ -5503,6 +5506,15 @@ td {
   .billing-table .billing-row-pending .badge,
   .billing-table .billing-row-pending .btn {
     min-height: 28px;
+    font-size: 10px;
+  }
+
+  .billing-table .billing-row-pending .badge {
+    padding: 2px 6px;
+  }
+
+  .billing-table .billing-row-pending .btn {
+    padding: 5px 8px;
   }
 
   .billing-table .billing-row-pending .actions {
@@ -5513,5 +5525,15 @@ td {
   .billing-table .billing-row-pending strong,
   .billing-table .billing-row-pending .small {
     max-width: 100%;
+  }
+
+  .billing-table .billing-row-pending strong {
+    font-size: 11px;
+    line-height: 1.15;
+  }
+
+  .billing-table .billing-row-pending .small {
+    font-size: 10px;
+    line-height: 1.2;
   }
 }
