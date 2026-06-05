@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentType } from '@/lib/types';
-import { documentTypeOptions, documentTypeLabel, statusLabel } from '@/lib/labels';
+import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
-import { Alert, Badge, Button, Card, Field, LoadingInline, ProgressBar, Select } from './ui';
+import { Alert, Badge, Button, Card, LoadingInline, ProgressBar } from './ui';
 
 type UploadResponse = {
   documentId: string;
@@ -246,39 +246,22 @@ export function DocumentSection() {
         </>
       )}
 
-      <div className="divider" />
-
-      <div className="document-upload-panel">
-        <div>
-          <h3>Envoyer un document</h3>
-          <p className="small">PDF ou image, 25 Mo maximum. Une nouvelle version repartira en verification.</p>
+      {message ? <Alert type="success">{message}</Alert> : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
+      <input
+        key={fileInputKey}
+        ref={fileInputRef}
+        className="document-hidden-input"
+        type="file"
+        accept="application/pdf,image/png,image/jpeg,image/webp"
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
+      />
+      {file ? (
+        <div className="document-selected-file">
+          <span>Selection : <strong>{file.name}</strong></span>
+          <Button onClick={upload} disabled={submitting}>{submitting ? 'Upload...' : 'Envoyer'}</Button>
         </div>
-        <div className="form">
-          {message ? <Alert type="success">{message}</Alert> : null}
-          {error ? <Alert type="error">{error}</Alert> : null}
-          <div className="form-row">
-            <Field label="Type de document">
-              <Select value={documentType} onChange={(e) => setDocumentType(e.target.value as DocumentType)}>
-                {documentTypeOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-              </Select>
-            </Field>
-            <Field label="Fichier PDF ou image">
-              <input
-                key={fileInputKey}
-                ref={fileInputRef}
-                className="input"
-                type="file"
-                accept="application/pdf,image/png,image/jpeg,image/webp"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-              />
-            </Field>
-          </div>
-          {file ? <p className="small">Pret a envoyer : <strong>{file.name}</strong></p> : null}
-          <div className="actions">
-            <Button onClick={upload} disabled={!file || submitting}>{submitting ? 'Upload...' : 'Envoyer le document'}</Button>
-          </div>
-        </div>
-      </div>
+      ) : null}
 
       <div className="divider" />
 
