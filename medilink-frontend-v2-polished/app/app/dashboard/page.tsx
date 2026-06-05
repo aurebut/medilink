@@ -7,7 +7,7 @@ import { formatDate, formatDateTime } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
+import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -27,6 +27,15 @@ function formatMissionDate(application: Application) {
   const startDate = application.mission?.startDate;
   if (!startDate) return 'Date à confirmer';
   return formatDate(startDate);
+}
+
+function formatShortDate(value?: string | null) {
+  if (!value) return 'Aucune date';
+  try {
+    return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' }).format(new Date(value));
+  } catch {
+    return value;
+  }
 }
 
 export default function CandidateDashboardPage() {
@@ -127,72 +136,86 @@ export default function CandidateDashboardPage() {
         description={`Votre espace ${gendered(profile, 'connecté', 'connectée')} pour prioriser les missions, garder un dossier solide et suivre les réponses.`}
       />
 
-      <section className="dashboard-hero">
-        <div className="dashboard-hero-copy">
-          <span className="dashboard-eyebrow">Priorité du jour</span>
-          <h2>{nextStep.label}</h2>
-          <p>{nextStep.helper}</p>
-          <div className="actions">
-            <LinkButton href={nextStep.href}>Continuer</LinkButton>
-            <LinkButton variant="light" href="/app/agenda">Ouvrir l’agenda</LinkButton>
-            <LinkButton variant="light" href="/app/messages">Ouvrir la messagerie</LinkButton>
-          </div>
-        </div>
-        <div className="dashboard-readiness">
-          <div>
-            <span>Profil</span>
-            <strong>{completionScore}%</strong>
-            <ProgressBar value={completionScore} />
-          </div>
-          <div>
-            <span>Documents valides</span>
-            <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
-          </div>
-          <div>
-            <span>Prochaine date</span>
-            <strong>{dashboard.nextAgendaItem?.date ? formatDate(dashboard.nextAgendaItem.date) : 'Aucune'}</strong>
-          </div>
-        </div>
-      </section>
+      <div className="candidate-dashboard">
+        <section className="dashboard-command-grid">
+          <Card className="dashboard-priority-card">
+            <span className="dashboard-eyebrow">Priorité du jour</span>
+            <h2>{nextStep.label}</h2>
+            <p>{nextStep.helper}</p>
+            <div className="dashboard-kpi-row">
+              <div>
+                <span>Profil</span>
+                <strong>{completionScore}%</strong>
+                <ProgressBar value={completionScore} />
+              </div>
+              <div>
+                <span>Documents</span>
+                <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
+              </div>
+              <div>
+                <span>Missions actives</span>
+                <strong>{dashboard.activeApplications.length}</strong>
+              </div>
+            </div>
+            <div className="actions">
+              <LinkButton href={nextStep.href}>Continuer</LinkButton>
+              <LinkButton variant="light" href="/app/messages">Messagerie</LinkButton>
+            </div>
+          </Card>
 
-      <div className="grid-3 dashboard-stat-grid">
-        <StatCard
-          label={`Dossier ${gendered(profile, 'candidat', 'candidate')}`}
-          value={profileReady ? gendered(profile, 'Prêt', 'Prête') : `${completionScore}%`}
-          helper={<ProgressBar value={completionScore} />}
-          action={<LinkButton variant="secondary" href="/app/profile">Améliorer</LinkButton>}
-        />
-        <StatCard
-          label="Documents"
-          value={`${dashboard.approvedDocuments.length}/${documents.length || 0}`}
-          helper={`${dashboard.pendingDocuments.length} en attente - ${dashboard.blockedDocuments.length} à corriger`}
-          action={<LinkButton variant="secondary" href="/app/profile">Gérer</LinkButton>}
-        />
-        <StatCard
-          label="Candidatures actives"
-          value={dashboard.activeApplications.length}
-          helper={`${dashboard.acceptedApplications.length} acceptée(s) - ${applications.length} au total`}
-          action={<LinkButton variant="secondary" href="/app/missions">Voir</LinkButton>}
-        />
-        <StatCard
-          label="Agenda"
-          value={dashboard.confirmedMissions.length}
-          helper={`${dashboard.proposedAgreements.length} proposition(s) à traiter`}
-          action={<LinkButton variant="secondary" href="/app/agenda">Planifier</LinkButton>}
-        />
-        <StatCard
-          label="Facturation"
-          value={dashboard.billingReady.length}
-          helper="Justificatifs candidat disponibles"
-          action={<LinkButton variant="secondary" href="/app/billing">Ouvrir</LinkButton>}
-        />
-      </div>
+          <Card className="dashboard-focus-card">
+            <div className="dashboard-section-head">
+              <div>
+                <span>Agenda</span>
+                <h2>Prochaine échéance</h2>
+              </div>
+              <LinkButton variant="light" href="/app/agenda">Ouvrir</LinkButton>
+            </div>
+            {dashboard.nextAgendaItem ? (
+              <div className="dashboard-next-event">
+                <div className="dashboard-date-tile">
+                  <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
+                  <span>{dashboard.nextAgendaItem.application.mission?.startTime || 'Horaire à confirmer'}</span>
+                </div>
+                <div>
+                  <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
+                  <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucune date planifiée</strong>
+                <p>Vos missions datées apparaîtront ici.</p>
+              </div>
+            )}
+          </Card>
 
-      <div className="dashboard-main">
-        <Card className="dashboard-panel">
+          <Card className="dashboard-focus-card">
+            <div className="dashboard-section-head">
+              <div>
+                <span>Facturation</span>
+                <h2>Compta rapide</h2>
+              </div>
+              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
+            </div>
+            <div className="dashboard-finance-stack">
+              <div>
+                <span>Justificatifs prêts</span>
+                <strong>{dashboard.billingReady.length}</strong>
+              </div>
+              <div>
+                <span>Propositions à traiter</span>
+                <strong>{dashboard.proposedAgreements.length}</strong>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        <section className="dashboard-operations-grid">
+          <Card className="dashboard-panel dashboard-missions-panel">
           <div className="toolbar">
             <div>
-              <h2>Candidatures récentes</h2>
+              <h2>Suivi des missions</h2>
               <p className="small">Les missions et accords qui méritent votre attention en premier.</p>
             </div>
             <LinkButton variant="light" href="/app/missions">Tout voir</LinkButton>
@@ -221,62 +244,30 @@ export default function CandidateDashboardPage() {
               <LinkButton variant="secondary" href="/app/search">Voir les missions</LinkButton>
             </div>
           )}
-        </Card>
-
-        <div className="dashboard-side">
-          <Card className="dashboard-panel">
-            <div className="toolbar">
-              <div>
-                <h2>Prochaine mission</h2>
-                <p className="small">Votre prochain engagement confirmé.</p>
-              </div>
-            </div>
-            {dashboard.nextMission ? (
-              <div className="dashboard-feature">
-                <span>{formatMissionDate(dashboard.nextMission)}</span>
-                <strong>{dashboard.nextMission.mission?.title || 'Mission acceptée'}</strong>
-                <p>{dashboard.nextMission.mission?.city || 'Lieu à confirmer'}</p>
-              </div>
-            ) : (
-              <div className="dashboard-empty compact">
-                <strong>Aucune mission acceptée</strong>
-                <p>Les missions validées apparaîtront ici.</p>
-              </div>
-            )}
           </Card>
 
-          <Card className="dashboard-panel">
+          <div className="dashboard-admin-column">
+            <Card className="dashboard-panel">
             <div className="toolbar">
               <div>
-                <h2>Compta</h2>
-                <p className="small">Justificatifs et rétrocessions disponibles.</p>
-              </div>
-              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
-            </div>
-            {dashboard.billingReady.length > 0 ? (
-              <div className="dashboard-mini-list">
-                {dashboard.billingReady.slice(0, 3).map(({ application, agreement }) => (
-                  <div key={application.id}>
-                    <span>{application.mission?.title || 'Mission'}</span>
-                    <Badge tone="success">{candidateAmountLabel(agreement)}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="dashboard-empty compact">
-                <strong>Aucun justificatif disponible</strong>
-                <p>Ils apparaîtront après validation de fin de mission.</p>
-              </div>
-            )}
-          </Card>
-
-          <Card className="dashboard-panel">
-            <div className="toolbar">
-              <div>
-                <h2>Documents sensibles</h2>
-                <p className="small">À surveiller pour éviter les blocages.</p>
+                <h2>Dossier</h2>
+                <p className="small">Profil, documents et conformité.</p>
               </div>
               <LinkButton variant="light" href="/app/profile">Gérer</LinkButton>
+            </div>
+            <div className="dashboard-dossier-summary">
+              <div>
+                <span>Profil</span>
+                <strong>{profileReady ? gendered(profile, 'Prêt', 'Prête') : `${completionScore}%`}</strong>
+              </div>
+              <div>
+                <span>Documents valides</span>
+                <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
+              </div>
+              <div>
+                <span>A corriger</span>
+                <strong>{dashboard.blockedDocuments.length}</strong>
+              </div>
             </div>
             {documents.length > 0 ? (
               <div className="dashboard-mini-list">
@@ -294,20 +285,18 @@ export default function CandidateDashboardPage() {
               </div>
             )}
           </Card>
-        </div>
-      </div>
 
-      <Card className="dashboard-panel dashboard-notifications">
+            <Card className="dashboard-panel dashboard-notifications">
         <div className="toolbar">
           <div>
-            <h2>Dernières notifications</h2>
+            <h2>Notifications</h2>
             <p className="small">Les alertes importantes de votre compte.</p>
           </div>
           <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
         </div>
         {notifications.length > 0 ? (
-          <div className="dashboard-notification-grid">
-            {notifications.slice(0, 3).map((notification) => (
+          <div className="dashboard-notification-list">
+            {notifications.slice(0, 4).map((notification) => (
               <div key={notification.id} className="dashboard-notification">
                 <div className="actions">
                   <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
@@ -325,6 +314,9 @@ export default function CandidateDashboardPage() {
           </div>
         )}
       </Card>
+          </div>
+        </section>
+      </div>
     </>
   );
 }
