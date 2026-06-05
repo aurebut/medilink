@@ -42,6 +42,11 @@ function dayNumber(value: Date) {
   return new Intl.DateTimeFormat('fr-FR', { day: 'numeric' }).format(value);
 }
 
+function messagePreview(body?: string | null) {
+  if (!body) return 'Aucun message';
+  return body.startsWith('__MEDILINK_WORKFLOW__') ? 'Mise à jour du suivi' : body;
+}
+
 export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -95,6 +100,16 @@ export default function CandidateDashboardPage() {
     const nextMission = [...acceptedApplications]
       .filter((a) => a.mission?.startDate)
       .sort((a, b) => new Date(a.mission!.startDate).getTime() - new Date(b.mission!.startDate).getTime())[0];
+    const userId = profile?.userId;
+    const receivedMessages = conversations.flatMap((conversation) => {
+      return (conversation.messages || [])
+        .filter((message) => !userId || message.senderUserId !== userId)
+        .map((message) => ({ conversation, message }));
+    });
+    const latestReceivedMessages = [...receivedMessages]
+      .sort((a, b) => new Date(b.message.createdAt).getTime() - new Date(a.message.createdAt).getTime())
+      .slice(0, 3);
+    const unreadReceivedMessages = receivedMessages.filter(({ message }) => !message.readAt).length;
     const missionRowsByDay = new Map<string, typeof missionRows>();
     missionRows.forEach((row) => {
       const key = dateKey(row.date);
@@ -116,10 +131,12 @@ export default function CandidateDashboardPage() {
       confirmedMissions,
       nextAgendaItem,
       nextMission,
+      latestReceivedMessages,
+      unreadReceivedMessages,
       missionRowsByDay,
       weekCarousel,
     };
-  }, [applications, conversations, documents, notifications]);
+  }, [applications, conversations, documents, notifications, profile?.userId]);
 
   if (loading) return <LoadingCard />;
 
@@ -156,6 +173,26 @@ export default function CandidateDashboardPage() {
               <h2>Semaine à venir</h2>
             </div>
             <LinkButton variant="light" href="/app/agenda">Agenda complet</LinkButton>
+          </div>
+          <div className="dashboard-week-summary">
+            {dashboard.nextAgendaItem ? (
+              <div className="dashboard-next-event compact">
+                <div className="dashboard-date-tile">
+                  <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
+                  <span>{dashboard.nextAgendaItem.application.mission?.startTime || 'Horaire à confirmer'}</span>
+                </div>
+                <div>
+                  <span>Prochaine échéance</span>
+                  <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
+                  <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="dashboard-empty compact dashboard-week-empty">
+                <strong>Aucune date planifiée</strong>
+                <p>Vos missions datées apparaîtront dans le calendrier.</p>
+              </div>
+            )}
           </div>
           <div className="week-carousel" aria-label="Semaines à venir">
             {dashboard.weekCarousel.map((week, weekIndex) => (
@@ -214,33 +251,43 @@ export default function CandidateDashboardPage() {
             </div>
             <div className="actions">
               <LinkButton href={nextStep.href}>Continuer</LinkButton>
-              <LinkButton variant="light" href="/app/messages">Messagerie</LinkButton>
             </div>
           </Card>
 
           <Card className="dashboard-focus-card">
             <div className="dashboard-section-head">
               <div>
-                <span>Agenda</span>
-                <h2>Prochaine échéance</h2>
+                <span>Messages</span>
+                <h2>Messages reçus</h2>
               </div>
-              <LinkButton variant="light" href="/app/agenda">Ouvrir</LinkButton>
+              <LinkButton variant="light" href="/app/messages">Ouvrir</LinkButton>
             </div>
-            {dashboard.nextAgendaItem ? (
-              <div className="dashboard-next-event">
-                <div className="dashboard-date-tile">
-                  <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
-                  <span>{dashboard.nextAgendaItem.application.mission?.startTime || 'Horaire à confirmer'}</span>
-                </div>
-                <div>
-                  <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
-                  <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
-                </div>
+            <div className="dashboard-message-summary">
+              <div>
+                <span>Non lus</span>
+                <strong>{dashboard.unreadReceivedMessages}</strong>
+              </div>
+              <div>
+                <span>Conversations</span>
+                <strong>{conversations.length}</strong>
+              </div>
+            </div>
+            {dashboard.latestReceivedMessages.length > 0 ? (
+              <div className="dashboard-mini-list dashboard-message-list">
+                {dashboard.latestReceivedMessages.map(({ conversation, message }) => (
+                  <div key={message.id}>
+                    <div>
+                      <strong>{conversation.establishment?.name || conversation.mission?.title || 'Conversation'}</strong>
+                      <span>{messagePreview(message.body)}</span>
+                    </div>
+                    <span className="small">{formatDateTime(message.createdAt)}</span>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="dashboard-empty compact">
-                <strong>Aucune date planifiée</strong>
-                <p>Vos missions datées apparaîtront ici.</p>
+                <strong>Aucun message reçu</strong>
+                <p>Les réponses des établissements apparaîtront ici.</p>
               </div>
             )}
           </Card>
