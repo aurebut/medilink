@@ -103,12 +103,12 @@ export default function CandidateBillingPage() {
           id: `medilink-${conversation.id}`,
           source: 'MEDILINK' as const,
           date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
-          client: conversation.establishment?.name || conversation.mission?.city || 'Etablissement',
+          client: conversation.establishment?.name || conversation.mission?.city || 'Établissement',
           mission: conversation.mission?.title || 'Mission MediLink',
           amount: released ? amountFromAgreement(agreement) : 0,
           currency: agreement?.currency || 'EUR',
           status: released ? 'AVAILABLE' as const : 'PENDING' as const,
-          paymentMethod: released ? 'Virement MediLink' : 'A confirmer',
+          paymentMethod: released ? 'Virement MediLink' : 'À confirmer',
           conversationId: conversation.id,
           agreement,
         };
@@ -184,7 +184,7 @@ export default function CandidateBillingPage() {
         credentials: 'include',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      if (!response.ok) throw new Error('Telechargement du justificatif impossible.');
+      if (!response.ok) throw new Error('Téléchargement du justificatif impossible.');
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
@@ -210,7 +210,7 @@ export default function CandidateBillingPage() {
     const client = String(form.get('client') || '').trim();
     const mission = String(form.get('mission') || '').trim();
     if (!date || !client || !mission || amount <= 0) {
-      setError('Renseignez au minimum une date, un etablissement, une mission et un montant positif.');
+      setError('Renseignez au minimum une date, un établissement, une mission et un montant positif.');
       return;
     }
 
@@ -232,14 +232,14 @@ export default function CandidateBillingPage() {
   }
 
   function exportCsv() {
-    const headers = ['Date', 'Source', 'Etablissement', 'Mission', 'Montant', 'Statut', 'Mode paiement', 'Notes'];
+    const headers = ['Date', 'Source', 'Établissement', 'Mission', 'Montant', 'Statut', 'Mode paiement', 'Notes'];
     const lines = filteredRows.map((row) => [
       row.date ? new Date(row.date).toISOString().slice(0, 10) : '',
       row.source === 'MEDILINK' ? 'MediLink' : 'Hors MediLink',
       row.client,
       row.mission,
       row.amount,
-      row.status === 'PENDING' ? 'En attente' : row.status === 'AVAILABLE' ? 'Encaisse' : 'Manuel',
+      row.status === 'PENDING' ? 'En attente' : row.status === 'AVAILABLE' ? 'Encaissé' : 'Manuel',
       row.paymentMethod,
       row.notes || agreementNextStep(row.agreement?.status),
     ].map(csvEscape).join(';'));
@@ -275,7 +275,7 @@ export default function CandidateBillingPage() {
           <div className="billing-hero-copy">
             <span>Exercice {selectedYear}</span>
             <h2>{formatMoney(dashboard.revenue)}</h2>
-            <p>Recettes encaissees connues dans MediLink et ajoutees manuellement.</p>
+            <p>Recettes encaissées connues dans MediLink et ajoutées manuellement.</p>
           </div>
           <div className="billing-threshold">
             <div className="toolbar compact">
@@ -293,7 +293,7 @@ export default function CandidateBillingPage() {
           <div className="toolbar compact">
             <div>
               <h2>Provision prudente</h2>
-              <p className="small">Taux modifiable selon votre situation URSSAF, CARMF et impots.</p>
+              <p className="small">Taux modifiable selon votre situation URSSAF, CARMF et impôts.</p>
             </div>
             <strong>{provisionRate}%</strong>
           </div>
@@ -308,16 +308,16 @@ export default function CandidateBillingPage() {
             aria-label="Taux de provision"
           />
           <div className="billing-provision-grid">
-            <div><span>A garder</span><strong>{formatMoney(dashboard.provision)}</strong></div>
+            <div><span>À garder</span><strong>{formatMoney(dashboard.provision)}</strong></div>
             <div><span>Net prudent</span><strong>{formatMoney(dashboard.netAvailable)}</strong></div>
           </div>
         </Card>
       </div>
 
       <div className="grid-3 dashboard-stat-grid">
-        <Card className="stat-card"><div className="stat"><span>Justificatifs MediLink</span><strong>{dashboard.medilinkReceipts}</strong><div className="small">PDF disponibles apres paiement libere.</div></div></Card>
-        <Card className="stat-card"><div className="stat"><span>En attente</span><strong>{dashboard.pendingRows.length}</strong><div className="small">Accords ou missions non finalises.</div></div></Card>
-        <Card className="stat-card"><div className="stat"><span>Lignes hors MediLink</span><strong>{manualRows.length}</strong><div className="small">Remplacements ajoutes au registre.</div></div></Card>
+        <Card className="stat-card"><div className="stat"><span>Justificatifs MediLink</span><strong>{dashboard.medilinkReceipts}</strong><div className="small">PDF disponibles après paiement libéré.</div></div></Card>
+        <Card className="stat-card"><div className="stat"><span>En attente</span><strong>{dashboard.pendingRows.length}</strong><div className="small">Accords ou missions non finalisés.</div></div></Card>
+        <Card className="stat-card"><div className="stat"><span>Lignes hors MediLink</span><strong>{manualRows.length}</strong><div className="small">Remplacements ajoutés au registre.</div></div></Card>
       </div>
 
       <div className="billing-workspace">
@@ -328,12 +328,12 @@ export default function CandidateBillingPage() {
               <p className="small">Base exportable pour votre suivi BNC, avec les missions MediLink et hors plateforme.</p>
             </div>
             <div className="billing-filters">
-              <Select value={selectedYear} onChange={(event) => setSelectedYear(Number(event.target.value))} aria-label="Annee">
+              <Select value={selectedYear} onChange={(event) => setSelectedYear(Number(event.target.value))} aria-label="Année">
                 {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
               </Select>
               <Select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)} aria-label="Filtre statut">
                 <option value="ALL">Toutes</option>
-                <option value="AVAILABLE">Encaissees</option>
+                <option value="AVAILABLE">Encaissées</option>
                 <option value="PENDING">En attente</option>
                 <option value="MANUAL">Hors MediLink</option>
               </Select>
@@ -343,7 +343,7 @@ export default function CandidateBillingPage() {
           {filteredRows.length === 0 ? (
             <EmptyState
               title="Aucune recette sur cette vue"
-              description="Ajoutez une ligne hors MediLink ou attendez qu'une mission validee apparaisse ici."
+              description="Ajoutez une ligne hors MediLink ou attendez qu'une mission validée apparaisse ici."
               action={<LinkButton href="/app/missions">Voir mes missions</LinkButton>}
             />
           ) : (
@@ -372,7 +372,7 @@ export default function CandidateBillingPage() {
                         <div className="small">{row.notes || agreementNextStep(row.agreement?.status)}</div>
                       </td>
                       <td>
-                        {row.amount > 0 ? formatMoney(row.amount, row.currency) : <span className="muted">A completer</span>}
+                        {row.amount > 0 ? formatMoney(row.amount, row.currency) : <span className="muted">À compléter</span>}
                       </td>
                       <td>
                         {row.source === 'MEDILINK'
@@ -382,7 +382,7 @@ export default function CandidateBillingPage() {
                       <td className="actions">
                         {row.conversationId && row.status === 'AVAILABLE' ? (
                           <Button variant="light" disabled={busyId === row.conversationId} onClick={() => void downloadCandidateInvoice(row.conversationId!)}>
-                            {busyId === row.conversationId ? 'Telechargement...' : 'PDF'}
+                            {busyId === row.conversationId ? 'Téléchargement...' : 'PDF'}
                           </Button>
                         ) : row.source === 'MANUAL' ? (
                           <Button type="button" variant="light" onClick={() => removeManualRevenue(row.id)}>Retirer</Button>
@@ -407,32 +407,32 @@ export default function CandidateBillingPage() {
               </div>
             </div>
             <form className="form" onSubmit={addManualRevenue}>
-              <Field label="Date encaissement"><Input name="date" type="date" required /></Field>
-              <Field label="Etablissement"><Input name="client" placeholder="Cabinet Martin" required /></Field>
+              <Field label="Date d'encaissement"><Input name="date" type="date" required /></Field>
+              <Field label="Établissement"><Input name="client" placeholder="Cabinet Martin" required /></Field>
               <Field label="Mission"><Input name="mission" placeholder="Remplacement MG" required /></Field>
               <div className="form-row">
                 <Field label="Montant"><Input name="amount" type="number" min="1" step="1" placeholder="1200" required /></Field>
                 <Field label="Paiement">
                   <Select name="paymentMethod" defaultValue="Virement">
                     <option>Virement</option>
-                    <option>Cheque</option>
-                    <option>Especes</option>
+                    <option>Chèque</option>
+                    <option>Espèces</option>
                     <option>Autre</option>
                   </Select>
                 </Field>
               </div>
-              <Field label="Note"><Input name="notes" placeholder="Retrocession 70%, facture recue..." /></Field>
+              <Field label="Note"><Input name="notes" placeholder="Rétrocession 70%, facture reçue..." /></Field>
               <Button type="submit" variant="secondary" block>Ajouter au registre</Button>
             </form>
           </Card>
 
           <Card className="dashboard-panel billing-checklist-card">
-            <h2>Echeances a surveiller</h2>
+            <h2>Échéances à surveiller</h2>
             <div className="billing-checklist">
-              <div><Badge tone="warning">Mensuel / trimestriel</Badge><strong>Declaration URSSAF/RSPM</strong><span>Reporter les honoraires encaisses sur la periode choisie.</span></div>
+              <div><Badge tone="warning">Mensuel / trimestriel</Badge><strong>Déclaration URSSAF/RSPM</strong><span>Reporter les honoraires encaissés sur la période choisie.</span></div>
               <div><Badge tone="neutral">Annuel</Badge><strong>2042-C-PRO</strong><span>Reporter les recettes BNC de l'exercice fiscal.</span></div>
-              <div><Badge tone="neutral">Annuel</Badge><strong>CARMF</strong><span>Verifier affiliation, dispense possible et appels de cotisations.</span></div>
-              <div><Badge tone="success">Continu</Badge><strong>Pieces justificatives</strong><span>Conserver justificatifs MediLink et documents hors plateforme.</span></div>
+              <div><Badge tone="neutral">Annuel</Badge><strong>CARMF</strong><span>Vérifier affiliation, dispense possible et appels de cotisations.</span></div>
+              <div><Badge tone="success">Continu</Badge><strong>Pièces justificatives</strong><span>Conserver justificatifs MediLink et documents hors plateforme.</span></div>
             </div>
           </Card>
         </div>
