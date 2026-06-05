@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
-import { formatDate, formatDateTime } from '@/lib/format';
+import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
@@ -91,6 +91,8 @@ export default function CandidateDashboardPage() {
     });
     const proposedAgreements = missionRows.filter((row) => row.agreement?.status === 'PROPOSED');
     const billingReady = missionRows.filter((row) => row.agreement?.status === 'PAYMENT_RELEASED');
+    const billingPending = missionRows.filter((row) => row.agreement && ['PAYMENT_REQUIRED', 'FUNDS_SECURED', 'COMPLETED'].includes(row.agreement.status));
+    const billingReadyTotal = billingReady.reduce((sum, row) => sum + (row.agreement?.candidateAmount || row.agreement?.amount || 0), 0);
     const nextAgendaItem = [...missionRows]
       .filter((row) => row.date)
       .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
@@ -120,6 +122,8 @@ export default function CandidateDashboardPage() {
       missionRows,
       proposedAgreements,
       billingReady,
+      billingPending,
+      billingReadyTotal,
       nextAgendaItem,
       latestReceivedMessages,
       unreadReceivedMessages,
@@ -162,6 +166,12 @@ export default function CandidateDashboardPage() {
                   <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
                   <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
                 </div>
+                <LinkButton
+                  variant="light"
+                  href={dashboard.nextAgendaItem.application.missionId ? `/app/missions/${dashboard.nextAgendaItem.application.missionId}` : '/app/agenda'}
+                >
+                  Voir
+                </LinkButton>
               </div>
             ) : (
               <div className="dashboard-empty compact dashboard-week-empty">
@@ -283,22 +293,61 @@ export default function CandidateDashboardPage() {
             )}
           </Card>
 
-          <Card className="dashboard-focus-card">
+          <Card className="dashboard-focus-card dashboard-finance-card">
             <div className="dashboard-section-head">
               <div>
                 <span>Facturation</span>
-                <h2>Compta rapide</h2>
+                <h2>Finance</h2>
               </div>
               <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
             </div>
+            <div className="dashboard-finance-status">
+              <span>
+                {dashboard.proposedAgreements.length > 0
+                  ? 'Proposition à valider'
+                  : dashboard.billingReady.length > 0
+                    ? 'Justificatif disponible'
+                    : dashboard.billingPending.length > 0
+                      ? 'Suivi en cours'
+                      : 'Aucune action urgente'}
+              </span>
+              <strong>
+                {dashboard.billingReady.length > 0
+                  ? `${formatMoney(dashboard.billingReadyTotal)} prêts`
+                  : dashboard.proposedAgreements.length > 0
+                    ? `${dashboard.proposedAgreements.length} à traiter`
+                    : dashboard.billingPending.length > 0
+                      ? `${dashboard.billingPending.length} en attente`
+                      : 'Tout est à jour'}
+              </strong>
+              <p>
+                {dashboard.proposedAgreements.length > 0
+                  ? 'Répondez aux conditions finales depuis la messagerie.'
+                  : dashboard.billingReady.length > 0
+                    ? 'Téléchargez vos justificatifs candidat dès maintenant.'
+                    : dashboard.billingPending.length > 0
+                      ? 'Les missions validées avanceront ici après finalisation.'
+                      : 'Les justificatifs apparaîtront après validation de mission.'}
+              </p>
+              <LinkButton
+                href={dashboard.proposedAgreements.length > 0 ? '/app/messages' : '/app/billing'}
+                variant={dashboard.proposedAgreements.length > 0 || dashboard.billingReady.length > 0 ? 'secondary' : 'light'}
+              >
+                {dashboard.proposedAgreements.length > 0
+                  ? 'Répondre'
+                  : dashboard.billingReady.length > 0
+                    ? 'Télécharger'
+                    : 'Voir le suivi'}
+              </LinkButton>
+            </div>
             <div className="dashboard-finance-stack">
               <div>
-                <span>Justificatifs prêts</span>
+                <span>À encaisser</span>
                 <strong>{dashboard.billingReady.length}</strong>
               </div>
               <div>
-                <span>Propositions à traiter</span>
-                <strong>{dashboard.proposedAgreements.length}</strong>
+                <span>En attente</span>
+                <strong>{dashboard.billingPending.length + dashboard.proposedAgreements.length}</strong>
               </div>
             </div>
           </Card>
