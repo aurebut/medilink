@@ -42,6 +42,7 @@ export default function CandidateAgendaPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [calendarAnimation, setCalendarAnimation] = useState<'next' | 'prev' | 'jump'>('jump');
   const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
@@ -122,6 +123,19 @@ export default function CandidateAgendaPage() {
     window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
   }
 
+  function goToMonth(offset: number) {
+    setCalendarAnimation(offset < 0 ? 'prev' : 'next');
+    setCalendarMonth((month) => addMonths(month, offset));
+  }
+
+  function goToToday() {
+    const today = new Date();
+    const todayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    setCalendarAnimation(todayMonth.getTime() < calendarMonth.getTime() ? 'prev' : 'next');
+    setCalendarMonth(todayMonth);
+    setSelectedDay(dateKey(today));
+  }
+
   if (loading) return <LoadingCard />;
 
   return (
@@ -153,11 +167,11 @@ export default function CandidateAgendaPage() {
             <div>
               <span>Calendrier</span>
               <div className="agenda-month-title">
-                <button type="button" className="agenda-arrow-button" aria-label="Mois précédent" title="Mois précédent" onClick={() => setCalendarMonth((month) => addMonths(month, -1))}>
+                <button type="button" className="agenda-arrow-button" aria-label="Mois précédent" title="Mois précédent" onClick={() => goToMonth(-1)}>
                   ←
                 </button>
                 <h2>{monthLabel(calendarMonth)}</h2>
-                <button type="button" className="agenda-arrow-button" aria-label="Mois suivant" title="Mois suivant" onClick={() => setCalendarMonth((month) => addMonths(month, 1))}>
+                <button type="button" className="agenda-arrow-button" aria-label="Mois suivant" title="Mois suivant" onClick={() => goToMonth(1)}>
                   →
                 </button>
               </div>
@@ -167,18 +181,14 @@ export default function CandidateAgendaPage() {
               <Button
                 type="button"
                 variant="light"
-                onClick={() => {
-                  const today = new Date();
-                  setCalendarMonth(new Date(today.getFullYear(), today.getMonth(), 1));
-                  setSelectedDay(dateKey(today));
-                }}
+                onClick={goToToday}
               >
                 Aujourd’hui
               </Button>
             </div>
           </div>
 
-          <div className="agenda-calendar">
+          <div key={`${dateKey(calendarMonth)}-${calendarAnimation}`} className={`agenda-calendar agenda-calendar-${calendarAnimation}`}>
             {weekDayLabels.map((day) => (
               <div key={day} className="agenda-weekday">{day}</div>
             ))}
