@@ -183,19 +183,6 @@ export function AppShell({
               Medi<em>Link</em>
             </span>
           </Link>
-          <button
-            type="button"
-            className="mobile-menu-button"
-            aria-label={mobileNavOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-            aria-expanded={mobileNavOpen}
-            aria-controls="sidebar-nav"
-            onClick={() => setMobileNavOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-            <span className="sr-only">Menu</span>
-          </button>
         </div>
 
         <nav id="sidebar-nav" className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}>
@@ -313,6 +300,23 @@ export function AppShell({
             </button>
           </div>
         ) : null}
+
+        <button
+          type="button"
+          className="mobile-menu-button"
+          aria-label={mobileNavOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={mobileNavOpen}
+          aria-controls="sidebar-nav"
+          onClick={() => {
+            setNotificationsOpen(false);
+            setMobileNavOpen((open) => !open);
+          }}
+        >
+          <span />
+          <span />
+          <span />
+          <span className="sr-only">Menu</span>
+        </button>
 
         <div className="sidebar-footer" ref={accountMenuRef}>
           {accountMenuOpen ? (

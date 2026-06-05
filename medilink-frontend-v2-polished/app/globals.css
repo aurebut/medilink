@@ -4255,6 +4255,7 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .shell > .sidebar .mobile-menu-button,
   .mobile-menu-button {
+    order: 3;
     width: 40px;
     height: 40px;
     flex: 0 0 40px;
