@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeOptions, documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
-import { Alert, Badge, Button, Card, Field, LoadingInline, Select } from './ui';
+import { Alert, Badge, Button, Card, Field, LoadingInline, ProgressBar, Select } from './ui';
 
 type UploadResponse = {
   documentId: string;
@@ -19,6 +19,10 @@ type UploadResponse = {
 
 type DownloadResponse = { provider: 'mock' | 'local' | 's3'; downloadUrl: string; expiresInSeconds: number };
 
+const requiredDocumentTypes: DocumentType[] = ['CV', 'DIPLOMA', 'IDENTITY_DOCUMENT', 'INSURANCE'];
+const recommendedDocumentTypes: DocumentType[] = ['ATTESTATION', 'CONVENTION'];
+const checklistDocumentTypes: DocumentType[] = [...requiredDocumentTypes, ...recommendedDocumentTypes];
+
 function statusTone(status: string) {
   if (status === 'APPROVED') return 'success';
   if (status === 'REJECTED' || status === 'EXPIRED') return 'danger';
@@ -26,14 +30,58 @@ function statusTone(status: string) {
   return 'neutral';
 }
 
+function getDocumentRank(status: string) {
+  if (status === 'APPROVED') return 5;
+  if (status === 'PENDING_VERIFICATION') return 4;
+  if (status === 'UPLOAD_PENDING') return 3;
+  if (status === 'REJECTED' || status === 'EXPIRED') return 2;
+  return 1;
+}
+
+function getCurrentDocument(documents: Document[], type: DocumentType) {
+  return documents
+    .filter((doc) => doc.documentType === type)
+    .sort((a, b) => {
+      const rankDiff = getDocumentRank(b.verificationStatus) - getDocumentRank(a.verificationStatus);
+      if (rankDiff !== 0) return rankDiff;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })[0];
+}
+
+function checklistCopy(type: DocumentType, doc?: Document) {
+  if (!doc) {
+    return type === 'CV'
+      ? 'Document prioritaire pour rendre vos candidatures lisibles.'
+      : 'A ajouter pour renforcer votre dossier.';
+  }
+  if (doc.verificationStatus === 'APPROVED') return 'Valide et consultable par les etablissements apres candidature.';
+  if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoye, en attente de validation Medilink.';
+  if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Upload a finaliser.';
+  if (doc.verificationStatus === 'REJECTED') {
+    return doc.rejectionReason ? `Refuse : ${doc.rejectionReason}` : 'Refuse, vous pouvez envoyer une nouvelle version.';
+  }
+  if (doc.verificationStatus === 'EXPIRED') return 'Expire, une version recente est necessaire.';
+  return 'Document ajoute au dossier.';
+}
+
+function checklistStatusLabel(doc?: Document) {
+  return doc ? statusLabel(doc.verificationStatus) : 'Manquant';
+}
+
+function checklistStatusTone(doc?: Document) {
+  return doc ? statusTone(doc.verificationStatus) : 'neutral';
+}
+
 export function DocumentSection() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [documentType, setDocumentType] = useState<DocumentType>('CV');
   const [file, setFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   async function load() {
     setLoading(true);
@@ -48,31 +96,52 @@ export function DocumentSection() {
 
   useEffect(() => { void load(); }, []);
 
+  const visibleDocuments = useMemo(
+    () => documents.filter((doc) => doc.documentType !== 'AVATAR' && doc.verificationStatus !== 'DELETED'),
+    [documents],
+  );
+
+  const checklist = useMemo(
+    () => checklistDocumentTypes.map((type) => ({
+      type,
+      required: requiredDocumentTypes.includes(type),
+      document: getCurrentDocument(visibleDocuments, type),
+    })),
+    [visibleDocuments],
+  );
+
+  const approvedRequiredCount = checklist.filter((item) => item.required && item.document?.verificationStatus === 'APPROVED').length;
+  const pendingCount = visibleDocuments.filter((doc) => doc.verificationStatus === 'PENDING_VERIFICATION' || doc.verificationStatus === 'UPLOAD_PENDING').length;
+  const rejectedCount = visibleDocuments.filter((doc) => doc.verificationStatus === 'REJECTED' || doc.verificationStatus === 'EXPIRED').length;
+  const missingRequiredCount = checklist.filter((item) => item.required && !item.document).length;
+  const completionScore = Math.round((approvedRequiredCount / requiredDocumentTypes.length) * 100);
+
   async function upload() {
     if (!file) return;
     setSubmitting(true);
     setMessage(null);
     setError(null);
     try {
-      const upload = await api.post<UploadResponse>('/documents/upload-url', {
+      const uploadResponse = await api.post<UploadResponse>('/documents/upload-url', {
         documentType,
         fileName: file.name,
         mimeType: file.type || 'application/octet-stream',
         sizeBytes: file.size,
       });
 
-      if (!isMockStorageUrl(upload.uploadUrl)) {
-        const put = await fetch(upload.uploadUrl, {
-          method: upload.method,
-          headers: upload.headers,
+      if (!isMockStorageUrl(uploadResponse.uploadUrl)) {
+        const put = await fetch(uploadResponse.uploadUrl, {
+          method: uploadResponse.method,
+          headers: uploadResponse.headers,
           body: file,
         });
         if (!put.ok) throw new Error('Upload fichier impossible vers le stockage.');
       }
 
-      await api.post(`/documents/${upload.documentId}/confirm-upload`, {});
+      await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
       setFile(null);
-      setMessage('Document envoyé. Il passe en vérification si nécessaire.');
+      setFileInputKey((key) => key + 1);
+      setMessage('Document envoye. Il passe en verification si necessaire.');
       await load();
     } catch (e: any) {
       setError(e.message || 'Erreur upload.');
@@ -88,7 +157,7 @@ export function DocumentSection() {
       const result = await api.get<DownloadResponse>(`/documents/${documentId}/download-url`);
       if (isMockStorageUrl(result.downloadUrl)) {
         previewWindow?.close();
-        alert('Storage en mode mock : aucun fichier réel à ouvrir. En production, une URL temporaire serait ouverte.');
+        alert('Storage en mode mock : aucun fichier reel a ouvrir. En production, une URL temporaire serait ouverte.');
         return;
       }
       showDocumentInPreview(result.downloadUrl, previewWindow);
@@ -108,41 +177,129 @@ export function DocumentSection() {
     }
   }
 
+  function chooseDocumentType(type: DocumentType) {
+    setDocumentType(type);
+    fileInputRef.current?.click();
+  }
+
   return (
-    <Card>
-      <h2>Documents</h2>
-      <p>Ajoutez votre CV, vos attestations et justificatifs. Les documents sont privés et passent par le backend.</p>
-      <div className="form">
-        {message ? <Alert type="success">{message}</Alert> : null}
-        {error ? <Alert type="error">{error}</Alert> : null}
-        <div className="form-row">
-          <Field label="Type de document">
-            <Select value={documentType} onChange={(e) => setDocumentType(e.target.value as DocumentType)}>
-              {documentTypeOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </Select>
-          </Field>
-          <Field label="Fichier PDF ou image">
-            <input className="input" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-          </Field>
+    <Card className="documents-card">
+      <div className="documents-hero">
+        <div>
+          <h2>Dossier documents</h2>
+          <p>Centralisez les pieces utiles a vos candidatures. Elles restent privees et ne sont consultables par un etablissement que si vous candidatez a l'une de ses missions.</p>
         </div>
-        <div className="actions"><Button onClick={upload} disabled={!file || submitting}>{submitting ? 'Upload...' : 'Envoyer le document'}</Button></div>
+        <div className="documents-score">
+          <strong>{completionScore}%</strong>
+          <span>documents essentiels valides</span>
+        </div>
       </div>
-      <div className="divider" />
-      {loading ? <LoadingInline label="Chargement des documents..." /> : documents.filter((doc) => doc.documentType !== 'AVATAR').length === 0 ? <p className="muted">Aucun document pour le moment.</p> : (
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajouté</th><th>Actions</th></tr></thead>
-            <tbody>
-              {documents.filter((doc) => doc.documentType !== 'AVATAR').map((doc) => <tr key={doc.id}>
-                <td>{documentTypeLabel(doc.documentType)}</td>
-                <td><strong>{doc.fileName}</strong>{doc.rejectionReason ? <div className="small">Motif : {doc.rejectionReason}</div> : null}</td>
-                <td><Badge tone={statusTone(doc.verificationStatus) as any}>{statusLabel(doc.verificationStatus)}</Badge></td>
-                <td>{formatDateTime(doc.createdAt)}</td>
-                <td className="actions"><Button variant="light" onClick={() => openDocument(doc.id)}>Voir</Button><Button variant="danger" onClick={() => remove(doc.id)}>Supprimer</Button></td>
-              </tr>)}
-            </tbody>
-          </table>
+
+      <div className="documents-summary">
+        <div className="documents-summary-main">
+          <ProgressBar value={completionScore} />
+          <span className="small">{approvedRequiredCount}/{requiredDocumentTypes.length} documents essentiels valides</span>
         </div>
+        <div className="documents-summary-stats">
+          <Badge tone={missingRequiredCount ? 'warning' : 'success'}>{missingRequiredCount} manquant(s)</Badge>
+          <Badge tone={pendingCount ? 'warning' : 'neutral'}>{pendingCount} en verification</Badge>
+          <Badge tone={rejectedCount ? 'danger' : 'neutral'}>{rejectedCount} a corriger</Badge>
+        </div>
+      </div>
+
+      {loading ? <LoadingInline label="Chargement des documents..." /> : (
+        <>
+          <div className="document-checklist">
+            {checklist.map(({ type, required, document }) => (
+              <div className={`document-checklist-item ${document?.verificationStatus === 'APPROVED' ? 'is-approved' : ''}`} key={type}>
+                <div className="document-checklist-head">
+                  <div>
+                    <span>{required ? 'Essentiel' : 'Recommande'}</span>
+                    <strong>{documentTypeLabel(type)}</strong>
+                  </div>
+                  <Badge tone={checklistStatusTone(document) as any}>{checklistStatusLabel(document)}</Badge>
+                </div>
+                <p>{checklistCopy(type, document)}</p>
+                {document ? (
+                  <div className="document-file-meta">
+                    <strong>{document.fileName}</strong>
+                    <span>Ajoute le {formatDateTime(document.createdAt)}</span>
+                  </div>
+                ) : null}
+                <div className="actions">
+                  {document ? <Button variant="light" onClick={() => openDocument(document.id)}>Voir</Button> : null}
+                  <Button variant={document ? 'secondary' : 'primary'} onClick={() => chooseDocumentType(type)}>
+                    {document ? 'Remplacer' : 'Ajouter'}
+                  </Button>
+                  {document ? <Button variant="danger" onClick={() => remove(document.id)}>Supprimer</Button> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {visibleDocuments.length === 0 ? (
+            <div className="document-empty-state">
+              <h3>Votre dossier est pret a etre construit.</h3>
+              <p>Commencez par votre CV : c'est le premier document regarde par les recruteurs lorsqu'ils consultent une candidature.</p>
+            </div>
+          ) : null}
+        </>
+      )}
+
+      <div className="divider" />
+
+      <div className="document-upload-panel">
+        <div>
+          <h3>Envoyer un document</h3>
+          <p className="small">PDF ou image, 25 Mo maximum. Une nouvelle version repartira en verification.</p>
+        </div>
+        <div className="form">
+          {message ? <Alert type="success">{message}</Alert> : null}
+          {error ? <Alert type="error">{error}</Alert> : null}
+          <div className="form-row">
+            <Field label="Type de document">
+              <Select value={documentType} onChange={(e) => setDocumentType(e.target.value as DocumentType)}>
+                {documentTypeOptions.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </Select>
+            </Field>
+            <Field label="Fichier PDF ou image">
+              <input
+                key={fileInputKey}
+                ref={fileInputRef}
+                className="input"
+                type="file"
+                accept="application/pdf,image/png,image/jpeg,image/webp"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
+            </Field>
+          </div>
+          {file ? <p className="small">Pret a envoyer : <strong>{file.name}</strong></p> : null}
+          <div className="actions">
+            <Button onClick={upload} disabled={!file || submitting}>{submitting ? 'Upload...' : 'Envoyer le document'}</Button>
+          </div>
+        </div>
+      </div>
+
+      <div className="divider" />
+
+      {loading ? null : visibleDocuments.length === 0 ? null : (
+        <>
+          <h3>Historique</h3>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajoute</th><th>Actions</th></tr></thead>
+              <tbody>
+                {visibleDocuments.map((doc) => <tr key={doc.id}>
+                  <td>{documentTypeLabel(doc.documentType)}</td>
+                  <td><strong>{doc.fileName}</strong>{doc.rejectionReason ? <div className="small">Motif : {doc.rejectionReason}</div> : null}</td>
+                  <td><Badge tone={statusTone(doc.verificationStatus) as any}>{statusLabel(doc.verificationStatus)}</Badge></td>
+                  <td>{formatDateTime(doc.createdAt)}</td>
+                  <td className="actions"><Button variant="light" onClick={() => openDocument(doc.id)}>Voir</Button><Button variant="danger" onClick={() => remove(doc.id)}>Supprimer</Button></td>
+                </tr>)}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </Card>
   );

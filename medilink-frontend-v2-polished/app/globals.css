@@ -2007,6 +2007,138 @@ button { touch-action: manipulation; }
 .alert.success { background: rgba(14,138,122,.10); color: #0B6F62; border-color: rgba(14,138,122,.22); }
 .alert.info { background: rgba(26,82,160,.08); color: var(--blue); border-color: rgba(26,82,160,.18); }
 
+.documents-card { display: grid; gap: 16px; }
+.documents-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+.documents-hero h2 { margin-bottom: 8px; }
+.documents-hero p { margin: 0; max-width: 760px; }
+.documents-score {
+  flex: 0 0 176px;
+  display: grid;
+  gap: 4px;
+  padding: 15px;
+  border: 1px solid rgba(14,138,122,.22);
+  border-radius: 10px;
+  background: rgba(14,138,122,.08);
+}
+.documents-score strong {
+  color: #0B6F62;
+  font-size: 32px;
+  line-height: 1;
+}
+.documents-score span {
+  color: #0B6F62;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+.documents-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.documents-summary-main {
+  display: grid;
+  gap: 8px;
+  flex: 1 1 320px;
+}
+.documents-summary-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.document-checklist {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.document-checklist-item {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.document-checklist-item.is-approved {
+  border-color: rgba(14,138,122,.24);
+  background: rgba(14,138,122,.045);
+}
+.document-checklist-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.document-checklist-head span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.document-checklist-head strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--heading);
+  font-size: 16px;
+  line-height: 1.25;
+}
+.document-checklist-item p {
+  margin: 0;
+  min-height: 42px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.document-file-meta {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.document-file-meta strong {
+  overflow: hidden;
+  color: var(--heading);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.document-file-meta span {
+  color: var(--muted);
+  font-size: 12px;
+}
+.document-upload-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, .55fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.document-upload-panel h3 { margin-bottom: 6px; }
+.document-upload-panel p { margin: 0; }
+.document-empty-state {
+  padding: 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  background: rgba(255,255,255,.62);
+}
+.document-empty-state h3 { margin-bottom: 6px; }
+.document-empty-state p { margin: 0; }
+
 .table-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 8px 32px rgba(11,25,41,.045); }
 table { width: 100%; border-collapse: collapse; min-width: 760px; }
 th, td { text-align: left; padding: 14px 15px; border-bottom: 1px solid var(--line); vertical-align: middle; }
@@ -2655,6 +2787,28 @@ tbody tr:hover { background: #FAFBFD; }
   }
   body {
     background: #f7f9fb;
+  }
+  .documents-hero,
+  .documents-summary,
+  .document-upload-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .documents-score {
+    width: 100%;
+    min-width: 0;
+  }
+  .documents-summary-stats {
+    justify-content: flex-start;
+  }
+  .document-checklist {
+    grid-template-columns: 1fr;
+  }
+  .document-checklist-item p {
+    min-height: 0;
+  }
+  .document-checklist-item .actions .btn {
+    flex: 1 1 120px;
   }
   .container { width: min(100% - 28px, 1180px); }
   .brand { gap: 8px; font-size: 17px; letter-spacing: 0; }
