@@ -158,7 +158,7 @@ export default function MissionPage() {
                   <div><span>Durée</span><strong>{mission.durationHours || '-'} h</strong></div>
                   <div><span>Rémunération</span><strong>{formatCompensation(mission)}</strong></div>
                   <div><span>Localisation</span><strong>{mission.location || mission.city}</strong></div>
-                  {mission.sector ? <div><span>Secteur</span><strong>{sectorLabel(mission.sector)}</strong></div> : null}
+                  {mission.sector ? <div><span>Secteur conventionné</span><strong>{sectorLabel(mission.sector)}</strong></div> : null}
                 </div>
               </Card>
             </div>
@@ -170,7 +170,7 @@ export default function MissionPage() {
                   {mission.patientType ? <div><span>Patientèle</span><strong>{mission.patientType}</strong></div> : null}
                   {mission.softwareUsed ? <div><span>Logiciel utilisé</span><strong>{mission.softwareUsed}</strong></div> : null}
                   {mission.hasSecretary != null ? <div><span>Secrétaire</span><strong>{mission.hasSecretary ? 'Oui' : 'Non'}</strong></div> : null}
-                  {mission.departmentInfo ? <div><span>Service</span><strong>{mission.departmentInfo}</strong></div> : null}
+                  {mission.departmentInfo ? <div><span>Département / service / type de cabinet</span><strong>{mission.departmentInfo}</strong></div> : null}
                   {mission.teamInfo ? <div><span>Équipe sur place</span><strong>{mission.teamInfo}</strong></div> : null}
                   {mission.equipmentInfo ? <div><span>Matériel disponible</span><strong>{mission.equipmentInfo}</strong></div> : null}
                   {mission.practicalInfo ? <div><span>Accès</span><strong>{mission.practicalInfo}</strong></div> : null}

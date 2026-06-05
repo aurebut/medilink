@@ -144,6 +144,7 @@ export class MissionsService {
     }
     if (dto.specialty) where.specialty = { contains: dto.specialty, mode: 'insensitive' };
     if (dto.city) where.city = { contains: dto.city, mode: 'insensitive' };
+    if (dto.departmentInfo) where.departmentInfo = { contains: dto.departmentInfo, mode: 'insensitive' };
     if (dto.sector) where.sector = dto.sector;
     if (dto.patientType) where.patientType = { contains: dto.patientType, mode: 'insensitive' };
     if (dto.softwareUsed) where.softwareUsed = { contains: dto.softwareUsed, mode: 'insensitive' };
@@ -163,6 +164,7 @@ export class MissionsService {
           { description: { contains: dto.q, mode: 'insensitive' } },
           { specialty: { contains: dto.q, mode: 'insensitive' } },
           { city: { contains: dto.q, mode: 'insensitive' } },
+          { departmentInfo: { contains: dto.q, mode: 'insensitive' } },
           { sector: { contains: dto.q, mode: 'insensitive' } },
           { patientType: { contains: dto.q, mode: 'insensitive' } },
           { softwareUsed: { contains: dto.q, mode: 'insensitive' } },

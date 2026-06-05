@@ -332,7 +332,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Ajoutez le contexte terrain</h2>
           <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
         </div>
-        <SingleChoiceField label="Service ou unité" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
+        <SingleChoiceField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
         <SingleChoiceField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
         <SingleChoiceField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
         <Field label="Présence de secrétaire">
@@ -380,7 +380,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <p>La ville est visible publiquement. Le lieu précis peut rester sobre si besoin.</p>
         </div>
         <SingleChoiceField required label="Ville" value={form.city || ''} options={cityOptions} onChange={(value) => set('city', value)} />
-        <SingleChoiceField label="Secteur" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
+        <SingleChoiceField label="Secteur conventionné" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
         <Field label="Lieu précis">
           <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
         </Field>
@@ -458,7 +458,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <div className="profile-preferences-section">
           <h3>Criteres proposes</h3>
           <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-          <MultiChoiceField label="Durees proposees" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+          <MultiChoiceField label="Durées proposées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
           <MultiChoiceField label="Horaires non proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
           <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
           <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
@@ -617,7 +617,7 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
       <div className="info-list">
         <div><span>Spécialité</span><strong>{form.specialty || '-'}</strong></div>
         <div><span>Ville</span><strong>{form.city || '-'}</strong></div>
-        <div><span>Secteur</span><strong>{sectorLabel(form.sector)}</strong></div>
+        <div><span>Secteur conventionné</span><strong>{sectorLabel(form.sector)}</strong></div>
         <div><span>Patientèle</span><strong>{form.patientType || '-'}</strong></div>
         <div><span>Logiciel</span><strong>{form.softwareUsed || '-'}</strong></div>
         <div><span>Secrétaire</span><strong>{form.hasSecretary === undefined || form.hasSecretary === null ? '-' : form.hasSecretary ? 'Oui' : 'Non'}</strong></div>

@@ -18,9 +18,9 @@ import {
   patientTypeOptions,
   pressureLevelOptions,
   refusedScheduleOptions,
-  sectorOptions,
   softwareOptions,
   specialtyOptions,
+  universityDiplomaOptions,
 } from '@/lib/profile-options';
 
 type UploadResponse = {
@@ -233,12 +233,12 @@ export default function ProfilePage() {
 
             <div className="form-row">
               <SingleChoiceField
-                label="Specialite"
+                label="Spécialité"
                 value={form.specialty || ''}
                 options={specialtyOptions}
                 onChange={(value) => set('specialty', value)}
               />
-              <SingleChoiceField label="Secteur" value={form.orientation || ''} options={sectorOptions} onChange={(value) => set('orientation', value)} />
+              <SingleChoiceField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
             </div>
 
             {form.medicalStatus === 'OTHER' ? (
@@ -247,11 +247,11 @@ export default function ProfilePage() {
               </Field>
             ) : null}
 
-            <SingleChoiceField label="Hopital / faculte" value={form.hospitalOrFaculty || ''} options={hospitalOrFacultyOptions} onChange={(value) => set('hospitalOrFaculty', value)} />
+            <SingleChoiceField label="Hôpital / faculté" value={form.hospitalOrFaculty || ''} options={hospitalOrFacultyOptions} onChange={(value) => set('hospitalOrFaculty', value)} />
 
             <div className="form-row">
               <Field label="Annees d'experience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
-              <MultiChoiceField label="Actes realises" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
+              <MultiChoiceField label="Compétences" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
             </div>
 
             <Field label="Disponibilites"><Textarea value={form.availabilityNotes || ''} onChange={(e) => set('availabilityNotes', e.target.value)} placeholder="Ex : nuits, week-ends, gardes ponctuelles..." /></Field>
@@ -272,13 +272,13 @@ export default function ProfilePage() {
 
               <MultiChoiceField label="Mobilite" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
               <MultiChoiceField label="Types de missions acceptees" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-              <MultiChoiceField label="Duree preferee" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+              <MultiChoiceField label="Durée préférée" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
               <MultiChoiceField label="Horaires refuses" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
-              <MultiChoiceField label="Logiciels connus" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
+              <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
               <MultiChoiceField label="Patientele acceptee" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
 
               <div className="form-row">
-                <BooleanPreference label="Secretaire obligatoire" value={form.secretaryRequired} onChange={(value) => set('secretaryRequired', value)} />
+                <BooleanPreference label="Secrétaire obligatoire" value={form.secretaryRequired} onChange={(value) => set('secretaryRequired', value)} />
                 <BooleanPreference label="Logement obligatoire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
               </div>
 

@@ -15,14 +15,14 @@ export const documentTypeOptions: Array<{ value: DocumentType; label: string }> 
   { value: 'ATTESTATION', label: 'Attestation' },
   { value: 'CONVENTION', label: 'Convention' },
   { value: 'DIPLOMA', label: 'Diplôme' },
-  { value: 'IDENTITY_DOCUMENT', label: 'Pièce d’identité' },
+  { value: 'IDENTITY_DOCUMENT', label: "Pièce d'identité" },
   { value: 'INSURANCE', label: 'Assurance' },
   { value: 'OTHER', label: 'Autre document' },
 ];
 
 export const establishmentTypeOptions: Array<{ value: EstablishmentType; label: string }> = [
-  { value: 'HOSPITAL', label: 'Hôpital' },
-  { value: 'CLINIC', label: 'Clinique' },
+  { value: 'HOSPITAL', label: 'Hôpital public' },
+  { value: 'CLINIC', label: 'Clinique privée' },
   { value: 'CABINET', label: 'Cabinet' },
   { value: 'MEDICAL_SERVICE', label: 'Service médical' },
   { value: 'AGENCY', label: 'Agence' },
@@ -50,10 +50,10 @@ export const requiredLevelOptions: Array<{ value: RequiredLevel; label: string }
 export function roleLabel(role?: UserRole) {
   const map: Record<UserRole, string> = {
     CANDIDATE: 'Candidat',
-    ESTABLISHMENT_OWNER: 'Établissement — propriétaire',
-    ESTABLISHMENT_ADMIN: 'Établissement — admin',
-    ESTABLISHMENT_RECRUITER: 'Établissement — recruteur',
-    ESTABLISHMENT_VIEWER: 'Établissement — lecture',
+    ESTABLISHMENT_OWNER: 'Établissement - propriétaire',
+    ESTABLISHMENT_ADMIN: 'Établissement - admin',
+    ESTABLISHMENT_RECRUITER: 'Établissement - recruteur',
+    ESTABLISHMENT_VIEWER: 'Établissement - lecture',
     MEDILINK_ADMIN: 'Admin Médilink',
     MEDILINK_SUPPORT: 'Support Médilink',
   };

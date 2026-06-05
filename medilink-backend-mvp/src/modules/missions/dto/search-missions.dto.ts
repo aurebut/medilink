@@ -21,6 +21,11 @@ export class SearchMissionsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(120)
+  departmentInfo?: string;
+
+  @IsOptional()
+  @IsString()
   @IsIn(['SECTEUR_1', 'SECTEUR_2', 'SECTEUR_3'])
   sector?: string;
 
