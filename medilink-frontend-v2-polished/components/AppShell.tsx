@@ -15,7 +15,7 @@ type NavItem = { href: string; label: string; icon: string };
 const candidateNav: NavItem[] = [
   { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
   { href: '/app/agenda', label: 'Agenda', icon: 'A' },
-  { href: '/app/billing', label: 'Facturation', icon: 'F' },
+  { href: '/app/billing', label: 'Ma compta', icon: 'C' },
   { href: '/app/search', label: 'Recherche', icon: 'R' },
   { href: '/app/messages', label: 'Messagerie', icon: 'M' },
 ];

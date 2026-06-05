@@ -258,7 +258,7 @@ export default function CandidateBillingPage() {
   return (
     <>
       <PageHeader
-        title="Facturation & compta"
+        title="Ma compta"
         description="Registre des recettes, justificatifs et provisions pour piloter vos remplacements sans tableur."
         actions={
           <>

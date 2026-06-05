@@ -48,7 +48,7 @@ export function CandidateMissionHistoryList({
           <div className="actions">
             {conversation ? <LinkButton href="/app/messages" variant="light">Ouvrir la discussion</LinkButton> : null}
             {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Detail mission</LinkButton> : null}
-            <LinkButton href="/app/billing" variant="light">Facturation</LinkButton>
+            <LinkButton href="/app/billing" variant="light">Ma compta</LinkButton>
           </div>
         </Card>
       ))}

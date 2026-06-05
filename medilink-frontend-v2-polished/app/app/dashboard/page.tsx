@@ -297,9 +297,9 @@ export default function CandidateDashboardPage() {
             <div className="dashboard-section-head">
               <div>
                 <span>Comptabilité</span>
-                <h2>Facturation & compta</h2>
+                <h2>Ma compta</h2>
               </div>
-              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
+              <LinkButton variant="light" href="/app/billing">Ouvrir ma compta</LinkButton>
             </div>
             <div className="dashboard-finance-status">
               <span>
@@ -337,7 +337,7 @@ export default function CandidateDashboardPage() {
                   ? 'Répondre'
                   : dashboard.billingReady.length > 0
                     ? 'Ouvrir le registre'
-                    : 'Voir la compta'}
+                    : 'Voir ma compta'}
               </LinkButton>
             </div>
             <div className="dashboard-finance-stack">
