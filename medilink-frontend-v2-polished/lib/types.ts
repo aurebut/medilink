@@ -22,6 +22,19 @@ export type MissionStatus = 'DRAFT' | 'PUBLISHED' | 'PAUSED' | 'FILLED' | 'ARCHI
 export type CompensationMode = 'FIXED_AMOUNT' | 'RETROCESSION';
 export type ApplicationStatus = 'SUBMITTED' | 'VIEWED' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN' | 'CANCELLED';
 export type MessageType = 'TEXT' | 'FILE' | 'SYSTEM';
+export type MissionAgreementStatus =
+  | 'PROPOSED'
+  | 'PAYMENT_REQUIRED'
+  | 'FUNDS_SECURED'
+  | 'COMPLETED'
+  | 'PAYMENT_RELEASED'
+  | 'REJECTED'
+  | 'CANCELLED'
+  | 'DISPUTED'
+  | 'EXPIRED';
+export type EscrowPaymentStatus = 'REQUIRES_PAYMENT' | 'SECURED' | 'RELEASED' | 'REFUNDED' | 'FAILED' | 'DISPUTED';
+export type InvoiceType = 'RECRUITER_INVOICE' | 'CANDIDATE_RECEIPT';
+export type InvoiceStatus = 'GENERATED' | 'VOID';
 
 export type CurrentUser = {
   id: string;
@@ -228,6 +241,7 @@ export type Conversation = {
   establishment?: Establishment;
   participants?: Array<{ id: string; conversationId: string; userId: string; lastReadAt?: string | null; archivedAt?: string | null; muted: boolean }>;
   messages?: Message[];
+  agreements?: MissionAgreement[];
 };
 
 export type Message = {
@@ -253,6 +267,63 @@ export type Notification = {
   data?: Record<string, unknown> | null;
   readAt?: string | null;
   createdAt: string;
+};
+
+export type EscrowPayment = {
+  id: string;
+  agreementId: string;
+  status: EscrowPaymentStatus;
+  provider: string;
+  providerRef?: string | null;
+  amount: number;
+  currency: string;
+  securedAt?: string | null;
+  releasedAt?: string | null;
+  refundedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type Invoice = {
+  id: string;
+  agreementId: string;
+  paymentId?: string | null;
+  type: InvoiceType;
+  status: InvoiceStatus;
+  number: string;
+  amount: number;
+  currency: string;
+  pdfUrl?: string | null;
+  issuedAt: string;
+  createdAt: string;
+};
+
+export type MissionAgreement = {
+  id: string;
+  applicationId: string;
+  conversationId: string;
+  missionId: string;
+  candidateUserId: string;
+  establishmentId: string;
+  status: MissionAgreementStatus;
+  compensationMode: CompensationMode;
+  retrocessionPercentage?: number | null;
+  amount: number;
+  currency: string;
+  platformFee: number;
+  candidateAmount: number;
+  startDate?: string | null;
+  endDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  terms?: string | null;
+  acceptedAt?: string | null;
+  expiresAt?: string | null;
+  completedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  payment?: EscrowPayment | null;
+  invoices?: Invoice[];
 };
 
 export type Paginated<T> = { items: T[]; total: number };

@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
+import { agreementLabel, agreementNextStep, agreementTone, candidateAmountLabel, conversationForApplication, latestAgreement, missionDateValue } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
-import type { Application, Document, Notification, Profile } from '@/lib/types';
+import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
@@ -32,6 +33,7 @@ export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,11 +42,13 @@ export default function CandidateDashboardPage() {
       api.get<Profile>('/me/profile'),
       api.get<Document[]>('/me/documents'),
       api.get<Application[]>('/me/applications'),
+      api.get<Conversation[]>('/conversations'),
       api.get<Notification[]>('/notifications'),
-    ]).then(([p, d, a, n]) => {
+    ]).then(([p, d, a, c, n]) => {
       setProfile(p);
       setDocuments(d);
       setApplications(a);
+      setConversations(c);
       setNotifications(n);
     }).finally(() => setLoading(false));
   }, []);
@@ -59,6 +63,22 @@ export default function CandidateDashboardPage() {
     const blockedDocuments = documents.filter((d) => ['REJECTED', 'EXPIRED'].includes(d.verificationStatus));
     const activeApplications = applications.filter((a) => !['REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(a.status));
     const acceptedApplications = applications.filter((a) => a.status === 'ACCEPTED');
+    const missionRows = sortedApplications.map((application) => {
+      const conversation = conversationForApplication(application, conversations);
+      const agreement = latestAgreement(conversation);
+      return {
+        application,
+        conversation,
+        agreement,
+        date: missionDateValue(application, agreement),
+      };
+    });
+    const proposedAgreements = missionRows.filter((row) => row.agreement?.status === 'PROPOSED');
+    const billingReady = missionRows.filter((row) => row.agreement?.status === 'PAYMENT_RELEASED');
+    const confirmedMissions = missionRows.filter((row) => ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(row.agreement?.status || ''));
+    const nextAgendaItem = [...missionRows]
+      .filter((row) => row.date)
+      .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
     const nextMission = [...acceptedApplications]
       .filter((a) => a.mission?.startDate)
       .sort((a, b) => new Date(a.mission!.startDate).getTime() - new Date(b.mission!.startDate).getTime())[0];
@@ -71,9 +91,14 @@ export default function CandidateDashboardPage() {
       blockedDocuments,
       activeApplications,
       acceptedApplications,
+      missionRows,
+      proposedAgreements,
+      billingReady,
+      confirmedMissions,
+      nextAgendaItem,
       nextMission,
     };
-  }, [applications, documents, notifications]);
+  }, [applications, conversations, documents, notifications]);
 
   if (loading) return <LoadingCard />;
 
@@ -89,7 +114,11 @@ export default function CandidateDashboardPage() {
       ? { label: 'Vérifier les documents', href: '/app/profile', helper: 'Gardez vos justificatifs prêts avant de postuler.' }
       : !hasApplications
         ? { label: 'Trouver une mission', href: '/app/search', helper: 'Votre dossier est prêt à être envoyé.' }
-        : { label: 'Suivre mes candidatures', href: '/app/applications', helper: 'Consultez les retours et relancez au bon moment.' };
+        : dashboard.proposedAgreements.length > 0
+          ? { label: 'Répondre à une proposition', href: '/app/messages', helper: 'Une proposition finale attend votre validation.' }
+          : dashboard.billingReady.length > 0
+            ? { label: 'Télécharger un justificatif', href: '/app/billing', helper: 'Une mission validée dispose maintenant d’un document comptable.' }
+            : { label: 'Suivre mes missions', href: '/app/missions', helper: 'Consultez les retours et relancez au bon moment.' };
 
   return (
     <>
@@ -105,6 +134,7 @@ export default function CandidateDashboardPage() {
           <p>{nextStep.helper}</p>
           <div className="actions">
             <LinkButton href={nextStep.href}>Continuer</LinkButton>
+            <LinkButton variant="light" href="/app/agenda">Ouvrir l’agenda</LinkButton>
             <LinkButton variant="light" href="/app/messages">Ouvrir la messagerie</LinkButton>
           </div>
         </div>
@@ -119,8 +149,8 @@ export default function CandidateDashboardPage() {
             <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
           </div>
           <div>
-            <span>Notifications non lues</span>
-            <strong>{dashboard.unreadNotifications.length}</strong>
+            <span>Prochaine date</span>
+            <strong>{dashboard.nextAgendaItem?.date ? formatDate(dashboard.nextAgendaItem.date) : 'Aucune'}</strong>
           </div>
         </div>
       </section>
@@ -142,7 +172,19 @@ export default function CandidateDashboardPage() {
           label="Candidatures actives"
           value={dashboard.activeApplications.length}
           helper={`${dashboard.acceptedApplications.length} acceptée(s) - ${applications.length} au total`}
-          action={<LinkButton variant="secondary" href="/app/applications">Voir</LinkButton>}
+          action={<LinkButton variant="secondary" href="/app/missions">Voir</LinkButton>}
+        />
+        <StatCard
+          label="Agenda"
+          value={dashboard.confirmedMissions.length}
+          helper={`${dashboard.proposedAgreements.length} proposition(s) à traiter`}
+          action={<LinkButton variant="secondary" href="/app/agenda">Planifier</LinkButton>}
+        />
+        <StatCard
+          label="Facturation"
+          value={dashboard.billingReady.length}
+          helper="Justificatifs candidat disponibles"
+          action={<LinkButton variant="secondary" href="/app/billing">Ouvrir</LinkButton>}
         />
       </div>
 
@@ -151,20 +193,22 @@ export default function CandidateDashboardPage() {
           <div className="toolbar">
             <div>
               <h2>Candidatures récentes</h2>
-              <p className="small">Les dossiers qui méritent votre attention en premier.</p>
+              <p className="small">Les missions et accords qui méritent votre attention en premier.</p>
             </div>
-            <LinkButton variant="light" href="/app/applications">Tout voir</LinkButton>
+            <LinkButton variant="light" href="/app/missions">Tout voir</LinkButton>
           </div>
-          {dashboard.sortedApplications.length > 0 ? (
+          {dashboard.missionRows.length > 0 ? (
             <div className="dashboard-list">
-              {dashboard.sortedApplications.slice(0, 5).map((application) => (
+              {dashboard.missionRows.slice(0, 5).map(({ application, agreement }) => (
                 <div key={application.id} className="dashboard-list-item">
                   <div>
                     <strong>{application.mission?.title || 'Mission'}</strong>
-                    <span>{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
+                    <span>{agreement ? agreementNextStep(agreement.status) : application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
                   </div>
                   <div className="dashboard-list-meta">
-                    <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
+                    <Badge tone={agreement ? agreementTone(agreement.status) : applicationTone(application.status)}>
+                      {agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}
+                    </Badge>
                     <span className="small">{formatMissionDate(application)}</span>
                   </div>
                 </div>
@@ -197,6 +241,31 @@ export default function CandidateDashboardPage() {
               <div className="dashboard-empty compact">
                 <strong>Aucune mission acceptée</strong>
                 <p>Les missions validées apparaîtront ici.</p>
+              </div>
+            )}
+          </Card>
+
+          <Card className="dashboard-panel">
+            <div className="toolbar">
+              <div>
+                <h2>Compta</h2>
+                <p className="small">Justificatifs et rétrocessions disponibles.</p>
+              </div>
+              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
+            </div>
+            {dashboard.billingReady.length > 0 ? (
+              <div className="dashboard-mini-list">
+                {dashboard.billingReady.slice(0, 3).map(({ application, agreement }) => (
+                  <div key={application.id}>
+                    <span>{application.mission?.title || 'Mission'}</span>
+                    <Badge tone="success">{candidateAmountLabel(agreement)}</Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucun justificatif disponible</strong>
+                <p>Ils apparaîtront après validation de fin de mission.</p>
               </div>
             )}
           </Card>

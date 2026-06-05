@@ -13,9 +13,11 @@ type NavItem = { href: string; label: string; icon: string };
 
 const candidateNav: NavItem[] = [
   { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
-  { href: '/app/profile', label: 'Mon profil', icon: 'P' },
+  { href: '/app/agenda', label: 'Agenda', icon: 'A' },
+  { href: '/app/missions', label: 'Missions', icon: 'M' },
+  { href: '/app/billing', label: 'Facturation', icon: 'F' },
   { href: '/app/search', label: 'Recherche', icon: 'R' },
-  { href: '/app/applications', label: 'Candidatures', icon: 'C' },
+  { href: '/app/profile', label: 'Profil', icon: 'P' },
   { href: '/app/messages', label: 'Messagerie', icon: 'M' },
   { href: '/app/notifications', label: 'Notifications', icon: 'N' },
 ];
