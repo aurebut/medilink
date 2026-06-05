@@ -132,28 +132,19 @@ export default function CandidateAgendaPage() {
         actions={<LinkButton href="/app/profile" variant="light">Modifier mes disponibilités</LinkButton>}
       />
 
-      <div className="grid-3 dashboard-stat-grid">
-        <Card className="stat-card">
-          <div className="stat">
-            <span>Missions acceptées</span>
-            <strong>{acceptedEvents.length}</strong>
-            <div className="small">A placer dans votre planning.</div>
-          </div>
-        </Card>
-        <Card className="stat-card">
-          <div className="stat">
-            <span>Propositions à traiter</span>
-            <strong>{proposalEvents.length}</strong>
-            <div className="small">Réponse attendue dans la messagerie.</div>
-          </div>
-        </Card>
-        <Card className="stat-card">
-          <div className="stat">
-            <span>Prochains événements</span>
-            <strong>{upcomingEvents.length}</strong>
-            <div className="small">Missions ou candidatures datées.</div>
-          </div>
-        </Card>
+      <div className="agenda-overview">
+        <div>
+          <span>Missions acceptées</span>
+          <strong>{acceptedEvents.length}</strong>
+        </div>
+        <div>
+          <span>Propositions</span>
+          <strong>{proposalEvents.length}</strong>
+        </div>
+        <div>
+          <span>A venir</span>
+          <strong>{upcomingEvents.length}</strong>
+        </div>
       </div>
 
       <div className="agenda-workspace">
@@ -161,11 +152,18 @@ export default function CandidateAgendaPage() {
           <div className="agenda-calendar-head">
             <div>
               <span>Calendrier</span>
-              <h2>{monthLabel(calendarMonth)}</h2>
+              <div className="agenda-month-title">
+                <button type="button" className="agenda-arrow-button" aria-label="Mois précédent" title="Mois précédent" onClick={() => setCalendarMonth((month) => addMonths(month, -1))}>
+                  ←
+                </button>
+                <h2>{monthLabel(calendarMonth)}</h2>
+                <button type="button" className="agenda-arrow-button" aria-label="Mois suivant" title="Mois suivant" onClick={() => setCalendarMonth((month) => addMonths(month, 1))}>
+                  →
+                </button>
+              </div>
               <p className="small">Missions, propositions et candidatures datées.</p>
             </div>
             <div className="agenda-month-actions">
-              <Button type="button" variant="light" onClick={() => setCalendarMonth((month) => addMonths(month, -1))}>Mois précédent</Button>
               <Button
                 type="button"
                 variant="light"
@@ -177,7 +175,6 @@ export default function CandidateAgendaPage() {
               >
                 Aujourd’hui
               </Button>
-              <Button type="button" variant="light" onClick={() => setCalendarMonth((month) => addMonths(month, 1))}>Mois suivant</Button>
             </div>
           </div>
 
@@ -309,17 +306,46 @@ export default function CandidateAgendaPage() {
               <p>Cette information vient du profil candidat. Une prochaine version pourra gérer des créneaux précis.</p>
             </div>
           </Card>
-
-          <Card className="dashboard-panel">
-            <h2>Priorités agenda</h2>
-            <div className="dashboard-mini-list">
-              <div><span>Répondre aux propositions</span><Badge tone={proposalEvents.length ? 'warning' : 'success'}>{proposalEvents.length}</Badge></div>
-              <div><span>Préparer les missions confirmées</span><Badge tone={acceptedEvents.length ? 'warning' : 'neutral'}>{acceptedEvents.length}</Badge></div>
-              <div><span>Compléter les indisponibilités</span><Badge tone={profile?.availabilityNotes ? 'success' : 'warning'}>{profile?.availabilityNotes ? 'OK' : 'A faire'}</Badge></div>
-            </div>
-          </Card>
         </div>
       </div>
+
+      <Card className="agenda-list-card">
+        <div className="toolbar">
+          <div>
+            <h2>Liste chronologique</h2>
+            <p className="small">Les prochaines actions à traiter, dans l’ordre.</p>
+          </div>
+          <LinkButton href="/app/missions" variant="light">Voir toutes les missions</LinkButton>
+        </div>
+
+        {upcomingEvents.length > 0 ? (
+          <div className="agenda-list">
+            {upcomingEvents.map(({ application, agreement, conversation, date }) => (
+              <div key={application.id} className="agenda-list-item">
+                <div className="agenda-list-date">
+                  <strong>{formatDate(date)}</strong>
+                  <span>{application.mission?.startTime || 'Horaire à confirmer'}</span>
+                </div>
+                <div className="agenda-list-main">
+                  <strong>{application.mission?.title || 'Mission'}</strong>
+                  <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
+                </div>
+                <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
+                <div className="actions">
+                  {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
+                  {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="Aucun événement à venir"
+            description="Les missions acceptées et candidatures datées apparaîtront ici."
+            action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
+          />
+        )}
+      </Card>
     </>
   );
 }
