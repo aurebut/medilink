@@ -4287,11 +4287,13 @@ tbody tr:hover { background: #FAFBFD; }
     gap: 6px;
     max-height: calc(100dvh - 86px) !important;
     overflow: auto !important;
-    padding: 10px !important;
+    padding: 0 8px 8px !important;
     border: 1px solid var(--line) !important;
     border-radius: 14px;
-    background: rgba(255,255,255,.96) !important;
-    box-shadow: 0 24px 70px rgba(11,25,41,.16) !important;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(14,138,122,.12), transparent 34%),
+      linear-gradient(135deg, #fff 0%, #F8F7F3 100%) !important;
+    box-shadow: 0 24px 70px rgba(11,25,41,.18) !important;
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
@@ -4307,10 +4309,33 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .shell > .sidebar .sidebar-link,
   .sidebar-link {
-    min-height: 42px;
+    min-height: 46px;
     justify-content: flex-start;
     color: var(--text);
     font-size: 14px;
+    padding: 11px 10px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: rgba(255,255,255,.38);
+    line-height: 1.25;
+  }
+  .shell > .sidebar .sidebar-link:first-child,
+  .sidebar-link:first-child {
+    margin-top: 8px;
+  }
+  .shell > .sidebar .sidebar-link:hover,
+  .sidebar-link:hover {
+    background: rgba(255,255,255,.82);
+    border-color: rgba(26,82,160,.10);
+    color: var(--blue);
+  }
+  .shell > .sidebar .sidebar-link.active,
+  .sidebar-link.active {
+    border-color: rgba(183,110,0,.18);
+    border-radius: 10px;
+    background: rgba(183,110,0,.06);
+    color: var(--heading);
+    box-shadow: none;
   }
   .shell > .sidebar .sidebar-link .nav-main,
   .sidebar-link .nav-main {
@@ -4325,6 +4350,11 @@ tbody tr:hover { background: #FAFBFD; }
     background: rgba(26,82,160,.08);
     color: var(--blue);
     font-size: 12px;
+  }
+  .shell > .sidebar .sidebar-link.active .nav-icon,
+  .sidebar-link.active .nav-icon {
+    background: #fff;
+    color: var(--blue);
   }
   .shell > .sidebar .sidebar-footer,
   .sidebar-footer {
@@ -4356,8 +4386,8 @@ tbody tr:hover { background: #FAFBFD; }
   .mobile-menu-account {
     display: grid;
     gap: 8px;
-    margin-top: 6px;
-    padding-top: 10px;
+    margin-top: 8px;
+    padding: 8px 0 0;
     border-top: 1px solid var(--line);
   }
   .shell > .sidebar .mobile-menu-user,
@@ -4366,10 +4396,10 @@ tbody tr:hover { background: #FAFBFD; }
     align-items: center;
     gap: 10px;
     min-width: 0;
-    padding: 10px;
+    padding: 11px;
     border: 1px solid var(--line);
     border-radius: 10px;
-    background: var(--surface-soft);
+    background: rgba(255,255,255,.72);
     color: var(--text);
   }
   .shell > .sidebar .mobile-menu-user strong,
@@ -4381,8 +4411,13 @@ tbody tr:hover { background: #FAFBFD; }
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 10px;
-    background: #fff;
+    background: rgba(255,255,255,.92);
     color: var(--text);
+  }
+  .shell > .sidebar .mobile-menu-actions .account-menu-item,
+  .mobile-menu-actions .account-menu-item {
+    min-height: 42px;
+    padding: 10px 11px;
   }
   .topbar,
   .content {
