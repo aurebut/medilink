@@ -7,7 +7,7 @@ import { formatDate, formatDateTime } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
+import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -79,8 +79,6 @@ export default function CandidateDashboardPage() {
     const approvedDocuments = documents.filter((d) => d.verificationStatus === 'APPROVED');
     const pendingDocuments = documents.filter((d) => ['PENDING_VERIFICATION', 'UPLOAD_PENDING'].includes(d.verificationStatus));
     const blockedDocuments = documents.filter((d) => ['REJECTED', 'EXPIRED'].includes(d.verificationStatus));
-    const activeApplications = applications.filter((a) => !['REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(a.status));
-    const acceptedApplications = applications.filter((a) => a.status === 'ACCEPTED');
     const missionRows = sortedApplications.map((application) => {
       const conversation = conversationForApplication(application, conversations);
       const agreement = latestAgreement(conversation);
@@ -93,13 +91,9 @@ export default function CandidateDashboardPage() {
     });
     const proposedAgreements = missionRows.filter((row) => row.agreement?.status === 'PROPOSED');
     const billingReady = missionRows.filter((row) => row.agreement?.status === 'PAYMENT_RELEASED');
-    const confirmedMissions = missionRows.filter((row) => ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(row.agreement?.status || ''));
     const nextAgendaItem = [...missionRows]
       .filter((row) => row.date)
       .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
-    const nextMission = [...acceptedApplications]
-      .filter((a) => a.mission?.startDate)
-      .sort((a, b) => new Date(a.mission!.startDate).getTime() - new Date(b.mission!.startDate).getTime())[0];
     const userId = profile?.userId;
     const receivedMessages = conversations.flatMap((conversation) => {
       return (conversation.messages || [])
@@ -123,14 +117,10 @@ export default function CandidateDashboardPage() {
       approvedDocuments,
       pendingDocuments,
       blockedDocuments,
-      activeApplications,
-      acceptedApplications,
       missionRows,
       proposedAgreements,
       billingReady,
-      confirmedMissions,
       nextAgendaItem,
-      nextMission,
       latestReceivedMessages,
       unreadReceivedMessages,
       missionRowsByDay,
@@ -143,20 +133,6 @@ export default function CandidateDashboardPage() {
   const firstName = profile?.firstName || 'Bienvenue';
   const completionScore = profile?.completionScore || 0;
   const profileReady = completionScore >= 80;
-  const documentsReady = documents.length > 0 && dashboard.blockedDocuments.length === 0 && dashboard.pendingDocuments.length === 0;
-  const hasApplications = applications.length > 0;
-
-  const nextStep = !profileReady
-    ? { label: 'Compléter le profil', href: '/app/profile', helper: 'Un profil complet rassure les établissements.' }
-    : !documentsReady
-      ? { label: 'Vérifier les documents', href: '/app/profile', helper: 'Gardez vos justificatifs prêts avant de postuler.' }
-      : !hasApplications
-        ? { label: 'Trouver une mission', href: '/app/search', helper: 'Votre dossier est prêt à être envoyé.' }
-        : dashboard.proposedAgreements.length > 0
-          ? { label: 'Répondre à une proposition', href: '/app/messages', helper: 'Une proposition finale attend votre validation.' }
-          : dashboard.billingReady.length > 0
-            ? { label: 'Télécharger un justificatif', href: '/app/billing', helper: 'Une mission validée dispose maintenant d’un document comptable.' }
-            : { label: 'Suivre mes missions', href: '/app/missions', helper: 'Consultez les retours et relancez au bon moment.' };
 
   return (
     <>
@@ -230,28 +206,43 @@ export default function CandidateDashboardPage() {
         </Card>
 
         <section className="dashboard-command-grid">
-          <Card className="dashboard-priority-card">
-            <span className="dashboard-eyebrow">Priorité du jour</span>
-            <h2>{nextStep.label}</h2>
-            <p>{nextStep.helper}</p>
-            <div className="dashboard-kpi-row">
+          <Card className="dashboard-focus-card dashboard-notifications">
+            <div className="dashboard-section-head">
               <div>
-                <span>Profil</span>
-                <strong>{completionScore}%</strong>
-                <ProgressBar value={completionScore} />
+                <span>Notifications</span>
+                <h2>Alertes récentes</h2>
+              </div>
+              <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
+            </div>
+            <div className="dashboard-message-summary">
+              <div>
+                <span>Non lues</span>
+                <strong>{dashboard.unreadNotifications.length}</strong>
               </div>
               <div>
-                <span>Documents</span>
-                <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
-              </div>
-              <div>
-                <span>Missions actives</span>
-                <strong>{dashboard.activeApplications.length}</strong>
+                <span>Total</span>
+                <strong>{notifications.length}</strong>
               </div>
             </div>
-            <div className="actions">
-              <LinkButton href={nextStep.href}>Continuer</LinkButton>
-            </div>
+            {notifications.length > 0 ? (
+              <div className="dashboard-notification-list">
+                {notifications.slice(0, 3).map((notification) => (
+                  <div key={notification.id} className="dashboard-notification">
+                    <div className="actions">
+                      <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
+                      <span className="small">{formatDateTime(notification.createdAt)}</span>
+                    </div>
+                    <strong>{notification.title}</strong>
+                    <p>{notification.body}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="dashboard-empty compact">
+                <strong>Aucune notification</strong>
+                <p>Les réponses, messages et alertes de dossier apparaîtront ici.</p>
+              </div>
+            )}
           </Card>
 
           <Card className="dashboard-focus-card">
@@ -388,34 +379,6 @@ export default function CandidateDashboardPage() {
             )}
           </Card>
 
-            <Card className="dashboard-panel dashboard-notifications">
-        <div className="toolbar">
-          <div>
-            <h2>Notifications</h2>
-            <p className="small">Les alertes importantes de votre compte.</p>
-          </div>
-          <LinkButton variant="light" href="/app/notifications">Tout voir</LinkButton>
-        </div>
-        {notifications.length > 0 ? (
-          <div className="dashboard-notification-list">
-            {notifications.slice(0, 4).map((notification) => (
-              <div key={notification.id} className="dashboard-notification">
-                <div className="actions">
-                  <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
-                  <span className="small">{formatDateTime(notification.createdAt)}</span>
-                </div>
-                <strong>{notification.title}</strong>
-                <p>{notification.body}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="dashboard-empty compact">
-            <strong>Aucune notification</strong>
-            <p>Les réponses, messages et alertes de dossier apparaîtront ici.</p>
-          </div>
-        )}
-      </Card>
           </div>
         </section>
       </div>

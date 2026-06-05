@@ -1022,46 +1022,12 @@ button { touch-action: manipulation; }
   gap: 16px;
   align-items: stretch;
 }
-.dashboard-priority-card,
 .dashboard-focus-card {
   display: grid;
   align-content: space-between;
   gap: 18px;
   min-height: 250px;
 }
-.dashboard-priority-card {
-  overflow: hidden;
-  border-color: rgba(26,82,160,.16);
-  background:
-    radial-gradient(circle at 8% 0%, rgba(45,108,200,.14), transparent 30%),
-    radial-gradient(circle at 95% 88%, rgba(14,138,122,.14), transparent 34%),
-    linear-gradient(135deg, #ffffff 0%, #F8F7F3 52%, #EEF5FF 100%);
-}
-.dashboard-priority-card h2 {
-  max-width: 680px;
-  margin: 0;
-  color: var(--heading);
-  font-family: var(--serif);
-  font-size: clamp(34px, 4vw, 48px);
-  font-weight: 400;
-  line-height: 1.03;
-}
-.dashboard-priority-card p {
-  max-width: 640px;
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.65;
-}
-.dashboard-kpi-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--line);
-}
-.dashboard-kpi-row > div,
 .dashboard-finance-stack > div,
 .dashboard-dossier-summary > div {
   display: grid;
@@ -1070,7 +1036,6 @@ button { touch-action: manipulation; }
   padding: 13px;
   background: rgba(255,255,255,.86);
 }
-.dashboard-kpi-row span,
 .dashboard-finance-stack span,
 .dashboard-dossier-summary span,
 .dashboard-section-head span,
@@ -1081,7 +1046,6 @@ button { touch-action: manipulation; }
   letter-spacing: .06em;
   text-transform: uppercase;
 }
-.dashboard-kpi-row strong,
 .dashboard-finance-stack strong,
 .dashboard-dossier-summary strong {
   color: var(--heading);
@@ -2366,7 +2330,6 @@ tbody tr:hover { background: #FAFBFD; }
   .agenda-workspace {
     grid-template-columns: 1fr;
   }
-  .dashboard-priority-card,
   .dashboard-focus-card,
   .dashboard-missions-panel {
     min-height: 0;
@@ -4220,7 +4183,6 @@ td {
   .dashboard-hero {
     padding: 20px;
   }
-  .dashboard-kpi-row,
   .dashboard-next-event {
     grid-template-columns: 1fr;
   }
@@ -4233,9 +4195,6 @@ td {
   .dashboard-message-list > div {
     grid-template-columns: 1fr;
     gap: 6px;
-  }
-  .dashboard-priority-card h2 {
-    font-size: 32px;
   }
   .dashboard-week-card {
     margin-left: -2px;
