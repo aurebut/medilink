@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api, clearAuthToken, setAuthToken } from '@/lib/api';
-import type { CurrentUser } from '@/lib/types';
+import type { CandidateGender, CurrentUser } from '@/lib/types';
 
 type AuthContextValue = {
   user: CurrentUser | null;
@@ -19,6 +19,7 @@ type RegisterPayload = {
   password: string;
   firstName?: string;
   lastName?: string;
+  candidateGender?: CandidateGender;
   phone?: string;
 };
 

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { formatDate } from '@/lib/format';
+import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Mission } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
@@ -23,7 +24,7 @@ function missionTone(status: Mission['status']) {
 
 function candidateName(application: Application) {
   const name = [application.candidate?.profile?.firstName, application.candidate?.profile?.lastName].filter(Boolean).join(' ');
-  return name || application.candidate?.email || 'Candidat à identifier';
+  return name || application.candidate?.email || `${candidateNounCapitalized(application.candidate?.profile)} à identifier`;
 }
 
 export default function EstablishmentDashboardPage() {

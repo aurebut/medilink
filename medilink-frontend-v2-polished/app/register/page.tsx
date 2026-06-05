@@ -7,6 +7,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input, Select } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
+import type { CandidateGender } from '@/lib/types';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [candidateGender, setCandidateGender] = useState<CandidateGender | ''>('');
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,6 +34,7 @@ export default function RegisterPage() {
         password,
         firstName,
         lastName,
+        candidateGender: accountType === 'candidate' ? candidateGender || undefined : undefined,
         phone,
       });
       router.push(defaultRouteForUser(user));
@@ -61,6 +64,15 @@ export default function RegisterPage() {
           <Field label="Prénom"><Input value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
           <Field label="Nom"><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
         </div>
+        {accountType === 'candidate' ? (
+          <Field label="Sexe / accord grammatical">
+            <Select value={candidateGender} onChange={(e) => setCandidateGender(e.target.value as CandidateGender | '')}>
+              <option value="">Sélectionner</option>
+              <option value="FEMININE">Féminin</option>
+              <option value="MASCULINE">Masculin</option>
+            </Select>
+          </Field>
+        ) : null}
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
         <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>
         <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8 caractères minimum" /></Field>

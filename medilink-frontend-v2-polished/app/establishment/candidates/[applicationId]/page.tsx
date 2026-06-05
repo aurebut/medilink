@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { CandidateProfileForApplication, Document } from '@/lib/types';
-import { documentTypeLabel, medicalStatusOptions, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
+import { documentTypeLabel, medicalStatusLabel as formatMedicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
-import { candidateHas, candidateNoun } from '@/lib/grammar';
+import { candidateIs, candidateNoun } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: string) {
@@ -23,8 +23,8 @@ function docTone(status: string) {
   return 'neutral';
 }
 
-function medicalStatusLabel(value?: string | null) {
-  return medicalStatusOptions.find((x) => x.value === value)?.label || value || '—';
+function medicalStatusLabel(value?: string | null, profile?: CandidateProfileForApplication['candidate']['profile']) {
+  return formatMedicalStatusLabel(value, profile);
 }
 
 export default function EstablishmentCandidateProfilePage() {
@@ -71,7 +71,7 @@ export default function EstablishmentCandidateProfilePage() {
   const documents = data.candidate.documents || [];
   const fullName = `${profile?.firstName || ''} ${profile?.lastName || ''}`.trim() || data.candidate.email;
   const candidateLabel = candidateNoun(profile);
-  const candidateHasLabel = candidateHas(profile);
+  const candidateIsLabel = candidateIs(profile);
 
   return (
     <>
@@ -105,7 +105,7 @@ export default function EstablishmentCandidateProfilePage() {
           <div className="form-row" style={{ marginTop: 18 }}>
             <div className="stat">
               <span>Statut médical</span>
-              <strong>{medicalStatusLabel(profile?.medicalStatus)}</strong>
+              <strong>{medicalStatusLabel(profile?.medicalStatus, profile)}</strong>
             </div>
             <div className="stat">
               <span>Spécialité</span>
@@ -201,7 +201,7 @@ export default function EstablishmentCandidateProfilePage() {
         <div className="actions" style={{ justifyContent: 'space-between' }}>
           <div>
             <h2>Documents validés</h2>
-            <p className="muted">Documents consultables car {candidateHasLabel} postule a une mission de votre etablissement.</p>
+            <p className="muted">Documents consultables car {candidateIsLabel} en candidature sur une mission de votre etablissement.</p>
           </div>
           <Badge tone="success">{documents.length} document(s)</Badge>
         </div>

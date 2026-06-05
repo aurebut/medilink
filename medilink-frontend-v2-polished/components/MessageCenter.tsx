@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { api, getApiEventUrl, getApiUrl, getAuthToken } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
-import { candidateContractedArticle, candidateHas, candidateWithArticle } from '@/lib/grammar';
+import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
 
@@ -589,8 +589,8 @@ export function MessageCenter() {
               onSelect: () => void downloadInvoice('recruiter'),
             },
             {
-              label: 'Justificatif candidat',
-              description: 'PDF candidat.',
+              label: `Justificatif ${candidateNoun(activeCandidateProfile)}`,
+              description: `PDF ${candidateNoun(activeCandidateProfile)}.`,
               tone: 'light',
               disabled: Boolean(busyAction),
               busy: busyAction === 'download-candidate',
@@ -992,7 +992,7 @@ function WorkflowStepPanel({
             {busyAction === 'download-recruiter' ? 'Téléchargement...' : 'Facture recruteur PDF'}
           </Button>
           <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadCandidate}>
-            {busyAction === 'download-candidate' ? 'Téléchargement...' : 'Justificatif candidat PDF'}
+            {busyAction === 'download-candidate' ? 'Téléchargement...' : 'Justificatif mission PDF'}
           </Button>
         </div>
       </div>
@@ -1109,6 +1109,7 @@ function WorkflowMessageCard({
   const retrocession = proposal?.compensationMode === 'RETROCESSION';
   const candidateLabel = candidateWithArticle(candidateProfile);
   const candidateHasLabel = candidateHas(candidateProfile);
+  const candidateNounLabel = candidateNoun(candidateProfile);
   const candidateTargetLabel = candidateContractedArticle(candidateProfile);
 
   return (
@@ -1213,7 +1214,7 @@ function WorkflowMessageCard({
                 {busyAction === 'download-recruiter' ? 'Téléchargement...' : 'Facture recruteur PDF'}
               </Button>
               <Button variant="light" disabled={Boolean(busyAction)} onClick={onDownloadCandidate}>
-                {busyAction === 'download-candidate' ? 'Téléchargement...' : 'Justificatif candidat PDF'}
+                {busyAction === 'download-candidate' ? 'Téléchargement...' : `Justificatif ${candidateNounLabel} PDF`}
               </Button>
             </div>
           ) : null}

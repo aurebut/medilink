@@ -3,7 +3,10 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { api } from '@/lib/api';
+import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
+import type { Profile } from '@/lib/types';
 import { useAuth } from './AuthProvider';
 
 type NavItem = { href: string; label: string; icon: string };
@@ -34,8 +37,8 @@ const adminNav: NavItem[] = [
   { href: '/admin/missions', label: 'Missions', icon: 'M' },
 ];
 
-function areaLabel(area: 'candidate' | 'establishment' | 'admin') {
-  if (area === 'candidate') return 'Espace candidat';
+function areaLabel(area: 'candidate' | 'establishment' | 'admin', profile?: Pick<Profile, 'candidateGender'> | null) {
+  if (area === 'candidate') return candidateAreaLabel(profile);
   if (area === 'establishment') return 'Espace etablissement';
   return 'Administration';
 }
@@ -73,6 +76,7 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const [candidateProfile, setCandidateProfile] = useState<Profile | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
@@ -110,6 +114,17 @@ export function AppShell({
   useEffect(() => {
     setMobileNavOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (area !== 'candidate' || user?.role !== 'CANDIDATE') {
+      setCandidateProfile(null);
+      return;
+    }
+
+    api.get<Profile>('/me/profile')
+      .then(setCandidateProfile)
+      .catch(() => setCandidateProfile(null));
+  }, [area, user?.role]);
 
   return (
     <div className="shell">
@@ -159,7 +174,7 @@ export function AppShell({
               <span className="truncate">
                 <strong>{user?.email || 'Utilisateur'}</strong>
                 <br />
-                <span>{roleLabel(user?.role)}</span>
+                <span>{roleLabel(user?.role, candidateProfile)}</span>
               </span>
             </div>
             <div className="mobile-menu-actions">
@@ -187,7 +202,7 @@ export function AppShell({
                 <span className="truncate">
                   <strong>{user?.email || 'Utilisateur'}</strong>
                   <br />
-                  <span>{roleLabel(user?.role)}</span>
+                  <span>{roleLabel(user?.role, candidateProfile)}</span>
                 </span>
               </div>
               <div className="account-menu-section">
@@ -226,7 +241,7 @@ export function AppShell({
             <span className="truncate">
               <strong>{user?.email || 'Utilisateur'}</strong>
               <br />
-              <span>{roleLabel(user?.role)}</span>
+              <span>{roleLabel(user?.role, candidateProfile)}</span>
             </span>
             <span className="user-chip-arrow">v</span>
           </button>
@@ -236,7 +251,7 @@ export function AppShell({
       <main className="main">
         <header className="topbar">
           <div className="topbar-title">
-            <strong>{areaLabel(area)}</strong>
+            <strong>{areaLabel(area, candidateProfile)}</strong>
             <div className="small">Plateforme MediLink</div>
           </div>
         </header>

@@ -3,6 +3,8 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api, isMockStorageUrl } from '@/lib/api';
 import type { CandidateGender, MedicalStatus, Profile } from '@/lib/types';
+import { gendered } from '@/lib/grammar';
+import { medicalStatusLabel } from '@/lib/labels';
 import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
@@ -99,7 +101,7 @@ export default function ProfilePage() {
       const updated = await api.patch<Profile>('/me/profile', payload);
       setProfile(updated);
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
-      setMessage('Profil mis a jour.');
+      setMessage(`Profil ${gendered(updated, 'mis a jour', 'mise a jour')}.`);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -158,7 +160,7 @@ export default function ProfilePage() {
     <>
       <PageHeader
         title="Mon profil"
-        description="Identite, informations professionnelles, preferences de missions et documents verifiables."
+        description={`Identite, informations professionnelles, preferences de missions et documents verifiables pour ${gendered(form, 'un candidat', 'une candidate')}.`}
       />
 
       <div className="grid-main">
@@ -200,7 +202,7 @@ export default function ProfilePage() {
         </Card>
 
         <Card>
-          <h2>Informations candidat</h2>
+          <h2>Informations {gendered(form, 'candidat', 'candidate')}</h2>
           <form className="form" onSubmit={submit}>
             {message ? <Alert type="success">{message}</Alert> : null}
             {error ? <Alert type="error">{error}</Alert> : null}
@@ -226,7 +228,11 @@ export default function ProfilePage() {
               <Field label="Statut medical">
                 <Select value={form.medicalStatus || ''} onChange={(e) => set('medicalStatus', e.target.value as MedicalStatus)}>
                   <option value="">Selectionner</option>
-                  {candidateMedicalStatusOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {candidateMedicalStatusOptions.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {medicalStatusLabel(o.value, form)}
+                    </option>
+                  ))}
                 </Select>
               </Field>
             </div>

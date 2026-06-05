@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
 
 export enum RegisterAccountType {
   CANDIDATE = 'candidate',
@@ -23,6 +23,10 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   lastName?: string;
+
+  @IsOptional()
+  @IsIn(['FEMININE', 'MASCULINE'])
+  candidateGender?: string;
 
   @IsOptional()
   @IsString()

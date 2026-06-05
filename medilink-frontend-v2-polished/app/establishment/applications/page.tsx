@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import type { Application, ApplicationStatus } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { formatDateTime } from '@/lib/format';
+import { candidateNoun } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -99,7 +100,7 @@ export default function EstablishmentApplicationsPage() {
                     <td>{formatDateTime(a.createdAt)}</td>
                     <td className="actions">
                       <LinkButton variant="light" href={`/establishment/candidates/${a.id}`}>
-                        Voir profil
+                        Voir profil {candidateNoun(a.candidate?.profile)}
                       </LinkButton>
 
                       {a.mission ? (

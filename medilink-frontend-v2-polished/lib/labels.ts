@@ -1,4 +1,5 @@
-import type { ApplicationStatus, DocumentType, DocumentVerificationStatus, EstablishmentType, MedicalStatus, MissionStatus, MissionType, RequiredLevel, UserRole, UserStatus, VerificationStatus } from './types';
+import type { ApplicationStatus, DocumentType, DocumentVerificationStatus, EstablishmentType, MedicalStatus, MissionStatus, MissionType, Profile, RequiredLevel, UserRole, UserStatus, VerificationStatus } from './types';
+import { candidateNounCapitalized, gendered } from './grammar';
 
 export const medicalStatusOptions: Array<{ value: MedicalStatus; label: string }> = [
   { value: 'STUDENT', label: 'Étudiant' },
@@ -47,9 +48,26 @@ export const requiredLevelOptions: Array<{ value: RequiredLevel; label: string }
   { value: 'OTHER', label: 'Autre profil' },
 ];
 
-export function roleLabel(role?: UserRole) {
+type CandidateAgreement = Pick<Profile, 'candidateGender'> | null | undefined;
+
+export function medicalStatusLabel(value?: MedicalStatus | string | null, profile?: CandidateAgreement) {
+  const map: Record<string, { masculine: string; feminine: string }> = {
+    STUDENT: { masculine: 'Étudiant', feminine: 'Étudiante' },
+    INTERN: { masculine: 'Interne', feminine: 'Interne' },
+    JUNIOR_DOCTOR: { masculine: 'Docteur junior', feminine: 'Docteure junior' },
+    DOCTOR: { masculine: 'Médecin', feminine: 'Médecin' },
+    REGULAR_LOCUM: { masculine: 'Remplaçant régulier', feminine: 'Remplaçante régulière' },
+    NURSE: { masculine: 'Infirmier', feminine: 'Infirmière' },
+    OPERATING_ROOM_ASSISTANT: { masculine: 'Aide opératoire', feminine: 'Aide opératoire' },
+    OTHER: { masculine: 'Autre', feminine: 'Autre' },
+  };
+  const label = value ? map[value] : null;
+  return label ? gendered(profile, label.masculine, label.feminine) : value || '—';
+}
+
+export function roleLabel(role?: UserRole, profile?: CandidateAgreement) {
   const map: Record<UserRole, string> = {
-    CANDIDATE: 'Candidat',
+    CANDIDATE: candidateNounCapitalized(profile),
     ESTABLISHMENT_OWNER: 'Établissement - propriétaire',
     ESTABLISHMENT_ADMIN: 'Établissement - admin',
     ESTABLISHMENT_RECRUITER: 'Établissement - recruteur',

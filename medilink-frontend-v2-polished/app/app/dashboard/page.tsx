@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { formatDate, formatDateTime } from '@/lib/format';
+import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Document, Notification, Profile } from '@/lib/types';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, StatCard } from '@/components/ui';
@@ -94,7 +95,7 @@ export default function CandidateDashboardPage() {
     <>
       <PageHeader
         title={`Bonjour ${firstName}`}
-        description="Votre espace de pilotage pour prioriser les missions, garder un dossier solide et suivre les réponses."
+        description={`Votre espace ${gendered(profile, 'connecté', 'connectée')} pour prioriser les missions, garder un dossier solide et suivre les réponses.`}
       />
 
       <section className="dashboard-hero">
@@ -126,8 +127,8 @@ export default function CandidateDashboardPage() {
 
       <div className="grid-3 dashboard-stat-grid">
         <StatCard
-          label="Dossier candidat"
-          value={profileReady ? 'Prêt' : `${completionScore}%`}
+          label={`Dossier ${gendered(profile, 'candidat', 'candidate')}`}
+          value={profileReady ? gendered(profile, 'Prêt', 'Prête') : `${completionScore}%`}
           helper={<ProgressBar value={completionScore} />}
           action={<LinkButton variant="secondary" href="/app/profile">Améliorer</LinkButton>}
         />
