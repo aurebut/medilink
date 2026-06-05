@@ -1420,7 +1420,7 @@ button { touch-action: manipulation; }
 }
 .agenda-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -1602,10 +1602,6 @@ button { touch-action: manipulation; }
   color: var(--teal);
   font-size: 10px;
   font-weight: 900;
-}
-.agenda-side {
-  display: grid;
-  gap: 16px;
 }
 .agenda-day-popover {
   position: absolute;

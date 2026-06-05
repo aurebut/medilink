@@ -6,7 +6,7 @@ import { agreementLabel, agreementTone, conversationForApplication, dateKey, lat
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
-import type { Application, Conversation, Profile } from '@/lib/types';
+import type { Application, Conversation } from '@/lib/types';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
 import { Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
@@ -40,7 +40,6 @@ function addMonths(date: Date, count: number) {
 }
 
 export default function CandidateAgendaPage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -70,11 +69,9 @@ export default function CandidateAgendaPage() {
 
   useEffect(() => {
     Promise.all([
-      api.get<Profile>('/me/profile'),
       api.get<Application[]>('/me/applications'),
       api.get<Conversation[]>('/conversations'),
-    ]).then(([p, a, c]) => {
-      setProfile(p);
+    ]).then(([a, c]) => {
       setApplications(a);
       setConversations(c);
     }).finally(() => setLoading(false));
@@ -326,56 +323,6 @@ export default function CandidateAgendaPage() {
           ) : null}
         </Card>
 
-        <div className="agenda-side">
-          <Card className="dashboard-panel">
-            <div className="toolbar">
-              <div>
-                <h2>Planning à venir</h2>
-                <p className="small">Les prochaines dates à surveiller.</p>
-              </div>
-            </div>
-            {upcomingEvents.length > 0 ? (
-            <div className="timeline-list">
-              {upcomingEvents.slice(0, 5).map(({ application, conversation, agreement, date }) => (
-                <div key={application.id} className="timeline-item">
-                  <div className="timeline-date">
-                    <strong>{formatDate(date)}</strong>
-                    <span>{application.mission?.startTime || 'Horaire à confirmer'}</span>
-                  </div>
-                  <div className="timeline-content">
-                    <div className="toolbar compact">
-                      <div>
-                        <h3>{application.mission?.title || 'Mission'}</h3>
-                        <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</p>
-                      </div>
-                      <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
-                    </div>
-                    <div className="actions">
-                      {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
-                      {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Voir la mission</LinkButton> : null}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            ) : (
-            <EmptyState
-              title="Aucune date à venir"
-              description="Les missions acceptées et candidatures datées apparaîtront ici."
-              action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
-            />
-            )}
-          </Card>
-
-          <Card className="dashboard-panel">
-            <h2>Disponibilités</h2>
-            <div className="dashboard-feature">
-              <span>Notes actuelles</span>
-              <strong>{profile?.availabilityNotes || 'Non renseignées'}</strong>
-              <p>Cette information vient du profil candidat. Une prochaine version pourra gérer des créneaux précis.</p>
-            </div>
-          </Card>
-        </div>
       </div>
 
       <Card className="agenda-list-card">
