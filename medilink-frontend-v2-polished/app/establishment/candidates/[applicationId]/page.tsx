@@ -201,7 +201,7 @@ export default function EstablishmentCandidateProfilePage() {
         <div className="actions" style={{ justifyContent: 'space-between' }}>
           <div>
             <h2>Documents validés</h2>
-            <p className="muted">Documents consultables car {candidateIsLabel} en candidature sur une mission de votre etablissement.</p>
+            <p className="muted">Documents consultables car {candidateIsLabel} en candidature sur une mission de votre établissement.</p>
           </div>
           <Badge tone="success">{documents.length} document(s)</Badge>
         </div>

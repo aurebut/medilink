@@ -423,7 +423,7 @@ export function MessageCenter() {
 
   if (loading) return <LoadingCard label="Chargement des conversations..." />;
   if (conversations.length === 0) {
-    return <EmptyState title="Aucune conversation" description="Les conversations sont creees automatiquement quand une candidature est envoyee." />;
+    return <EmptyState title="Aucune conversation" description="Les conversations sont créées automatiquement quand une candidature est envoyée." />;
   }
 
   const showConversationList = !isMobile || !activeId;
@@ -776,7 +776,7 @@ function WorkflowComposer({
         <div>
           <Badge>{hasProposal ? 'Proposition envoyée' : 'Prochaine étape'}</Badge>
           <h3>{hasProposal ? 'Envoyer une nouvelle proposition finale' : 'Formaliser une proposition finale'}</h3>
-          <p>La proposition apparaitra dans le fil avec les boutons d'acceptation cote {candidateLabel}.</p>
+          <p>La proposition apparaîtra dans le fil avec les boutons d'acceptation côté {candidateLabel}.</p>
         </div>
         <div className="actions">
           <Button onClick={onOpen}>{hasProposal ? 'Modifier la proposition' : 'Envoyer une proposition'}</Button>
@@ -1148,7 +1148,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_REQUIRED' ? (
         <>
           <h3>{retrocession ? 'Accord accepté' : 'Paiement requis'}</h3>
-          <p>{retrocession ? `${candidateHasLabel} accepte la retrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le reglement selon les honoraires encaisses.` : `${candidateHasLabel} accepte. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'a la fin.`}</p>
+          <p>{retrocession ? `${candidateHasLabel} accepte la rétrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le règlement selon les honoraires encaissés.` : `${candidateHasLabel} accepte. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin.`}</p>
           {recruiterCanSecure ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Confirmation...' : retrocession ? 'Confirmer la mission' : 'Payer et confirmer'}</Button>
@@ -1164,14 +1164,14 @@ function WorkflowMessageCard({
       {workflow.kind === 'PROPOSAL_REJECTED' ? (
         <>
           <h3>Proposition refusée</h3>
-          <p>La proposition finale a ete refusee. Le recruteur peut discuter avec {candidateLabel} puis envoyer une nouvelle proposition.</p>
+          <p>La proposition finale a été refusée. Le recruteur peut discuter avec {candidateLabel} puis envoyer une nouvelle proposition.</p>
         </>
       ) : null}
 
       {workflow.kind === 'FUNDS_SECURED' ? (
         <>
           <h3>Mission confirmée</h3>
-          <p>{retrocession ? "La mission est confirmee avec une remuneration en retrocession d'honoraires." : `Le paiement du recruteur est securise par Medilink. Les fonds seront liberes ${candidateTargetLabel} apres validation de la fin de mission.`}</p>
+          <p>{retrocession ? "La mission est confirmée avec une rémunération en rétrocession d'honoraires." : `Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés ${candidateTargetLabel} après validation de la fin de mission.`}</p>
           {recruiterCanComplete ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}</Button>
@@ -1183,7 +1183,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'MISSION_COMPLETED' ? (
         <>
           <h3>Mission terminée</h3>
-          <p>{retrocession ? "La fin de mission a ete validee. La retrocession d'honoraires peut maintenant etre confirmee." : `La fin de mission a ete validee. Le paiement securise peut maintenant etre libere ${candidateTargetLabel}.`}</p>
+          <p>{retrocession ? "La fin de mission a été validée. La rétrocession d'honoraires peut maintenant être confirmée." : `La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré ${candidateTargetLabel}.`}</p>
           {recruiterCanPay ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Validation...' : retrocession ? 'Valider la rétrocession' : 'Libérer le paiement'}</Button>
@@ -1195,7 +1195,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_RELEASED' ? (
         <>
           <h3>{retrocession ? 'Rétrocession validée' : 'Paiement libéré'}</h3>
-          <p>{retrocession ? "La retrocession d'honoraires a ete validee. Les justificatifs peuvent etre generes." : `Les fonds ont ete liberes ${candidateTargetLabel}. Les factures et justificatifs peuvent etre generes.`}</p>
+          <p>{retrocession ? "La rétrocession d'honoraires a été validée. Les justificatifs peuvent être générés." : `Les fonds ont été libérés ${candidateTargetLabel}. Les factures et justificatifs peuvent être générés.`}</p>
           {canGenerateInvoices ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onGenerateInvoices}>{busyAction === 'invoices' ? 'Génération...' : 'Générer les factures'}</Button>

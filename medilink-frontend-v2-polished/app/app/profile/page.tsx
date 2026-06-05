@@ -102,7 +102,7 @@ export default function ProfilePage() {
       const updated = await api.patch<Profile>('/me/profile', payload);
       setProfile(updated);
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
-      setMessage(`Profil ${gendered(updated, 'mis a jour', 'mise a jour')}.`);
+      setMessage(`Profil ${gendered(updated, 'mis à jour', 'mise à jour')}.`);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -141,7 +141,7 @@ export default function ProfilePage() {
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
       setAvatarFile(null);
       setAvatarInputKey((key) => key + 1);
-      setMessage('Photo de profil mise a jour.');
+      setMessage('Photo de profil mise à jour.');
     } catch (e: any) {
       setError(e.message || 'Erreur upload photo.');
     } finally {
@@ -162,7 +162,7 @@ export default function ProfilePage() {
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
       setMessage(healthVerificationMessage(updated.healthVerificationStatus));
     } catch (e: any) {
-      setError(e.message || 'Verification RPPS impossible.');
+      setError(e.message || 'Vérification RPPS impossible.');
       try {
         const refreshed = await api.get<Profile>('/me/profile');
         setProfile(refreshed);
@@ -214,7 +214,7 @@ export default function ProfilePage() {
                   />
                 </Field>
                 <Button type="button" disabled={!avatarFile || uploadingAvatar} onClick={uploadAvatar}>
-                  {uploadingAvatar ? 'Upload...' : 'Mettre a jour la photo'}
+                  {uploadingAvatar ? 'Upload...' : 'Mettre à jour la photo'}
                 </Button>
               </div>
             </div>
@@ -223,10 +223,10 @@ export default function ProfilePage() {
             <div className="stat">
               <strong>{profile.completionScore}%</strong>
               <ProgressBar value={profile.completionScore} />
-              <span>Plus votre profil est complet, plus vos candidatures sont lisibles pour les etablissements.</span>
+              <span>Plus votre profil est complet, plus vos candidatures sont lisibles pour les établissements.</span>
             </div>
             <div className="divider" />
-            <p className="small">A renseigner en priorite : ville, statut medical, specialite, mobilite, missions acceptees et CV.</p>
+            <p className="small">À renseigner en priorité : ville, statut médical, spécialité, mobilité, missions acceptées et CV.</p>
           </Card>
 
         </div>
@@ -240,8 +240,8 @@ export default function ProfilePage() {
             <div className="profile-preferences-section">
               <div className="toolbar">
                 <div>
-                  <h3>Verification professionnelle</h3>
-                  <p className="small">Controle automatique via l'Annuaire Sante ANS a partir du RPPS.</p>
+                  <h3>Vérification professionnelle</h3>
+                  <p className="small">Contrôle automatique via l'Annuaire Santé ANS à partir du RPPS.</p>
                 </div>
                 <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
                   {healthVerificationLabel(profile.healthVerificationStatus)}
@@ -259,13 +259,13 @@ export default function ProfilePage() {
                 <div className="info-list">
                   {profile.verifiedProfession ? (
                     <div>
-                      <span>Profession validee</span>
+                      <span>Profession validée</span>
                       <strong>{profile.verifiedProfession}</strong>
                     </div>
                   ) : null}
                   {profile.verifiedSpecialty ? (
                     <div>
-                      <span>Specialite validee</span>
+                      <span>Spécialité validée</span>
                       <strong>{profile.verifiedSpecialty}</strong>
                     </div>
                   ) : null}
@@ -277,7 +277,7 @@ export default function ProfilePage() {
                 disabled={verifyingHealth || !String(form.rpps || '').trim()}
                 onClick={verifyHealthProfessional}
               >
-                {verifyingHealth ? 'Verification...' : 'Valider mon compte'}
+                {verifyingHealth ? 'Vérification...' : 'Valider mon compte'}
               </Button>
             </div>
 
@@ -382,17 +382,17 @@ export default function ProfilePage() {
 function healthVerificationLabel(status?: HealthVerificationStatus | null) {
   switch (status) {
     case 'VERIFIED':
-      return 'Verifie';
+      return 'Vérifié';
     case 'PENDING':
-      return 'Verification...';
+      return 'Vérification...';
     case 'NOT_FOUND':
       return 'RPPS introuvable';
     case 'MISMATCH':
-      return 'Identite differente';
+      return 'Identité différente';
     case 'ERROR':
       return 'Erreur ANS';
     default:
-      return 'Non verifie';
+      return 'Non vérifié';
   }
 }
 
@@ -406,10 +406,10 @@ function healthVerificationTone(
 }
 
 function healthVerificationMessage(status?: HealthVerificationStatus | null) {
-  if (status === 'VERIFIED') return 'Compte professionnel verifie.';
-  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouve pour ce RPPS.';
-  if (status === 'MISMATCH') return 'RPPS trouve, mais le nom ou le prenom ne correspond pas au profil.';
-  return 'Verification RPPS terminee.';
+  if (status === 'VERIFIED') return 'Compte professionnel vérifié.';
+  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouvé pour ce RPPS.';
+  if (status === 'MISMATCH') return 'RPPS trouvé, mais le nom ou le prénom ne correspond pas au profil.';
+  return 'Vérification RPPS terminée.';
 }
 
 function safeArray(value: unknown): string[] {

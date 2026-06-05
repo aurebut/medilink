@@ -185,18 +185,18 @@ export default function EditEstablishmentPage() {
                 options={softwareOptions}
                 onChange={(value) => set('softwareUsed', value)}
               />
-              <Field label="Presence de secretaire">
+              <Field label="Présence de secrétaire">
                 <Select
                   value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
                   onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
                 >
-                  <option value="">Non renseigne</option>
+                  <option value="">Non renseigné</option>
                   <option value="true">Oui</option>
                   <option value="false">Non</option>
                 </Select>
               </Field>
               <SingleChoiceField
-                label="Type de secretariat"
+                label="Type de secrétariat"
                 value={form.secretaryType || ''}
                 options={secretaryTypeOptions}
                 onChange={(value) => set('secretaryType', value)}
@@ -216,57 +216,57 @@ export default function EditEstablishmentPage() {
                     value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
                     onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
                   >
-                    <option value="">Non renseigne</option>
+                    <option value="">Non renseigné</option>
                     <option value="true">Oui</option>
                     <option value="false">Non</option>
                   </Select>
                 </Field>
               </div>
               <MultiChoiceField
-                label="Materiel disponible"
+                label="Matériel disponible"
                 values={safeArray(form.equipmentAvailable)}
                 options={equipmentOptions}
                 onChange={(values) => set('equipmentAvailable', values)}
               />
               <div className="profile-preferences-section">
-                <h3>Criteres habituels de mission</h3>
+                <h3>Critères habituels de mission</h3>
                 <MultiChoiceField
-                  label="Mobilite utile"
+                  label="Mobilité utile"
                   values={safeArray(form.mobilityOptions)}
                   options={mobilityOptions}
                   onChange={(values) => set('mobilityOptions', values)}
                 />
                 <MultiChoiceField
-                  label="Types de missions proposees"
+                  label="Types de missions proposées"
                   values={safeArray(form.acceptedMissionTypes)}
                   options={acceptedMissionTypeOptions}
                   onChange={(values) => set('acceptedMissionTypes', values)}
                 />
                 <MultiChoiceField
-                  label="Durees habituelles"
+                  label="Durées habituelles"
                   values={safeArray(form.preferredDurations)}
                   options={durationOptions}
                   onChange={(values) => set('preferredDurations', values)}
                 />
                 <MultiChoiceField
-                  label="Horaires rarement proposes"
+                  label="Horaires rarement proposés"
                   values={safeArray(form.refusedSchedules)}
                   options={refusedScheduleOptions}
                   onChange={(values) => set('refusedSchedules', values)}
                 />
                 <MultiChoiceField
-                  label="Patienteles recues"
+                  label="Patientèles reçues"
                   values={safeArray(form.acceptedPatientTypes)}
                   options={patientTypeOptions}
                   onChange={(values) => set('acceptedPatientTypes', values)}
                 />
                 <MultiChoiceField
-                  label="Logiciels utilises"
+                  label="Logiciels utilisés"
                   values={safeArray(form.knownSoftware)}
                   options={softwareOptions}
                   onChange={(values) => set('knownSoftware', values)}
                 />
-                <Field label="Remuneration minimale habituelle (EUR)">
+                <Field label="Rémunération minimale habituelle (EUR)">
                   <Input
                     type="number"
                     min={0}
@@ -294,7 +294,7 @@ export default function EditEstablishmentPage() {
                 <Textarea
                   value={form.description || ''}
                   onChange={(e) => set('description', e.target.value)}
-                  placeholder="Organisation du cabinet, ambiance, specialites presentes..."
+                  placeholder="Organisation du cabinet, ambiance, spécialités présentes..."
                 />
               </Field>
               <Button disabled={saving}>{saving ? 'Enregistrement...' : 'Enregistrer les modifications'}</Button>

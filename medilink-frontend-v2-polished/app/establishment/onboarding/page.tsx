@@ -22,13 +22,13 @@ import {
 } from '@/lib/profile-options';
 
 function sectorLabel(value?: string | null) {
-  return sectorOptions.find((option) => option.value === value)?.label || value || 'Secteur non renseigne';
+  return sectorOptions.find((option) => option.value === value)?.label || value || 'Secteur non renseigné';
 }
 
 function booleanLabel(value?: boolean | null) {
-  if (value === true) return 'Secretaire present';
-  if (value === false) return 'Pas de secretaire';
-  return 'Secretariat non renseigne';
+  if (value === true) return 'Secrétaire présent';
+  if (value === false) return 'Pas de secrétaire';
+  return 'Secrétariat non renseigné';
 }
 
 export default function EstablishmentOnboardingPage() {
@@ -61,7 +61,7 @@ export default function EstablishmentOnboardingPage() {
         acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
         knownSoftware: cleanArray(form.knownSoftware),
       });
-      setMessage('Etablissement cree.');
+      setMessage('Établissement créé.');
       await reload();
     } catch (e: any) {
       setError(e.message);
@@ -71,7 +71,7 @@ export default function EstablishmentOnboardingPage() {
   }
 
   async function remove(establishment: Establishment) {
-    if (!confirm(`Supprimer definitivement l'etablissement "${establishment.name}" ? Les missions, candidatures et conversations liees seront aussi supprimees.`)) {
+    if (!confirm(`Supprimer définitivement l'établissement "${establishment.name}" ? Les missions, candidatures et conversations liées seront aussi supprimées.`)) {
       return;
     }
 
@@ -81,7 +81,7 @@ export default function EstablishmentOnboardingPage() {
 
     try {
       await api.delete(`/establishments/${establishment.id}`);
-      setMessage('Etablissement supprime.');
+      setMessage('Établissement supprimé.');
       await reload();
     } catch (e: any) {
       setError(e.message);
@@ -94,20 +94,20 @@ export default function EstablishmentOnboardingPage() {
 
   return (
     <>
-      <PageHeader title="Etablissement" description="Creez ou consultez votre etablissement recruteur." />
+      <PageHeader title="Établissement" description="Créez ou consultez votre établissement recruteur." />
       <div className="grid-2">
         <Card>
-          <h2>Mes etablissements</h2>
+          <h2>Mes établissements</h2>
           {message ? <Alert type="success">{message}</Alert> : null}
           {error ? <Alert type="error">{error}</Alert> : null}
-          {establishments.length === 0 ? <p>Aucun etablissement.</p> : null}
+          {establishments.length === 0 ? <p>Aucun établissement.</p> : null}
           {establishments.map((establishment) => (
             <div key={establishment.id} className="toolbar" style={{ marginTop: 12 }}>
               <div>
                 <strong>{establishment.name}</strong>
                 <br />
                 <span className="small">
-                  {establishmentTypeLabel(establishment.type)} - {establishment.city || 'Ville non renseignee'}
+                  {establishmentTypeLabel(establishment.type)} - {establishment.city || 'Ville non renseignée'}
                 </span>
                 <br />
                 <span className="small">
@@ -145,7 +145,7 @@ export default function EstablishmentOnboardingPage() {
         </Card>
 
         <Card>
-          <h2>Creer un etablissement</h2>
+          <h2>Créer un établissement</h2>
           <form className="form" onSubmit={submit}>
             <Field label="Nom"><Input required value={form.name || ''} onChange={(e) => set('name', e.target.value)} /></Field>
             <Field label="Type">
@@ -160,17 +160,17 @@ export default function EstablishmentOnboardingPage() {
             <SingleChoiceField label="Secteur" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
             <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
             <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
-            <Field label="Presence de secretaire">
+            <Field label="Présence de secrétaire">
               <Select
                 value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
                 onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
               >
-                <option value="">Non renseigne</option>
+                <option value="">Non renseigné</option>
                 <option value="true">Oui</option>
                 <option value="false">Non</option>
               </Select>
             </Field>
-            <SingleChoiceField label="Type de secretariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
+            <SingleChoiceField label="Type de secrétariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
             <div className="form-row">
               <Field label="Patients par jour en moyenne">
                 <Input type="number" min={0} value={form.averagePatientsPerDay ?? ''} onChange={(e) => set('averagePatientsPerDay', e.target.value)} placeholder="Ex : 25" />
@@ -180,22 +180,22 @@ export default function EstablishmentOnboardingPage() {
                   value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
                   onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
                 >
-                  <option value="">Non renseigne</option>
+                  <option value="">Non renseigné</option>
                   <option value="true">Oui</option>
                   <option value="false">Non</option>
                 </Select>
               </Field>
             </div>
-            <MultiChoiceField label="Materiel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
+            <MultiChoiceField label="Matériel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
             <div className="profile-preferences-section">
-              <h3>Criteres habituels de mission</h3>
-              <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-              <MultiChoiceField label="Types de missions proposees" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-              <MultiChoiceField label="Durees habituelles" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-              <MultiChoiceField label="Horaires rarement proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
-              <MultiChoiceField label="Patienteles recues" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
-              <MultiChoiceField label="Logiciels utilises" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-              <Field label="Remuneration minimale habituelle (EUR)">
+              <h3>Critères habituels de mission</h3>
+              <MultiChoiceField label="Mobilité utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
+              <MultiChoiceField label="Types de missions proposées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
+              <MultiChoiceField label="Durées habituelles" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+              <MultiChoiceField label="Horaires rarement proposés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+              <MultiChoiceField label="Patientèles reçues" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
+              <MultiChoiceField label="Logiciels utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
+              <Field label="Rémunération minimale habituelle (EUR)">
                 <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
               </Field>
             </div>
@@ -205,8 +205,8 @@ export default function EstablishmentOnboardingPage() {
               <Field label="Telephone"><Input value={form.phone || ''} onChange={(e) => set('phone', e.target.value)} /></Field>
             </div>
             <Field label="Site web"><Input value={form.website || ''} onChange={(e) => set('website', e.target.value)} placeholder="https://..." /></Field>
-            <Field label="Description du cabinet"><Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Organisation du cabinet, ambiance, specialites presentes..." /></Field>
-            <Button disabled={saving}>{saving ? 'Creation...' : 'Creer'}</Button>
+            <Field label="Description du cabinet"><Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Organisation du cabinet, ambiance, spécialités présentes..." /></Field>
+            <Button disabled={saving}>{saving ? 'Création...' : 'Créer'}</Button>
           </form>
         </Card>
       </div>
