@@ -21,6 +21,7 @@ type RegisterPayload = {
   lastName?: string;
   candidateGender?: CandidateGender;
   phone?: string;
+  rpps?: string;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);

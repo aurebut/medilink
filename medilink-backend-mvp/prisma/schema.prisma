@@ -72,6 +72,15 @@ enum VerificationStatus {
   SUSPENDED
 }
 
+enum HealthVerificationStatus {
+  NOT_SUBMITTED
+  PENDING
+  VERIFIED
+  NOT_FOUND
+  MISMATCH
+  ERROR
+}
+
 enum EstablishmentMemberRole {
   OWNER
   ADMIN
@@ -277,6 +286,15 @@ model Profile {
   accommodationRequired Boolean?
   fastPaymentImportant Boolean?
   acceptedPressureLevel String?
+  rpps                String?                  @unique
+  healthVerificationStatus HealthVerificationStatus @default(NOT_SUBMITTED)
+  healthVerifiedAt    DateTime?
+  healthVerificationCheckedAt DateTime?
+  ansPractitionerId   String?
+  ansPractitionerLastUpdated DateTime?
+  verifiedProfession  String?
+  verifiedSpecialty   String?
+  healthVerificationPayload Json?
   completionScore     Int            @default(0)
   visibilityStatus    String         @default("PRIVATE")
   createdAt           DateTime       @default(now())

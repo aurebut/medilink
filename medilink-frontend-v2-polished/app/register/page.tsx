@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [lastName, setLastName] = useState('');
   const [candidateGender, setCandidateGender] = useState<CandidateGender | ''>('');
   const [phone, setPhone] = useState('');
+  const [rpps, setRpps] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +37,7 @@ export default function RegisterPage() {
         lastName,
         candidateGender: accountType === 'candidate' ? candidateGender || undefined : undefined,
         phone,
+        rpps: accountType === 'candidate' ? rpps || undefined : undefined,
       });
       router.push(defaultRouteForUser(user));
     } catch (err: any) {
@@ -65,13 +67,23 @@ export default function RegisterPage() {
           <Field label="Nom"><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
         </div>
         {accountType === 'candidate' ? (
-          <Field label="Sexe / accord grammatical">
-            <Select value={candidateGender} onChange={(e) => setCandidateGender(e.target.value as CandidateGender | '')}>
-              <option value="">Sélectionner</option>
-              <option value="FEMININE">Féminin</option>
-              <option value="MASCULINE">Masculin</option>
-            </Select>
-          </Field>
+          <>
+            <Field label="Sexe / accord grammatical">
+              <Select value={candidateGender} onChange={(e) => setCandidateGender(e.target.value as CandidateGender | '')}>
+                <option value="">Sélectionner</option>
+                <option value="FEMININE">Féminin</option>
+                <option value="MASCULINE">Masculin</option>
+              </Select>
+            </Field>
+            <Field label="Numero RPPS (facultatif)">
+              <Input
+                inputMode="numeric"
+                value={rpps}
+                onChange={(e) => setRpps(e.target.value)}
+                placeholder="Ex : 10001234567"
+              />
+            </Field>
+          </>
         ) : null}
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
         <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>

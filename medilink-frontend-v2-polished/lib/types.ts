@@ -14,6 +14,7 @@ export type DocumentType = 'CV' | 'ATTESTATION' | 'CONVENTION' | 'DIPLOMA' | 'ID
 export type DocumentVerificationStatus = 'UPLOAD_PENDING' | 'PENDING_VERIFICATION' | 'APPROVED' | 'REJECTED' | 'EXPIRED' | 'DELETED';
 export type EstablishmentType = 'HOSPITAL' | 'CLINIC' | 'CABINET' | 'MEDICAL_SERVICE' | 'AGENCY' | 'OTHER';
 export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED' | 'SUSPENDED';
+export type HealthVerificationStatus = 'NOT_SUBMITTED' | 'PENDING' | 'VERIFIED' | 'NOT_FOUND' | 'MISMATCH' | 'ERROR';
 export type EstablishmentMemberRole = 'OWNER' | 'ADMIN' | 'RECRUITER' | 'VIEWER';
 export type MissionType = 'GARDE' | 'REMPLACEMENT' | 'VACATION' | 'STAGE' | 'AIDE_OP';
 export type RequiredLevel = 'STUDENT' | 'INTERN' | 'JUNIOR_DOCTOR' | 'DOCTOR' | 'NURSE' | 'OPERATING_ROOM_ASSISTANT' | 'OTHER';
@@ -63,6 +64,15 @@ export type Profile = {
   accommodationRequired?: boolean | null;
   fastPaymentImportant?: boolean | null;
   acceptedPressureLevel?: string | null;
+  rpps?: string | null;
+  healthVerificationStatus: HealthVerificationStatus;
+  healthVerifiedAt?: string | null;
+  healthVerificationCheckedAt?: string | null;
+  ansPractitionerId?: string | null;
+  ansPractitionerLastUpdated?: string | null;
+  verifiedProfession?: string | null;
+  verifiedSpecialty?: string | null;
+  healthVerificationPayload?: Record<string, unknown> | null;
   completionScore: number;
   visibilityStatus: string;
   createdAt: string;

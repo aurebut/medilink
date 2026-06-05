@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsIn, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsIn, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
 export enum RegisterAccountType {
   CANDIDATE = 'candidate',
@@ -31,4 +31,11 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @IsOptional()
+  @IsString()
+  @Matches(/^[0-9 ._-]{8,20}$/, {
+    message: 'Le RPPS doit contenir uniquement des chiffres.',
+  })
+  rpps?: string;
 }

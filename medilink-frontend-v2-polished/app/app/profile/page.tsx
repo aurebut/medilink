@@ -2,10 +2,10 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api, isMockStorageUrl } from '@/lib/api';
-import type { CandidateGender, MedicalStatus, Profile } from '@/lib/types';
+import type { CandidateGender, HealthVerificationStatus, MedicalStatus, Profile } from '@/lib/types';
 import { gendered } from '@/lib/grammar';
 import { medicalStatusLabel } from '@/lib/labels';
-import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import {
@@ -43,6 +43,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [verifyingHealth, setVerifyingHealth] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -148,6 +149,32 @@ export default function ProfilePage() {
     }
   }
 
+  async function verifyHealthProfessional() {
+    setVerifyingHealth(true);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const updated = await api.post<Profile>('/me/profile/verify-health-professional', {
+        rpps: form.rpps,
+      });
+      setProfile(updated);
+      setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
+      setMessage(healthVerificationMessage(updated.healthVerificationStatus));
+    } catch (e: any) {
+      setError(e.message || 'Verification RPPS impossible.');
+      try {
+        const refreshed = await api.get<Profile>('/me/profile');
+        setProfile(refreshed);
+        setForm({ ...refreshed, actsPerformedText: (refreshed.actsPerformed || []).join(', ') });
+      } catch {
+        // Keep current form state if refresh fails.
+      }
+    } finally {
+      setVerifyingHealth(false);
+    }
+  }
+
   const initials = `${form.firstName || ''} ${form.lastName || ''}`
     .trim()
     .split(/\s+/)
@@ -199,6 +226,52 @@ export default function ProfilePage() {
           </div>
           <div className="divider" />
           <p className="small">A renseigner en priorite : ville, statut medical, specialite, mobilite, missions acceptees et CV.</p>
+        </Card>
+
+        <Card>
+          <div className="toolbar">
+            <div>
+              <h2>Verification professionnelle</h2>
+              <p className="small">Controle automatique via l'Annuaire Sante ANS a partir du RPPS.</p>
+            </div>
+            <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
+              {healthVerificationLabel(profile.healthVerificationStatus)}
+            </Badge>
+          </div>
+          <div className="form">
+            <Field label="Numero RPPS">
+              <Input
+                inputMode="numeric"
+                value={form.rpps || ''}
+                onChange={(e) => set('rpps', e.target.value)}
+                placeholder="Ex : 10001234567"
+              />
+            </Field>
+            {profile.verifiedProfession || profile.verifiedSpecialty ? (
+              <div className="info-list">
+                {profile.verifiedProfession ? (
+                  <div>
+                    <span>Profession validee</span>
+                    <strong>{profile.verifiedProfession}</strong>
+                  </div>
+                ) : null}
+                {profile.verifiedSpecialty ? (
+                  <div>
+                    <span>Specialite validee</span>
+                    <strong>{profile.verifiedSpecialty}</strong>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+            <Button
+              type="button"
+              variant="secondary"
+              disabled={verifyingHealth || !String(form.rpps || '').trim()}
+              onClick={verifyHealthProfessional}
+            >
+              {verifyingHealth ? 'Verification...' : 'Valider mon compte'}
+            </Button>
+          </div>
         </Card>
 
         <Card>
@@ -303,6 +376,39 @@ export default function ProfilePage() {
       <div style={{ marginTop: 16 }}><DocumentSection /></div>
     </>
   );
+}
+
+function healthVerificationLabel(status?: HealthVerificationStatus | null) {
+  switch (status) {
+    case 'VERIFIED':
+      return 'Verifie';
+    case 'PENDING':
+      return 'Verification...';
+    case 'NOT_FOUND':
+      return 'RPPS introuvable';
+    case 'MISMATCH':
+      return 'Identite differente';
+    case 'ERROR':
+      return 'Erreur ANS';
+    default:
+      return 'Non verifie';
+  }
+}
+
+function healthVerificationTone(
+  status?: HealthVerificationStatus | null,
+): 'neutral' | 'success' | 'warning' | 'danger' {
+  if (status === 'VERIFIED') return 'success';
+  if (status === 'NOT_FOUND' || status === 'MISMATCH') return 'warning';
+  if (status === 'ERROR') return 'danger';
+  return 'neutral';
+}
+
+function healthVerificationMessage(status?: HealthVerificationStatus | null) {
+  if (status === 'VERIFIED') return 'Compte professionnel verifie.';
+  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouve pour ce RPPS.';
+  if (status === 'MISMATCH') return 'RPPS trouve, mais le nom ou le prenom ne correspond pas au profil.';
+  return 'Verification RPPS terminee.';
 }
 
 function safeArray(value: unknown): string[] {

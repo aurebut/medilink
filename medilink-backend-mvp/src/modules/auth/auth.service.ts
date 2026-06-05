@@ -10,6 +10,8 @@ import * as bcrypt from 'bcryptjs';
 import { addDays, addHours } from '../../utils/date.util';
 import { AuditService } from '../audit/audit.service';
 import { EmailService } from '../notifications/email.service';
+import { AnsDirectoryService } from '../profiles/ans-directory.service';
+import { ProfilesService } from '../profiles/profiles.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { createRawToken, hashToken } from '../../common/utils/token.util';
 import { LoginDto } from './dto/login.dto';
@@ -23,6 +25,8 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly emailService: EmailService,
     private readonly audit: AuditService,
+    private readonly profiles: ProfilesService,
+    private readonly ansDirectory: AnsDirectoryService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -55,6 +59,7 @@ export class AuthService {
                     firstName: dto.firstName,
                     lastName: dto.lastName,
                     candidateGender: dto.candidateGender,
+                    rpps: dto.rpps ? this.ansDirectory.normalizeRpps(dto.rpps) : undefined,
                   },
                 }
               : undefined,
@@ -71,6 +76,21 @@ export class AuthService {
       entityId: user.id,
       metadata: { role },
     });
+
+    if (role === UserRole.CANDIDATE && dto.rpps) {
+      this.profiles
+        .verifyHealthProfessional(
+          {
+            id: user.id,
+            email: user.email,
+            role: user.role,
+            status: user.status,
+            emailVerified: user.emailVerified,
+          },
+          dto.rpps,
+        )
+        .catch(() => undefined);
+    }
 
     const session = await this.createSession(user.id);
 

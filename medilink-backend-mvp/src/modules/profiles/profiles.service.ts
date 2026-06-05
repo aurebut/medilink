@@ -1,9 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { DocumentType, DocumentVerificationStatus } from '@prisma/client';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  DocumentType,
+  DocumentVerificationStatus,
+  HealthVerificationStatus,
+  Prisma,
+  UserRole,
+} from '@prisma/client';
 import { calculateCompletionScore } from '../../common/utils/completion.util';
+import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { AnsDirectoryService } from './ans-directory.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
@@ -12,6 +20,7 @@ export class ProfilesService {
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly storage: StorageService,
+    private readonly ansDirectory: AnsDirectoryService,
   ) {}
 
   async getMyProfile(userId: string) {
@@ -79,6 +88,89 @@ export class ProfilesService {
     });
 
     return profile;
+  }
+
+  async verifyHealthProfessional(user: RequestUser, rppsInput: string) {
+    if (user.role !== UserRole.CANDIDATE) {
+      throw new ForbiddenException('Verification reservee aux candidats.');
+    }
+
+    const profile = await this.ensureProfile(user.id);
+    const rpps = this.ansDirectory.normalizeRpps(rppsInput);
+    if (rpps.length < 8 || rpps.length > 14) {
+      throw new BadRequestException('Numero RPPS invalide.');
+    }
+
+    await this.prisma.profile.update({
+      where: { userId: user.id },
+      data: {
+        rpps,
+        healthVerificationStatus: HealthVerificationStatus.PENDING,
+        healthVerificationCheckedAt: new Date(),
+      },
+    });
+
+    try {
+      const result = await this.ansDirectory.verifyPractitioner({
+        rpps,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      });
+      const status = result.notFound
+        ? HealthVerificationStatus.NOT_FOUND
+        : result.matched
+          ? HealthVerificationStatus.VERIFIED
+          : HealthVerificationStatus.MISMATCH;
+      const checkedAt = new Date();
+      const updated = await this.prisma.profile.update({
+        where: { userId: user.id },
+        data: {
+          rpps,
+          healthVerificationStatus: status,
+          healthVerifiedAt: status === HealthVerificationStatus.VERIFIED ? checkedAt : null,
+          healthVerificationCheckedAt: checkedAt,
+          ansPractitionerId: result.practitioner?.id,
+          ansPractitionerLastUpdated: result.practitioner?.lastUpdated
+            ? new Date(result.practitioner.lastUpdated)
+            : null,
+          verifiedProfession: result.practitioner?.profession,
+          verifiedSpecialty: result.practitioner?.specialty,
+          healthVerificationPayload: result.rawSummary as Prisma.InputJsonValue,
+        },
+      });
+
+      await this.audit.log({
+        actorUserId: user.id,
+        action:
+          status === HealthVerificationStatus.VERIFIED
+            ? 'profile.health_verified'
+            : 'profile.health_verification_failed',
+        entityType: 'profile',
+        entityId: updated.id,
+        metadata: { rpps, status, bundleTotal: result.bundleTotal },
+      });
+
+      return updated;
+    } catch (error) {
+      const updated = await this.prisma.profile.update({
+        where: { userId: user.id },
+        data: {
+          rpps,
+          healthVerificationStatus: HealthVerificationStatus.ERROR,
+          healthVerificationCheckedAt: new Date(),
+        },
+      });
+
+      await this.audit.log({
+        actorUserId: user.id,
+        action: 'profile.health_verification_error',
+        entityType: 'profile',
+        entityId: updated.id,
+        metadata: { rpps },
+      });
+
+      throw error;
+    }
   }
 
   async ensureProfile(userId: string) {
