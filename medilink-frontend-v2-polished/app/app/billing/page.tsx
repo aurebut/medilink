@@ -41,10 +41,6 @@ function safeNumber(value: FormDataEntryValue | null) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function csvEscape(value: string | number | null | undefined) {
-  return `"${String(value ?? '').replace(/"/g, '""')}"`;
-}
-
 function amountFromAgreement(agreement?: MissionAgreement | null) {
   if (!agreement) return 0;
   return agreement.candidateAmount || agreement.amount || 0;
@@ -231,28 +227,6 @@ export default function CandidateBillingPage() {
     setManualRows((rows) => rows.filter((row) => row.id !== id));
   }
 
-  function exportCsv() {
-    const headers = ['Date', 'Source', 'Établissement', 'Mission', 'Montant', 'Statut', 'Mode paiement', 'Notes'];
-    const lines = filteredRows.map((row) => [
-      row.date ? new Date(row.date).toISOString().slice(0, 10) : '',
-      row.source === 'MEDILINK' ? 'MediLink' : 'Hors MediLink',
-      row.client,
-      row.mission,
-      row.amount,
-      row.status === 'PENDING' ? 'En attente' : row.status === 'AVAILABLE' ? 'Encaissé' : 'Manuel',
-      row.paymentMethod,
-      row.notes || agreementNextStep(row.agreement?.status),
-    ].map(csvEscape).join(';'));
-    const csv = [headers.map(csvEscape).join(';'), ...lines].join('\n');
-    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `medilink-compta-${selectedYear}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  }
-
   if (loading) return <LoadingCard />;
 
   return (
@@ -260,12 +234,6 @@ export default function CandidateBillingPage() {
       <PageHeader
         title="Ma compta"
         description="Registre des recettes, justificatifs et provisions pour piloter vos remplacements sans tableur."
-        actions={
-          <>
-            <Button type="button" variant="light" onClick={exportCsv} disabled={filteredRows.length === 0}>Exporter CSV</Button>
-            <LinkButton href="/app/messages" variant="light">Voir les accords</LinkButton>
-          </>
-        }
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
