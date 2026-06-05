@@ -44,6 +44,7 @@ export default function CandidateAgendaPage() {
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [calendarAnimation, setCalendarAnimation] = useState<'next' | 'prev' | 'jump'>('jump');
   const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
+  const [detailOpen, setDetailOpen] = useState(false);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
@@ -126,6 +127,7 @@ export default function CandidateAgendaPage() {
 
   function goToMonth(offset: number) {
     setCalendarAnimation(offset < 0 ? 'prev' : 'next');
+    setDetailOpen(false);
     setCalendarMonth((month) => addMonths(month, offset));
   }
 
@@ -135,6 +137,7 @@ export default function CandidateAgendaPage() {
     setCalendarAnimation(todayMonth.getTime() < calendarMonth.getTime() ? 'prev' : 'next');
     setCalendarMonth(todayMonth);
     setSelectedDay(dateKey(today));
+    setDetailOpen(true);
   }
 
   function onCalendarTouchEnd(clientX: number) {
@@ -217,7 +220,10 @@ export default function CandidateAgendaPage() {
                   key={day.key}
                   type="button"
                   className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
-                  onClick={() => setSelectedDay(day.key)}
+                  onClick={() => {
+                    setSelectedDay(day.key);
+                    setDetailOpen(true);
+                  }}
                 >
                   <div className="agenda-day-number">{day.date.getDate()}</div>
                   <div className="agenda-day-events">
@@ -234,57 +240,59 @@ export default function CandidateAgendaPage() {
               );
             })}
           </div>
+
+          {detailOpen ? (
+            <div className="agenda-day-popover" role="dialog" aria-label="Détails du jour">
+              <div className="agenda-popover-head">
+                <div>
+                  <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</strong>
+                  <span>{selectedEvents.length} événement(s)</span>
+                </div>
+                <button type="button" className="agenda-popover-close" aria-label="Fermer" onClick={() => setDetailOpen(false)}>×</button>
+              </div>
+
+              {selectedEvents.length > 0 ? (
+                <div className="agenda-detail-events">
+                  {selectedEvents.map(({ application, agreement, conversation }) => (
+                    <div key={application.id} className="agenda-detail-event">
+                      <div>
+                        <strong>{application.mission?.title || 'Mission'}</strong>
+                        <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
+                      </div>
+                      <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
+                      <div className="actions">
+                        {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
+                        {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="dashboard-empty compact">
+                  <strong>Aucun événement</strong>
+                  <p>Vous pouvez quand même ajouter une note pour cette journée.</p>
+                </div>
+              )}
+
+              <div className="agenda-note-editor">
+                <label className="field">
+                  <span className="label">Note du jour</span>
+                  <Textarea
+                    value={draftNote}
+                    onChange={(event) => setDraftNote(event.target.value)}
+                    placeholder="Ex : appeler le secrétariat, préparer documents, indisponible l’après-midi..."
+                  />
+                </label>
+                <div className="actions">
+                  <Button type="button" onClick={saveNote}>Enregistrer</Button>
+                  {notes[selectedDay] ? <Button type="button" variant="light" onClick={clearNote}>Effacer</Button> : null}
+                </div>
+              </div>
+            </div>
+          ) : null}
         </Card>
 
         <div className="agenda-side">
-          <Card className="agenda-detail-card">
-            <div className="toolbar">
-              <div>
-                <h2>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</h2>
-                <p className="small">Détails, événements et note personnelle.</p>
-              </div>
-              <Badge tone={selectedEvents.length ? 'warning' : 'neutral'}>{selectedEvents.length} événement(s)</Badge>
-            </div>
-
-            {selectedEvents.length > 0 ? (
-              <div className="agenda-detail-events">
-                {selectedEvents.map(({ application, agreement, conversation }) => (
-                  <div key={application.id} className="agenda-detail-event">
-                    <div>
-                      <strong>{application.mission?.title || 'Mission'}</strong>
-                      <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
-                    </div>
-                    <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
-                    <div className="actions">
-                      {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
-                      {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="dashboard-empty compact">
-                <strong>Aucun événement</strong>
-                <p>Vous pouvez quand même ajouter une note pour cette journée.</p>
-              </div>
-            )}
-
-            <div className="agenda-note-editor">
-              <label className="field">
-                <span className="label">Note du jour</span>
-                <Textarea
-                  value={draftNote}
-                  onChange={(event) => setDraftNote(event.target.value)}
-                  placeholder="Ex : appeler le secrétariat, préparer documents, indisponible l’après-midi..."
-                />
-              </label>
-              <div className="actions">
-                <Button type="button" onClick={saveNote}>Enregistrer la note</Button>
-                {notes[selectedDay] ? <Button type="button" variant="light" onClick={clearNote}>Effacer</Button> : null}
-              </div>
-            </div>
-          </Card>
-
           <Card className="dashboard-panel">
             <div className="toolbar">
               <div>

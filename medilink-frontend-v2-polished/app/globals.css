@@ -1381,6 +1381,7 @@ button { touch-action: manipulation; }
 .agenda-calendar-card {
   display: grid;
   gap: 18px;
+  overflow: visible;
 }
 .agenda-calendar {
   display: grid;
@@ -1525,6 +1526,61 @@ button { touch-action: manipulation; }
   display: grid;
   gap: 16px;
 }
+.agenda-day-popover {
+  position: absolute;
+  top: 98px;
+  right: 18px;
+  z-index: 8;
+  width: min(390px, calc(100% - 36px));
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(26,82,160,.16);
+  border-radius: 14px;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 24px 70px rgba(11,25,41,.18);
+  animation: agenda-popover-in .16s ease-out;
+}
+.agenda-popover-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.agenda-popover-head strong,
+.agenda-popover-head span {
+  display: block;
+}
+.agenda-popover-head strong {
+  color: var(--heading);
+  font-size: 18px;
+  line-height: 1.2;
+}
+.agenda-popover-head span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.agenda-popover-close {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--heading);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.agenda-popover-close:hover {
+  background: var(--surface-soft);
+}
 .agenda-list-card {
   margin-top: 16px;
 }
@@ -1615,6 +1671,16 @@ button { touch-action: manipulation; }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+@keyframes agenda-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 .workspace-list {
@@ -4122,6 +4188,20 @@ td {
     min-height: 70px;
     gap: 5px;
     padding: 6px;
+  }
+  .agenda-day-popover {
+    position: fixed;
+    inset: auto 12px max(12px, env(safe-area-inset-bottom));
+    top: auto;
+    right: 12px;
+    width: auto;
+    max-height: min(72dvh, 560px);
+    overflow: auto;
+    padding: 12px;
+    border-radius: 14px;
+  }
+  .agenda-day-popover .textarea {
+    min-height: 84px;
   }
   .agenda-weekday {
     min-height: 30px;
