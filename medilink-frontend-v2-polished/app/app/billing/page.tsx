@@ -329,7 +329,7 @@ export default function CandidateBillingPage() {
                 </thead>
                 <tbody>
                   {filteredRows.map((row) => (
-                    <tr key={row.id}>
+                    <tr key={row.id} className={row.status === 'PENDING' ? 'billing-row-pending' : undefined}>
                       <td>{formatDate(row.date)}</td>
                       <td>
                         <strong>{row.client}</strong>
