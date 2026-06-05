@@ -4,9 +4,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api } from '@/lib/api';
+import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
-import type { Profile } from '@/lib/types';
+import type { Notification, Profile } from '@/lib/types';
 import { useAuth } from './AuthProvider';
 
 type NavItem = { href: string; label: string; icon: string };
@@ -17,7 +18,6 @@ const candidateNav: NavItem[] = [
   { href: '/app/billing', label: 'Facturation', icon: 'F' },
   { href: '/app/search', label: 'Recherche', icon: 'R' },
   { href: '/app/messages', label: 'Messagerie', icon: 'M' },
-  { href: '/app/notifications', label: 'Notifications', icon: 'N' },
 ];
 
 const establishmentNav: NavItem[] = [
@@ -77,19 +77,49 @@ export function AppShell({
   const router = useRouter();
   const { user, logout } = useAuth();
   const [candidateProfile, setCandidateProfile] = useState<Profile | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
+  const notificationsRef = useRef<HTMLDivElement | null>(null);
   const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
   const userProfileHref = profileHref(area);
   const userAccountHref = accountHref(area);
   const userHomeHref = homeHref(area);
+  const unreadNotifications = notifications.filter((notification) => !notification.readAt).length;
 
   async function onLogout() {
     setMobileNavOpen(false);
     setAccountMenuOpen(false);
+    setNotificationsOpen(false);
     await logout();
     router.push('/login');
+  }
+
+  async function loadNotifications() {
+    if (area !== 'candidate') return;
+
+    setNotificationsLoading(true);
+    setNotificationsError(null);
+    try {
+      setNotifications(await api.get<Notification[]>('/notifications'));
+    } catch (e: any) {
+      setNotificationsError(e.message);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }
+
+  async function markNotificationRead(id: string) {
+    try {
+      await api.patch(`/notifications/${id}/read`, {});
+      await loadNotifications();
+    } catch (e: any) {
+      setNotificationsError(e.message);
+    }
   }
 
   useEffect(() => {
@@ -97,10 +127,16 @@ export function AppShell({
       if (!accountMenuRef.current?.contains(event.target as Node)) {
         setAccountMenuOpen(false);
       }
+      if (!notificationsRef.current?.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
     }
 
     function onEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') setAccountMenuOpen(false);
+      if (event.key === 'Escape') {
+        setAccountMenuOpen(false);
+        setNotificationsOpen(false);
+      }
     }
 
     document.addEventListener('mousedown', onDocumentClick);
@@ -113,7 +149,19 @@ export function AppShell({
 
   useEffect(() => {
     setMobileNavOpen(false);
+    setNotificationsOpen(false);
+    setAccountMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    if (area !== 'candidate') {
+      setNotifications([]);
+      setNotificationsOpen(false);
+      return;
+    }
+
+    void loadNotifications();
+  }, [area]);
 
   useEffect(() => {
     if (area !== 'candidate' || user?.role !== 'CANDIDATE') {
@@ -188,6 +236,12 @@ export function AppShell({
                 <span>Paramètres du compte</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
+              {area === 'candidate' ? (
+                <Link href="/app/notifications" className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+                  <span>Notifications</span>
+                  <span className="menu-arrow">&gt;</span>
+                </Link>
+              ) : null}
               <button type="button" className="account-menu-item danger" onClick={onLogout}>
                 <span>Déconnexion</span>
                 <span className="menu-arrow">&gt;</span>
@@ -195,6 +249,70 @@ export function AppShell({
             </div>
           </div>
         </nav>
+
+        {area === 'candidate' ? (
+          <div className="notification-menu-wrap" ref={notificationsRef}>
+            {notificationsOpen ? (
+              <div className="notification-menu" role="dialog" aria-label="Notifications recentes">
+                <div className="notification-menu-head">
+                  <div>
+                    <strong>Notifications</strong>
+                    <span>{unreadNotifications > 0 ? `${unreadNotifications} non lue${unreadNotifications > 1 ? 's' : ''}` : 'Tout est lu'}</span>
+                  </div>
+                  <Link href="/app/notifications" className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
+                    Voir plus
+                  </Link>
+                </div>
+
+                <div className="notification-menu-list">
+                  {notificationsLoading ? (
+                    <div className="notification-menu-empty">Chargement...</div>
+                  ) : notificationsError ? (
+                    <div className="notification-menu-empty error">{notificationsError}</div>
+                  ) : notifications.length === 0 ? (
+                    <div className="notification-menu-empty">Aucune notification.</div>
+                  ) : (
+                    notifications.slice(0, 5).map((notification) => (
+                      <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
+                        <div className="notification-menu-item-head">
+                          <strong>{notification.title}</strong>
+                          <span>{formatDateTime(notification.createdAt)}</span>
+                        </div>
+                        <p>{notification.body}</p>
+                        {!notification.readAt ? (
+                          <button type="button" onClick={() => markNotificationRead(notification.id)}>
+                            Marquer comme lue
+                          </button>
+                        ) : null}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              className={`notification-bell ${notificationsOpen ? 'open' : ''}`}
+              aria-label="Ouvrir les notifications"
+              aria-haspopup="dialog"
+              aria-expanded={notificationsOpen}
+              onMouseDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setAccountMenuOpen(false);
+                setNotificationsOpen((open) => !open);
+                if (!notificationsOpen) void loadNotifications();
+              }}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {unreadNotifications > 0 ? <span className="notification-dot">{unreadNotifications > 9 ? '9+' : unreadNotifications}</span> : null}
+            </button>
+          </div>
+        ) : null}
 
         <div className="sidebar-footer" ref={accountMenuRef}>
           {accountMenuOpen ? (
@@ -236,6 +354,7 @@ export function AppShell({
             onMouseDown={(event) => event.stopPropagation()}
             onClick={(event) => {
               event.stopPropagation();
+              setNotificationsOpen(false);
               setAccountMenuOpen((open) => !open);
             }}
           >
