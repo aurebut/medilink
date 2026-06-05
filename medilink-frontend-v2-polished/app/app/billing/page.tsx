@@ -403,7 +403,7 @@ export default function CandidateBillingPage() {
             <div className="toolbar compact">
               <div>
                 <h2>Ajouter hors MediLink</h2>
-                <p className="small">Remplacement, garde ou vacation payee en dehors de la plateforme.</p>
+                <p className="small">Remplacement, garde ou vacation payée en dehors de la plateforme.</p>
               </div>
             </div>
             <form className="form" onSubmit={addManualRevenue}>
