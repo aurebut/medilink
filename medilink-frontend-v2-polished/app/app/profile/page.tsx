@@ -191,94 +191,95 @@ export default function ProfilePage() {
       />
 
       <div className="grid-main">
-        <Card className="card-highlight">
-          <div className="profile-photo-panel">
-            <div className="profile-photo-preview">
-              {profile.avatarUrl ? (
-                <img src={profile.avatarUrl} alt="Photo de profil" />
-              ) : (
-                <span>{initials}</span>
-              )}
-            </div>
-            <div className="profile-photo-controls">
-              <h2>Photo de profil</h2>
-              <p className="small">JPG, PNG ou WebP, 3 Mo maximum.</p>
-              <Field label="Image">
-                <input
-                  key={avatarInputKey}
-                  className="input"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
-                />
-              </Field>
-              <Button type="button" disabled={!avatarFile || uploadingAvatar} onClick={uploadAvatar}>
-                {uploadingAvatar ? 'Upload...' : 'Mettre a jour la photo'}
-              </Button>
-            </div>
-          </div>
-          <div className="divider" />
-          <h2>Completion</h2>
-          <div className="stat">
-            <strong>{profile.completionScore}%</strong>
-            <ProgressBar value={profile.completionScore} />
-            <span>Plus votre profil est complet, plus vos candidatures sont lisibles pour les etablissements.</span>
-          </div>
-          <div className="divider" />
-          <p className="small">A renseigner en priorite : ville, statut medical, specialite, mobilite, missions acceptees et CV.</p>
-        </Card>
-
-        <Card>
-          <div className="toolbar">
-            <div>
-              <h2>Verification professionnelle</h2>
-              <p className="small">Controle automatique via l'Annuaire Sante ANS a partir du RPPS.</p>
-            </div>
-            <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
-              {healthVerificationLabel(profile.healthVerificationStatus)}
-            </Badge>
-          </div>
-          <div className="form">
-            <Field label="Numero RPPS">
-              <Input
-                inputMode="numeric"
-                value={form.rpps || ''}
-                onChange={(e) => set('rpps', e.target.value)}
-                placeholder="Ex : 10001234567"
-              />
-            </Field>
-            {profile.verifiedProfession || profile.verifiedSpecialty ? (
-              <div className="info-list">
-                {profile.verifiedProfession ? (
-                  <div>
-                    <span>Profession validee</span>
-                    <strong>{profile.verifiedProfession}</strong>
-                  </div>
-                ) : null}
-                {profile.verifiedSpecialty ? (
-                  <div>
-                    <span>Specialite validee</span>
-                    <strong>{profile.verifiedSpecialty}</strong>
-                  </div>
-                ) : null}
+        <div className="profile-sidebar">
+          <Card className="card-highlight">
+            <div className="profile-photo-panel">
+              <div className="profile-photo-preview">
+                {profile.avatarUrl ? (
+                  <img src={profile.avatarUrl} alt="Photo de profil" />
+                ) : (
+                  <span>{initials}</span>
+                )}
               </div>
-            ) : null}
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={verifyingHealth || !String(form.rpps || '').trim()}
-              onClick={verifyHealthProfessional}
-            >
-              {verifyingHealth ? 'Verification...' : 'Valider mon compte'}
-            </Button>
-          </div>
-        </Card>
+              <div className="profile-photo-controls">
+                <h2>Photo de profil</h2>
+                <p className="small">JPG, PNG ou WebP, 3 Mo maximum.</p>
+                <Field label="Image">
+                  <input
+                    key={avatarInputKey}
+                    className="input"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(e) => setAvatarFile(e.target.files?.[0] || null)}
+                  />
+                </Field>
+                <Button type="button" disabled={!avatarFile || uploadingAvatar} onClick={uploadAvatar}>
+                  {uploadingAvatar ? 'Upload...' : 'Mettre a jour la photo'}
+                </Button>
+              </div>
+            </div>
+            <div className="divider" />
+            <h2>Completion</h2>
+            <div className="stat">
+              <strong>{profile.completionScore}%</strong>
+              <ProgressBar value={profile.completionScore} />
+              <span>Plus votre profil est complet, plus vos candidatures sont lisibles pour les etablissements.</span>
+            </div>
+            <div className="divider" />
+            <p className="small">A renseigner en priorite : ville, statut medical, specialite, mobilite, missions acceptees et CV.</p>
+          </Card>
+
+        </div>
 
         <Card>
           <h2>Informations {gendered(form, 'candidat', 'candidate')}</h2>
           <form className="form" onSubmit={submit}>
             {message ? <Alert type="success">{message}</Alert> : null}
             {error ? <Alert type="error">{error}</Alert> : null}
+
+            <div className="profile-preferences-section">
+              <div className="toolbar">
+                <div>
+                  <h3>Verification professionnelle</h3>
+                  <p className="small">Controle automatique via l'Annuaire Sante ANS a partir du RPPS.</p>
+                </div>
+                <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
+                  {healthVerificationLabel(profile.healthVerificationStatus)}
+                </Badge>
+              </div>
+              <Field label="Numero RPPS">
+                <Input
+                  inputMode="numeric"
+                  value={form.rpps || ''}
+                  onChange={(e) => set('rpps', e.target.value)}
+                  placeholder="Ex : 10001234567"
+                />
+              </Field>
+              {profile.verifiedProfession || profile.verifiedSpecialty ? (
+                <div className="info-list">
+                  {profile.verifiedProfession ? (
+                    <div>
+                      <span>Profession validee</span>
+                      <strong>{profile.verifiedProfession}</strong>
+                    </div>
+                  ) : null}
+                  {profile.verifiedSpecialty ? (
+                    <div>
+                      <span>Specialite validee</span>
+                      <strong>{profile.verifiedSpecialty}</strong>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={verifyingHealth || !String(form.rpps || '').trim()}
+                onClick={verifyHealthProfessional}
+              >
+                {verifyingHealth ? 'Verification...' : 'Valider mon compte'}
+              </Button>
+            </div>
 
             <div className="form-row">
               <Field label="Prenom"><Input value={form.firstName || ''} onChange={(e) => set('firstName', e.target.value)} /></Field>
