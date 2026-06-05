@@ -21,7 +21,7 @@ export class SearchMissionsDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MaxLength(300)
   departmentInfo?: string;
 
   @IsOptional()
@@ -31,12 +31,12 @@ export class SearchMissionsDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MaxLength(300)
   patientType?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MaxLength(300)
   softwareUsed?: string;
 
   @IsOptional()

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
+import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate } from '@/lib/format';
@@ -332,9 +332,9 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Ajoutez le contexte terrain</h2>
           <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
         </div>
-        <SingleChoiceField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
-        <SingleChoiceField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
-        <SingleChoiceField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
+        <MultiChoiceTextField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
+        <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
+        <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
         <Field label="Présence de secrétaire">
           <Select
             value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}

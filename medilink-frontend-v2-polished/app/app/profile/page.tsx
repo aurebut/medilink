@@ -5,7 +5,7 @@ import { api, isMockStorageUrl } from '@/lib/api';
 import type { CandidateGender, MedicalStatus, Profile } from '@/lib/types';
 import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
-import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
+import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import {
   acceptedMissionTypeOptions,
   actsPerformedOptions,
@@ -232,13 +232,13 @@ export default function ProfilePage() {
             </div>
 
             <div className="form-row">
-              <SingleChoiceField
+              <MultiChoiceTextField
                 label="Spécialité"
                 value={form.specialty || ''}
                 options={specialtyOptions}
                 onChange={(value) => set('specialty', value)}
               />
-              <SingleChoiceField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
+              <MultiChoiceTextField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
             </div>
 
             {form.medicalStatus === 'OTHER' ? (

@@ -1,8 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Input, Select } from './ui';
 import type { ChoiceOption } from '@/lib/profile-options';
+
+const OTHER_VALUE = '__OTHER__';
+
+function optionLabel(options: ChoiceOption[], value: string) {
+  return options.find((option) => option.value === value)?.label || value;
+}
+
+function splitTextChoices(value: string) {
+  return value.split(',').map((item) => item.trim()).filter(Boolean);
+}
 
 export function SingleChoiceField({
   label,
@@ -21,9 +31,15 @@ export function SingleChoiceField({
   const [customOpen, setCustomOpen] = useState(isCustom);
   const [customValue, setCustomValue] = useState(isCustom ? value : '');
 
+  useEffect(() => {
+    const nextIsCustom = Boolean(value) && !options.some((option) => option.value === value);
+    if (nextIsCustom) setCustomValue(value);
+  }, [options, value]);
+
   function selectValue(next: string) {
-    if (next === '__OTHER__') {
+    if (next === OTHER_VALUE) {
       setCustomOpen(true);
+      setCustomValue(isCustom ? value : '');
       return;
     }
 
@@ -41,17 +57,24 @@ export function SingleChoiceField({
   return (
     <div className="field">
       <span className="label">{label}</span>
-      <Select required={required} value={customOpen || isCustom ? '__OTHER__' : value} onChange={(e) => selectValue(e.target.value)}>
-        <option value="">Selectionner</option>
+      <Select required={required} value={customOpen || isCustom ? OTHER_VALUE : value} onChange={(e) => selectValue(e.target.value)}>
+        <option value="">Sélectionner</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>
         ))}
-        <option value="__OTHER__">Autre</option>
+        <option value={OTHER_VALUE}>Autre</option>
       </Select>
       {customOpen ? (
         <div className="custom-choice-row">
           <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Entrer un texte libre" />
           <Button type="button" variant="secondary" onClick={applyCustomValue}>Valider</Button>
+        </div>
+      ) : null}
+      {isCustom && !customOpen ? (
+        <div className="selected-custom-values">
+          <button type="button" onClick={() => setCustomOpen(true)}>
+            {value}
+          </button>
         </div>
       ) : null}
     </div>
@@ -75,7 +98,7 @@ export function MultiChoiceField({
   const availableOptions = options.filter((option) => !values.includes(option.value));
 
   function addValue(value: string) {
-    if (value === '__OTHER__') {
+    if (value === OTHER_VALUE) {
       setCustomOpen(true);
       setSelectedValue('');
       return;
@@ -99,11 +122,11 @@ export function MultiChoiceField({
       <Select value={selectedValue} onChange={(e) => addValue(e.target.value)}>
         <option value="">Ajouter une option</option>
         {availableOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        <option value="__OTHER__">Autre</option>
+        <option value={OTHER_VALUE}>Autre</option>
       </Select>
       {customOpen ? (
         <div className="custom-choice-row">
-          <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Ajouter une reponse libre" />
+          <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Ajouter une réponse libre" />
           <Button type="button" variant="secondary" onClick={addCustomValue}>Ajouter</Button>
         </div>
       ) : null}
@@ -111,11 +134,34 @@ export function MultiChoiceField({
         <div className="selected-custom-values">
           {values.map((value) => (
             <button key={value} type="button" onClick={() => onChange(values.filter((item) => item !== value))}>
-              {options.find((option) => option.value === value)?.label || value} x
+              {optionLabel(options, value)} ×
             </button>
           ))}
         </div>
       ) : null}
     </div>
+  );
+}
+
+export function MultiChoiceTextField({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: ChoiceOption[];
+  onChange: (value: string) => void;
+}) {
+  const values = splitTextChoices(value || '');
+
+  return (
+    <MultiChoiceField
+      label={label}
+      values={values}
+      options={options}
+      onChange={(nextValues) => onChange(nextValues.join(', '))}
+    />
   );
 }

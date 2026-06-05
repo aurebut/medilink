@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
+import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import {
   acceptedMissionTypeOptions,
@@ -158,8 +158,8 @@ export default function EstablishmentOnboardingPage() {
               <SingleChoiceField label="Pays" value={form.country || ''} options={countryOptions} onChange={(value) => set('country', value)} />
             </div>
             <SingleChoiceField label="Secteur" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
-            <SingleChoiceField label="Type de patientele" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
-            <SingleChoiceField label="Logiciel utilise" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
+            <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
+            <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
             <Field label="Presence de secretaire">
               <Select
                 value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}

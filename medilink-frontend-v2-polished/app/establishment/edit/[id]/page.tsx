@@ -7,7 +7,7 @@ import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeOptions } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManager';
-import { MultiChoiceField, SingleChoiceField } from '@/components/FormChoiceFields';
+import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import {
   acceptedMissionTypeOptions,
@@ -173,14 +173,14 @@ export default function EditEstablishmentPage() {
                 options={sectorOptions}
                 onChange={(value) => set('sector', value)}
               />
-              <SingleChoiceField
-                label="Type de patientele"
+              <MultiChoiceTextField
+                label="Type de patientèle"
                 value={form.patientType || ''}
                 options={patientTypeOptions}
                 onChange={(value) => set('patientType', value)}
               />
-              <SingleChoiceField
-                label="Logiciel utilise"
+              <MultiChoiceTextField
+                label="Logiciel utilisé"
                 value={form.softwareUsed || ''}
                 options={softwareOptions}
                 onChange={(value) => set('softwareUsed', value)}

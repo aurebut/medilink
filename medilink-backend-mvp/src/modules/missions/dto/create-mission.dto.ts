@@ -52,12 +52,12 @@ export class CreateMissionDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MaxLength(300)
   patientType?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(120)
+  @MaxLength(300)
   softwareUsed?: string;
 
   @IsOptional()
