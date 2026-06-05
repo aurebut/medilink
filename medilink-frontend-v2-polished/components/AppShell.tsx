@@ -14,7 +14,6 @@ type NavItem = { href: string; label: string; icon: string };
 const candidateNav: NavItem[] = [
   { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
   { href: '/app/agenda', label: 'Agenda', icon: 'A' },
-  { href: '/app/missions', label: 'Missions', icon: 'M' },
   { href: '/app/billing', label: 'Facturation', icon: 'F' },
   { href: '/app/search', label: 'Recherche', icon: 'R' },
   { href: '/app/profile', label: 'Profil', icon: 'P' },
@@ -154,7 +153,9 @@ export function AppShell({
 
         <nav id="sidebar-nav" className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}>
           {nav.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const active = pathname === item.href
+              || pathname.startsWith(`${item.href}/`)
+              || (area === 'candidate' && item.href === '/app/agenda' && pathname.startsWith('/app/missions/'));
             return (
               <Link
                 key={item.href}

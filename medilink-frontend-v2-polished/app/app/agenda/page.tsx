@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementTone, conversationForApplication, dateKey, latestAgreement, missionDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementNextStep, agreementTone, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Profile } from '@/lib/types';
@@ -35,6 +35,13 @@ function monthLabel(date: Date) {
 
 function addMonths(date: Date, count: number) {
   return new Date(date.getFullYear(), date.getMonth() + count, 1);
+}
+
+function applicationTone(status: string): 'neutral' | 'success' | 'warning' | 'danger' {
+  if (status === 'ACCEPTED') return 'success';
+  if (status === 'REJECTED' || status === 'WITHDRAWN' || status === 'CANCELLED') return 'danger';
+  if (status === 'VIEWED') return 'warning';
+  return 'neutral';
 }
 
 export default function CandidateAgendaPage() {
@@ -98,9 +105,23 @@ export default function CandidateAgendaPage() {
     }));
   }, [applications, conversations]);
 
+  const missionRows = useMemo(() => applications.map((application) => {
+    const conversation = conversationForApplication(application, conversations);
+    const agreement = latestAgreement(conversation);
+
+    return {
+      application,
+      conversation,
+      agreement,
+      date: missionDateValue(application, agreement),
+    };
+  }).sort((a, b) => new Date(b.application.updatedAt || b.application.createdAt).getTime() - new Date(a.application.updatedAt || a.application.createdAt).getTime()), [applications, conversations]);
+
   const upcomingEvents = events.filter((event) => event.upcoming).slice(0, 8);
   const acceptedEvents = events.filter((event) => event.application.status === 'ACCEPTED');
   const proposalEvents = events.filter((event) => latestAgreement(event.conversation)?.status === 'PROPOSED');
+  const activeRows = missionRows.filter(({ application }) => !['REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(application.status));
+  const completedRows = missionRows.filter(({ agreement }) => ['COMPLETED', 'PAYMENT_RELEASED'].includes(agreement?.status || ''));
   const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
@@ -175,6 +196,14 @@ export default function CandidateAgendaPage() {
         <div>
           <span>A venir</span>
           <strong>{upcomingEvents.length}</strong>
+        </div>
+        <div>
+          <span>Actives</span>
+          <strong>{activeRows.length}</strong>
+        </div>
+        <div>
+          <span>Terminées</span>
+          <strong>{completedRows.length}</strong>
         </div>
       </div>
 
@@ -370,7 +399,7 @@ export default function CandidateAgendaPage() {
             <h2>Liste chronologique</h2>
             <p className="small">Les prochaines actions à traiter, dans l’ordre.</p>
           </div>
-          <LinkButton href="/app/missions" variant="light">Voir toutes les missions</LinkButton>
+          <LinkButton href="/app/search" variant="light">Trouver une mission</LinkButton>
         </div>
 
         {upcomingEvents.length > 0 ? (
@@ -399,6 +428,54 @@ export default function CandidateAgendaPage() {
             description="Les missions acceptées et candidatures datées apparaîtront ici."
             action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
           />
+        )}
+      </Card>
+
+      <Card className="agenda-list-card">
+        <div className="toolbar">
+          <div>
+            <h2>Suivi des missions</h2>
+            <p className="small">Candidatures, propositions, missions acceptées et fins de mission.</p>
+          </div>
+          <LinkButton href="/app/billing" variant="light">Facturation</LinkButton>
+        </div>
+
+        {missionRows.length === 0 ? (
+          <EmptyState
+            title="Aucune mission suivie"
+            description="Envoyez une candidature pour démarrer un suivi de mission."
+            action={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
+          />
+        ) : (
+          <div className="workspace-list">
+            {missionRows.map(({ application, conversation, agreement, date }) => (
+              <Card key={application.id} className="mission-card workspace-mission-card">
+                <div className="workspace-card-head">
+                  <div>
+                    <h3>{application.mission?.title || 'Mission'}</h3>
+                    <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</p>
+                  </div>
+                  <div className="workspace-badges">
+                    <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
+                    {agreement ? <Badge tone={agreementTone(agreement.status)}>{agreementLabel(agreement.status)}</Badge> : null}
+                  </div>
+                </div>
+
+                <div className="workspace-metrics">
+                  <div><span>Date</span><strong>{formatDate(date)}</strong></div>
+                  <div><span>Ville</span><strong>{application.mission?.city || '-'}</strong></div>
+                  <div><span>Rémunération</span><strong>{candidateAmountLabel(agreement)}</strong></div>
+                  <div><span>Prochaine étape</span><strong>{agreementNextStep(agreement?.status)}</strong></div>
+                </div>
+
+                <div className="actions">
+                  {conversation ? <LinkButton href="/app/messages" variant="light">Ouvrir la discussion</LinkButton> : null}
+                  {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Détail mission</LinkButton> : null}
+                  <LinkButton href="/app/billing" variant="light">Facturation</LinkButton>
+                </div>
+              </Card>
+            ))}
+          </div>
         )}
       </Card>
     </>
