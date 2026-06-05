@@ -4171,6 +4171,11 @@ tbody tr:hover { background: #FAFBFD; }
   line-height: 1.4;
   white-space: nowrap;
 }
+.notification-menu-item-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
 .notification-menu-item p,
 .notification-menu-empty {
   margin: 0;
@@ -4178,17 +4183,33 @@ tbody tr:hover { background: #FAFBFD; }
   font-size: 13px;
   line-height: 1.45;
 }
-.notification-menu-item button {
-  width: fit-content;
+.notification-delete-button {
+  width: 30px;
+  height: 30px;
   min-height: 30px;
-  padding: 6px 9px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 1px solid rgba(26,82,160,.14);
   border-radius: 8px;
   background: #fff;
-  color: var(--blue);
+  color: var(--muted);
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 800;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.notification-delete-button:hover {
+  border-color: rgba(180,35,24,.18);
+  background: #FEF3F2;
+  color: #B42318;
+}
+.notification-delete-button svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .notification-menu-empty {
   padding: 20px 12px;

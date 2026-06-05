@@ -113,11 +113,24 @@ export function AppShell({
     }
   }
 
-  async function markNotificationRead(id: string) {
+  async function deleteNotification(id: string) {
+    const deletedNotification = notifications.find((notification) => notification.id === id);
+    const deletedIndex = notifications.findIndex((notification) => notification.id === id);
+
+    setNotifications((items) => items.filter((notification) => notification.id !== id));
+    setNotificationsError(null);
+
     try {
-      await api.patch(`/notifications/${id}/read`, {});
-      await loadNotifications();
+      await api.delete(`/notifications/${id}`);
     } catch (e: any) {
+      if (deletedNotification) {
+        setNotifications((items) => {
+          if (items.some((notification) => notification.id === id)) return items;
+          const restored = [...items];
+          restored.splice(Math.max(deletedIndex, 0), 0, deletedNotification);
+          return restored;
+        });
+      }
       setNotificationsError(e.message);
     }
   }
@@ -263,14 +276,25 @@ export function AppShell({
                       <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
                         <div className="notification-menu-item-head">
                           <strong>{notification.title}</strong>
-                          <span>{formatDateTime(notification.createdAt)}</span>
+                          <span className="notification-menu-item-meta">
+                            <span>{formatDateTime(notification.createdAt)}</span>
+                            <button
+                              type="button"
+                              className="notification-delete-button"
+                              aria-label={`Supprimer la notification ${notification.title}`}
+                              onClick={() => void deleteNotification(notification.id)}
+                            >
+                              <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                                <path d="M3 6h18" />
+                                <path d="M8 6V4h8v2" />
+                                <path d="M19 6l-1 16H6L5 6" />
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                              </svg>
+                            </button>
+                          </span>
                         </div>
                         <p>{notification.body}</p>
-                        {!notification.readAt ? (
-                          <button type="button" onClick={() => markNotificationRead(notification.id)}>
-                            Marquer comme lue
-                          </button>
-                        ) : null}
                       </div>
                     ))
                   )}

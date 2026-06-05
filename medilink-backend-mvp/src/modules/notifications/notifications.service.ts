@@ -51,6 +51,22 @@ export class NotificationsService {
     });
   }
 
+  async delete(userId: string, notificationId: string) {
+    const notification = await this.prisma.notification.findFirst({
+      where: { id: notificationId, userId },
+    });
+
+    if (!notification) {
+      throw new NotFoundException('Notification introuvable.');
+    }
+
+    await this.prisma.notification.delete({
+      where: { id: notification.id },
+    });
+
+    return { deleted: true };
+  }
+
   async notifyApplicationReceived(applicationId: string) {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
