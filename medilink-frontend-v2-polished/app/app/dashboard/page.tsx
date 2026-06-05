@@ -296,8 +296,8 @@ export default function CandidateDashboardPage() {
           <Card className="dashboard-focus-card dashboard-finance-card">
             <div className="dashboard-section-head">
               <div>
-                <span>Facturation</span>
-                <h2>Finance</h2>
+                <span>Comptabilité</span>
+                <h2>Facturation & compta</h2>
               </div>
               <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
             </div>
@@ -306,9 +306,9 @@ export default function CandidateDashboardPage() {
                 {dashboard.proposedAgreements.length > 0
                   ? 'Proposition à valider'
                   : dashboard.billingReady.length > 0
-                    ? 'Justificatif disponible'
+                    ? 'Recette à classer'
                     : dashboard.billingPending.length > 0
-                      ? 'Suivi en cours'
+                      ? 'Mission en attente'
                       : 'Aucune action urgente'}
               </span>
               <strong>
@@ -318,16 +318,16 @@ export default function CandidateDashboardPage() {
                     ? `${dashboard.proposedAgreements.length} à traiter`
                     : dashboard.billingPending.length > 0
                       ? `${dashboard.billingPending.length} en attente`
-                      : 'Tout est à jour'}
+                      : 'Registre à jour'}
               </strong>
               <p>
                 {dashboard.proposedAgreements.length > 0
-                  ? 'Répondez aux conditions finales depuis la messagerie.'
+                  ? 'Répondez aux conditions finales depuis la messagerie avant d’alimenter votre registre.'
                   : dashboard.billingReady.length > 0
-                    ? 'Téléchargez vos justificatifs candidat dès maintenant.'
-                    : dashboard.billingPending.length > 0
-                      ? 'Les missions validées avanceront ici après finalisation.'
-                      : 'Les justificatifs apparaîtront après validation de mission.'}
+                    ? 'Retrouvez ces recettes dans votre livre comptable avec les justificatifs PDF.'
+                  : dashboard.billingPending.length > 0
+                      ? 'Les missions validées entreront dans le registre après paiement libéré.'
+                      : 'Suivez vos recettes, provisions et remplacements hors MediLink.'}
               </p>
               <LinkButton
                 href={dashboard.proposedAgreements.length > 0 ? '/app/messages' : '/app/billing'}
@@ -336,13 +336,13 @@ export default function CandidateDashboardPage() {
                 {dashboard.proposedAgreements.length > 0
                   ? 'Répondre'
                   : dashboard.billingReady.length > 0
-                    ? 'Télécharger'
-                    : 'Voir le suivi'}
+                    ? 'Ouvrir le registre'
+                    : 'Voir la compta'}
               </LinkButton>
             </div>
             <div className="dashboard-finance-stack">
               <div>
-                <span>À encaisser</span>
+                <span>Recettes</span>
                 <strong>{dashboard.billingReady.length}</strong>
               </div>
               <div>
