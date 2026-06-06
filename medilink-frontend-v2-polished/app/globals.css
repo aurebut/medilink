@@ -501,6 +501,7 @@ button { touch-action: manipulation; }
   padding: 40px 24px;
   background: var(--ivory);
 }
+
 .current-missions-stats {
   margin-bottom: 16px;
 }
@@ -709,7 +710,6 @@ button { touch-action: manipulation; }
     display: none;
   }
 }
-
 .auth-page::before,
 .auth-page::after {
   content: '';
@@ -5687,6 +5687,13 @@ td {
   line-height: 1.4;
 }
 
+.billing-missions-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .48fr);
+  gap: 16px;
+  align-items: start;
+}
+
 .billing-mission-list {
   display: grid;
   gap: 14px;
@@ -5695,6 +5702,20 @@ td {
 .billing-mission-card {
   display: grid;
   gap: 16px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.billing-mission-card:hover,
+.billing-mission-card:focus-visible,
+.billing-mission-card.selected {
+  border-color: rgba(14,138,122,.34);
+  box-shadow: 0 16px 44px rgba(11,25,41,.08);
+}
+
+.billing-mission-card:focus-visible {
+  transform: translateY(-1px);
 }
 
 .billing-mission-head {
@@ -5816,6 +5837,127 @@ td {
   line-height: 1.25;
 }
 
+.billing-mission-detail {
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.billing-detail-head h2 {
+  margin: 8px 0 4px;
+  color: var(--heading);
+  line-height: 1.12;
+}
+
+.billing-detail-head p,
+.billing-detail-section p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.billing-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.billing-detail-grid > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.billing-detail-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.billing-detail-grid strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--heading);
+  line-height: 1.25;
+}
+
+.billing-detail-section {
+  display: grid;
+  gap: 10px;
+}
+
+.billing-detail-section h3 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.billing-detail-timeline,
+.billing-action-list {
+  display: grid;
+  gap: 8px;
+}
+
+.billing-detail-timeline > div,
+.billing-action-list > div {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.billing-detail-timeline > div > span,
+.billing-action-list > div > span {
+  width: 12px;
+  height: 12px;
+  margin-top: 2px;
+  border: 2px solid rgba(108,122,137,.3);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.billing-detail-timeline > div.done > span {
+  border-color: var(--teal);
+  background: var(--teal);
+}
+
+.billing-detail-timeline > div.active {
+  border-color: rgba(204,139,35,.26);
+  background: rgba(204,139,35,.08);
+}
+
+.billing-detail-timeline strong,
+.billing-action-list strong {
+  display: block;
+  color: var(--heading);
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.billing-detail-timeline small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.billing-action-list > div > span {
+  border-color: var(--teal);
+}
+
 .billing-manual-card .form-row {
   grid-template-columns: minmax(0, .8fr) minmax(0, 1fr);
 }
@@ -5916,6 +6058,7 @@ td {
 @media (max-width: 1080px) {
   .billing-hero-grid,
   .billing-workspace,
+  .billing-missions-workspace,
   .billing-overview-grid,
   .billing-doc-grid,
   .billing-export-grid,
@@ -5930,6 +6073,10 @@ td {
   .billing-timeline {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .billing-mission-detail {
+    position: static;
+  }
 }
 
 @media (max-width: 720px) {
@@ -5942,6 +6089,7 @@ td {
   .billing-manual-card .form-row,
   .billing-mission-head,
   .billing-mission-meta,
+  .billing-detail-grid,
   .billing-export-stats {
     grid-template-columns: 1fr;
   }
