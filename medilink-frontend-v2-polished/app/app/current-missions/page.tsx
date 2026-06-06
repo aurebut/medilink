@@ -297,7 +297,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
   return (
     <section className="candidate-current-detail candidate-current-unified">
-      <MissionCommandStrip row={row} />
+      {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
 
       {activeSection === 'pilotage' ? (
         <>
