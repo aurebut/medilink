@@ -7,7 +7,7 @@ import { api } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
-import type { Notification, Profile } from '@/lib/types';
+import type { Conversation, Notification, Profile } from '@/lib/types';
 import { useAuth } from './AuthProvider';
 
 type NavItem = { href: string; label: string; icon: string };
@@ -82,6 +82,17 @@ function getNotificationLink(notification: Notification, area: 'candidate' | 'es
   return null;
 }
 
+function getNotificationBody(notification: Notification, conversations: Conversation[]) {
+  if (notification.type === 'NEW_MESSAGE' && notification.data) {
+    const data = notification.data as Record<string, any>;
+    const conv = conversations.find(c => c.id === data.conversationId);
+    if (conv) {
+      return `Vous avez reçu un nouveau message de ${conv.establishment?.name || 'l\'établissement'}.`;
+    }
+  }
+  return notification.body;
+}
+
 export function AppShell({
   children,
   area,
@@ -94,6 +105,7 @@ export function AppShell({
   const { user, logout } = useAuth();
   const [candidateProfile, setCandidateProfile] = useState<Profile | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -185,11 +197,15 @@ export function AppShell({
   useEffect(() => {
     if (area !== 'candidate') {
       setNotifications([]);
+      setConversations([]);
       setNotificationsOpen(false);
       return;
     }
 
     void loadNotifications();
+    api.get<Conversation[]>('/conversations')
+      .then(setConversations)
+      .catch(() => {});
   }, [area]);
 
   useEffect(() => {
@@ -312,7 +328,7 @@ export function AppShell({
                               </button>
                             </span>
                           </div>
-                          <p>{notification.body}</p>
+                          <p>{getNotificationBody(notification, conversations)}</p>
                           {notificationLink ? (
                             <Link
                               href={notificationLink}
