@@ -204,14 +204,16 @@ export default function CandidateBillingPage() {
   }, [manualRows, provisionRate, classifiedIds]);
 
   const accountingRows = useMemo<AccountingRow[]>(() => {
-    const medilinkRows = conversations
+    const medilinkRowMap = new Map<string, AccountingRow>();
+
+    conversations
       .map((conversation) => ({ conversation, agreement: latestAgreement(conversation) }))
       .filter((row) => row.agreement)
-      .map(({ conversation, agreement }) => {
+      .forEach(({ conversation, agreement }) => {
         const released = agreement?.status === 'PAYMENT_RELEASED';
-        const rowId = `medilink-${conversation.id}`;
+        const rowId = `medilink-${agreement?.id || conversation.applicationId || conversation.id}`;
         const amount = amountFromAgreement(agreement);
-        return {
+        const row = {
           id: rowId,
           source: 'MEDILINK' as const,
           date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
@@ -226,7 +228,14 @@ export default function CandidateBillingPage() {
           hasReceipt: released || Boolean(agreement?.invoices?.some((invoice) => invoice.type === 'CANDIDATE_RECEIPT')),
           classified: classifiedIds.includes(rowId),
         };
+
+        const existing = medilinkRowMap.get(rowId);
+        if (!existing || new Date(row.date || 0).getTime() >= new Date(existing.date || 0).getTime()) {
+          medilinkRowMap.set(rowId, row);
+        }
       });
+
+    const medilinkRows = [...medilinkRowMap.values()];
 
     const manualAccountingRows = manualRows.map((row) => ({
       id: row.id,
@@ -683,6 +692,7 @@ function MissionAccountingDetail({
     <Card className="billing-mission-detail">
       <div className="billing-detail-head">
         <div>
+          <span>Mission selectionnee</span>
           <Badge tone={agreementTone(row.agreement?.status)}>{agreementLabel(row.agreement?.status)}</Badge>
           <h2>{row.mission}</h2>
           <p>{row.client}</p>
