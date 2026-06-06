@@ -837,9 +837,7 @@ button { touch-action: manipulation; }
 
 .candidate-command-main span,
 .candidate-command-stat span,
-.candidate-current-prep span,
-.candidate-current-route-head span,
-.candidate-current-prep-head span {
+.candidate-current-route-head span {
   color: var(--muted);
   font-size: 12px;
   font-weight: 850;
@@ -928,7 +926,7 @@ button { touch-action: manipulation; }
 
 .candidate-current-pilotage-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(260px, .58fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
@@ -945,8 +943,7 @@ button { touch-action: manipulation; }
     #fff;
 }
 
-.candidate-current-route-head,
-.candidate-current-prep-head {
+.candidate-current-route-head {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -954,13 +951,11 @@ button { touch-action: manipulation; }
   min-width: 0;
 }
 
-.candidate-current-route-head > div,
-.candidate-current-prep-head {
+.candidate-current-route-head > div {
   min-width: 0;
 }
 
-.candidate-current-route-head strong,
-.candidate-current-prep-head strong {
+.candidate-current-route-head strong {
   display: block;
   margin-top: 4px;
   color: var(--heading);
@@ -1124,49 +1119,6 @@ button { touch-action: manipulation; }
   margin: 0;
   color: var(--heading);
   font-size: 18px;
-}
-
-.candidate-current-prep {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 9px;
-  min-width: 0;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-}
-
-.candidate-current-prep > div {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #F8FAFC;
-}
-
-.candidate-current-prep > div.ready {
-  border-color: rgba(14,138,122,.24);
-  background: rgba(14,138,122,.06);
-}
-
-.candidate-current-prep > div.waiting {
-  border-color: rgba(208,119,45,.25);
-  background: rgba(208,119,45,.07);
-}
-
-.candidate-current-prep strong {
-  color: var(--heading);
-  line-height: 1.15;
-}
-
-.candidate-current-prep p {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.35;
-  overflow-wrap: anywhere;
 }
 
 .candidate-current-detail-grid {

@@ -135,18 +135,6 @@ function rowPriority(row: MissionRow) {
   return 3;
 }
 
-function missionReadiness(row: MissionRow) {
-  const mission = row.application.mission;
-  const checks = [
-    Boolean(missionStart(row.application, row.agreement)),
-    Boolean(mission?.location || mission?.establishment?.address || mission?.city),
-    Boolean(mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo),
-    Boolean(row.conversation),
-    Boolean(row.agreement || row.application.status === 'ACCEPTED'),
-  ];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
-}
-
 function mapsHref(address: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 }
@@ -276,7 +264,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
   const progress = missionProgress(row.application, row.agreement);
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse a confirmer';
-  const readiness = missionReadiness(row);
   const detailItems = [
     { label: 'Service', value: mission?.departmentInfo || mission?.sector },
     { label: 'Equipe', value: mission?.teamInfo },
@@ -288,13 +275,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Echanger avec l etablissement pour confirmer les derniers details.';
-  const prepItems = [
-    { label: 'Adresse', value: address, ready: address !== 'Adresse a confirmer' },
-    { label: 'Contact', value: establishment?.phone || establishment?.email || 'Via messagerie MediLink', ready: Boolean(establishment?.phone || establishment?.email || row.conversation) },
-    { label: 'Consignes', value: mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo || 'A demander avant depart', ready: Boolean(mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo) },
-    { label: 'Materiel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'A confirmer', ready: Boolean(mission?.equipmentInfo || mission?.equipmentAvailable?.length) },
-  ];
-
   return (
     <section className="candidate-current-detail candidate-current-unified">
       {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
@@ -326,19 +306,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
               </div>
             </section>
 
-            <section className="candidate-current-prep" aria-label="Preparation mission">
-              <div className="candidate-current-prep-head">
-                <span>Preparation</span>
-                <strong>{readiness}% pret</strong>
-              </div>
-              {prepItems.map((item) => (
-                <div key={item.label} className={item.ready ? 'ready' : 'waiting'}>
-                  <span>{item.ready ? 'Pret' : 'A verifier'}</span>
-                  <strong>{item.label}</strong>
-                  <p>{item.value}</p>
-                </div>
-              ))}
-            </section>
           </div>
         </>
       ) : null}
