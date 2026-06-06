@@ -205,31 +205,6 @@ export default function CandidateCurrentMissionsPage() {
       .sort((a, b) => missionSortValue(a) - missionSortValue(b));
   }, [applications, conversations]);
 
-  const propositionsRows = useMemo(() => {
-    return rows.filter((row) => {
-      const status = row.agreement?.status;
-      return status === 'PROPOSED' || (row.application.status === 'ACCEPTED' && !row.agreement);
-    });
-  }, [rows]);
-
-  const confirmedRows = useMemo(() => {
-    return rows.filter((row) => {
-      const status = row.agreement?.status;
-      const end = endDateTime(row.application, row.agreement);
-      const isPast = end ? new Date() > end : false;
-      return (status === 'PAYMENT_REQUIRED' || status === 'FUNDS_SECURED') && !isPast;
-    });
-  }, [rows]);
-
-  const completedRows = useMemo(() => {
-    return rows.filter((row) => {
-      const status = row.agreement?.status;
-      const end = endDateTime(row.application, row.agreement);
-      const isPast = end ? new Date() > end : false;
-      return status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || isPast;
-    });
-  }, [rows]);
-
   const priorityRow = useMemo(() => {
     return [...rows].sort((a, b) => rowPriority(a) - rowPriority(b) || missionSortValue(a) - missionSortValue(b))[0] || null;
   }, [rows]);
@@ -270,15 +245,7 @@ export default function CandidateCurrentMissionsPage() {
       ) : (
         <>
           {priorityRow ? (
-            <MissionCommandStrip
-              row={priorityRow}
-              stats={{
-                total: rows.length,
-                soon: confirmedRows.length,
-                proposals: propositionsRows.length,
-                done: completedRows.length,
-              }}
-            />
+            <MissionCommandStrip row={priorityRow} />
           ) : null}
 
           <div className="candidate-current-layout">
@@ -322,13 +289,7 @@ export default function CandidateCurrentMissionsPage() {
   );
 }
 
-function MissionCommandStrip({
-  row,
-  stats,
-}: {
-  row: MissionRow;
-  stats: { total: number; soon: number; proposals: number; done: number };
-}) {
+function MissionCommandStrip({ row }: { row: MissionRow }) {
   const mission = row.application.mission;
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse a confirmer';
@@ -347,7 +308,7 @@ function MissionCommandStrip({
       <div className="candidate-command-stat">
         <span>Prepa</span>
         <strong>{missionReadiness(row)}%</strong>
-        <small>{stats.total} mission(s), {stats.done} terminee(s)</small>
+        <small>Infos critiques reunies</small>
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? <LinkButton href="/app/messages" variant="secondary">Messagerie</LinkButton> : null}
