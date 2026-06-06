@@ -1,12 +1,12 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, isMockStorageUrl } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
-import { Alert, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type MissionStep = {
   key: string;
@@ -24,14 +24,22 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'compta';
+type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'compta';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
   { id: 'brief', label: 'Brief' },
   { id: 'lieu', label: 'Lieu & contact' },
+  { id: 'documents', label: 'Documents de mission' },
   { id: 'compta', label: 'Compta & actions' },
 ];
+
+type UploadResponse = {
+  documentId: string;
+  uploadUrl: string;
+  method: string;
+  headers: Record<string, string>;
+};
 
 function missionStart(application: Application, agreement?: MissionAgreement | null) {
   return agreement?.startDate || application.mission?.startDate || null;
@@ -90,12 +98,15 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const scheduleStarted = Boolean(start && now >= start);
   const scheduleEnded = Boolean(end && now > end);
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
+  const paymentReleased = Boolean(status === 'PAYMENT_RELEASED' || agreement?.payment?.releasedAt);
+  const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
 
   return [
     { key: 'confirmed', label: 'Mission confirmee', helper: 'La mission est validee avec l etablissement.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !detailsProvided, done: confirmed },
     { key: 'establishment-info', label: 'Informations fournies par l etablissement', helper: detailsProvided ? 'Lieu et informations operationnelles sont renseignes.' : 'Lieu, consignes ou contexte doivent encore etre renseignes.', status: detailsProvided ? 'Renseigne' : 'A completer', active: confirmed && !detailsProvided, done: detailsProvided },
-    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : start ? 'Mission planifiee selon la date de debut indiquee.' : 'Date de debut a renseigner.', status: active ? 'En cours' : scheduleStarted ? 'Passe' : 'Planifie', active, done: scheduleStarted },
+    { key: 'documents', label: 'Documents de mission', helper: 'Deposer les fichiers generes pendant toute la duree de la mission.', status: scheduleStarted ? 'A deposer' : 'A venir', active: active || (scheduleStarted && !completed), done: false },
     { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a ete validee.' : scheduleEnded ? 'La date de fin est passee, en attente de validation.' : 'Cette etape se validera apres la fin de mission.', status: completed ? 'Validee' : scheduleEnded ? 'A valider' : 'A venir', active: scheduleEnded && !completed, done: completed },
+    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libere.' : paymentSecured ? 'Paiement securise, liberation apres validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libere' : paymentSecured ? 'Securise' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
 
@@ -375,6 +386,10 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
         </div>
       ) : null}
 
+      {activeSection === 'documents' ? (
+        <MissionDocumentsPanel row={row} />
+      ) : null}
+
       {activeSection === 'compta' ? (
         <div className="candidate-current-tab-panel">
           <div className="candidate-current-grid">
@@ -399,5 +414,86 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
         </div>
       ) : null}
     </section>
+  );
+}
+
+function MissionDocumentsPanel({ row }: { row: MissionRow }) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const missionTitle = row.application.mission?.title || 'mission';
+
+  async function uploadFiles() {
+    if (files.length === 0) return;
+    setSubmitting(true);
+    setMessage(null);
+    setError(null);
+    try {
+      for (const file of files) {
+        const uploadResponse = await api.post<UploadResponse>('/documents/upload-url', {
+          documentType: 'OTHER',
+          fileName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          sizeBytes: file.size,
+        });
+
+        if (!isMockStorageUrl(uploadResponse.uploadUrl)) {
+          const put = await fetch(uploadResponse.uploadUrl, {
+            method: uploadResponse.method,
+            headers: uploadResponse.headers,
+            body: file,
+          });
+          if (!put.ok) throw new Error(`Upload impossible pour ${file.name}.`);
+        }
+
+        await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
+      }
+      setFiles([]);
+      setMessage(`${files.length} fichier(s) ajoute(s) aux documents de mission.`);
+    } catch (e: any) {
+      setError(e.message || 'Upload impossible.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="candidate-current-tab-panel">
+      <div className="candidate-current-documents">
+        <div>
+          <span>Documents de mission</span>
+          <strong>Fichiers produits pendant la mission</strong>
+          <p>Ajoutez ici les documents generes pendant la duree de la mission {missionTitle}. Ils seront conserves dans votre dossier documents MediLink.</p>
+        </div>
+        <label className="candidate-current-dropzone">
+          <Input
+            type="file"
+            multiple
+            onChange={(event) => setFiles(Array.from(event.target.files || []))}
+          />
+          <strong>{files.length ? `${files.length} fichier(s) selectionne(s)` : 'Selectionner des fichiers'}</strong>
+          <span>Comptes rendus, feuilles de soin, justificatifs ou pieces utiles a transmettre.</span>
+        </label>
+        {files.length > 0 ? (
+          <div className="candidate-current-file-list">
+            {files.map((file) => (
+              <div key={`${file.name}-${file.size}`}>
+                <strong>{file.name}</strong>
+                <span>{Math.max(1, Math.round(file.size / 1024))} Ko</span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {message ? <Alert type="success">{message}</Alert> : null}
+        {error ? <Alert type="error">{error}</Alert> : null}
+        <div className="actions">
+          <Button type="button" disabled={files.length === 0 || submitting} onClick={() => void uploadFiles()}>
+            {submitting ? 'Envoi...' : 'Envoyer les fichiers'}
+          </Button>
+          <LinkButton href="/app/profile" variant="light">Voir mon dossier</LinkButton>
+        </div>
+      </div>
+    </div>
   );
 }
