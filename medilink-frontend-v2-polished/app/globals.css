@@ -5170,13 +5170,6 @@ td {
 }
 
 /* Candidate billing workspace */
-.billing-context-bar {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
 .billing-nav-row {
   display: grid;
   grid-template-columns: 132px minmax(0, 1fr);
@@ -5189,15 +5182,6 @@ td {
   width: 100%;
 }
 
-.billing-context-bar > div {
-  min-width: 0;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-}
-
-.billing-context-bar span,
 .billing-mission-amount span,
 .billing-mission-meta span,
 .billing-doc-meta span,
@@ -5209,17 +5193,6 @@ td {
   font-weight: 800;
   letter-spacing: .04em;
   text-transform: uppercase;
-}
-
-.billing-context-bar strong {
-  display: block;
-  margin-top: 5px;
-  overflow: hidden;
-  color: var(--heading);
-  font-size: 20px;
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .billing-tabs {
@@ -5753,10 +5726,6 @@ td {
 @media (max-width: 720px) {
   .billing-nav-row {
     grid-template-columns: 1fr;
-  }
-
-  .billing-context-bar {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .billing-hero-card,

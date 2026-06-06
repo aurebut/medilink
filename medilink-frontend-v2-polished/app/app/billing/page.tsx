@@ -387,13 +387,6 @@ export default function CandidateBillingPage() {
         </div>
       </div>
 
-      <div className="billing-context-bar">
-        <div><span>Encaissé</span><strong>{formatMoney(dashboard.revenue)}</strong></div>
-        <div><span>En attente</span><strong>{dashboard.pendingRows.length}</strong></div>
-        <div><span>À valider</span><strong>{dashboard.completedRows.length}</strong></div>
-        <div><span>Provision</span><strong>{formatMoney(dashboard.provision)}</strong></div>
-      </div>
-
       {activeTab === 'overview' ? (
         <OverviewTab
           dashboard={dashboard}
