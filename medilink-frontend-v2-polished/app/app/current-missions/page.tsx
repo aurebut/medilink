@@ -57,26 +57,16 @@ function endDateTime(application: Application, agreement?: MissionAgreement | nu
   return day ? new Date(`${day}T${time}`) : null;
 }
 
-function missionTimeRange(application: Application, agreement?: MissionAgreement | null) {
-  const mission = application.mission;
-  const hours = [
-    agreement?.startTime || mission?.startTime,
-    agreement?.endTime || mission?.endTime,
-  ].filter(Boolean).join(' - ');
-  return hours || 'Horaires a confirmer';
-}
-
 function missionDateRange(application: Application, agreement?: MissionAgreement | null) {
   const start = missionStart(application, agreement);
   const end = missionEnd(application, agreement);
   if (!start) {
-    return { primary: 'Dates a confirmer', secondary: missionTimeRange(application, agreement) };
+    return { primary: 'A confirmer', secondary: 'Fin a confirmer' };
   }
 
-  const sameDay = !end || end === start;
   return {
-    primary: sameDay ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`,
-    secondary: sameDay ? missionTimeRange(application, agreement) : `Debut ${formatDate(start)} - Fin ${formatDate(end)}`,
+    primary: formatDate(start),
+    secondary: end ? `Fin ${formatDate(end)}` : 'Fin a confirmer',
   };
 }
 
@@ -236,7 +226,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <p>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'} - {address}</p>
       </div>
       <div className="candidate-command-stat">
-        <span>Dates</span>
+        <span>Debut</span>
         <strong>{dates.primary}</strong>
         <small>{dates.secondary}</small>
       </div>
