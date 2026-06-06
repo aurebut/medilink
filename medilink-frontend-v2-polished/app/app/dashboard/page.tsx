@@ -71,6 +71,18 @@ function getNotificationBody(notification: Notification, conversations: Conversa
   return notification.body;
 }
 
+function getNotificationLinkLabel(notification: Notification) {
+  if (!notification.data) return '';
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    return 'Voir la conversation';
+  }
+  if (data.missionId) {
+    return 'Suivre la mission';
+  }
+  return '';
+}
+
 export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -283,7 +295,7 @@ export default function CandidateDashboardPage() {
                           href={notificationLink}
                           className="notification-action-link"
                         >
-                          Voir la conversation &rarr;
+                          {getNotificationLinkLabel(notification)} &rarr;
                         </Link>
                       ) : null}
                     </div>

@@ -93,6 +93,19 @@ function getNotificationBody(notification: Notification, conversations: Conversa
   return notification.body;
 }
 
+function getNotificationLinkLabel(notification: Notification, area: 'candidate' | 'establishment' | 'admin') {
+  if (!notification.data) return '';
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    return 'Voir la conversation';
+  }
+  if (data.missionId) {
+    if (area === 'establishment') return 'Voir les candidatures';
+    return 'Suivre la mission';
+  }
+  return '';
+}
+
 export function AppShell({
   children,
   area,
@@ -335,7 +348,7 @@ export function AppShell({
                               className="notification-action-link"
                               onClick={() => setNotificationsOpen(false)}
                             >
-                              Voir la conversation &rarr;
+                              {getNotificationLinkLabel(notification, area)} &rarr;
                             </Link>
                           ) : null}
                         </div>

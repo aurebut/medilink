@@ -18,6 +18,18 @@ function getNotificationLink(notification: Notification) {
   return null;
 }
 
+function getNotificationLinkLabel(notification: Notification) {
+  if (!notification.data) return '';
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    return 'Voir la conversation';
+  }
+  if (data.missionId) {
+    return 'Suivre la mission';
+  }
+  return '';
+}
+
 export default function NotificationsPage() {
   const [items, setItems] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +77,7 @@ export default function NotificationsPage() {
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                 {getNotificationLink(n) ? (
                   <LinkButton href={getNotificationLink(n)!} variant="secondary">
-                    Voir la conversation
+                    {getNotificationLinkLabel(n)}
                   </LinkButton>
                 ) : null}
                 {!n.readAt ? <Button variant="light" onClick={() => read(n.id)}>Marquer comme lue</Button> : null}
