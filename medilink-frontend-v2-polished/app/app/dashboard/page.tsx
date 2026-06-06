@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
@@ -106,6 +107,13 @@ export default function CandidateDashboardPage() {
       .sort((a, b) => new Date(b.message.createdAt).getTime() - new Date(a.message.createdAt).getTime())
       .slice(0, 3);
     const unreadReceivedMessages = receivedMessages.filter(({ message }) => !message.readAt).length;
+    const sortedConversations = [...conversations]
+      .sort((a, b) => {
+        const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
+        const bTime = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 3);
     const missionRowsByDay = new Map<string, typeof missionRows>();
     missionRows.forEach((row) => {
       const key = dateKey(row.date);
@@ -129,6 +137,7 @@ export default function CandidateDashboardPage() {
       unreadReceivedMessages,
       missionRowsByDay,
       weekCarousel,
+      sortedConversations,
     };
   }, [applications, conversations, documents, notifications, profile?.userId]);
 
@@ -273,17 +282,33 @@ export default function CandidateDashboardPage() {
                 <strong>{conversations.length}</strong>
               </div>
             </div>
-            {dashboard.latestReceivedMessages.length > 0 ? (
+            {dashboard.sortedConversations.length > 0 ? (
               <div className="dashboard-mini-list dashboard-message-list">
-                {dashboard.latestReceivedMessages.map(({ conversation, message }) => (
-                  <div key={message.id}>
-                    <div>
-                      <strong>{conversation.establishment?.name || conversation.mission?.title || 'Conversation'}</strong>
-                      <span>{messagePreview(message.body)}</span>
-                    </div>
-                    <span className="small">{formatDateTime(message.createdAt)}</span>
-                  </div>
-                ))}
+                {dashboard.sortedConversations.map((conversation) => {
+                  const lastMessage = conversation.messages?.[0];
+                  const userId = profile?.userId;
+                  const unreadCount = (conversation.messages || [])
+                    .filter((msg) => !userId || msg.senderUserId !== userId)
+                    .filter((msg) => !msg.readAt).length;
+                  return (
+                    <Link
+                      key={conversation.id}
+                      href={`/app/messages?id=${conversation.id}`}
+                      className="dashboard-message-link"
+                    >
+                      <div className="dashboard-message-link-main">
+                        <strong>{conversation.establishment?.name || conversation.mission?.title || 'Conversation'}</strong>
+                        <span>{messagePreview(lastMessage?.body)}</span>
+                      </div>
+                      <div className="dashboard-message-link-meta">
+                        {unreadCount > 0 ? (
+                          <Badge tone="warning">Non lu</Badge>
+                        ) : null}
+                        <span className="small">{formatDateTime(conversation.lastMessageAt)}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
               <div className="dashboard-empty compact">

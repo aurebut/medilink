@@ -1,12 +1,14 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { api, getApiEventUrl, getApiUrl, getAuthToken } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
 import { useAuth } from './AuthProvider';
+
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
 
@@ -142,6 +144,8 @@ function workflowLabel(kind: WorkflowKind) {
 
 export function MessageCenter() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const conversationIdParam = searchParams.get('id');
   const [isMobile, setIsMobile] = useState(() => (
     typeof window !== 'undefined' ? window.matchMedia('(max-width: 620px)').matches : false
   ));
@@ -214,7 +218,10 @@ export function MessageCenter() {
     try {
       const data = await api.get<ConversationWithLast[]>('/conversations');
       setConversations(data);
-      if (!activeId && data[0] && !isMobile) setActiveId(data[0].id);
+      const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
+      if (initialActiveId) {
+        setActiveId(initialActiveId);
+      }
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -243,9 +250,17 @@ export function MessageCenter() {
     return () => media.removeEventListener('change', update);
   }, []);
   useEffect(() => {
-    if (!isMobile && !activeId && conversations[0]) setActiveId(conversations[0].id);
-  }, [isMobile, activeId, conversations]);
+    if (!isMobile && !activeId && conversations[0]) {
+      const initialActiveId = conversationIdParam || conversations[0].id;
+      setActiveId(initialActiveId);
+    }
+  }, [isMobile, activeId, conversations, conversationIdParam]);
   useEffect(() => { void loadConversations(); }, []);
+  useEffect(() => {
+    if (conversationIdParam) {
+      setActiveId(conversationIdParam);
+    }
+  }, [conversationIdParam]);
   useEffect(() => {
     if (!activeId) return;
     setMobileOptionsOpen(false);
