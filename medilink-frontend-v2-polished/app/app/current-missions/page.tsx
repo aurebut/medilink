@@ -115,6 +115,7 @@ export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'propositions' | 'confirmed' | 'completed'>('all');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -150,11 +151,59 @@ export default function CandidateCurrentMissionsPage() {
       .sort((a, b) => missionSortValue(a) - missionSortValue(b));
   }, [applications, conversations]);
 
-  const selectedRow = rows.find((row) => row.application.id === selectedId) || rows[0] || null;
+  const propositionsRows = useMemo(() => {
+    return rows.filter((row) => {
+      const status = row.agreement?.status;
+      return status === 'PROPOSED' || (row.application.status === 'ACCEPTED' && !row.agreement);
+    });
+  }, [rows]);
+
+  const confirmedRows = useMemo(() => {
+    return rows.filter((row) => {
+      const status = row.agreement?.status;
+      const end = endDateTime(row.application, row.agreement);
+      const isPast = end ? new Date() > end : false;
+      return (status === 'PAYMENT_REQUIRED' || status === 'FUNDS_SECURED') && !isPast;
+    });
+  }, [rows]);
+
+  const completedRows = useMemo(() => {
+    return rows.filter((row) => {
+      const status = row.agreement?.status;
+      const end = endDateTime(row.application, row.agreement);
+      const isPast = end ? new Date() > end : false;
+      return status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || isPast;
+    });
+  }, [rows]);
+
+  const tabs = [
+    { id: 'all' as const, label: 'Toutes', count: rows.length },
+    { id: 'propositions' as const, label: 'Propositions', count: propositionsRows.length },
+    { id: 'confirmed' as const, label: 'Confirmées', count: confirmedRows.length },
+    { id: 'completed' as const, label: 'Terminées', count: completedRows.length },
+  ];
+
+  const filteredRows = useMemo(() => {
+    if (activeTab === 'propositions') return propositionsRows;
+    if (activeTab === 'confirmed') return confirmedRows;
+    if (activeTab === 'completed') return completedRows;
+    return rows;
+  }, [activeTab, rows, propositionsRows, confirmedRows, completedRows]);
+
+  const selectedRow = useMemo(() => {
+    return filteredRows.find((row) => row.application.id === selectedId) || filteredRows[0] || null;
+  }, [filteredRows, selectedId]);
 
   useEffect(() => {
-    if (!selectedId && rows[0]) setSelectedId(rows[0].application.id);
-  }, [rows, selectedId]);
+    if (filteredRows.length > 0) {
+      const isSelectedInFiltered = filteredRows.some((row) => row.application.id === selectedId);
+      if (!isSelectedInFiltered) {
+        setSelectedId(filteredRows[0].application.id);
+      }
+    } else {
+      setSelectedId(null);
+    }
+  }, [filteredRows, selectedId]);
 
   if (loading) return <LoadingCard label="Chargement de vos missions en cours..." />;
 
@@ -175,36 +224,74 @@ export default function CandidateCurrentMissionsPage() {
           action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
         />
       ) : (
-        <div className="candidate-current-layout">
-          <div className="candidate-current-list">
-            {rows.map((row) => {
-              const mission = row.application.mission;
-              const selected = selectedRow?.application.id === row.application.id;
-              return (
+        <>
+          <div className="billing-nav-row" style={{ gridTemplateColumns: '1fr', marginBottom: '20px' }}>
+            <div className="billing-tabs" role="tablist" aria-label="Onglets des missions">
+              {tabs.map((tab) => (
                 <button
-                  key={row.application.id}
+                  key={tab.id}
                   type="button"
-                  className={`candidate-current-card ${selected ? 'selected' : ''}`}
-                  onClick={() => setSelectedId(row.application.id)}
+                  className={activeTab === tab.id ? 'active' : ''}
+                  onClick={() => setActiveTab(tab.id)}
+                  role="tab"
+                  aria-selected={activeTab === tab.id}
                 >
-                  <span className="candidate-current-card-head">
-                    <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
-                      {row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}
-                    </Badge>
-                    <span>{timingLabel(row.application, row.agreement)}</span>
-                  </span>
-                  <strong>{mission?.title || 'Mission confirmee'}</strong>
-                  <span>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</span>
-                  <small>{missionSchedule(row.application, row.agreement)}</small>
+                  {tab.label}
+                  {tab.count > 0 && (
+                    <span className="tab-count-badge">{tab.count}</span>
+                  )}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          {selectedRow ? (
-            <MissionControlPanel row={selectedRow} />
-          ) : null}
-        </div>
+          {filteredRows.length === 0 ? (
+            <EmptyState
+              title={
+                activeTab === 'propositions' ? 'Aucune proposition en attente' :
+                activeTab === 'confirmed' ? 'Aucune mission confirmée' :
+                'Aucune mission terminée'
+              }
+              description={
+                activeTab === 'propositions' ? "Vous n'avez pas de proposition finale à valider pour le moment." :
+                activeTab === 'confirmed' ? "Vos missions acceptées et confirmées s'afficheront ici dès qu'elles seront payées." :
+                "L'historique de vos missions terminées apparaîtra ici."
+              }
+              action={activeTab === 'confirmed' ? <LinkButton href="/app/search">Trouver une mission</LinkButton> : undefined}
+            />
+          ) : (
+            <div className="candidate-current-layout">
+              <div className="candidate-current-list">
+                {filteredRows.map((row) => {
+                  const mission = row.application.mission;
+                  const selected = selectedRow?.application.id === row.application.id;
+                  return (
+                    <button
+                      key={row.application.id}
+                      type="button"
+                      className={`candidate-current-card ${selected ? 'selected' : ''}`}
+                      onClick={() => setSelectedId(row.application.id)}
+                    >
+                      <span className="candidate-current-card-head">
+                        <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
+                          {row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}
+                        </Badge>
+                        <span>{timingLabel(row.application, row.agreement)}</span>
+                      </span>
+                      <strong>{mission?.title || 'Mission confirmee'}</strong>
+                      <span>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</span>
+                      <small>{missionSchedule(row.application, row.agreement)}</small>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedRow ? (
+                <MissionControlPanel row={selectedRow} />
+              ) : null}
+            </div>
+          )}
+        </>
       )}
     </>
   );

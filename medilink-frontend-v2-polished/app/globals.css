@@ -5759,6 +5759,26 @@ td {
   box-shadow: 0 10px 20px rgba(20,39,74,.14);
 }
 
+.tab-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--muted);
+  transition: all 0.2s ease;
+}
+
+.billing-tabs button.active .tab-count-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
 .billing-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
