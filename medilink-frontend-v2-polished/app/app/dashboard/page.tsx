@@ -318,16 +318,6 @@ export default function CandidateDashboardPage() {
               </div>
               <LinkButton variant="light" href="/app/messages">Ouvrir</LinkButton>
             </div>
-            <div className="dashboard-message-summary">
-              <div>
-                <span>Non lus</span>
-                <strong>{dashboard.unreadReceivedMessages}</strong>
-              </div>
-              <div>
-                <span>Conversations</span>
-                <strong>{conversations.length}</strong>
-              </div>
-            </div>
             {dashboard.sortedConversations.length > 0 ? (
               <div className="dashboard-mini-list dashboard-message-list">
                 {dashboard.sortedConversations.map((conversation) => {
