@@ -75,18 +75,25 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const start = startDateTime(application, agreement);
   const end = endDateTime(application, agreement);
   const now = new Date();
-  const hasDetails = Boolean(application.mission?.practicalInfo || application.mission?.departmentInfo || application.mission?.teamInfo);
+  const mission = application.mission;
+  const hasLocation = Boolean(mission?.location || mission?.establishment?.address || mission?.city || mission?.establishment?.city);
+  const hasEstablishmentInfo = Boolean(
+    mission?.practicalInfo
+      || mission?.departmentInfo
+      || mission?.teamInfo
+      || mission?.equipmentInfo
+      || mission?.equipmentAvailable?.length
+  );
+  const detailsProvided = hasLocation && hasEstablishmentInfo;
   const confirmed = application.status === 'ACCEPTED' || Boolean(agreement);
-  const secured = ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status || '');
   const active = Boolean(start && end && now >= start && now <= end);
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || (end && now > end));
 
   return [
-    { key: 'accepted', label: 'Mission acceptee', helper: 'L etablissement a valide votre candidature.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !hasDetails, done: confirmed },
-    { key: 'details', label: 'Brief operationnel', helper: 'Lieu, service, horaires et consignes sont regroupes pour le depart.', status: hasDetails ? 'Recu' : 'A completer', active: hasDetails && !secured, done: hasDetails },
-    { key: 'confirmed', label: 'Depart verrouille', helper: secured ? 'La mission est confirmee.' : 'En attente des dernieres confirmations.', status: secured ? 'Confirme' : 'En attente', active: secured && !active, done: secured },
-    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : 'A effectuer sur place selon le planning.', status: active ? 'En cours' : 'Planifie', active, done: completed },
-    { key: 'closed', label: 'Cloture & compta', helper: completed ? 'Suivi comptable disponible.' : 'La compta sera mise a jour apres validation.', status: completed ? 'Pret' : 'A venir', active: completed, done: completed },
+    { key: 'confirmed', label: 'Mission confirmee', helper: 'La mission est validee avec l etablissement.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !detailsProvided, done: confirmed },
+    { key: 'establishment-info', label: 'Informations fournies par l etablissement', helper: detailsProvided ? 'Lieu et informations operationnelles sont renseignes.' : 'Lieu, consignes ou contexte doivent encore etre renseignes.', status: detailsProvided ? 'Renseigne' : 'A completer', active: confirmed && !detailsProvided, done: detailsProvided },
+    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : 'Mission planifiee selon les dates indiquees.', status: active ? 'En cours' : 'Planifie', active, done: completed },
+    { key: 'completed', label: 'Mission terminee', helper: completed ? 'La mission est terminee cote operationnel.' : 'Cette etape se validera apres la fin de mission.', status: completed ? 'Terminee' : 'A venir', active: completed, done: completed },
   ];
 }
 
