@@ -66,8 +66,8 @@ export default function SearchMissionsPage() {
   return (
     <>
       <PageHeader
-        title="Recherche de missions"
-        description="Filtre les gardes, remplacements, vacations, stages et aides opératoires disponibles."
+        title="Annonces de missions"
+        description="Consulte les gardes, remplacements, vacations, stages et aides opératoires disponibles."
       />
 
       <div className="grid-main">
@@ -76,7 +76,7 @@ export default function SearchMissionsPage() {
             <div>
               <h2>Filtres</h2>
               <p>
-                {activeFilters > 0 ? <span className="search-filters-count">{activeFilters} actif(s)</span> : 'Affinez votre recherche'}
+                {activeFilters > 0 ? <span className="search-filters-count">{activeFilters} actif(s)</span> : 'Affinez les annonces'}
               </p>
             </div>
             <Button
@@ -90,9 +90,9 @@ export default function SearchMissionsPage() {
             />
           </div>
           <div className="search-filters-body" id="mission-search-filters">
-            <p>Affinez la recherche selon votre disponibilité, votre niveau et votre localisation.</p>
+            <p>Affinez les annonces selon votre disponibilité, votre niveau et votre localisation.</p>
             <form className="form" onSubmit={submit}>
-              <Field label="Recherche">
+              <Field label="Mot-clé">
                 <Input value={filters.q} onChange={(e) => set('q', e.target.value)} placeholder="Urgences, pédiatrie..." />
               </Field>
               <Field label="Ville">
@@ -170,7 +170,7 @@ export default function SearchMissionsPage() {
                 </Field>
               </div>
               <div className="actions">
-                <Button disabled={loading}>{loading ? 'Recherche...' : 'Rechercher'}</Button>
+                <Button disabled={loading}>{loading ? 'Chargement...' : 'Rechercher'}</Button>
                 <Button
                   type="button"
                   variant="light"
