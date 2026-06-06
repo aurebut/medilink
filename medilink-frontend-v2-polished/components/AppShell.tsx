@@ -25,6 +25,7 @@ const establishmentNav: NavItem[] = [
   { href: '/establishment/onboarding', label: 'Établissement', icon: 'E' },
   { href: '/establishment/missions', label: 'Missions', icon: 'M' },
   { href: '/establishment/missions/new', label: 'Créer mission', icon: '+' },
+  { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
   { href: '/establishment/applications', label: 'Candidatures', icon: 'C' },
   { href: '/establishment/messages', label: 'Messagerie', icon: 'M' },
 ];
