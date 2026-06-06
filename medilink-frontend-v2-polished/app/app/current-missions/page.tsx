@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementNextStep, agreementTone, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
-import { Alert, Badge, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type MissionStep = {
   key: string;
@@ -68,19 +68,6 @@ function timingLabel(application: Application, agreement?: MissionAgreement | nu
   const hours = Math.ceil((start.getTime() - now.getTime()) / 3600000);
   if (hours <= 24) return 'Depart dans moins de 24 h';
   return `Depart dans ${Math.ceil(hours / 24)} jours`;
-}
-
-function missionSchedule(application: Application, agreement?: MissionAgreement | null) {
-  const mission = application.mission;
-  const start = missionStart(application, agreement);
-  const end = missionEnd(application, agreement);
-  if (!start) return 'Planning a confirmer';
-  const dates = end && end !== start ? `${formatDate(start)} - ${formatDate(end)}` : formatDate(start);
-  const hours = [
-    agreement?.startTime || mission?.startTime,
-    agreement?.endTime || mission?.endTime,
-  ].filter(Boolean).join(' - ');
-  return hours ? `${dates} - ${hours}` : dates;
 }
 
 function missionTimeRange(application: Application, agreement?: MissionAgreement | null) {
@@ -243,10 +230,6 @@ export default function CandidateCurrentMissionsPage() {
             ))}
           </div>
 
-          {priorityRow ? (
-            <MissionCommandStrip row={priorityRow} />
-          ) : null}
-
           <div className="candidate-current-layout">
             {selectedRow ? (
               <MissionControlPanel row={selectedRow} activeSection={activeSection} />
@@ -275,9 +258,9 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <small>{dayShortLabel(row.application, row.agreement)} - {missionTimeRange(row.application, row.agreement)}</small>
       </div>
       <div className="candidate-command-stat">
-        <span>Prepa</span>
-        <strong>{missionReadiness(row)}%</strong>
-        <small>Infos critiques reunies</small>
+        <span>Statut</span>
+        <strong>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</strong>
+        <small>{agreementNextStep(row.agreement?.status)}</small>
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? <LinkButton href="/app/messages" variant="secondary">Messagerie</LinkButton> : null}
@@ -313,20 +296,8 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
   ];
 
   return (
-    <Card className="candidate-current-detail">
-      <div className="candidate-current-hero">
-        <div>
-          <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
-            {row.agreement ? agreementLabel(row.agreement.status) : 'Candidature acceptee'}
-          </Badge>
-          <h2>{mission?.title || 'Mission confirmee'}</h2>
-          <p>{establishment?.name || mission?.city || 'Etablissement a confirmer'}</p>
-        </div>
-        <div className="candidate-current-timing">
-          <span>{timingLabel(row.application, row.agreement)}</span>
-          <strong>{missionSchedule(row.application, row.agreement)}</strong>
-        </div>
-      </div>
+    <section className="candidate-current-detail candidate-current-unified">
+      <MissionCommandStrip row={row} />
 
       {activeSection === 'pilotage' ? (
         <>
@@ -466,6 +437,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
           </div>
         </div>
       ) : null}
-    </Card>
+    </section>
   );
 }

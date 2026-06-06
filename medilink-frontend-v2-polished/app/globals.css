@@ -886,32 +886,6 @@ button { touch-action: manipulation; }
   gap: 18px;
 }
 
-.candidate-current-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, .36fr);
-  gap: 16px;
-  align-items: start;
-}
-
-.candidate-current-hero h2 {
-  margin: 8px 0 5px;
-  color: var(--heading);
-}
-
-.candidate-current-hero p {
-  margin: 0;
-}
-
-.candidate-current-timing {
-  display: grid;
-  gap: 5px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #F8FAFC;
-}
-
-.candidate-current-timing span,
 .candidate-current-panel span,
 .candidate-current-detail-grid span {
   color: var(--muted);
@@ -920,11 +894,26 @@ button { touch-action: manipulation; }
   text-transform: uppercase;
 }
 
-.candidate-current-timing strong,
 .candidate-current-panel strong,
 .candidate-current-detail-grid strong {
   color: var(--heading);
   line-height: 1.25;
+}
+
+.candidate-current-unified {
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid rgba(14,138,122,.18);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(14,138,122,.07), rgba(255,255,255,.96) 260px),
+    #fff;
+  box-shadow: 0 18px 48px rgba(11,25,41,.07);
+}
+
+.candidate-current-unified .candidate-command-strip {
+  margin-bottom: 0;
+  box-shadow: none;
 }
 
 .candidate-page-tabs {
@@ -1199,7 +1188,6 @@ button { touch-action: manipulation; }
 @media (max-width: 1080px) {
   .candidate-command-strip,
   .candidate-current-layout,
-  .candidate-current-hero,
   .candidate-current-pilotage-grid {
     grid-template-columns: 1fr;
   }
