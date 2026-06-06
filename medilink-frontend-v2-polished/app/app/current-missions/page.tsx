@@ -12,6 +12,7 @@ type MissionStep = {
   key: string;
   label: string;
   helper: string;
+  status: string;
   active: boolean;
   done: boolean;
 };
@@ -120,11 +121,11 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || (end && now > end));
 
   return [
-    { key: 'accepted', label: 'Mission acceptee', helper: 'L etablissement a valide votre candidature.', active: confirmed && !hasDetails, done: confirmed },
-    { key: 'details', label: 'Details recus', helper: 'Lieu, service, horaires et consignes sont disponibles.', active: hasDetails && !secured, done: hasDetails },
-    { key: 'confirmed', label: 'Depart confirme', helper: secured ? 'La mission est confirmee.' : 'En attente des dernieres confirmations.', active: secured && !active, done: secured },
-    { key: 'active', label: 'Sur place', helper: active ? 'Mission en cours.' : 'A effectuer le jour J.', active, done: completed },
-    { key: 'closed', label: 'Fin & compta', helper: completed ? 'Suivi comptable disponible.' : 'La compta sera mise a jour apres validation.', active: completed, done: completed },
+    { key: 'accepted', label: 'Mission acceptee', helper: 'L etablissement a valide votre candidature.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !hasDetails, done: confirmed },
+    { key: 'details', label: 'Brief operationnel', helper: 'Lieu, service, horaires et consignes sont regroupes pour le depart.', status: hasDetails ? 'Recu' : 'A completer', active: hasDetails && !secured, done: hasDetails },
+    { key: 'confirmed', label: 'Depart verrouille', helper: secured ? 'La mission est confirmee.' : 'En attente des dernieres confirmations.', status: secured ? 'Confirme' : 'En attente', active: secured && !active, done: secured },
+    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : 'A effectuer sur place selon le planning.', status: active ? 'En cours' : 'Planifie', active, done: completed },
+    { key: 'closed', label: 'Cloture & compta', helper: completed ? 'Suivi comptable disponible.' : 'La compta sera mise a jour apres validation.', status: completed ? 'Pret' : 'A venir', active: completed, done: completed },
   ];
 }
 
@@ -407,26 +408,44 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
             </div>
           </div>
 
-          <div className="candidate-current-route">
-            {progress.map((step) => (
-              <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
-                <span aria-hidden="true" />
+          <div className="candidate-current-pilotage-grid">
+            <section className="candidate-current-route" aria-label="Timeline de mission">
+              <div className="candidate-current-route-head">
                 <div>
-                  <strong>{step.label}</strong>
-                  <small>{step.helper}</small>
+                  <span>Timeline</span>
+                  <strong>Avancement mission</strong>
                 </div>
+                <small>{nextStep}</small>
               </div>
-            ))}
-          </div>
+              <div className="candidate-current-route-list">
+                {progress.map((step, index) => (
+                  <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
+                    <span aria-hidden="true">{step.done ? '' : index + 1}</span>
+                    <div>
+                      <div className="candidate-current-route-title">
+                        <strong>{step.label}</strong>
+                        <small>{step.status}</small>
+                      </div>
+                      <p>{step.helper}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-          <div className="candidate-current-prep">
-            {prepItems.map((item) => (
-              <div key={item.label} className={item.ready ? 'ready' : 'waiting'}>
-                <span>{item.ready ? 'Pret' : 'A verifier'}</span>
-                <strong>{item.label}</strong>
-                <p>{item.value}</p>
+            <section className="candidate-current-prep" aria-label="Preparation mission">
+              <div className="candidate-current-prep-head">
+                <span>Preparation</span>
+                <strong>{readiness}% pret</strong>
               </div>
-            ))}
+              {prepItems.map((item) => (
+                <div key={item.label} className={item.ready ? 'ready' : 'waiting'}>
+                  <span>{item.ready ? 'Pret' : 'A verifier'}</span>
+                  <strong>{item.label}</strong>
+                  <p>{item.value}</p>
+                </div>
+              ))}
+            </section>
           </div>
         </>
       ) : null}

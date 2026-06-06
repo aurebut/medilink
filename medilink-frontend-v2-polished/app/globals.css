@@ -838,7 +838,9 @@ button { touch-action: manipulation; }
 .candidate-command-main span,
 .candidate-command-stat span,
 .candidate-current-dispatch span,
-.candidate-current-prep span {
+.candidate-current-prep span,
+.candidate-current-route-head span,
+.candidate-current-prep-head span {
   color: var(--muted);
   font-size: 12px;
   font-weight: 850;
@@ -1023,10 +1025,14 @@ button { touch-action: manipulation; }
   display: grid;
   gap: 5px;
   min-width: 0;
-  padding: 13px;
+  min-height: 112px;
+  align-content: space-between;
+  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,250,252,.96)),
+    #fff;
 }
 
 .candidate-current-dispatch strong {
@@ -1040,55 +1046,165 @@ button { touch-action: manipulation; }
   overflow-wrap: anywhere;
 }
 
+.candidate-current-pilotage-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(260px, .58fr);
+  gap: 12px;
+  align-items: start;
+}
+
 .candidate-current-route {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.candidate-current-route > div {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
-  gap: 8px;
+  gap: 14px;
   min-width: 0;
-  padding: 10px;
+  padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background:
+    linear-gradient(180deg, rgba(248,250,252,.72), rgba(255,255,255,.96)),
+    #fff;
 }
 
-.candidate-current-route > div > span {
-  width: 16px;
-  height: 16px;
-  margin-top: 2px;
+.candidate-current-route-head,
+.candidate-current-prep-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.candidate-current-route-head > div,
+.candidate-current-prep-head {
+  min-width: 0;
+}
+
+.candidate-current-route-head strong,
+.candidate-current-prep-head strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--heading);
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.candidate-current-route-head small {
+  max-width: 280px;
+  color: var(--muted);
+  line-height: 1.4;
+  text-align: right;
+}
+
+.candidate-current-route-list {
+  display: grid;
+  gap: 0;
+}
+
+.candidate-current-route-list > div {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 0 0 18px;
+}
+
+.candidate-current-route-list > div:last-child {
+  padding-bottom: 0;
+}
+
+.candidate-current-route-list > div::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 34px;
+  bottom: -1px;
+  width: 2px;
+  background: #DCE5EF;
+}
+
+.candidate-current-route-list > div:last-child::before {
+  display: none;
+}
+
+.candidate-current-route-list > div > span {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
   border: 2px solid #D8E0EC;
   border-radius: 999px;
   background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
 }
 
-.candidate-current-route > div.done > span {
+.candidate-current-route-list > div.done::before {
+  background: rgba(14,138,122,.34);
+}
+
+.candidate-current-route-list > div.done > span {
   border-color: var(--teal);
   background: var(--teal);
 }
 
-.candidate-current-route > div.active {
-  border-color: rgba(14,138,122,.34);
-  background: rgba(14,138,122,.08);
+.candidate-current-route-list > div.done > span::after {
+  content: '';
+  width: 10px;
+  height: 6px;
+  margin-top: -2px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg);
+}
+
+.candidate-current-route-list > div.active > span {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 5px rgba(14,138,122,.12);
 }
 
 .candidate-current-route strong {
   display: block;
   color: var(--heading);
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 15px;
+  line-height: 1.25;
 }
 
-.candidate-current-route small {
+.candidate-current-route-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.candidate-current-route-title small {
   display: block;
-  margin-top: 3px;
+  flex: 0 0 auto;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
   color: var(--muted);
   font-size: 11px;
-  line-height: 1.25;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.candidate-current-route-list > div.active .candidate-current-route-title small,
+.candidate-current-route-list > div.done .candidate-current-route-title small {
+  border-color: rgba(14,138,122,.22);
+  background: rgba(14,138,122,.08);
+  color: var(--teal-dark);
+}
+
+.candidate-current-route p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .candidate-current-grid,
@@ -1132,8 +1248,13 @@ button { touch-action: manipulation; }
 
 .candidate-current-prep {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
 }
 
 .candidate-current-prep > div {
@@ -1143,7 +1264,7 @@ button { touch-action: manipulation; }
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fff;
+  background: #F8FAFC;
 }
 
 .candidate-current-prep > div.ready {
@@ -1187,13 +1308,12 @@ button { touch-action: manipulation; }
 @media (max-width: 1080px) {
   .candidate-command-strip,
   .candidate-current-layout,
-  .candidate-current-hero {
+  .candidate-current-hero,
+  .candidate-current-pilotage-grid {
     grid-template-columns: 1fr;
   }
 
-  .candidate-current-route,
   .candidate-current-dispatch,
-  .candidate-current-prep,
   .candidate-current-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1206,11 +1326,27 @@ button { touch-action: manipulation; }
 @media (max-width: 720px) {
   .candidate-current-grid,
   .candidate-current-info,
-  .candidate-current-route,
   .candidate-current-dispatch,
-  .candidate-current-prep,
   .candidate-current-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .candidate-current-route-head {
+    display: grid;
+  }
+
+  .candidate-current-route-head small {
+    max-width: none;
+    text-align: left;
+  }
+
+  .candidate-current-route-title {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .candidate-current-route-title small {
+    justify-self: start;
   }
 
   .candidate-command-strip {
