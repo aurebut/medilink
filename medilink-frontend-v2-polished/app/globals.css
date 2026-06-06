@@ -706,8 +706,236 @@ button { touch-action: manipulation; }
     grid-template-columns: 1fr;
   }
 
-  .current-mission-step::after {
-    display: none;
+.current-mission-step::after {
+  display: none;
+  }
+}
+
+.candidate-current-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, .34fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.candidate-current-list {
+  display: grid;
+  gap: 10px;
+}
+
+.candidate-current-card {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.candidate-current-card:hover,
+.candidate-current-card:focus-visible,
+.candidate-current-card.selected {
+  border-color: rgba(14,138,122,.34);
+  box-shadow: 0 14px 38px rgba(11,25,41,.08);
+  outline: none;
+}
+
+.candidate-current-card:focus-visible {
+  transform: translateY(-1px);
+}
+
+.candidate-current-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.candidate-current-card strong {
+  color: var(--heading);
+  line-height: 1.25;
+}
+
+.candidate-current-card > span:not(.candidate-current-card-head),
+.candidate-current-card small {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.candidate-current-detail {
+  display: grid;
+  gap: 18px;
+}
+
+.candidate-current-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, .36fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.candidate-current-hero h2 {
+  margin: 8px 0 5px;
+  color: var(--heading);
+}
+
+.candidate-current-hero p {
+  margin: 0;
+}
+
+.candidate-current-timing {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #F8FAFC;
+}
+
+.candidate-current-timing span,
+.candidate-current-panel span,
+.candidate-current-detail-grid span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.candidate-current-timing strong,
+.candidate-current-panel strong,
+.candidate-current-detail-grid strong {
+  color: var(--heading);
+  line-height: 1.25;
+}
+
+.candidate-current-route {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.candidate-current-route > div {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.candidate-current-route > div > span {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 2px solid #D8E0EC;
+  border-radius: 999px;
+  background: #fff;
+}
+
+.candidate-current-route > div.done > span {
+  border-color: var(--teal);
+  background: var(--teal);
+}
+
+.candidate-current-route > div.active {
+  border-color: rgba(14,138,122,.34);
+  background: rgba(14,138,122,.08);
+}
+
+.candidate-current-route strong {
+  display: block;
+  color: var(--heading);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.candidate-current-route small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.candidate-current-grid,
+.candidate-current-info {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.candidate-current-panel,
+.candidate-current-info > div {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #F8FAFC;
+}
+
+.candidate-current-panel p,
+.candidate-current-info p {
+  margin: 0;
+}
+
+.candidate-current-panel small {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.candidate-current-info h3 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 18px;
+}
+
+.candidate-current-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.candidate-current-detail-grid > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+@media (max-width: 1080px) {
+  .candidate-current-layout,
+  .candidate-current-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .candidate-current-route,
+  .candidate-current-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .candidate-current-grid,
+  .candidate-current-info,
+  .candidate-current-route,
+  .candidate-current-detail-grid {
+    grid-template-columns: 1fr;
   }
 }
 .auth-page::before,
