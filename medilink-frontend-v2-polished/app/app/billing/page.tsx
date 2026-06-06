@@ -363,38 +363,35 @@ export default function CandidateBillingPage() {
       <PageHeader
         title="Ma compta"
         description="Cockpit de revenus, suivi des rétrocessions, justificatifs et exports pour vos missions."
-        actions={
-          <div className="billing-filters">
-            <Select value={selectedYear} onChange={(event) => setSelectedYear(Number(event.target.value))} aria-label="Année">
-              {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
-            </Select>
-            <Button type="button" variant="light" onClick={() => exportCsv('year')}>Exporter CSV</Button>
-          </div>
-        }
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
+
+      <div className="billing-nav-row">
+        <Select value={selectedYear} onChange={(event) => setSelectedYear(Number(event.target.value))} aria-label="Année">
+          {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
+        </Select>
+        <div className="billing-tabs" role="tablist" aria-label="Sections comptables">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={activeTab === tab.id ? 'active' : ''}
+              onClick={() => setActiveTab(tab.id)}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="billing-context-bar">
         <div><span>Encaissé</span><strong>{formatMoney(dashboard.revenue)}</strong></div>
         <div><span>En attente</span><strong>{dashboard.pendingRows.length}</strong></div>
         <div><span>À valider</span><strong>{dashboard.completedRows.length}</strong></div>
         <div><span>Provision</span><strong>{formatMoney(dashboard.provision)}</strong></div>
-      </div>
-
-      <div className="billing-tabs" role="tablist" aria-label="Sections comptables">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            className={activeTab === tab.id ? 'active' : ''}
-            onClick={() => setActiveTab(tab.id)}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-          >
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {activeTab === 'overview' ? (
