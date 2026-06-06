@@ -38,7 +38,7 @@ function missionStart(application: Application, agreement?: MissionAgreement | n
 }
 
 function missionEnd(application: Application, agreement?: MissionAgreement | null) {
-  return agreement?.endDate || application.mission?.endDate || missionStart(application, agreement);
+  return agreement?.endDate || application.mission?.endDate || null;
 }
 
 function startDateTime(application: Application, agreement?: MissionAgreement | null) {
@@ -87,13 +87,15 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const detailsProvided = hasLocation && hasEstablishmentInfo;
   const confirmed = application.status === 'ACCEPTED' || Boolean(agreement);
   const active = Boolean(start && end && now >= start && now <= end);
-  const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || (end && now > end));
+  const scheduleStarted = Boolean(start && now >= start);
+  const scheduleEnded = Boolean(end && now > end);
+  const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
 
   return [
     { key: 'confirmed', label: 'Mission confirmee', helper: 'La mission est validee avec l etablissement.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !detailsProvided, done: confirmed },
     { key: 'establishment-info', label: 'Informations fournies par l etablissement', helper: detailsProvided ? 'Lieu et informations operationnelles sont renseignes.' : 'Lieu, consignes ou contexte doivent encore etre renseignes.', status: detailsProvided ? 'Renseigne' : 'A completer', active: confirmed && !detailsProvided, done: detailsProvided },
-    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : 'Mission planifiee selon les dates indiquees.', status: active ? 'En cours' : 'Planifie', active, done: completed },
-    { key: 'completed', label: 'Mission terminee', helper: completed ? 'La mission est terminee cote operationnel.' : 'Cette etape se validera apres la fin de mission.', status: completed ? 'Terminee' : 'A venir', active: completed, done: completed },
+    { key: 'active', label: 'Jour J', helper: active ? 'Mission en cours.' : start ? 'Mission planifiee selon la date de debut indiquee.' : 'Date de debut a renseigner.', status: active ? 'En cours' : scheduleStarted ? 'Passe' : 'Planifie', active, done: scheduleStarted },
+    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a ete validee.' : scheduleEnded ? 'La date de fin est passee, en attente de validation.' : 'Cette etape se validera apres la fin de mission.', status: completed ? 'Validee' : scheduleEnded ? 'A valider' : 'A venir', active: scheduleEnded && !completed, done: completed },
   ];
 }
 
