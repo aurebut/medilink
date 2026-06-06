@@ -2045,7 +2045,8 @@ button { touch-action: manipulation; }
   gap: 16px;
 }
 .dashboard-notification-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   max-height: 280px;
   overflow-y: auto;
@@ -2067,7 +2068,8 @@ button { touch-action: manipulation; }
   background-color: rgba(26, 82, 160, 0.4);
 }
 .dashboard-notification-list .dashboard-notification {
-  min-height: 0;
+  min-height: auto;
+  flex-shrink: 0;
 }
 .dashboard-week-card {
   display: grid;
