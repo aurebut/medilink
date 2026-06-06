@@ -23,6 +23,8 @@ type MissionRow = {
   startDate?: string | null;
 };
 
+type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'compta';
+
 function missionStart(application: Application, agreement?: MissionAgreement | null) {
   return agreement?.startDate || application.mission?.startDate || null;
 }
@@ -73,6 +75,32 @@ function missionSchedule(application: Application, agreement?: MissionAgreement 
   return hours ? `${dates} - ${hours}` : dates;
 }
 
+function missionTimeRange(application: Application, agreement?: MissionAgreement | null) {
+  const mission = application.mission;
+  const hours = [
+    agreement?.startTime || mission?.startTime,
+    agreement?.endTime || mission?.endTime,
+  ].filter(Boolean).join(' - ');
+  return hours || 'Horaires a confirmer';
+}
+
+function missionDuration(application: Application, agreement?: MissionAgreement | null) {
+  const start = startDateTime(application, agreement);
+  const end = endDateTime(application, agreement);
+  if (start && end) {
+    const hours = Math.max(0, Math.round(((end.getTime() - start.getTime()) / 3600000) * 10) / 10);
+    if (hours > 0) return `${hours} h`;
+  }
+  return application.mission?.durationHours ? `${application.mission.durationHours} h` : 'Duree a confirmer';
+}
+
+function dayShortLabel(application: Application, agreement?: MissionAgreement | null) {
+  const start = missionStart(application, agreement);
+  if (!start) return 'Date a confirmer';
+  const date = new Date(start);
+  return date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
 function missionProgress(application: Application, agreement?: MissionAgreement | null): MissionStep[] {
   const status = agreement?.status;
   const start = startDateTime(application, agreement);
@@ -111,11 +139,37 @@ function readableList(values?: string[] | null) {
   return values?.length ? values.join(', ') : null;
 }
 
+function rowPriority(row: MissionRow) {
+  const start = startDateTime(row.application, row.agreement);
+  const end = endDateTime(row.application, row.agreement);
+  const now = new Date();
+  if (end && now > end) return 4;
+  if (start && end && now >= start && now <= end) return 0;
+  if (start && start.getTime() - now.getTime() <= 24 * 3600000) return 1;
+  if (row.agreement?.status === 'PROPOSED') return 2;
+  return 3;
+}
+
+function missionReadiness(row: MissionRow) {
+  const mission = row.application.mission;
+  const checks = [
+    Boolean(missionStart(row.application, row.agreement)),
+    Boolean(mission?.location || mission?.establishment?.address || mission?.city),
+    Boolean(mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo),
+    Boolean(row.conversation),
+    Boolean(row.agreement || row.application.status === 'ACCEPTED'),
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function mapsHref(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
 export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'all' | 'propositions' | 'confirmed' | 'completed'>('all');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -176,34 +230,24 @@ export default function CandidateCurrentMissionsPage() {
     });
   }, [rows]);
 
-  const tabs = [
-    { id: 'all' as const, label: 'Toutes', count: rows.length },
-    { id: 'propositions' as const, label: 'Propositions', count: propositionsRows.length },
-    { id: 'confirmed' as const, label: 'Confirmées', count: confirmedRows.length },
-    { id: 'completed' as const, label: 'Terminées', count: completedRows.length },
-  ];
-
-  const filteredRows = useMemo(() => {
-    if (activeTab === 'propositions') return propositionsRows;
-    if (activeTab === 'confirmed') return confirmedRows;
-    if (activeTab === 'completed') return completedRows;
-    return rows;
-  }, [activeTab, rows, propositionsRows, confirmedRows, completedRows]);
+  const priorityRow = useMemo(() => {
+    return [...rows].sort((a, b) => rowPriority(a) - rowPriority(b) || missionSortValue(a) - missionSortValue(b))[0] || null;
+  }, [rows]);
 
   const selectedRow = useMemo(() => {
-    return filteredRows.find((row) => row.application.id === selectedId) || filteredRows[0] || null;
-  }, [filteredRows, selectedId]);
+    return rows.find((row) => row.application.id === selectedId) || priorityRow || rows[0] || null;
+  }, [priorityRow, rows, selectedId]);
 
   useEffect(() => {
-    if (filteredRows.length > 0) {
-      const isSelectedInFiltered = filteredRows.some((row) => row.application.id === selectedId);
-      if (!isSelectedInFiltered) {
-        setSelectedId(filteredRows[0].application.id);
+    if (rows.length > 0) {
+      const isSelectedInRows = rows.some((row) => row.application.id === selectedId);
+      if (!isSelectedInRows) {
+        setSelectedId((priorityRow || rows[0]).application.id);
       }
     } else {
       setSelectedId(null);
     }
-  }, [filteredRows, selectedId]);
+  }, [priorityRow, rows, selectedId]);
 
   if (loading) return <LoadingCard label="Chargement de vos missions en cours..." />;
 
@@ -225,82 +269,102 @@ export default function CandidateCurrentMissionsPage() {
         />
       ) : (
         <>
-          <div className="billing-nav-row" style={{ gridTemplateColumns: '1fr', marginBottom: '20px' }}>
-            <div className="billing-tabs" role="tablist" aria-label="Onglets des missions">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  className={activeTab === tab.id ? 'active' : ''}
-                  onClick={() => setActiveTab(tab.id)}
-                  role="tab"
-                  aria-selected={activeTab === tab.id}
-                >
-                  {tab.label}
-                  {tab.count > 0 && (
-                    <span className="tab-count-badge">{tab.count}</span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {filteredRows.length === 0 ? (
-            <EmptyState
-              title={
-                activeTab === 'propositions' ? 'Aucune proposition en attente' :
-                activeTab === 'confirmed' ? 'Aucune mission confirmée' :
-                'Aucune mission terminée'
-              }
-              description={
-                activeTab === 'propositions' ? "Vous n'avez pas de proposition finale à valider pour le moment." :
-                activeTab === 'confirmed' ? "Vos missions acceptées et confirmées s'afficheront ici dès qu'elles seront payées." :
-                "L'historique de vos missions terminées apparaîtra ici."
-              }
-              action={activeTab === 'confirmed' ? <LinkButton href="/app/search">Trouver une mission</LinkButton> : undefined}
+          {priorityRow ? (
+            <MissionCommandStrip
+              row={priorityRow}
+              stats={{
+                total: rows.length,
+                soon: confirmedRows.length,
+                proposals: propositionsRows.length,
+                done: completedRows.length,
+              }}
             />
-          ) : (
-            <div className="candidate-current-layout">
-              <div className="candidate-current-list">
-                {filteredRows.map((row) => {
-                  const mission = row.application.mission;
-                  const selected = selectedRow?.application.id === row.application.id;
-                  return (
-                    <button
-                      key={row.application.id}
-                      type="button"
-                      className={`candidate-current-card ${selected ? 'selected' : ''}`}
-                      onClick={() => setSelectedId(row.application.id)}
-                    >
-                      <span className="candidate-current-card-head">
-                        <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
-                          {row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}
-                        </Badge>
-                        <span>{timingLabel(row.application, row.agreement)}</span>
-                      </span>
-                      <strong>{mission?.title || 'Mission confirmee'}</strong>
-                      <span>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</span>
-                      <small>{missionSchedule(row.application, row.agreement)}</small>
-                    </button>
-                  );
-                })}
-              </div>
+          ) : null}
 
-              {selectedRow ? (
-                <MissionControlPanel row={selectedRow} />
-              ) : null}
+          <div className="candidate-current-layout">
+            <div className="candidate-current-list">
+              {rows.map((row) => {
+                const mission = row.application.mission;
+                const selected = selectedRow?.application.id === row.application.id;
+                const readiness = missionReadiness(row);
+                return (
+                  <button
+                    key={row.application.id}
+                    type="button"
+                    className={`candidate-current-card ${selected ? 'selected' : ''}`}
+                    onClick={() => setSelectedId(row.application.id)}
+                  >
+                    <span className="candidate-current-card-head">
+                      <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
+                        {row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}
+                      </Badge>
+                      <span>{timingLabel(row.application, row.agreement)}</span>
+                    </span>
+                    <strong>{mission?.title || 'Mission confirmee'}</strong>
+                    <span>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</span>
+                    <small>{dayShortLabel(row.application, row.agreement)} - {missionTimeRange(row.application, row.agreement)}</small>
+                    <span className="candidate-current-card-meta">
+                      <span>{formatCompensation(row.agreement || mission || {})}</span>
+                      <span>{readiness}% pret</span>
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+
+            {selectedRow ? (
+              <MissionControlPanel row={selectedRow} />
+            ) : null}
+          </div>
         </>
       )}
     </>
   );
 }
 
+function MissionCommandStrip({
+  row,
+  stats,
+}: {
+  row: MissionRow;
+  stats: { total: number; soon: number; proposals: number; done: number };
+}) {
+  const mission = row.application.mission;
+  const address = establishmentAddress(mission);
+  const hasAddress = address !== 'Adresse a confirmer';
+  return (
+    <section className="candidate-command-strip" aria-label="Mission prioritaire">
+      <div className="candidate-command-main">
+        <span>Prochaine mission</span>
+        <h2>{mission?.title || 'Mission confirmee'}</h2>
+        <p>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'} - {address}</p>
+      </div>
+      <div className="candidate-command-stat">
+        <span>Depart</span>
+        <strong>{timingLabel(row.application, row.agreement)}</strong>
+        <small>{dayShortLabel(row.application, row.agreement)} - {missionTimeRange(row.application, row.agreement)}</small>
+      </div>
+      <div className="candidate-command-stat">
+        <span>Prepa</span>
+        <strong>{missionReadiness(row)}%</strong>
+        <small>{stats.total} mission(s), {stats.done} terminee(s)</small>
+      </div>
+      <div className="candidate-command-actions">
+        {row.conversation ? <LinkButton href="/app/messages" variant="secondary">Messagerie</LinkButton> : null}
+        {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itineraire</a> : null}
+      </div>
+    </section>
+  );
+}
+
 function MissionControlPanel({ row }: { row: MissionRow }) {
+  const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
   const mission = row.application.mission;
   const establishment = mission?.establishment;
   const progress = missionProgress(row.application, row.agreement);
+  const address = establishmentAddress(mission);
+  const hasAddress = address !== 'Adresse a confirmer';
+  const readiness = missionReadiness(row);
   const detailItems = [
     { label: 'Service', value: mission?.departmentInfo || mission?.sector },
     { label: 'Equipe', value: mission?.teamInfo },
@@ -312,6 +376,18 @@ function MissionControlPanel({ row }: { row: MissionRow }) {
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Echanger avec l etablissement pour confirmer les derniers details.';
+  const prepItems = [
+    { label: 'Adresse', value: address, ready: address !== 'Adresse a confirmer' },
+    { label: 'Contact', value: establishment?.phone || establishment?.email || 'Via messagerie MediLink', ready: Boolean(establishment?.phone || establishment?.email || row.conversation) },
+    { label: 'Consignes', value: mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo || 'A demander avant depart', ready: Boolean(mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo) },
+    { label: 'Materiel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'A confirmer', ready: Boolean(mission?.equipmentInfo || mission?.equipmentAvailable?.length) },
+  ];
+  const sections: Array<{ id: MissionSection; label: string; count?: number }> = [
+    { id: 'pilotage', label: 'Pilotage' },
+    { id: 'brief', label: 'Brief', count: detailItems.length },
+    { id: 'lieu', label: 'Lieu & contact' },
+    { id: 'compta', label: 'Compta & actions' },
+  ];
 
   return (
     <Card className="candidate-current-detail">
@@ -329,61 +405,165 @@ function MissionControlPanel({ row }: { row: MissionRow }) {
         </div>
       </div>
 
-      <div className="candidate-current-route">
-        {progress.map((step) => (
-          <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
-            <span aria-hidden="true" />
-            <div>
-              <strong>{step.label}</strong>
-              <small>{step.helper}</small>
-            </div>
-          </div>
+      <div className="candidate-mission-tabs billing-tabs" role="tablist" aria-label="Sections de la mission selectionnee">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            className={activeSection === section.id ? 'active' : ''}
+            onClick={() => setActiveSection(section.id)}
+            role="tab"
+            aria-selected={activeSection === section.id}
+          >
+            {section.label}
+            {section.count ? <span className="tab-count-badge">{section.count}</span> : null}
+          </button>
         ))}
       </div>
 
-      <div className="candidate-current-grid">
-        <div className="candidate-current-panel">
-          <span>Etablissement</span>
-          <strong>{establishment?.name || 'A confirmer'}</strong>
-          <p>{establishmentAddress(mission)}</p>
-          <small>{establishment?.phone || establishment?.email || 'Contact via la messagerie MediLink'}</small>
-        </div>
-
-        <div className="candidate-current-panel">
-          <span>Mission</span>
-          <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
-          <p>{formatCompensation(row.agreement || mission || {})}</p>
-          <small>{mission?.specialty || 'Specialite a confirmer'}</small>
-        </div>
-      </div>
-
-      <div className="candidate-current-info">
-        <div>
-          <h3>Consignes de l etablissement</h3>
-          <p>{mission?.practicalInfo || mission?.description || 'Les consignes detaillees seront ajoutees par l etablissement ou envoyees dans la messagerie.'}</p>
-        </div>
-        <div>
-          <h3>Prochaine action</h3>
-          <p>{nextStep}</p>
-        </div>
-      </div>
-
-      {detailItems.length > 0 ? (
-        <div className="candidate-current-detail-grid">
-          {detailItems.map((item) => (
-            <div key={item.label}>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
+      {activeSection === 'pilotage' ? (
+        <>
+          <div className="candidate-current-dispatch">
+            <div>
+              <span>Date</span>
+              <strong>{dayShortLabel(row.application, row.agreement)}</strong>
+              <small>{missionTimeRange(row.application, row.agreement)}</small>
             </div>
-          ))}
+            <div>
+              <span>Duree</span>
+              <strong>{missionDuration(row.application, row.agreement)}</strong>
+              <small>{mission?.missionType ? missionTypeLabel(mission.missionType) : 'Mission'}</small>
+            </div>
+            <div>
+              <span>Lieu</span>
+              <strong>{mission?.city || establishment?.city || 'A confirmer'}</strong>
+              <small>{establishment?.name || 'Etablissement'}</small>
+            </div>
+            <div>
+              <span>Preparation</span>
+              <strong>{readiness}%</strong>
+              <small>Infos critiques reunies</small>
+            </div>
+          </div>
+
+          <div className="candidate-current-route">
+            {progress.map((step) => (
+              <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
+                <span aria-hidden="true" />
+                <div>
+                  <strong>{step.label}</strong>
+                  <small>{step.helper}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="candidate-current-prep">
+            {prepItems.map((item) => (
+              <div key={item.label} className={item.ready ? 'ready' : 'waiting'}>
+                <span>{item.ready ? 'Pret' : 'A verifier'}</span>
+                <strong>{item.label}</strong>
+                <p>{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {activeSection === 'brief' ? (
+        <div className="candidate-current-tab-panel">
+          <div className="candidate-current-grid">
+            <div className="candidate-current-panel">
+              <span>Mission</span>
+              <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
+              <p>{formatCompensation(row.agreement || mission || {})}</p>
+              <small>{mission?.specialty || 'Specialite a confirmer'}</small>
+            </div>
+            <div className="candidate-current-panel">
+              <span>Contexte</span>
+              <strong>{mission?.departmentInfo || mission?.sector || 'Service a confirmer'}</strong>
+              <p>{mission?.teamInfo || 'Equipe et organisation a confirmer dans la messagerie.'}</p>
+              <small>{mission?.patientType || establishment?.patientType || 'Patientele a confirmer'}</small>
+            </div>
+          </div>
+
+          <div className="candidate-current-info">
+            <div>
+              <h3>Consignes de l etablissement</h3>
+              <p>{mission?.practicalInfo || mission?.description || 'Les consignes detaillees seront ajoutees par l etablissement ou envoyees dans la messagerie.'}</p>
+            </div>
+            <div>
+              <h3>Materiel & environnement</h3>
+              <p>{mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'Materiel a confirmer avant le depart.'}</p>
+            </div>
+          </div>
+
+          {detailItems.length > 0 ? (
+            <div className="candidate-current-detail-grid">
+              {detailItems.map((item) => (
+                <div key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      <div className="actions">
-        {row.conversation ? <LinkButton href="/app/messages">Contacter l etablissement</LinkButton> : null}
-        {mission?.id ? <LinkButton href={`/app/missions/${mission.id}`} variant="light">Voir la mission</LinkButton> : null}
-        <LinkButton href="/app/billing" variant="light">Suivi compta</LinkButton>
-      </div>
+      {activeSection === 'lieu' ? (
+        <div className="candidate-current-tab-panel">
+          <div className="candidate-current-grid">
+            <div className="candidate-current-panel candidate-current-map-panel">
+              <span>Adresse</span>
+              <strong>{address}</strong>
+              <p>{mission?.city || establishment?.city || 'Ville a confirmer'}</p>
+              {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Ouvrir l itineraire</a> : null}
+            </div>
+            <div className="candidate-current-panel">
+              <span>Contact</span>
+              <strong>{establishment?.name || 'Etablissement a confirmer'}</strong>
+              <p>{establishment?.phone || establishment?.email || 'Contact via la messagerie MediLink'}</p>
+              <small>{establishment?.website || 'Site web non renseigne'}</small>
+            </div>
+          </div>
+
+          <div className="candidate-current-info">
+            <div>
+              <h3>Acces</h3>
+              <p>{mission?.parkingAvailable ? 'Parking disponible.' : 'Parking a confirmer.'} {mission?.accommodationProvided ? 'Logement fourni.' : 'Logement non renseigne.'}</p>
+            </div>
+            <div>
+              <h3>Point de contact</h3>
+              <p>{row.conversation ? 'Conversation ouverte avec l etablissement.' : 'Aucune conversation rattachee pour le moment.'}</p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {activeSection === 'compta' ? (
+        <div className="candidate-current-tab-panel">
+          <div className="candidate-current-grid">
+            <div className="candidate-current-panel">
+              <span>Remuneration</span>
+              <strong>{formatCompensation(row.agreement || mission || {})}</strong>
+              <p>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</p>
+              <small>{row.agreement?.terms || 'Conditions a retrouver dans la proposition ou la messagerie.'}</small>
+            </div>
+            <div className="candidate-current-panel">
+              <span>Prochaine action</span>
+              <strong>{nextStep}</strong>
+              <p>Le suivi comptable sera alimente au fil des validations de mission et de paiement.</p>
+            </div>
+          </div>
+
+          <div className="actions">
+            {row.conversation ? <LinkButton href="/app/messages">Contacter l etablissement</LinkButton> : null}
+            {mission?.id ? <LinkButton href={`/app/missions/${mission.id}`} variant="light">Voir la mission</LinkButton> : null}
+            <LinkButton href="/app/billing" variant="light">Suivi compta</LinkButton>
+          </div>
+        </div>
+      ) : null}
     </Card>
   );
 }

@@ -815,6 +815,71 @@ button { touch-action: manipulation; }
   align-items: start;
 }
 
+.candidate-command-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(190px, .55fr) minmax(150px, .38fr) auto;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid rgba(14,138,122,.18);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(14,138,122,.1), rgba(255,255,255,.94) 48%, rgba(26,82,160,.08));
+  box-shadow: 0 16px 42px rgba(11,25,41,.07);
+}
+
+.candidate-command-main,
+.candidate-command-stat {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.candidate-command-main span,
+.candidate-command-stat span,
+.candidate-current-dispatch span,
+.candidate-current-prep span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.candidate-command-main h2 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 22px;
+  line-height: 1.12;
+}
+
+.candidate-command-main p,
+.candidate-command-stat small {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.candidate-command-stat {
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.82);
+  border-radius: 8px;
+  background: rgba(255,255,255,.72);
+}
+
+.candidate-command-stat strong {
+  color: var(--heading);
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.candidate-command-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .candidate-current-list {
   display: grid;
   gap: 10px;
@@ -868,6 +933,30 @@ button { touch-action: manipulation; }
   line-height: 1.35;
 }
 
+.candidate-current-card-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.candidate-current-card-meta span {
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #F8FAFC;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.candidate-current-card.selected .candidate-current-card-meta span {
+  border-color: rgba(14,138,122,.24);
+  background: rgba(14,138,122,.08);
+  color: var(--teal-dark);
+}
+
 .candidate-current-detail {
   display: grid;
   gap: 18px;
@@ -912,6 +1001,42 @@ button { touch-action: manipulation; }
 .candidate-current-detail-grid strong {
   color: var(--heading);
   line-height: 1.25;
+}
+
+.candidate-mission-tabs {
+  width: 100%;
+}
+
+.candidate-current-tab-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.candidate-current-dispatch {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.candidate-current-dispatch > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.candidate-current-dispatch strong {
+  color: var(--heading);
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.candidate-current-dispatch small {
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .candidate-current-route {
@@ -993,10 +1118,53 @@ button { touch-action: manipulation; }
   overflow-wrap: anywhere;
 }
 
+.candidate-current-map-panel .btn {
+  justify-self: start;
+  margin-top: 4px;
+}
+
 .candidate-current-info h3 {
   margin: 0;
   color: var(--heading);
   font-size: 18px;
+}
+
+.candidate-current-prep {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.candidate-current-prep > div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.candidate-current-prep > div.ready {
+  border-color: rgba(14,138,122,.24);
+  background: rgba(14,138,122,.06);
+}
+
+.candidate-current-prep > div.waiting {
+  border-color: rgba(208,119,45,.25);
+  background: rgba(208,119,45,.07);
+}
+
+.candidate-current-prep strong {
+  color: var(--heading);
+  line-height: 1.15;
+}
+
+.candidate-current-prep p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .candidate-current-detail-grid {
@@ -1016,14 +1184,21 @@ button { touch-action: manipulation; }
 }
 
 @media (max-width: 1080px) {
+  .candidate-command-strip,
   .candidate-current-layout,
   .candidate-current-hero {
     grid-template-columns: 1fr;
   }
 
   .candidate-current-route,
+  .candidate-current-dispatch,
+  .candidate-current-prep,
   .candidate-current-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .candidate-command-actions {
+    justify-content: flex-start;
   }
 }
 
@@ -1031,8 +1206,22 @@ button { touch-action: manipulation; }
   .candidate-current-grid,
   .candidate-current-info,
   .candidate-current-route,
+  .candidate-current-dispatch,
+  .candidate-current-prep,
   .candidate-current-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .candidate-command-strip {
+    padding: 12px;
+  }
+
+  .candidate-command-main h2 {
+    font-size: 20px;
+  }
+
+  .candidate-command-actions .btn {
+    width: 100%;
   }
 }
 .auth-page::before,
