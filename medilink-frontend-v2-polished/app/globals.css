@@ -6146,7 +6146,8 @@ td {
   color: #fff;
 }
 
-.billing-hero-grid {
+.billing-hero-grid,
+.billing-overview-summary {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
   gap: 16px;
@@ -6155,15 +6156,13 @@ td {
 
 .billing-hero-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, .58fr);
-  gap: 22px;
+  grid-template-columns: minmax(0, .95fr) minmax(420px, 1.05fr);
+  gap: 18px;
   align-items: stretch;
   overflow: hidden;
-  min-height: 218px;
+  min-height: 178px;
   border-color: rgba(14,138,122,.18);
   background:
-    radial-gradient(circle at 100% 0%, rgba(14,138,122,.13), transparent 36%),
-    radial-gradient(circle at 0% 100%, rgba(45,108,200,.12), transparent 38%),
     linear-gradient(135deg, #fff 0%, #f7fbfb 100%);
 }
 
@@ -6198,7 +6197,7 @@ td {
 .billing-hero-copy h2 {
   margin: 0;
   color: var(--heading);
-  font-size: clamp(40px, 5vw, 60px);
+  font-size: clamp(36px, 4vw, 52px);
   line-height: 1;
 }
 
@@ -6207,6 +6206,85 @@ td {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.billing-overview-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-content: stretch;
+}
+
+.billing-overview-kpis > div {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(26,82,160,.10);
+  border-radius: 12px;
+  background: rgba(255,255,255,.78);
+}
+
+.billing-overview-kpis span,
+.billing-side-row span,
+.billing-side-progress span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.billing-overview-kpis strong {
+  color: var(--heading);
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.billing-overview-kpis small,
+.billing-side-progress small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.billing-overview-side {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.billing-side-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.billing-side-row strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--heading);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.billing-side-progress {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.billing-side-progress > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .billing-threshold {
@@ -6769,6 +6847,7 @@ td {
 
 @media (max-width: 1080px) {
   .billing-hero-grid,
+  .billing-overview-summary,
   .billing-workspace,
   .billing-missions-workspace,
   .billing-overview-grid,
@@ -6797,6 +6876,7 @@ td {
   }
 
   .billing-hero-card,
+  .billing-overview-kpis,
   .billing-provision-grid,
   .billing-manual-card .form-row,
   .billing-mission-head,

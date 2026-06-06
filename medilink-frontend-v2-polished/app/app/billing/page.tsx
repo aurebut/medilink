@@ -474,32 +474,53 @@ function OverviewTab({
 }) {
   return (
     <>
-      <div className="billing-hero-grid">
+      <div className="billing-overview-summary">
         <Card className="billing-hero-card">
           <div className="billing-hero-copy">
             <span>Exercice {selectedYear}</span>
             <h2>{formatMoney(dashboard.revenue)}</h2>
             <p>Recettes encaissées connues dans MediLink et ajoutées manuellement.</p>
           </div>
-          <div className="billing-threshold">
-            <div className="toolbar compact">
-              <div>
-                <h3>Seuil micro-BNC</h3>
-                <p className="small">{formatMoney(dashboard.remainingBeforeThreshold)} avant {formatMoney(MICRO_BNC_THRESHOLD)}</p>
-              </div>
-              <Badge tone={dashboard.thresholdProgress >= 85 ? 'warning' : 'success'}>{dashboard.thresholdProgress}%</Badge>
+          <div className="billing-overview-kpis">
+            <div>
+              <span>Encaissées</span>
+              <strong>{dashboard.collectedRows.length}</strong>
+              <small>{formatMoney(dashboard.revenue)} sur l'exercice</small>
             </div>
-            <div className="billing-progress"><span style={{ width: `${dashboard.thresholdProgress}%` }} /></div>
+            <div>
+              <span>En attente</span>
+              <strong>{dashboard.pendingRows.length}</strong>
+              <small>Propositions ou missions non finalisées</small>
+            </div>
+            <div>
+              <span>À régulariser</span>
+              <strong>{dashboard.completedRows.length}</strong>
+              <small>Fin de mission avant rétrocession</small>
+            </div>
           </div>
         </Card>
 
-        <Card className="billing-provision-card">
-          <div className="toolbar compact">
+        <Card className="billing-overview-side">
+          <div className="billing-side-row">
             <div>
-              <h2>Provision prudente</h2>
-              <p className="small">Taux modifiable selon votre situation URSSAF, CARMF et impôts.</p>
+              <span>Provision prudente</span>
+              <strong>{formatMoney(dashboard.provision)}</strong>
             </div>
-            <strong>{provisionRate}%</strong>
+            <Badge>{provisionRate}%</Badge>
+          </div>
+          <div className="billing-side-row">
+            <div>
+              <span>Net prudent</span>
+              <strong>{formatMoney(dashboard.netAvailable)}</strong>
+            </div>
+          </div>
+          <div className="billing-side-progress">
+            <div>
+              <span>Seuil micro-BNC</span>
+              <Badge tone={dashboard.thresholdProgress >= 85 ? 'warning' : 'success'}>{dashboard.thresholdProgress}%</Badge>
+            </div>
+            <div className="billing-progress"><span style={{ width: `${dashboard.thresholdProgress}%` }} /></div>
+            <small>{formatMoney(dashboard.remainingBeforeThreshold)} avant {formatMoney(MICRO_BNC_THRESHOLD)}</small>
           </div>
           <input
             className="billing-slider"
@@ -511,17 +532,7 @@ function OverviewTab({
             onChange={(event) => setProvisionRate(Number(event.target.value))}
             aria-label="Taux de provision"
           />
-          <div className="billing-provision-grid">
-            <div><span>À garder</span><strong>{formatMoney(dashboard.provision)}</strong></div>
-            <div><span>Net prudent</span><strong>{formatMoney(dashboard.netAvailable)}</strong></div>
-          </div>
         </Card>
-      </div>
-
-      <div className="grid-3 dashboard-stat-grid">
-        <Card className="stat-card"><div className="stat"><span>Recettes encaissées</span><strong>{dashboard.collectedRows.length}</strong><div className="small">{formatMoney(dashboard.revenue)} sur l'exercice.</div></div></Card>
-        <Card className="stat-card"><div className="stat"><span>Missions en attente</span><strong>{dashboard.pendingRows.length}</strong><div className="small">Propositions ou missions non finalisées.</div></div></Card>
-        <Card className="stat-card"><div className="stat"><span>À régulariser</span><strong>{dashboard.completedRows.length}</strong><div className="small">Missions terminées avant validation rétrocession.</div></div></Card>
       </div>
 
       <div className="billing-overview-grid">
@@ -810,7 +821,6 @@ function RevenuesTab({
 
       <div className="billing-side">
         <ManualRevenueCard onAddManual={onAddManual} />
-        <ChecklistCard />
       </div>
     </div>
   );
