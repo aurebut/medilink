@@ -226,7 +226,6 @@ export default function CandidateCurrentMissionsPage() {
       <PageHeader
         title="Missions en cours"
         description="Votre suivi de mission cote candidat : depart, consignes, etablissement et prochaines actions."
-        actions={<LinkButton href="/app/messages" variant="light">Messagerie</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
