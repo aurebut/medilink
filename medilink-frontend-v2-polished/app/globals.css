@@ -1003,8 +1003,9 @@ button { touch-action: manipulation; }
   line-height: 1.25;
 }
 
-.candidate-mission-tabs {
+.candidate-page-tabs {
   width: 100%;
+  margin-bottom: 16px;
 }
 
 .candidate-current-tab-panel {

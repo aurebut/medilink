@@ -25,6 +25,13 @@ type MissionRow = {
 
 type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'compta';
 
+const missionSections: Array<{ id: MissionSection; label: string }> = [
+  { id: 'pilotage', label: 'Pilotage' },
+  { id: 'brief', label: 'Brief' },
+  { id: 'lieu', label: 'Lieu & contact' },
+  { id: 'compta', label: 'Compta & actions' },
+];
+
 function missionStart(application: Application, agreement?: MissionAgreement | null) {
   return agreement?.startDate || application.mission?.startDate || null;
 }
@@ -170,6 +177,7 @@ export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -244,6 +252,21 @@ export default function CandidateCurrentMissionsPage() {
         />
       ) : (
         <>
+          <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections de la mission selectionnee">
+            {missionSections.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                className={activeSection === section.id ? 'active' : ''}
+                onClick={() => setActiveSection(section.id)}
+                role="tab"
+                aria-selected={activeSection === section.id}
+              >
+                {section.label}
+              </button>
+            ))}
+          </div>
+
           {priorityRow ? (
             <MissionCommandStrip row={priorityRow} />
           ) : null}
@@ -280,7 +303,7 @@ export default function CandidateCurrentMissionsPage() {
             </div>
 
             {selectedRow ? (
-              <MissionControlPanel row={selectedRow} />
+              <MissionControlPanel row={selectedRow} activeSection={activeSection} />
             ) : null}
           </div>
         </>
@@ -318,8 +341,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
   );
 }
 
-function MissionControlPanel({ row }: { row: MissionRow }) {
-  const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
+function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSection: MissionSection }) {
   const mission = row.application.mission;
   const establishment = mission?.establishment;
   const progress = missionProgress(row.application, row.agreement);
@@ -343,12 +365,6 @@ function MissionControlPanel({ row }: { row: MissionRow }) {
     { label: 'Consignes', value: mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo || 'A demander avant depart', ready: Boolean(mission?.practicalInfo || mission?.departmentInfo || mission?.teamInfo) },
     { label: 'Materiel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'A confirmer', ready: Boolean(mission?.equipmentInfo || mission?.equipmentAvailable?.length) },
   ];
-  const sections: Array<{ id: MissionSection; label: string; count?: number }> = [
-    { id: 'pilotage', label: 'Pilotage' },
-    { id: 'brief', label: 'Brief', count: detailItems.length },
-    { id: 'lieu', label: 'Lieu & contact' },
-    { id: 'compta', label: 'Compta & actions' },
-  ];
 
   return (
     <Card className="candidate-current-detail">
@@ -364,22 +380,6 @@ function MissionControlPanel({ row }: { row: MissionRow }) {
           <span>{timingLabel(row.application, row.agreement)}</span>
           <strong>{missionSchedule(row.application, row.agreement)}</strong>
         </div>
-      </div>
-
-      <div className="candidate-mission-tabs billing-tabs" role="tablist" aria-label="Sections de la mission selectionnee">
-        {sections.map((section) => (
-          <button
-            key={section.id}
-            type="button"
-            className={activeSection === section.id ? 'active' : ''}
-            onClick={() => setActiveSection(section.id)}
-            role="tab"
-            aria-selected={activeSection === section.id}
-          >
-            {section.label}
-            {section.count ? <span className="tab-count-badge">{section.count}</span> : null}
-          </button>
-        ))}
       </div>
 
       {activeSection === 'pilotage' ? (
