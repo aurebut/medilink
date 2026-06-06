@@ -236,7 +236,7 @@ export default function CandidateDashboardPage() {
             </div>
             {notifications.length > 0 ? (
               <div className="dashboard-notification-list">
-                {notifications.slice(0, 3).map((notification) => (
+                {notifications.slice(0, 10).map((notification) => (
                   <div key={notification.id} className="dashboard-notification">
                     <div className="actions">
                       <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>

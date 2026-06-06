@@ -2047,6 +2047,24 @@ button { touch-action: manipulation; }
 .dashboard-notification-list {
   display: grid;
   gap: 10px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 82, 160, 0.2) transparent;
+}
+.dashboard-notification-list::-webkit-scrollbar {
+  width: 6px;
+}
+.dashboard-notification-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dashboard-notification-list::-webkit-scrollbar-thumb {
+  background-color: rgba(26, 82, 160, 0.2);
+  border-radius: 10px;
+}
+.dashboard-notification-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(26, 82, 160, 0.4);
 }
 .dashboard-notification-list .dashboard-notification {
   min-height: 0;
