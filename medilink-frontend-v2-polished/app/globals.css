@@ -1788,7 +1788,7 @@ button { touch-action: manipulation; }
 }
 .dashboard-focus-card {
   display: grid;
-  align-content: space-between;
+  align-content: start;
   gap: 18px;
   min-height: 250px;
 }
