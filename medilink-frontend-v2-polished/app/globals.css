@@ -555,24 +555,41 @@ button { touch-action: manipulation; }
 }
 
 .current-mission-route {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
+.current-mission-route::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  top: 17px;
+  height: 2px;
+  background: #D8E0EC;
+}
+
 .current-mission-step {
   position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-columns: 18px;
+  grid-template-rows: 18px auto;
   gap: 8px;
-  align-items: center;
-  min-height: 36px;
+  justify-items: center;
+  align-items: start;
+  min-height: 48px;
   color: var(--muted);
   font-size: 12px;
   font-weight: 700;
+  text-align: center;
 }
 
 .current-mission-step span {
+  position: relative;
+  z-index: 2;
   width: 18px;
   height: 18px;
   border-radius: 999px;
@@ -580,26 +597,22 @@ button { touch-action: manipulation; }
   background: var(--surface);
 }
 
-.current-mission-step::after {
-  content: '';
-  position: absolute;
-  left: 27px;
-  right: 0;
-  top: 17px;
-  height: 2px;
-  background: #D8E0EC;
-}
-
-.current-mission-step:last-child::after {
-  display: none;
+.current-mission-step strong {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  max-width: 100%;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--surface);
+  line-height: 1.2;
 }
 
 .current-mission-step.active {
   color: var(--heading);
 }
 
-.current-mission-step.active span,
-.current-mission-step.active::after {
+.current-mission-step.active span {
   border-color: var(--teal);
   background: var(--teal);
 }
@@ -696,7 +709,7 @@ button { touch-action: manipulation; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .current-mission-step:nth-child(2)::after {
+  .current-mission-route::before {
     display: none;
   }
 }
@@ -706,8 +719,8 @@ button { touch-action: manipulation; }
     grid-template-columns: 1fr;
   }
 
-.current-mission-step::after {
-  display: none;
+  .current-mission-route::before {
+    display: none;
   }
 }
 
