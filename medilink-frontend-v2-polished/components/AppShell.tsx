@@ -68,6 +68,20 @@ function homeHref(area: 'candidate' | 'establishment' | 'admin') {
   return '/admin/dashboard';
 }
 
+function getNotificationLink(notification: Notification, area: 'candidate' | 'establishment' | 'admin') {
+  if (!notification.data) return null;
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    if (area === 'candidate') return `/app/messages?id=${data.conversationId}`;
+    if (area === 'establishment') return `/establishment/messages?id=${data.conversationId}`;
+  }
+  if (data.missionId) {
+    if (area === 'candidate') return '/app/missions';
+    if (area === 'establishment') return '/establishment/applications';
+  }
+  return null;
+}
+
 export function AppShell({
   children,
   area,
@@ -274,31 +288,43 @@ export function AppShell({
                   ) : notifications.length === 0 ? (
                     <div className="notification-menu-empty">Aucune notification.</div>
                   ) : (
-                    notifications.slice(0, 5).map((notification) => (
-                      <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
-                        <div className="notification-menu-item-head">
-                          <strong>{notification.title}</strong>
-                          <span className="notification-menu-item-meta">
-                            <span>{formatDateTime(notification.createdAt)}</span>
-                            <button
-                              type="button"
-                              className="notification-delete-button"
-                              aria-label={`Supprimer la notification ${notification.title}`}
-                              onClick={() => void deleteNotification(notification.id)}
+                    notifications.slice(0, 5).map((notification) => {
+                      const notificationLink = getNotificationLink(notification, area);
+                      return (
+                        <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
+                          <div className="notification-menu-item-head">
+                            <strong>{notification.title}</strong>
+                            <span className="notification-menu-item-meta">
+                              <span>{formatDateTime(notification.createdAt)}</span>
+                              <button
+                                type="button"
+                                className="notification-delete-button"
+                                aria-label={`Supprimer la notification ${notification.title}`}
+                                onClick={() => void deleteNotification(notification.id)}
+                              >
+                                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                                  <path d="M3 6h18" />
+                                  <path d="M8 6V4h8v2" />
+                                  <path d="M19 6l-1 16H6L5 6" />
+                                  <path d="M10 11v6" />
+                                  <path d="M14 11v6" />
+                                </svg>
+                              </button>
+                            </span>
+                          </div>
+                          <p>{notification.body}</p>
+                          {notificationLink ? (
+                            <Link
+                              href={notificationLink}
+                              className="notification-action-link"
+                              onClick={() => setNotificationsOpen(false)}
                             >
-                              <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                                <path d="M3 6h18" />
-                                <path d="M8 6V4h8v2" />
-                                <path d="M19 6l-1 16H6L5 6" />
-                                <path d="M10 11v6" />
-                                <path d="M14 11v6" />
-                              </svg>
-                            </button>
-                          </span>
+                              Voir la conversation &rarr;
+                            </Link>
+                          ) : null}
                         </div>
-                        <p>{notification.body}</p>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </div>

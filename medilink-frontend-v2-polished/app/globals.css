@@ -2118,6 +2118,24 @@ button { touch-action: manipulation; }
   min-height: auto;
   flex-shrink: 0;
 }
+.notification-action-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+  width: fit-content;
+}
+.notification-action-link:hover {
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+.notification-menu-item .notification-action-link {
+  margin-top: 10px;
+  font-size: 12px;
+}
 .dashboard-week-card {
   display: grid;
   gap: 16px;

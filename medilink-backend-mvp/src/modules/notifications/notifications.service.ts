@@ -123,6 +123,29 @@ export class NotificationsService {
       include: { conversation: true },
     });
 
+    const conversation = await this.prisma.conversation.findUnique({
+      where: { id: conversationId },
+    });
+    if (!conversation) return;
+
+    const sender = await this.prisma.user.findUnique({
+      where: { id: senderUserId },
+      include: { profile: true },
+    });
+
+    let senderName = 'l\'établissement';
+
+    if (sender?.role === 'CANDIDATE') {
+      senderName = `${sender.profile?.firstName || ''} ${sender.profile?.lastName || ''}`.trim() || sender.email;
+    } else {
+      const establishment = await this.prisma.establishment.findUnique({
+        where: { id: conversation.establishmentId },
+      });
+      if (establishment) {
+        senderName = establishment.name;
+      }
+    }
+
     for (const participant of participants) {
       const user = await this.prisma.user.findUnique({ where: { id: participant.userId } });
       if (!user) continue;
@@ -131,7 +154,7 @@ export class NotificationsService {
         userId: user.id,
         type: NotificationType.NEW_MESSAGE,
         title: 'Nouveau message',
-        body: 'Vous avez reçu un nouveau message.',
+        body: senderName ? `Vous avez reçu un nouveau message de ${senderName}.` : 'Vous avez reçu un nouveau message.',
         data: { conversationId },
       });
 

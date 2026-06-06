@@ -4,7 +4,19 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
-import { Alert, Badge, Button, EmptyState, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+
+function getNotificationLink(notification: Notification) {
+  if (!notification.data) return null;
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    return `/app/messages?id=${data.conversationId}`;
+  }
+  if (data.missionId) {
+    return '/app/missions';
+  }
+  return null;
+}
 
 export default function NotificationsPage() {
   const [items, setItems] = useState<Notification[]>([]);
@@ -50,7 +62,14 @@ export default function NotificationsPage() {
               </div>
               <h3>{n.title}</h3>
               <p>{n.body}</p>
-              {!n.readAt ? <Button variant="light" onClick={() => read(n.id)}>Marquer comme lue</Button> : null}
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                {getNotificationLink(n) ? (
+                  <LinkButton href={getNotificationLink(n)!} variant="secondary">
+                    Voir la conversation
+                  </LinkButton>
+                ) : null}
+                {!n.readAt ? <Button variant="light" onClick={() => read(n.id)}>Marquer comme lue</Button> : null}
+              </div>
             </div>
           ))}
         </div>

@@ -48,6 +48,29 @@ function messagePreview(body?: string | null) {
   return body.startsWith('__MEDILINK_WORKFLOW__') ? 'Mise à jour du suivi' : body;
 }
 
+function getNotificationLink(notification: Notification) {
+  if (!notification.data) return null;
+  const data = notification.data as Record<string, any>;
+  if (data.conversationId) {
+    return `/app/messages?id=${data.conversationId}`;
+  }
+  if (data.missionId) {
+    return '/app/missions';
+  }
+  return null;
+}
+
+function getNotificationBody(notification: Notification, conversations: Conversation[]) {
+  if (notification.type === 'NEW_MESSAGE' && notification.data) {
+    const data = notification.data as Record<string, any>;
+    const conv = conversations.find(c => c.id === data.conversationId);
+    if (conv) {
+      return `Vous avez reçu un nouveau message de ${conv.establishment?.name || 'l\'établissement'}.`;
+    }
+  }
+  return notification.body;
+}
+
 export default function CandidateDashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -245,16 +268,27 @@ export default function CandidateDashboardPage() {
             </div>
             {notifications.length > 0 ? (
               <div className="dashboard-notification-list">
-                {notifications.slice(0, 10).map((notification) => (
-                  <div key={notification.id} className="dashboard-notification">
-                    <div className="actions">
-                      <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
-                      <span className="small">{formatDateTime(notification.createdAt)}</span>
+                {notifications.slice(0, 10).map((notification) => {
+                  const notificationLink = getNotificationLink(notification);
+                  return (
+                    <div key={notification.id} className="dashboard-notification">
+                      <div className="actions">
+                        <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
+                        <span className="small">{formatDateTime(notification.createdAt)}</span>
+                      </div>
+                      <strong>{notification.title}</strong>
+                      <p>{getNotificationBody(notification, conversations)}</p>
+                      {notificationLink ? (
+                        <Link
+                          href={notificationLink}
+                          className="notification-action-link"
+                        >
+                          Voir la conversation &rarr;
+                        </Link>
+                      ) : null}
                     </div>
-                    <strong>{notification.title}</strong>
-                    <p>{notification.body}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="dashboard-empty compact">
@@ -290,6 +324,7 @@ export default function CandidateDashboardPage() {
                   const unreadCount = (conversation.messages || [])
                     .filter((msg) => !userId || msg.senderUserId !== userId)
                     .filter((msg) => !msg.readAt).length;
+                  const isMine = lastMessage?.senderUserId === userId;
                   return (
                     <Link
                       key={conversation.id}
@@ -298,7 +333,10 @@ export default function CandidateDashboardPage() {
                     >
                       <div className="dashboard-message-link-main">
                         <strong>{conversation.establishment?.name || conversation.mission?.title || 'Conversation'}</strong>
-                        <span>{messagePreview(lastMessage?.body)}</span>
+                        <span>
+                          {isMine ? 'Vous : ' : ''}
+                          {messagePreview(lastMessage?.body)}
+                        </span>
                       </div>
                       <div className="dashboard-message-link-meta">
                         {unreadCount > 0 ? (
