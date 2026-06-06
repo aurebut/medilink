@@ -810,7 +810,7 @@ button { touch-action: manipulation; }
 
 .candidate-current-layout {
   display: grid;
-  grid-template-columns: minmax(260px, .34fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -880,83 +880,6 @@ button { touch-action: manipulation; }
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.candidate-current-list {
-  display: grid;
-  gap: 10px;
-}
-
-.candidate-current-card {
-  display: grid;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
-}
-
-.candidate-current-card:hover,
-.candidate-current-card:focus-visible,
-.candidate-current-card.selected {
-  border-color: rgba(14,138,122,.34);
-  box-shadow: 0 14px 38px rgba(11,25,41,.08);
-  outline: none;
-}
-
-.candidate-current-card:focus-visible {
-  transform: translateY(-1px);
-}
-
-.candidate-current-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.candidate-current-card strong {
-  color: var(--heading);
-  line-height: 1.25;
-}
-
-.candidate-current-card > span:not(.candidate-current-card-head),
-.candidate-current-card small {
-  color: var(--muted);
-  line-height: 1.35;
-}
-
-.candidate-current-card-meta {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-top: 2px;
-}
-
-.candidate-current-card-meta span {
-  padding: 4px 7px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #F8FAFC;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
-  line-height: 1;
-}
-
-.candidate-current-card.selected .candidate-current-card-meta span {
-  border-color: rgba(14,138,122,.24);
-  background: rgba(14,138,122,.08);
-  color: var(--teal-dark);
 }
 
 .candidate-current-detail {

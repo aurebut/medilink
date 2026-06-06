@@ -177,7 +177,6 @@ function mapsHref(address: string) {
 export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -218,20 +217,7 @@ export default function CandidateCurrentMissionsPage() {
     return [...rows].sort((a, b) => rowPriority(a) - rowPriority(b) || missionSortValue(a) - missionSortValue(b))[0] || null;
   }, [rows]);
 
-  const selectedRow = useMemo(() => {
-    return rows.find((row) => row.application.id === selectedId) || priorityRow || rows[0] || null;
-  }, [priorityRow, rows, selectedId]);
-
-  useEffect(() => {
-    if (rows.length > 0) {
-      const isSelectedInRows = rows.some((row) => row.application.id === selectedId);
-      if (!isSelectedInRows) {
-        setSelectedId((priorityRow || rows[0]).application.id);
-      }
-    } else {
-      setSelectedId(null);
-    }
-  }, [priorityRow, rows, selectedId]);
+  const selectedRow = priorityRow || rows[0] || null;
 
   if (loading) return <LoadingCard label="Chargement de vos missions en cours..." />;
 
@@ -273,36 +259,6 @@ export default function CandidateCurrentMissionsPage() {
           ) : null}
 
           <div className="candidate-current-layout">
-            <div className="candidate-current-list">
-              {rows.map((row) => {
-                const mission = row.application.mission;
-                const selected = selectedRow?.application.id === row.application.id;
-                const readiness = missionReadiness(row);
-                return (
-                  <button
-                    key={row.application.id}
-                    type="button"
-                    className={`candidate-current-card ${selected ? 'selected' : ''}`}
-                    onClick={() => setSelectedId(row.application.id)}
-                  >
-                    <span className="candidate-current-card-head">
-                      <Badge tone={row.agreement ? agreementTone(row.agreement.status) : 'success'}>
-                        {row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}
-                      </Badge>
-                      <span>{timingLabel(row.application, row.agreement)}</span>
-                    </span>
-                    <strong>{mission?.title || 'Mission confirmee'}</strong>
-                    <span>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</span>
-                    <small>{dayShortLabel(row.application, row.agreement)} - {missionTimeRange(row.application, row.agreement)}</small>
-                    <span className="candidate-current-card-meta">
-                      <span>{formatCompensation(row.agreement || mission || {})}</span>
-                      <span>{readiness}% pret</span>
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
             {selectedRow ? (
               <MissionControlPanel row={selectedRow} activeSection={activeSection} />
             ) : null}
