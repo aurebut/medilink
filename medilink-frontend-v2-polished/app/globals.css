@@ -2039,18 +2039,70 @@ button { touch-action: manipulation; }
 }
 .dashboard-finance-status {
   display: grid;
-  gap: 8px;
-  padding: 14px;
-  border: 1px solid rgba(14,138,122,.20);
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(14,138,122,.09), rgba(26,82,160,.06));
+  background: var(--surface-soft);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
-.dashboard-finance-status span {
-  color: var(--teal);
+.dashboard-finance-status:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+.dashboard-finance-status.is-success {
+  border-color: rgba(14, 138, 122, 0.2);
+  background: linear-gradient(135deg, rgba(14, 138, 122, 0.08), rgba(26, 82, 160, 0.03));
+}
+.dashboard-finance-status.is-success:hover {
+  border-color: rgba(14, 138, 122, 0.35);
+  box-shadow: 0 4px 20px rgba(14, 138, 122, 0.05);
+}
+.dashboard-finance-status.is-warning {
+  border-color: rgba(183, 110, 0, 0.2);
+  background: linear-gradient(135deg, rgba(183, 110, 0, 0.08), rgba(26, 82, 160, 0.03));
+}
+.dashboard-finance-status.is-warning:hover {
+  border-color: rgba(183, 110, 0, 0.35);
+  box-shadow: 0 4px 20px rgba(183, 110, 0, 0.05);
+}
+.dashboard-finance-status.is-info {
+  border-color: rgba(26, 82, 160, 0.2);
+  background: linear-gradient(135deg, rgba(26, 82, 160, 0.08), rgba(26, 82, 160, 0.03));
+}
+.dashboard-finance-status.is-info:hover {
+  border-color: rgba(26, 82, 160, 0.35);
+  box-shadow: 0 4px 20px rgba(26, 82, 160, 0.05);
+}
+.finance-status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.finance-status-header span:not(.status-dot) {
+  color: var(--muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .06em;
   text-transform: uppercase;
+}
+.finance-status-header .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted-2);
+}
+.dashboard-finance-status.is-success .status-dot {
+  background: var(--teal);
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
+}
+.dashboard-finance-status.is-warning .status-dot {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px rgba(183, 110, 0, 0.2);
+}
+.dashboard-finance-status.is-info .status-dot {
+  background: var(--blue);
+  box-shadow: 0 0 0 3px rgba(26, 82, 160, 0.2);
 }
 .dashboard-finance-status strong {
   color: var(--heading);

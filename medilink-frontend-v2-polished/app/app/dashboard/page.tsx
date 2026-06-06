@@ -176,6 +176,44 @@ export default function CandidateDashboardPage() {
     };
   }, [applications, conversations, documents, notifications, profile?.userId]);
 
+  const financeStatus = useMemo(() => {
+    let tone: 'success' | 'warning' | 'info' | 'neutral' = 'neutral';
+    let label = 'Aucune action urgente';
+    let amountLabel = 'Registre à jour';
+    let description = 'Suivez vos recettes, provisions et remplacements hors MediLink.';
+    let buttonText = 'Voir ma compta';
+    let buttonHref = '/app/billing';
+    let buttonVariant: 'primary' | 'secondary' | 'light' = 'light';
+
+    if (dashboard.proposedAgreements.length > 0) {
+      tone = 'warning';
+      label = 'Proposition à valider';
+      amountLabel = `${dashboard.proposedAgreements.length} à traiter`;
+      description = 'Répondez aux conditions finales depuis la messagerie avant d’alimenter votre registre.';
+      buttonText = 'Répondre';
+      buttonHref = '/app/messages';
+      buttonVariant = 'secondary';
+    } else if (dashboard.billingReady.length > 0) {
+      tone = 'success';
+      label = 'Recette à classer';
+      amountLabel = `${formatMoney(dashboard.billingReadyTotal)} prêts`;
+      description = 'Retrouvez ces recettes dans votre livre comptable avec les justificatifs PDF.';
+      buttonText = 'Ouvrir le registre';
+      buttonHref = '/app/billing';
+      buttonVariant = 'secondary';
+    } else if (dashboard.billingPending.length > 0) {
+      tone = 'info';
+      label = 'Mission en attente';
+      amountLabel = `${dashboard.billingPending.length} en attente`;
+      description = 'Les missions validées entreront dans le registre après paiement libéré.';
+      buttonText = 'Voir ma compta';
+      buttonHref = '/app/billing';
+      buttonVariant = 'light';
+    }
+
+    return { tone, label, amountLabel, description, buttonText, buttonHref, buttonVariant };
+  }, [dashboard.proposedAgreements.length, dashboard.billingReady.length, dashboard.billingReadyTotal, dashboard.billingPending.length]);
+
   if (loading) return <LoadingCard />;
 
   const firstName = profile?.firstName || 'Bienvenue';
@@ -364,56 +402,21 @@ export default function CandidateDashboardPage() {
                 <span>Comptabilité</span>
                 <h2>Ma compta</h2>
               </div>
-              <LinkButton variant="light" href="/app/billing">Ouvrir ma compta</LinkButton>
+              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
             </div>
-            <div className="dashboard-finance-status">
-              <span>
-                {dashboard.proposedAgreements.length > 0
-                  ? 'Proposition à valider'
-                  : dashboard.billingReady.length > 0
-                    ? 'Recette à classer'
-                    : dashboard.billingPending.length > 0
-                      ? 'Mission en attente'
-                      : 'Aucune action urgente'}
-              </span>
-              <strong>
-                {dashboard.billingReady.length > 0
-                  ? `${formatMoney(dashboard.billingReadyTotal)} prêts`
-                  : dashboard.proposedAgreements.length > 0
-                    ? `${dashboard.proposedAgreements.length} à traiter`
-                    : dashboard.billingPending.length > 0
-                      ? `${dashboard.billingPending.length} en attente`
-                      : 'Registre à jour'}
-              </strong>
-              <p>
-                {dashboard.proposedAgreements.length > 0
-                  ? 'Répondez aux conditions finales depuis la messagerie avant d’alimenter votre registre.'
-                  : dashboard.billingReady.length > 0
-                    ? 'Retrouvez ces recettes dans votre livre comptable avec les justificatifs PDF.'
-                  : dashboard.billingPending.length > 0
-                      ? 'Les missions validées entreront dans le registre après paiement libéré.'
-                      : 'Suivez vos recettes, provisions et remplacements hors MediLink.'}
-              </p>
+            <div className={`dashboard-finance-status is-${financeStatus.tone}`}>
+              <div className="finance-status-header">
+                <span className="status-dot" />
+                <span>{financeStatus.label}</span>
+              </div>
+              <strong>{financeStatus.amountLabel}</strong>
+              <p>{financeStatus.description}</p>
               <LinkButton
-                href={dashboard.proposedAgreements.length > 0 ? '/app/messages' : '/app/billing'}
-                variant={dashboard.proposedAgreements.length > 0 || dashboard.billingReady.length > 0 ? 'secondary' : 'light'}
+                href={financeStatus.buttonHref}
+                variant={financeStatus.buttonVariant}
               >
-                {dashboard.proposedAgreements.length > 0
-                  ? 'Répondre'
-                  : dashboard.billingReady.length > 0
-                    ? 'Ouvrir le registre'
-                    : 'Voir ma compta'}
+                {financeStatus.buttonText}
               </LinkButton>
-            </div>
-            <div className="dashboard-finance-stack">
-              <div>
-                <span>Recettes</span>
-                <strong>{dashboard.billingReady.length}</strong>
-              </div>
-              <div>
-                <span>En attente</span>
-                <strong>{dashboard.billingPending.length + dashboard.proposedAgreements.length}</strong>
-              </div>
             </div>
           </Card>
         </section>
