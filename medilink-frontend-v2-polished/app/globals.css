@@ -6149,21 +6149,20 @@ td {
 .billing-hero-grid,
 .billing-overview-summary {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, .75fr);
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, .36fr);
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .billing-hero-card {
   display: grid;
-  grid-template-columns: minmax(0, .95fr) minmax(420px, 1.05fr);
-  gap: 18px;
-  align-items: stretch;
+  grid-template-columns: minmax(0, .84fr) minmax(360px, 1.16fr);
+  gap: 26px;
+  align-items: center;
   overflow: hidden;
-  min-height: 178px;
+  min-height: 168px;
   border-color: rgba(14,138,122,.18);
-  background:
-    linear-gradient(135deg, #fff 0%, #f7fbfb 100%);
+  background: linear-gradient(135deg, #fff 0%, #f8fbfb 100%);
 }
 
 .billing-hero-card::before {
@@ -6177,7 +6176,7 @@ td {
 .billing-hero-copy {
   display: grid;
   align-content: center;
-  gap: 10px;
+  gap: 9px;
   min-width: 0;
 }
 
@@ -6197,33 +6196,39 @@ td {
 .billing-hero-copy h2 {
   margin: 0;
   color: var(--heading);
-  font-size: clamp(36px, 4vw, 52px);
+  font-size: clamp(34px, 3.6vw, 48px);
   line-height: 1;
 }
 
 .billing-hero-copy p {
-  max-width: 560px;
+  max-width: 430px;
   margin: 0;
   color: var(--muted);
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
 .billing-overview-kpis {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  align-content: stretch;
+  gap: 0;
+  align-items: center;
+  min-height: 96px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(26,82,160,.10);
 }
 
 .billing-overview-kpis > div {
   display: grid;
   align-content: center;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid rgba(26,82,160,.10);
-  border-radius: 12px;
-  background: rgba(255,255,255,.78);
+  min-height: 86px;
+  padding: 0 14px;
+}
+
+.billing-overview-kpis > div + div {
+  border-left: 1px solid rgba(26,82,160,.10);
 }
 
 .billing-overview-kpis span,
@@ -6240,7 +6245,7 @@ td {
 .billing-overview-kpis strong {
   color: var(--heading);
   font-family: var(--serif);
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 400;
   line-height: 1;
 }
@@ -6255,7 +6260,9 @@ td {
 .billing-overview-side {
   display: grid;
   align-content: start;
-  gap: 12px;
+  gap: 10px;
+  min-height: 168px;
+  padding: 16px;
 }
 
 .billing-side-row {
@@ -6269,14 +6276,14 @@ td {
   display: block;
   margin-top: 5px;
   color: var(--heading);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.1;
 }
 
 .billing-side-progress {
   display: grid;
-  gap: 8px;
-  padding-top: 10px;
+  gap: 7px;
+  padding-top: 9px;
   border-top: 1px solid var(--line);
 }
 
@@ -6299,7 +6306,7 @@ td {
 }
 
 .billing-progress {
-  height: 9px;
+  height: 7px;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(26,82,160,.10);
@@ -6447,31 +6454,46 @@ td {
 
 .billing-overview-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, .42fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .38fr);
+  gap: 14px;
   align-items: start;
 }
 
 .billing-alert-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .billing-alert-list > div {
   display: grid;
-  gap: 7px;
-  padding: 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 12px;
+  align-items: center;
+  padding: 10px 0;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
+  border-width: 1px 0 0;
+  background: transparent;
+}
+
+.billing-alert-list > div:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.billing-alert-list .badge {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
 }
 
 .billing-alert-list strong {
+  grid-column: 1;
   color: var(--heading);
   line-height: 1.25;
 }
 
 .billing-alert-list span:not(.badge) {
+  grid-column: 1;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.4;
@@ -6888,6 +6910,32 @@ td {
 
   .billing-hero-card {
     min-height: 0;
+  }
+
+  .billing-overview-kpis {
+    min-height: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .billing-overview-kpis > div {
+    min-height: 0;
+    padding: 12px 0;
+  }
+
+  .billing-overview-kpis > div + div {
+    border-top: 1px solid rgba(26,82,160,.10);
+    border-left: 0;
+  }
+
+  .billing-alert-list > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .billing-alert-list .badge {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
   }
 
   .billing-mission-amount {
