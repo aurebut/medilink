@@ -57,19 +57,6 @@ function endDateTime(application: Application, agreement?: MissionAgreement | nu
   return day ? new Date(`${day}T${time}`) : null;
 }
 
-function timingLabel(application: Application, agreement?: MissionAgreement | null) {
-  const start = startDateTime(application, agreement);
-  const end = endDateTime(application, agreement);
-  const now = new Date();
-  if (!start || !end) return 'Planning a confirmer';
-  if (now > end) return `Terminee le ${formatDate(missionEnd(application, agreement))}`;
-  if (now >= start && now <= end) return 'En mission maintenant';
-
-  const hours = Math.ceil((start.getTime() - now.getTime()) / 3600000);
-  if (hours <= 24) return 'Depart dans moins de 24 h';
-  return `Depart dans ${Math.ceil(hours / 24)} jours`;
-}
-
 function missionTimeRange(application: Application, agreement?: MissionAgreement | null) {
   const mission = application.mission;
   const hours = [
@@ -79,11 +66,18 @@ function missionTimeRange(application: Application, agreement?: MissionAgreement
   return hours || 'Horaires a confirmer';
 }
 
-function dayShortLabel(application: Application, agreement?: MissionAgreement | null) {
+function missionDateRange(application: Application, agreement?: MissionAgreement | null) {
   const start = missionStart(application, agreement);
-  if (!start) return 'Date a confirmer';
-  const date = new Date(start);
-  return date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+  const end = missionEnd(application, agreement);
+  if (!start) {
+    return { primary: 'Dates a confirmer', secondary: missionTimeRange(application, agreement) };
+  }
+
+  const sameDay = !end || end === start;
+  return {
+    primary: sameDay ? formatDate(start) : `${formatDate(start)} - ${formatDate(end)}`,
+    secondary: sameDay ? missionTimeRange(application, agreement) : `Debut ${formatDate(start)} - Fin ${formatDate(end)}`,
+  };
 }
 
 function missionProgress(application: Application, agreement?: MissionAgreement | null): MissionStep[] {
@@ -233,6 +227,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
   const mission = row.application.mission;
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse a confirmer';
+  const dates = missionDateRange(row.application, row.agreement);
   return (
     <section className="candidate-command-strip" aria-label="Mission prioritaire">
       <div className="candidate-command-main">
@@ -241,9 +236,9 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <p>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'} - {address}</p>
       </div>
       <div className="candidate-command-stat">
-        <span>Depart</span>
-        <strong>{timingLabel(row.application, row.agreement)}</strong>
-        <small>{dayShortLabel(row.application, row.agreement)} - {missionTimeRange(row.application, row.agreement)}</small>
+        <span>Dates</span>
+        <strong>{dates.primary}</strong>
+        <small>{dates.secondary}</small>
       </div>
       <div className="candidate-command-stat">
         <span>Statut</span>
