@@ -92,16 +92,6 @@ function missionTimeRange(application: Application, agreement?: MissionAgreement
   return hours || 'Horaires a confirmer';
 }
 
-function missionDuration(application: Application, agreement?: MissionAgreement | null) {
-  const start = startDateTime(application, agreement);
-  const end = endDateTime(application, agreement);
-  if (start && end) {
-    const hours = Math.max(0, Math.round(((end.getTime() - start.getTime()) / 3600000) * 10) / 10);
-    if (hours > 0) return `${hours} h`;
-  }
-  return application.mission?.durationHours ? `${application.mission.durationHours} h` : 'Duree a confirmer';
-}
-
 function dayShortLabel(application: Application, agreement?: MissionAgreement | null) {
   const start = missionStart(application, agreement);
   if (!start) return 'Date a confirmer';
@@ -340,29 +330,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
       {activeSection === 'pilotage' ? (
         <>
-          <div className="candidate-current-dispatch">
-            <div>
-              <span>Date</span>
-              <strong>{dayShortLabel(row.application, row.agreement)}</strong>
-              <small>{missionTimeRange(row.application, row.agreement)}</small>
-            </div>
-            <div>
-              <span>Duree</span>
-              <strong>{missionDuration(row.application, row.agreement)}</strong>
-              <small>{mission?.missionType ? missionTypeLabel(mission.missionType) : 'Mission'}</small>
-            </div>
-            <div>
-              <span>Lieu</span>
-              <strong>{mission?.city || establishment?.city || 'A confirmer'}</strong>
-              <small>{establishment?.name || 'Etablissement'}</small>
-            </div>
-            <div>
-              <span>Preparation</span>
-              <strong>{readiness}%</strong>
-              <small>Infos critiques reunies</small>
-            </div>
-          </div>
-
           <div className="candidate-current-pilotage-grid">
             <section className="candidate-current-route" aria-label="Timeline de mission">
               <div className="candidate-current-route-head">

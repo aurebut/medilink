@@ -837,7 +837,6 @@ button { touch-action: manipulation; }
 
 .candidate-command-main span,
 .candidate-command-stat span,
-.candidate-current-dispatch span,
 .candidate-current-prep span,
 .candidate-current-route-head span,
 .candidate-current-prep-head span {
@@ -936,37 +935,6 @@ button { touch-action: manipulation; }
 .candidate-current-tab-panel {
   display: grid;
   gap: 14px;
-}
-
-.candidate-current-dispatch {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.candidate-current-dispatch > div {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-  min-height: 112px;
-  align-content: space-between;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.92), rgba(248,250,252,.96)),
-    #fff;
-}
-
-.candidate-current-dispatch strong {
-  color: var(--heading);
-  font-size: 18px;
-  line-height: 1.1;
-}
-
-.candidate-current-dispatch small {
-  color: var(--muted);
-  overflow-wrap: anywhere;
 }
 
 .candidate-current-pilotage-grid {
@@ -1236,7 +1204,6 @@ button { touch-action: manipulation; }
     grid-template-columns: 1fr;
   }
 
-  .candidate-current-dispatch,
   .candidate-current-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1249,7 +1216,6 @@ button { touch-action: manipulation; }
 @media (max-width: 720px) {
   .candidate-current-grid,
   .candidate-current-info,
-  .candidate-current-dispatch,
   .candidate-current-detail-grid {
     grid-template-columns: 1fr;
   }
