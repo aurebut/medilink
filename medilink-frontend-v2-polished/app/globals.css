@@ -558,63 +558,116 @@ button { touch-action: manipulation; }
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fff 0%, #F8FAFC 100%);
 }
 
 .current-mission-route::before {
   content: '';
   position: absolute;
-  left: 9px;
-  right: 9px;
-  top: 17px;
-  height: 2px;
-  background: #D8E0EC;
+  left: 28px;
+  right: 28px;
+  top: 34px;
+  height: 6px;
+  border-radius: 999px;
+  background: #E3EAF4;
+}
+
+.current-mission-route::after {
+  content: '';
+  position: absolute;
+  left: 28px;
+  top: 34px;
+  width: min(var(--mission-progress, 0%), calc(100% - 56px));
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--teal), var(--blue));
 }
 
 .current-mission-step {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 18px;
-  grid-template-rows: 18px auto;
-  gap: 8px;
-  justify-items: center;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
   align-items: start;
-  min-height: 48px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 4px 8px 0 0;
   color: var(--muted);
-  font-size: 12px;
-  font-weight: 700;
-  text-align: center;
+  text-align: left;
 }
 
-.current-mission-step span {
+.current-mission-step-marker {
   position: relative;
   z-index: 2;
-  width: 18px;
-  height: 18px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
   border-radius: 999px;
   border: 2px solid #D8E0EC;
   background: var(--surface);
+  box-shadow: 0 0 0 6px #F8FAFC;
+}
+
+.current-mission-step-marker::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: inherit;
+  background: #C5D0DF;
 }
 
 .current-mission-step strong {
-  position: relative;
-  z-index: 2;
-  display: inline-block;
-  max-width: 100%;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: var(--surface);
-  line-height: 1.2;
-}
-
-.current-mission-step.active {
+  display: block;
+  min-width: 0;
   color: var(--heading);
+  font-size: 13px;
+  line-height: 1.25;
 }
 
-.current-mission-step.active span {
+.current-mission-step small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.current-mission-step[data-status='done'] .current-mission-step-marker,
+.current-mission-step[data-status='current'] .current-mission-step-marker {
   border-color: var(--teal);
   background: var(--teal);
+}
+
+.current-mission-step[data-status='done'] .current-mission-step-marker::after {
+  width: 10px;
+  height: 6px;
+  border-radius: 0;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  background: transparent;
+  transform: translateY(-1px) rotate(-45deg);
+}
+
+.current-mission-step[data-status='current'] .current-mission-step-marker {
+  background: var(--teal);
+  box-shadow: 0 0 0 6px #F8FAFC, 0 0 0 10px rgba(14, 138, 122, .14);
+}
+
+.current-mission-step[data-status='current'] .current-mission-step-marker::after {
+  background: #fff;
+}
+
+.current-mission-step[data-status='waiting'] strong,
+.current-mission-step[data-status='waiting'] small {
+  color: var(--muted);
 }
 
 .current-mission-grid,
@@ -706,21 +759,52 @@ button { touch-action: manipulation; }
   }
 
   .current-mission-route {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 14px;
   }
 
   .current-mission-route::before {
-    display: none;
+    left: 27px;
+    right: auto;
+    top: 28px;
+    bottom: 28px;
+    width: 6px;
+    height: auto;
+  }
+
+  .current-mission-route::after {
+    left: 27px;
+    top: 28px;
+    width: 6px;
+    height: min(var(--mission-progress, 0%), calc(100% - 56px));
+  }
+
+  .current-mission-step {
+    min-height: 64px;
+    padding: 0 0 14px;
+  }
+
+  .current-mission-step:last-child {
+    min-height: 36px;
+    padding-bottom: 0;
   }
 }
 
 @media (max-width: 520px) {
   .current-mission-route {
     grid-template-columns: 1fr;
+    padding: 12px;
   }
 
-  .current-mission-route::before {
-    display: none;
+  .current-mission-step {
+    grid-template-columns: 26px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .current-mission-step-marker {
+    width: 26px;
+    height: 26px;
   }
 }
 

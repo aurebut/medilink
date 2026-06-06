@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { medicalStatusLabel, missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
@@ -86,13 +87,26 @@ function missionSchedule(mission?: Mission) {
 
 function missionChecklist(moment: MissionMoment) {
   const steps = [
-    { key: 'accepted', label: 'Candidat valide' },
-    { key: 'prepared', label: 'Details partages' },
-    { key: 'active', label: 'Mission suivie' },
-    { key: 'closed', label: 'Fin & paiement' },
+    { key: 'accepted', label: 'Candidat valide', detail: 'Affectation confirmee' },
+    { key: 'prepared', label: 'Brief operationnel', detail: 'Infos terrain a jour' },
+    { key: 'active', label: 'Mission suivie', detail: 'Presence et alerte' },
+    { key: 'closed', label: 'Cloture', detail: 'Fin & paiement' },
   ];
-  const activeIndex = moment === 'done' ? 3 : moment === 'active' ? 2 : moment === 'today' ? 1 : 0;
-  return steps.map((step, index) => ({ ...step, active: index <= activeIndex }));
+  const currentIndex = moment === 'done' ? 3 : moment === 'active' ? 2 : moment === 'today' ? 1 : 0;
+  return steps.map((step, index) => ({
+    ...step,
+    status: index < currentIndex || moment === 'done' ? 'done' : index === currentIndex ? 'current' : 'waiting',
+  }));
+}
+
+function missionProgress(moment: MissionMoment) {
+  const progress: Record<MissionMoment, number> = {
+    upcoming: 12,
+    today: 42,
+    active: 72,
+    done: 100,
+  };
+  return progress[moment];
 }
 
 function notesStorageKey(establishmentId: string) {
@@ -199,6 +213,7 @@ export default function EstablishmentCurrentMissionsPage() {
               const profile = application.candidate?.profile;
               const moment = missionMoment(mission);
               const checklist = missionChecklist(moment);
+              const progressStyle = { '--mission-progress': `${missionProgress(moment)}%` } as CSSProperties;
               const practicalItems = [
                 mission?.departmentInfo,
                 mission?.teamInfo,
@@ -225,11 +240,14 @@ export default function EstablishmentCurrentMissionsPage() {
                     </div>
                   </div>
 
-                  <div className="current-mission-route" aria-label="Progression de la mission">
+                  <div className="current-mission-route" style={progressStyle} aria-label="Progression de la mission">
                     {checklist.map((step) => (
-                      <div key={step.key} className={`current-mission-step ${step.active ? 'active' : ''}`}>
-                        <span />
-                        <strong>{step.label}</strong>
+                      <div key={step.key} className="current-mission-step" data-status={step.status}>
+                        <span className="current-mission-step-marker" aria-hidden="true" />
+                        <div>
+                          <strong>{step.label}</strong>
+                          <small>{step.detail}</small>
+                        </div>
                       </div>
                     ))}
                   </div>
