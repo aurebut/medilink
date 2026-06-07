@@ -78,7 +78,7 @@ function MissionAnnouncementView({
   const hasApplied = Boolean(application);
 
   return (
-    <>
+    <div className="candidate-mission-detail-page">
       <PageHeader
         title={mission.title}
         description="Annonce de mission consultee dans votre espace candidat."
@@ -146,7 +146,7 @@ function MissionAnnouncementView({
         {hasApplied ? null : <LinkButton href={getMissionApplyPath(mission.id)}>Postuler</LinkButton>}
         {conversation ? <LinkButton href={`/app/messages?id=${conversation.id}`} variant="secondary">Ouvrir la discussion</LinkButton> : null}
       </div>
-    </>
+    </div>
   );
 }
 
@@ -236,7 +236,7 @@ export default function CandidateMissionDetailPage() {
   const end = missionEndDate(context.application, context.agreement);
 
   return (
-    <>
+    <div className="candidate-mission-detail-page">
       <PageHeader
         title={mission?.title || 'Ma mission'}
         description="Votre page de mission personnelle : statut, brief, lieu, documents et compta."
@@ -312,6 +312,6 @@ export default function CandidateMissionDetailPage() {
       <div className="actions">
         {context.conversation ? <LinkButton href={`/app/messages?id=${context.conversation.id}`} variant="secondary">Contacter l'etablissement</LinkButton> : null}
       </div>
-    </>
+    </div>
   );
 }
