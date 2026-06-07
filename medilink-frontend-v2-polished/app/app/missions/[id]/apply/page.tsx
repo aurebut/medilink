@@ -63,7 +63,7 @@ export default function ApplyMissionPage() {
           <h2>{mission.title}</h2>
           <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
           <div className="actions">
-            <LinkButton href="/app/applications">Voir mes candidatures</LinkButton>
+            <LinkButton href="/app/search?tab=applications">Voir mes candidatures</LinkButton>
             <LinkButton variant="light" href="/app/messages">Ouvrir la messagerie</LinkButton>
             <Button type="button" variant="light" onClick={() => router.push('/app/search')}>Retour aux missions</Button>
           </div>

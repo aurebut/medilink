@@ -17,7 +17,7 @@ const candidateNav: NavItem[] = [
   { href: '/app/agenda', label: 'Agenda', icon: 'A' },
   { href: '/app/current-missions', label: 'Missions en cours', icon: '>' },
   { href: '/app/billing', label: 'Ma compta', icon: 'C' },
-  { href: '/app/search', label: 'Annonce', icon: 'A' },
+  { href: '/app/search', label: 'Annonce et candidature', icon: 'A' },
   { href: '/app/messages', label: 'Messagerie', icon: 'M' },
 ];
 
