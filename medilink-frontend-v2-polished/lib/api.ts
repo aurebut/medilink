@@ -254,6 +254,7 @@ export const api = {
   post: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body }),
   postSilent: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body, invalidateCache: false }),
   patch: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body }),
+  patchSilent: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body, invalidateCache: false }),
   delete: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE' }),
 };
 

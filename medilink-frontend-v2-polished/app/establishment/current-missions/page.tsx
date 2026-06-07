@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { api, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
+import { api, clearApiCache, getApiCacheValue, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
@@ -211,10 +211,14 @@ export default function EstablishmentCurrentMissionsPage() {
 
     setMissionsLoading(true);
     setError(null);
+    const applicationsPath = `/establishment/applications?establishmentId=${primary.id}`;
+    const unsubscribeApplications = subscribeApiCache<Application[]>(applicationsPath, setApplications);
     api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`)
       .then(setApplications)
       .catch((e: any) => setError(e.message))
       .finally(() => setMissionsLoading(false));
+
+    return unsubscribeApplications;
   }, [primary]);
 
   useEffect(() => {
@@ -255,18 +259,27 @@ export default function EstablishmentCurrentMissionsPage() {
     const app = currentApplications.find(a => a.id === selectedApplicationId);
     if (!app) return;
 
-    setLoadingDetails(true);
-    const promises: Promise<any>[] = [
-      api.get<CandidateProfileForApplication>(`/establishment/applications/${selectedApplicationId}/candidate-profile`)
-    ];
+    const profilePath = `/establishment/applications/${selectedApplicationId}/candidate-profile`;
+    const promises: Promise<any>[] = [];
+    const cachedProfile = getApiCacheValue<CandidateProfileForApplication>(profilePath);
+    if (cachedProfile) {
+      void cachedProfile.then(setCandidateProfile);
+    }
+    promises.push(api.get<CandidateProfileForApplication>(profilePath));
 
     const convId = app.conversation?.id;
     if (convId) {
-      promises.push(api.get<Conversation>(`/conversations/${convId}`));
+      const conversationPath = `/conversations/${convId}`;
+      const cachedConversation = getApiCacheValue<Conversation>(conversationPath);
+      if (cachedConversation) {
+        void cachedConversation.then(setSelectedConversation);
+      }
+      promises.push(api.get<Conversation>(conversationPath));
     } else {
       setSelectedConversation(null);
     }
 
+    setLoadingDetails(!cachedProfile && !(convId && getApiCacheValue<Conversation>(`/conversations/${convId}`)));
     Promise.all(promises)
       .then(([profileRes, convRes]) => {
         setCandidateProfile(profileRes);
@@ -569,9 +582,13 @@ function MissionControlPanel({
   const savePracticalInfo = async (newValue: string) => {
     if (!mission?.id) return;
     try {
-      await api.patch(`/missions/${mission.id}`, {
+      await api.patchSilent(`/missions/${mission.id}`, {
         practicalInfo: newValue || null,
       });
+      clearApiCache('/establishment/dashboard');
+      if (row.application.mission?.establishmentId) {
+        clearApiCache(`/missions/mine?establishmentId=${row.application.mission.establishmentId}`);
+      }
       updateLocalMission(mission.id, { practicalInfo: newValue });
     } catch (e: any) {
       setError(e.message || 'Impossible de sauvegarder les consignes.');
@@ -591,13 +608,17 @@ function MissionControlPanel({
     if (!mission?.id) return;
     setSavingBrief(true);
     try {
-      await api.patch(`/missions/${mission.id}`, {
+      await api.patchSilent(`/missions/${mission.id}`, {
         departmentInfo: editDepartmentInfo,
         teamInfo: editTeamInfo,
         softwareUsed: editSoftwareUsed,
         practicalInfo: editPracticalInfo,
         description: editDescription,
       });
+      clearApiCache('/establishment/dashboard');
+      if (row.application.mission?.establishmentId) {
+        clearApiCache(`/missions/mine?establishmentId=${row.application.mission.establishmentId}`);
+      }
 
       updateLocalMission(mission.id, {
         departmentInfo: editDepartmentInfo,

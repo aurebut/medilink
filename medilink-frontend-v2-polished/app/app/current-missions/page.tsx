@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { api, isMockStorageUrl } from '@/lib/api';
+import { api, clearApiCache, isMockStorageUrl, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
@@ -194,6 +194,9 @@ export default function CandidateCurrentMissionsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const unsubscribeApplications = subscribeApiCache<Application[]>('/me/applications', setApplications);
+    const unsubscribeConversations = subscribeApiCache<Conversation[]>('/conversations', setConversations);
+
     Promise.all([
       api.get<Application[]>('/me/applications'),
       api.get<Conversation[]>('/conversations'),
@@ -203,6 +206,11 @@ export default function CandidateCurrentMissionsPage() {
     }).catch((e: any) => {
       setError(e.message);
     }).finally(() => setLoading(false));
+
+    return () => {
+      unsubscribeApplications();
+      unsubscribeConversations();
+    };
   }, []);
 
   const rows = useMemo(() => {
@@ -495,7 +503,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
     try {
       for (const file of files) {
         const categorizedFileName = `${day.uploadNamePrefix} - ${file.name}`;
-        const uploadResponse = await api.post<UploadResponse>('/documents/upload-url', {
+        const uploadResponse = await api.postSilent<UploadResponse>('/documents/upload-url', {
           documentType: 'OTHER',
           fileName: categorizedFileName,
           mimeType: file.type || 'application/octet-stream',
@@ -511,8 +519,9 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
           if (!put.ok) throw new Error(`Upload impossible pour ${file.name}.`);
         }
 
-        await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
+        await api.postSilent(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
       }
+      clearApiCache('/me/documents');
       setFilesByDay((current) => ({
         ...current,
         [day.key]: [],
