@@ -8,7 +8,7 @@ import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelL
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, StatCard, Textarea, Button, Input } from '@/components/ui';
+import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type NotesByApplication = Record<string, string>;
@@ -332,15 +332,6 @@ export default function EstablishmentCurrentMissionsPage() {
     };
   }, [selectedApplicationId, currentApplications, selectedConversation]);
 
-  const stats = useMemo(() => {
-    const moments = currentApplications.map((application) => missionMoment(application.mission));
-    return {
-      active: moments.filter((moment) => moment === 'active' || moment === 'today').length,
-      upcoming: moments.filter((moment) => moment === 'upcoming').length,
-      done: moments.filter((moment) => moment === 'done').length,
-    };
-  }, [currentApplications]);
-
   if (loading || missionsLoading) return <LoadingCard label="Chargement des missions en cours..." />;
 
   return (
@@ -370,12 +361,6 @@ export default function EstablishmentCurrentMissionsPage() {
         </Card>
       ) : (
         <>
-          <div className="grid-3 current-missions-stats" style={{ marginBottom: 20 }}>
-            <StatCard label="En route aujourd'hui" value={stats.active} helper="Missions actives ou qui démarrent aujourd'hui" />
-            <StatCard label="A venir" value={stats.upcoming} helper="Missions confirmées à préparer" />
-            <StatCard label="Terminées" value={stats.done} helper="Missions acceptées déjà passées" />
-          </div>
-
           <div className="grid-main">
             {/* Sidebar with active missions list */}
             <Card className="current-mission-selector-card">

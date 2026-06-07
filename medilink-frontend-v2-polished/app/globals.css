@@ -502,10 +502,6 @@ button { touch-action: manipulation; }
   background: var(--ivory);
 }
 
-.current-missions-stats {
-  margin-bottom: 16px;
-}
-
 .current-mission-mobile-select {
   display: none;
 }
@@ -3762,7 +3758,6 @@ tbody tr:hover { background: #FAFBFD; }
 
 @media (max-width: 980px) {
   .hero, .grid-main, .grid-2, .grid-3, .message-layout, .wizard-layout { grid-template-columns: 1fr; }
-  .current-missions-stats,
   .current-mission-desktop-title,
   .current-mission-desktop-list {
     display: none !important;
