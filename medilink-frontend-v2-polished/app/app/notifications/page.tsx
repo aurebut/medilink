@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
+import { getCandidateMissionPath } from '@/lib/mission-links';
 import { Alert, Badge, Button, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 function getNotificationLink(notification: Notification) {
@@ -13,7 +14,7 @@ function getNotificationLink(notification: Notification) {
     return `/app/messages?id=${data.conversationId}`;
   }
   if (data.missionId) {
-    return '/app/missions';
+    return getCandidateMissionPath(data.missionId);
   }
   return null;
 }

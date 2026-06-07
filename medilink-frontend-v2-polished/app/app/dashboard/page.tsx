@@ -7,6 +7,7 @@ import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, ca
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
+import { getCandidateMissionPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -55,7 +56,7 @@ function getNotificationLink(notification: Notification) {
     return `/app/messages?id=${data.conversationId}`;
   }
   if (data.missionId) {
-    return '/app/missions';
+    return getCandidateMissionPath(data.missionId);
   }
   return null;
 }

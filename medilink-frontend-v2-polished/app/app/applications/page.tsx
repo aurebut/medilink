@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import type { Application } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
+import { getCandidateMissionPath, getMissionPublicPath } from '@/lib/mission-links';
 import { Alert, Badge, Button, EmptyState, LoadingCard, PageHeader } from '@/components/ui';
 
 function tone(status: string) {
@@ -75,6 +76,14 @@ export default function ApplicationsPage() {
                   <td>{formatDateTime(a.createdAt)}</td>
                   <td className="actions">
                     {a.conversation ? <Link className="btn btn-light" href="/app/messages">Messagerie</Link> : null}
+                    {a.missionId ? (
+                      <Link
+                        className="btn btn-secondary"
+                        href={a.status === 'ACCEPTED' ? getCandidateMissionPath(a.missionId) : getMissionPublicPath(a.missionId)}
+                      >
+                        Voir mission
+                      </Link>
+                    ) : null}
                     <Button variant="danger" onClick={() => withdraw(a.id)} disabled={['ACCEPTED', 'REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(a.status)}>Retirer</Button>
                   </td>
                 </tr>
