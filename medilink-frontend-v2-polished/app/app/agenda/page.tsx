@@ -8,7 +8,7 @@ import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation } from '@/lib/types';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
-import { Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
+import { Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -328,45 +328,7 @@ export default function CandidateAgendaPage() {
       <Card className="agenda-list-card">
         <div className="toolbar">
           <div>
-            <h2>Liste chronologique</h2>
-            <p className="small">Les prochaines actions à traiter, dans l’ordre.</p>
-          </div>
-          <LinkButton href="/app/search" variant="light">Trouver une mission</LinkButton>
-        </div>
-
-        {upcomingEvents.length > 0 ? (
-          <div className="agenda-list">
-            {upcomingEvents.map(({ application, agreement, conversation, date }) => (
-              <div key={application.id} className="agenda-list-item">
-                <div className="agenda-list-date">
-                  <strong>{formatDate(date)}</strong>
-                  <span>{application.mission?.startTime || 'Horaire à confirmer'}</span>
-                </div>
-                <div className="agenda-list-main">
-                  <strong>{application.mission?.title || 'Mission'}</strong>
-                  <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
-                </div>
-                <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
-                <div className="actions">
-                  {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
-                  {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            title="Aucun événement à venir"
-            description="Les missions acceptées et candidatures datées apparaîtront ici."
-            action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
-          />
-        )}
-      </Card>
-
-      <Card className="agenda-list-card">
-        <div className="toolbar">
-          <div>
-            <h2>Historique des missions</h2>
+            <h2>Historique d'événements</h2>
             <p className="small">Les dernières candidatures, propositions et missions traitées.</p>
           </div>
           <LinkButton href="/app/agenda/missions" variant="light">Voir tout</LinkButton>
