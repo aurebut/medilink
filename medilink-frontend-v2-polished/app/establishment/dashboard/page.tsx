@@ -8,7 +8,13 @@ import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Mission } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
+import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
+import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
+
+function dayNumber(value: Date) {
+  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric' }).format(value);
+}
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -85,11 +91,6 @@ export default function EstablishmentDashboardPage() {
     const publishedMissions = missions.filter((mission) => mission.status === 'PUBLISHED');
     const draftMissions = missions.filter((mission) => mission.status === 'DRAFT');
     const activeMissions = missions.filter((mission) => mission.status === 'PUBLISHED' || mission.status === 'FILLED');
-    const today = new Date().setHours(0, 0, 0, 0);
-    const upcomingMissions = [...activeMissions]
-      .filter((mission) => mission.startDate && new Date(mission.startDate).getTime() >= today)
-      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-    const nextMission = upcomingMissions[0] || sortedMissions.find((mission) => mission.status === 'PUBLISHED') || sortedMissions[0];
     const sortedConversations = [...conversations]
       .sort((a, b) => {
         const aTime = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
@@ -111,6 +112,19 @@ export default function EstablishmentDashboardPage() {
         acceptedCount: (applicationsByMission[mission.id] || []).filter((application) => application.status === 'ACCEPTED').length,
       }));
 
+    const agendaRows = buildEstablishmentAgendaRows(missions, applications, conversations);
+    const agendaRowsByDay = new Map<string, typeof agendaRows>();
+    agendaRows.forEach((row) => {
+      const key = dateKey(row.date);
+      agendaRowsByDay.set(key, [...(agendaRowsByDay.get(key) || []), row]);
+    });
+    const weekCarousel = buildWeekCarousel(new Date(), 8);
+    const nextAgendaItem = agendaRows
+      .filter((row) => row.date)
+      .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
+    const today = new Date().setHours(0, 0, 0, 0);
+    const upcomingMissions = agendaRows.filter((row) => row.date && new Date(row.date).getTime() >= today);
+
     return {
       sortedApplications,
       sortedMissions,
@@ -118,10 +132,13 @@ export default function EstablishmentDashboardPage() {
       pendingApplications,
       publishedMissions,
       draftMissions,
-      upcomingMissions,
-      nextMission,
       sortedConversations,
       missionPipeline,
+      agendaRows,
+      agendaRowsByDay,
+      weekCarousel,
+      nextAgendaItem,
+      upcomingMissions,
     };
   }, [applications, conversations, missions]);
 
@@ -142,16 +159,6 @@ export default function EstablishmentDashboardPage() {
 
   if (dashboardLoading) return <LoadingCard label="Chargement de votre activité..." />;
 
-  const completionScore = primary.completionScore || 0;
-  const establishmentReady = completionScore >= 80;
-  const nextStep = !establishmentReady
-    ? { label: 'Finaliser votre fiche', href: `/establishment/edit/${primary.id}`, helper: 'Complétez les informations de votre établissement pour inspirer confiance aux candidats.' }
-    : missions.length === 0
-      ? { label: 'Publier votre première mission', href: '/establishment/missions/new', helper: 'Créez une offre claire pour commencer à recevoir des candidatures qualifiées.' }
-      : dashboard.pendingApplications.length > 0
-        ? { label: 'Traiter les candidatures', href: '/establishment/missions?tab=applications', helper: `${dashboard.pendingApplications.length} dossier(s) attendent votre attention.` }
-        : { label: 'Piloter vos missions', href: '/establishment/missions', helper: 'Gardez vos besoins à jour et anticipez vos prochaines recherches.' };
-
   return (
     <>
       <PageHeader
@@ -160,53 +167,76 @@ export default function EstablishmentDashboardPage() {
       />
 
       <div className="establishment-dashboard candidate-dashboard">
-        <Card className="dashboard-week-card establishment-priority-card">
+        <Card className="dashboard-week-card">
           <div className="dashboard-section-head">
             <div>
-              <span>Priorité du jour</span>
-              <h2>{nextStep.label}</h2>
+              <span>Agenda</span>
+              <h2>Semaine à venir</h2>
             </div>
-            <LinkButton variant="light" href={nextStep.href}>Continuer</LinkButton>
+            <LinkButton variant="light" href="/establishment/agenda">Agenda complet</LinkButton>
           </div>
-          <div className="establishment-priority-grid">
-            <div className="establishment-priority-copy">
-              <p>{nextStep.helper}</p>
-              <div className="dashboard-readiness compact-readiness">
-                <div>
-                  <span>Fiche établissement</span>
-                  <strong>{completionScore}%</strong>
-                  <ProgressBar value={completionScore} />
-                </div>
-                <div>
-                  <span>Candidatures à traiter</span>
-                  <strong>{dashboard.pendingApplications.length}</strong>
-                </div>
-                <div>
-                  <span>Missions publiées</span>
-                  <strong>{dashboard.publishedMissions.length}</strong>
-                </div>
-              </div>
-            </div>
-            {dashboard.nextMission ? (
+          <div className="dashboard-week-summary">
+            {dashboard.nextAgendaItem ? (
               <div className="dashboard-next-event compact">
                 <div className="dashboard-date-tile">
-                  <strong>{formatShortDate(dashboard.nextMission.startDate)}</strong>
-                  <span>{dashboard.nextMission.startTime || 'Horaire à confirmer'}</span>
+                  <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
+                  <span>{dashboard.nextAgendaItem.mission.startTime || 'Horaire à confirmer'}</span>
                 </div>
                 <div>
-                  <span>Prochaine mission à piloter</span>
-                  <strong>{dashboard.nextMission.title}</strong>
-                  <p>{dashboard.nextMission.city || dashboard.nextMission.location || 'Lieu à confirmer'}</p>
+                  <span>Prochaine échéance</span>
+                  <strong>{dashboard.nextAgendaItem.mission.title}</strong>
+                  <p>
+                    {dashboard.nextAgendaItem.selectedApplication
+                      ? `Avec ${candidateName(dashboard.nextAgendaItem.selectedApplication)}`
+                      : 'Aucun candidat validé'}
+                  </p>
                 </div>
-                <LinkButton variant="light" href={`/establishment/missions/${dashboard.nextMission.id}`}>Voir</LinkButton>
+                <LinkButton
+                  variant="light"
+                  href={`/establishment/missions/${dashboard.nextAgendaItem.mission.id}`}
+                >
+                  Voir
+                </LinkButton>
               </div>
             ) : (
-              <div className="dashboard-empty compact">
-                <strong>Aucune mission planifiée</strong>
-                <p>Publiez une mission pour commencer à recevoir des candidatures.</p>
-                <LinkButton variant="secondary" href="/establishment/missions/new">Créer</LinkButton>
+              <div className="dashboard-empty compact dashboard-week-empty">
+                <strong>Aucune date planifiée</strong>
+                <p>Vos missions planifiées apparaîtront dans le calendrier.</p>
               </div>
             )}
+          </div>
+          <div className="week-carousel" aria-label="Semaines à venir">
+            {dashboard.weekCarousel.map((week, weekIndex) => (
+              <div key={week.key} className="week-panel">
+                <div className="week-panel-head">
+                  <strong>{weekIndex === 0 ? 'Cette semaine' : weekRangeLabel(week.start)}</strong>
+                  <span>{weekIndex === 0 ? weekRangeLabel(week.start) : `${weekIndex + 1}e semaine`}</span>
+                </div>
+                <div className="week-grid">
+                  {week.days.map((day, index) => {
+                    const rows = dashboard.agendaRowsByDay.get(dateKey(day)) || [];
+                    const today = dateKey(day) === dateKey(new Date());
+                    return (
+                      <div key={dateKey(day)} className={`week-day ${today ? 'today' : ''}`}>
+                        <div className="week-day-head">
+                          <span>{weekDayLabels[index]}</span>
+                          <strong>{dayNumber(day)}</strong>
+                        </div>
+                        <div className="week-day-body">
+                          {rows.slice(0, 2).map((row) => (
+                            <div key={row.mission.id} className={`week-event is-${establishmentMissionTone(row)}`}>
+                              <strong>{row.mission.title}</strong>
+                              <span>{row.mission.startTime || establishmentMissionLabel(row)}</span>
+                            </div>
+                          ))}
+                          {rows.length > 2 ? <span className="week-more">+{rows.length - 2}</span> : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
 
