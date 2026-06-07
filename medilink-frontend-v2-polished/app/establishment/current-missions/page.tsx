@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api, clearApiCache, getApiCacheValue, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
+import { buildEstablishmentAgendaRows } from '@/lib/establishment-agenda';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
@@ -29,7 +31,7 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'candidat' | 'documents' | 'compta';
+type MissionSection = 'pilotage' | 'brief' | 'candidat' | 'documents' | 'compta' | 'historique';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
@@ -37,6 +39,7 @@ const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'candidat', label: 'Candidat & contact' },
   { id: 'documents', label: 'Documents validés' },
   { id: 'compta', label: 'Compta & facturation' },
+  { id: 'historique', label: 'Historique de missions' },
 ];
 
 function candidateName(application: Application) {
@@ -192,6 +195,7 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
 export default function EstablishmentCurrentMissionsPage() {
   const { primary, loading } = useEstablishments();
   const [applications, setApplications] = useState<Application[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [missionsLoading, setMissionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState<NotesByApplication>({});
@@ -205,6 +209,7 @@ export default function EstablishmentCurrentMissionsPage() {
   useEffect(() => {
     if (!primary) {
       setApplications([]);
+      setConversations([]);
       setMissionsLoading(false);
       return;
     }
@@ -213,12 +218,22 @@ export default function EstablishmentCurrentMissionsPage() {
     setError(null);
     const applicationsPath = `/establishment/applications?establishmentId=${primary.id}`;
     const unsubscribeApplications = subscribeApiCache<Application[]>(applicationsPath, setApplications);
-    api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`)
-      .then(setApplications)
+    const unsubscribeConversations = subscribeApiCache<Conversation[]>('/conversations', setConversations);
+    Promise.all([
+      api.get<Application[]>(applicationsPath),
+      api.get<Conversation[]>('/conversations'),
+    ])
+      .then(([nextApplications, nextConversations]) => {
+        setApplications(nextApplications);
+        setConversations(nextConversations);
+      })
       .catch((e: any) => setError(e.message))
       .finally(() => setMissionsLoading(false));
 
-    return unsubscribeApplications;
+    return () => {
+      unsubscribeApplications();
+      unsubscribeConversations();
+    };
   }, [primary]);
 
   useEffect(() => {
@@ -240,6 +255,24 @@ export default function EstablishmentCurrentMissionsPage() {
         return aDate - bDate;
       });
   }, [applications]);
+
+  const historyRows = useMemo(() => {
+    const missions = Array.from(
+      applications.reduce((map, application) => {
+        if (application.mission) {
+          map.set(application.mission.id, application.mission);
+        }
+        return map;
+      }, new Map<string, Mission>()).values()
+    );
+    return buildEstablishmentAgendaRows(missions, applications, conversations);
+  }, [applications, conversations]);
+
+  useEffect(() => {
+    if (primary && currentApplications.length === 0 && activeSection !== 'historique') {
+      setActiveSection('historique');
+    }
+  }, [activeSection, currentApplications.length, primary]);
 
   // Set default selected application id
   useEffect(() => {
@@ -345,6 +378,8 @@ export default function EstablishmentCurrentMissionsPage() {
     };
   }, [selectedApplicationId, currentApplications, selectedConversation]);
 
+  const displayedSection: MissionSection = currentApplications.length === 0 && activeSection !== 'historique' ? 'historique' : activeSection;
+
   if (loading || missionsLoading) return <LoadingCard label="Chargement des missions en cours..." />;
 
   return (
@@ -364,14 +399,35 @@ export default function EstablishmentCurrentMissionsPage() {
           <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       ) : currentApplications.length === 0 ? (
-        <Card className="card-highlight current-missions-empty">
-          <h2>Aucune mission en cours</h2>
-          <p>Les missions apparaissent ici dès qu'une candidature est acceptée. Vous pourrez ensuite suivre le planning, contacter le candidat et ajouter vos notes terrain.</p>
-          <div className="actions">
-            <LinkButton href="/establishment/missions?tab=applications">Traiter les candidatures</LinkButton>
-            <LinkButton variant="light" href="/establishment/missions/new">Créer une mission</LinkButton>
+        <>
+          <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections de la mission selectionnee" style={{ marginBottom: 16 }}>
+            {missionSections.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                className={displayedSection === section.id ? 'active' : ''}
+                onClick={() => setActiveSection(section.id)}
+                role="tab"
+                aria-selected={displayedSection === section.id}
+              >
+                {section.label}
+              </button>
+            ))}
           </div>
-        </Card>
+
+          {displayedSection === 'historique' ? (
+            <EstablishmentMissionHistoryList rows={historyRows} />
+          ) : (
+            <Card className="card-highlight current-missions-empty">
+              <h2>Aucune mission en cours</h2>
+              <p>Les missions apparaissent ici dès qu'une candidature est acceptée. Vous pourrez ensuite suivre le planning, contacter le candidat et ajouter vos notes terrain.</p>
+              <div className="actions">
+                <LinkButton href="/establishment/missions?tab=applications">Traiter les candidatures</LinkButton>
+                <LinkButton variant="light" href="/establishment/missions/new">Créer une mission</LinkButton>
+              </div>
+            </Card>
+          )}
+        </>
       ) : (
         <>
           <div className="grid-main">
@@ -467,23 +523,25 @@ export default function EstablishmentCurrentMissionsPage() {
                       <button
                         key={section.id}
                         type="button"
-                        className={activeSection === section.id ? 'active' : ''}
+                        className={displayedSection === section.id ? 'active' : ''}
                         onClick={() => setActiveSection(section.id)}
                         role="tab"
-                        aria-selected={activeSection === section.id}
+                        aria-selected={displayedSection === section.id}
                       >
                         {section.label}
                       </button>
                     ))}
                   </div>
 
-                  {loadingDetails ? (
+                  {displayedSection === 'historique' ? (
+                    <EstablishmentMissionHistoryList rows={historyRows} />
+                  ) : loadingDetails ? (
                     <LoadingCard label="Chargement des détails de la mission..." />
                   ) : (
                     <div className="candidate-current-layout">
                       <MissionControlPanel
                         row={selectedRow}
-                        activeSection={activeSection}
+                        activeSection={displayedSection}
                         notes={notes}
                         updateNote={updateNote}
                         candidateProfile={candidateProfile}

@@ -3,10 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api, clearApiCache, isMockStorageUrl, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
+import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath, getCandidateMissionPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
+import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type MissionStep = {
@@ -25,7 +27,7 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'compta';
+type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'compta' | 'historique';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
@@ -33,6 +35,7 @@ const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'lieu', label: 'Lieu & contact' },
   { id: 'documents', label: 'Documents de mission' },
   { id: 'compta', label: 'Compta & actions' },
+  { id: 'historique', label: 'Historique de missions' },
 ];
 
 type UploadResponse = {
@@ -238,6 +241,18 @@ export default function CandidateCurrentMissionsPage() {
   }, [rows]);
 
   const selectedRow = priorityRow || rows[0] || null;
+  const historyRows = useMemo(
+    () => buildCandidateMissionHistoryRows(applications, conversations),
+    [applications, conversations]
+  );
+
+  useEffect(() => {
+    if (rows.length === 0 && activeSection !== 'historique') {
+      setActiveSection('historique');
+    }
+  }, [activeSection, rows.length]);
+
+  const displayedSection: MissionSection = rows.length === 0 && activeSection !== 'historique' ? 'historique' : activeSection;
 
   if (loading) return <LoadingCard label="Chargement de vos missions en cours..." />;
 
@@ -250,7 +265,7 @@ export default function CandidateCurrentMissionsPage() {
 
       {error ? <Alert type="error">{error}</Alert> : null}
 
-      {rows.length === 0 ? (
+      {displayedSection !== 'historique' && rows.length === 0 ? (
         <EmptyState
           title="Aucune mission en cours"
           description="Une mission apparaît ici dès qu’une candidature est acceptée ou qu’une proposition est envoyée par un établissement."
@@ -263,21 +278,25 @@ export default function CandidateCurrentMissionsPage() {
               <button
                 key={section.id}
                 type="button"
-                className={activeSection === section.id ? 'active' : ''}
+                className={displayedSection === section.id ? 'active' : ''}
                 onClick={() => setActiveSection(section.id)}
                 role="tab"
-                aria-selected={activeSection === section.id}
+                aria-selected={displayedSection === section.id}
               >
                 {section.label}
               </button>
             ))}
           </div>
 
-          <div className="candidate-current-layout">
-            {selectedRow ? (
-              <MissionControlPanel row={selectedRow} activeSection={activeSection} />
-            ) : null}
-          </div>
+          {displayedSection === 'historique' ? (
+            <CandidateMissionHistoryList rows={historyRows} />
+          ) : (
+            <div className="candidate-current-layout">
+              {selectedRow ? (
+                <MissionControlPanel row={selectedRow} activeSection={displayedSection} />
+              ) : null}
+            </div>
+          )}
         </>
       )}
     </>
