@@ -23,7 +23,6 @@ const candidateNav: NavItem[] = [
 
 const establishmentNav: NavItem[] = [
   { href: '/establishment/dashboard', label: 'Dashboard', icon: 'D' },
-  { href: '/establishment/onboarding', label: 'Établissement', icon: 'E' },
   { href: '/establishment/missions', label: 'Missions', icon: 'M' },
   { href: '/establishment/missions/new', label: 'Créer mission', icon: '+' },
   { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
@@ -275,7 +274,7 @@ export function AppShell({
             </div>
             <div className="mobile-menu-actions">
               <Link href={userProfileHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
-                <span>Mon profil</span>
+                <span>{area === 'establishment' ? 'Mes informations' : 'Mon profil'}</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
               <Link href={userAccountHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
@@ -413,7 +412,7 @@ export function AppShell({
               </div>
               <div className="account-menu-section">
                 <Link href={userProfileHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
-                  <span>Mon profil</span>
+                  <span>{area === 'establishment' ? 'Mes informations' : 'Mon profil'}</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
                 <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
