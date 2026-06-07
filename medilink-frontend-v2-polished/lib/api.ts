@@ -21,27 +21,71 @@ type CacheEntry = {
   promise: Promise<unknown>;
 };
 
-const GET_CACHE_TTL_MS = 60_000;
+const GET_CACHE_TTL_MS = 5 * 60_000;
+const SESSION_CACHE_PREFIX = 'medilink_api_cache:';
 const getCache = new Map<string, CacheEntry>();
 
 function cacheKey(path: string) {
   return path;
 }
 
+function sessionCacheKey(path: string) {
+  return `${SESSION_CACHE_PREFIX}${path}`;
+}
+
+function readSessionCache<T>(path: string, now: number) {
+  if (typeof window === 'undefined') return null;
+
+  const raw = window.sessionStorage.getItem(sessionCacheKey(path));
+  if (!raw) return null;
+
+  try {
+    const cached = JSON.parse(raw) as { expiresAt: number; value: T };
+    if (cached.expiresAt <= now) {
+      window.sessionStorage.removeItem(sessionCacheKey(path));
+      return null;
+    }
+    return cached.value;
+  } catch {
+    window.sessionStorage.removeItem(sessionCacheKey(path));
+    return null;
+  }
+}
+
+function writeSessionCache<T>(path: string, value: T, expiresAt: number) {
+  if (typeof window === 'undefined' || value === undefined) return;
+
+  try {
+    window.sessionStorage.setItem(sessionCacheKey(path), JSON.stringify({ expiresAt, value }));
+  } catch {
+    // Storage can be full or unavailable; in-memory cache still covers the current view.
+  }
+}
+
 export function clearApiCache(path?: string) {
   if (!path) {
     getCache.clear();
+    if (typeof window !== 'undefined') {
+      Object.keys(window.sessionStorage)
+        .filter((key) => key.startsWith(SESSION_CACHE_PREFIX))
+        .forEach((key) => window.sessionStorage.removeItem(key));
+    }
     return;
   }
 
   getCache.delete(cacheKey(path));
+  if (typeof window !== 'undefined') {
+    window.sessionStorage.removeItem(sessionCacheKey(path));
+  }
 }
 
 export function primeApiCache<T>(path: string, value: T) {
+  const expiresAt = Date.now() + GET_CACHE_TTL_MS;
   getCache.set(cacheKey(path), {
-    expiresAt: Date.now() + GET_CACHE_TTL_MS,
+    expiresAt,
     promise: Promise.resolve(value),
   });
+  writeSessionCache(path, value, expiresAt);
 }
 
 export function getAuthToken() {
@@ -91,6 +135,16 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     if (cached && cached.expiresAt > now) {
       return cached.promise as Promise<T>;
     }
+
+    const sessionValue = readSessionCache<T>(path, now);
+    if (sessionValue !== null) {
+      const promise = Promise.resolve(sessionValue);
+      getCache.set(key, {
+        expiresAt: now + GET_CACHE_TTL_MS,
+        promise,
+      });
+      return promise;
+    }
   }
 
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
@@ -114,6 +168,8 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     if (!response.ok) {
       throw new ApiError(normalizeError(payload), response.status, payload);
     }
+
+    if (canUseCache) writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
 
     return payload as T;
   }).catch((error) => {

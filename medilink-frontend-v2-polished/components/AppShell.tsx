@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, primeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
-import type { Conversation, Notification, Profile } from '@/lib/types';
+import type { CandidateDashboardData, Conversation, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
 import { useAuth } from './AuthProvider';
 
 type NavItem = { href: string; label: string; icon: string };
@@ -67,6 +67,52 @@ function idleWarm(paths: string[]) {
 
   const id = window.setTimeout(warm, 500);
   return () => window.clearTimeout(id);
+}
+
+function prefetchRoutes(router: ReturnType<typeof useRouter>, hrefs: string[]) {
+  hrefs.forEach((href) => router.prefetch(href));
+}
+
+function primeCandidateDashboard(data: CandidateDashboardData) {
+  primeApiCache('/me/profile', data.profile);
+  primeApiCache('/me/documents', data.documents);
+  primeApiCache('/me/applications', data.applications);
+  primeApiCache('/conversations', data.conversations);
+  primeApiCache('/notifications', data.notifications);
+}
+
+function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
+  if (data.establishment) {
+    primeApiCache('/establishments/me', [data.establishment]);
+    primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
+    primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+  }
+  primeApiCache('/conversations', data.conversations);
+}
+
+function warmCandidateWorkspace() {
+  void api.get<CandidateDashboardData>('/me/dashboard')
+    .then(primeCandidateDashboard)
+    .catch(() => undefined);
+  warmApi([
+    '/missions?limit=50',
+    '/me/profile',
+    '/me/documents',
+    '/me/applications',
+    '/conversations',
+    '/notifications',
+  ]);
+}
+
+function warmEstablishmentWorkspace() {
+  void api.get<EstablishmentDashboardData>('/establishment/dashboard')
+    .then(primeEstablishmentDashboard)
+    .catch(() => undefined);
+  warmApi([
+    '/establishments/me',
+    '/conversations',
+    '/notifications',
+  ]);
 }
 
 function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: string) {
@@ -252,6 +298,8 @@ export function AppShell({
   function warmRoute(href: string) {
     router.prefetch(href);
     warmApi(warmPathsForRoute(area, href));
+    if (area === 'candidate') warmCandidateWorkspace();
+    if (area === 'establishment') warmEstablishmentWorkspace();
   }
 
   useEffect(() => {
@@ -314,10 +362,29 @@ export function AppShell({
     if (!user || area === 'admin') return;
 
     if (area === 'candidate') {
-      return idleWarm(['/me/dashboard', '/me/applications', '/conversations', '/notifications']);
+      prefetchRoutes(router, candidateNav.map((item) => item.href));
+      return idleWarm(['/me/dashboard', '/missions?limit=50', '/me/profile', '/me/documents', '/me/applications', '/conversations', '/notifications']);
     }
 
-    return idleWarm(['/establishment/dashboard', '/conversations', '/notifications']);
+    prefetchRoutes(router, establishmentNav.map((item) => item.href));
+    return idleWarm(['/establishment/dashboard', '/establishments/me', '/conversations', '/notifications']);
+  }, [area, router, user]);
+
+  useEffect(() => {
+    if (!user || area === 'admin') return;
+
+    const warm = () => {
+      if (area === 'candidate') {
+        warmCandidateWorkspace();
+        return;
+      }
+
+      warmEstablishmentWorkspace();
+    };
+
+    if (typeof window === 'undefined') return;
+    const id = window.setTimeout(warm, 150);
+    return () => window.clearTimeout(id);
   }, [area, user]);
 
   return (
