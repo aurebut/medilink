@@ -341,28 +341,32 @@ export class ApplicationsService {
       throw new ForbiddenException('Vous ne pouvez retirer que vos candidatures.');
     }
 
+    const targetStatus = application.status === ApplicationStatus.ACCEPTED
+      ? ApplicationStatus.CANCELLED
+      : ApplicationStatus.WITHDRAWN;
+
     const allowed = ALLOWED_APPLICATION_TRANSITIONS[application.status] || [];
-    if (!allowed.includes(ApplicationStatus.WITHDRAWN)) {
-      throw new BadRequestException('Cette candidature ne peut plus être retirée.');
+    if (!allowed.includes(targetStatus)) {
+      throw new BadRequestException('Cette candidature ne peut plus être modifiée.');
     }
 
     const updated = await this.prisma.application.update({
       where: { id: application.id },
-      data: { status: ApplicationStatus.WITHDRAWN },
+      data: { status: targetStatus },
     });
 
     await this.prisma.applicationStatusHistory.create({
       data: {
         applicationId: application.id,
         oldStatus: application.status,
-        newStatus: ApplicationStatus.WITHDRAWN,
+        newStatus: targetStatus,
         changedByUserId: user.id,
       },
     });
 
     await this.audit.log({
       actorUserId: user.id,
-      action: 'application.withdrawn',
+      action: targetStatus === ApplicationStatus.CANCELLED ? 'application.cancelled' : 'application.withdrawn',
       entityType: 'application',
       entityId: application.id,
     });

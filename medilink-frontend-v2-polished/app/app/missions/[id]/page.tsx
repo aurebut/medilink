@@ -14,7 +14,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
-import { Alert, Badge, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type MissionContext = {
   application: Application;
@@ -158,18 +158,26 @@ export default function CandidateMissionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([
-      api.get<Application[]>('/me/applications'),
-      api.get<Conversation[]>('/conversations'),
-      api.get<Mission>(`/missions/${id}`).catch(() => null),
-    ]).then(([nextApplications, nextConversations, nextMission]) => {
+  async function load() {
+    setLoading(true);
+    try {
+      const [nextApplications, nextConversations, nextMission] = await Promise.all([
+        api.get<Application[]>('/me/applications'),
+        api.get<Conversation[]>('/conversations'),
+        api.get<Mission>(`/missions/${id}`).catch(() => null),
+      ]);
       setApplications(nextApplications);
       setConversations(nextConversations);
       setPublicMission(nextMission);
-    }).catch((e: any) => {
+    } catch (e: any) {
       setError(e.message);
-    }).finally(() => setLoading(false));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void load();
   }, [id]);
 
   const context = useMemo<MissionContext | null>(() => {
@@ -182,6 +190,22 @@ export default function CandidateMissionDetailPage() {
       agreement: latestAgreement(conversation),
     };
   }, [applications, conversations, id]);
+
+  async function withdraw(appId: string) {
+    if (!context) return;
+    const isAccepted = context.application.status === 'ACCEPTED';
+    const confirmMessage = isAccepted 
+      ? 'Annuler cette mission ?' 
+      : 'Retirer cette candidature ?';
+      
+    if (!confirm(confirmMessage)) return;
+    try {
+      await api.post(`/applications/${appId}/withdraw`, {});
+      void load();
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
 
   if (loading) return <LoadingCard label="Chargement de votre mission..." />;
 
@@ -242,7 +266,6 @@ export default function CandidateMissionDetailPage() {
         description="Votre page de mission personnelle : statut, brief, lieu, documents et compta."
         actions={
           <>
-            <LinkButton href="/app/current-missions" variant="light">Missions en cours</LinkButton>
             {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)}>Messagerie</LinkButton> : null}
           </>
         }
@@ -311,6 +334,13 @@ export default function CandidateMissionDetailPage() {
 
       <div className="actions">
         {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)} variant="secondary">Contacter l'etablissement</LinkButton> : null}
+        <Button
+          variant="danger"
+          onClick={() => withdraw(context.application.id)}
+          disabled={['CANCELLED', 'WITHDRAWN', 'REJECTED'].includes(context.application.status)}
+        >
+          {context.application.status === 'ACCEPTED' ? 'Annuler la mission' : 'Retirer ma candidature'}
+        </Button>
       </div>
     </div>
   );
