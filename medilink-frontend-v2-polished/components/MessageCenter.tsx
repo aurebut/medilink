@@ -628,6 +628,12 @@ export function MessageCenter() {
   const mobileActionStep = workflowTimelineSteps.find((step) => (
     step.options?.length && (step.status === 'current' || step.status === 'rejected')
   )) || workflowTimelineSteps.find((step) => step.options?.length);
+  const mobileCurrentStep = workflowTimelineSteps.find((step) => step.status === 'current' || step.status === 'rejected')
+    || [...workflowTimelineSteps].reverse().find((step) => step.status === 'done')
+    || workflowTimelineSteps[0];
+  const mobileNextStep = workflowTimelineSteps.find((step) => (
+    step.key !== mobileCurrentStep?.key && (step.status === 'current' || step.status === 'waiting' || step.status === 'locked')
+  )) || null;
 
   return (
     <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -672,6 +678,9 @@ export function MessageCenter() {
           </div>
           <div className="message-toolbar-actions">
             <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+            {isMobile && mobileActionStep?.options?.length ? (
+              <MobileWorkflowHeaderAction step={mobileActionStep} />
+            ) : null}
             {isMobile ? (
               <Button
                 type="button"
@@ -686,14 +695,12 @@ export function MessageCenter() {
           </div>
         </div>
 
-        {isMobile && mobileActionStep?.options?.length ? (
-          <MobileWorkflowActionBar step={mobileActionStep} />
-        ) : null}
-
         {isMobile && mobileOptionsOpen ? (
           <MobileWorkflowMenu
             status={currentStatus}
             steps={workflowTimelineSteps}
+            currentStep={mobileCurrentStep}
+            nextStep={mobileNextStep}
             refreshAction={refreshAction}
             onClose={() => setMobileOptionsOpen(false)}
           />
@@ -771,23 +778,20 @@ export function MessageCenter() {
   );
 }
 
-function MobileWorkflowActionBar({
+function MobileWorkflowHeaderAction({
   step,
 }: {
   step: MobileTimelineStep;
 }) {
   return (
-    <div className="mobile-workflow-action-bar">
+    <div className="mobile-workflow-header-action" aria-label={`Action ${step.title}`}>
+      <span>{step.title}</span>
       <div>
-        <span>Action</span>
-        <strong>{step.title}</strong>
-      </div>
-      <div className="mobile-workflow-action-buttons">
         {step.options?.map((option) => (
           <button
             key={option.label}
             type="button"
-            className={`mobile-workflow-action-button ${option.tone ? `is-${option.tone}` : ''}`}
+            className={`mobile-workflow-header-button ${option.tone ? `is-${option.tone}` : ''}`}
             disabled={option.disabled || option.busy}
             onClick={option.onSelect}
           >
@@ -874,11 +878,15 @@ function WorkflowComposer({
 function MobileWorkflowMenu({
   status,
   steps,
+  currentStep,
+  nextStep,
   refreshAction,
   onClose,
 }: {
   status: string;
   steps: MobileTimelineStep[];
+  currentStep?: MobileTimelineStep;
+  nextStep?: MobileTimelineStep | null;
   refreshAction: MobileWorkflowOption;
   onClose: () => void;
 }) {
@@ -893,6 +901,37 @@ function MobileWorkflowMenu({
           ×
         </button>
       </div>
+      {currentStep ? (
+        <div className={`mobile-workflow-current is-${currentStep.status}`}>
+          <div className="mobile-workflow-current-title">
+            <span>Étape actuelle</span>
+            <strong>{currentStep.title}</strong>
+          </div>
+          <p>{currentStep.description}</p>
+          <div className="mobile-workflow-current-grid">
+            {currentStep.options?.length ? currentStep.options.map((option) => (
+              <div key={option.label}>
+                <span>Action attendue</span>
+                <strong>{option.label}</strong>
+                <small>{option.description}</small>
+              </div>
+            )) : (
+              <div>
+                <span>Action attendue</span>
+                <strong>Aucune action immédiate</strong>
+                <small>Le suivi se mettra à jour dès qu'une nouvelle validation sera effectuée.</small>
+              </div>
+            )}
+          </div>
+          {nextStep ? (
+            <div className="mobile-workflow-current-next">
+              <span>Suite</span>
+              <strong>{nextStep.title}</strong>
+              <small>{nextStep.description}</small>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mobile-workflow-timeline">
         {steps.map((step) => (
           <div key={step.key} className={`mobile-timeline-step is-${step.status}`}>
