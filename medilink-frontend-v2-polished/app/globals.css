@@ -4405,10 +4405,6 @@ tbody tr:hover { background: #FAFBFD; }
     overflow-x: auto;
     overscroll-behavior-x: contain;
     padding-bottom: 4px;
-    scrollbar-width: none;
-  }
-  .candidate-page-tabs.billing-tabs::-webkit-scrollbar {
-    display: none;
   }
   .candidate-page-tabs.billing-tabs button {
     flex: 0 0 auto;
@@ -6782,6 +6778,26 @@ td {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #fff;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 82, 160, 0.28) transparent;
+}
+
+.billing-tabs::-webkit-scrollbar {
+  height: 4px;
+  display: block;
+}
+
+.billing-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.billing-tabs::-webkit-scrollbar-thumb {
+  background: rgba(26, 82, 160, 0.28);
+  border-radius: 999px;
+}
+
+.billing-tabs::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 82, 160, 0.42);
 }
 
 .billing-tabs button {
