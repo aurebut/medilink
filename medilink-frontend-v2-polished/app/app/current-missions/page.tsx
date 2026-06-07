@@ -42,6 +42,13 @@ type UploadResponse = {
   headers: Record<string, string>;
 };
 
+type MissionDocumentDay = {
+  key: string;
+  label: string;
+  dateLabel: string;
+  uploadNamePrefix: string;
+};
+
 function missionStart(application: Application, agreement?: MissionAgreement | null) {
   return agreement?.startDate || application.mission?.startDate || null;
 }
@@ -117,6 +124,51 @@ function establishmentAddress(mission?: Mission) {
 
 function readableList(values?: string[] | null) {
   return values?.length ? values.join(', ') : null;
+}
+
+function localDateFromMissionDay(value?: string | null) {
+  const day = value?.slice(0, 10);
+  if (!day) return null;
+  const date = new Date(`${day}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function dayKey(value: Date) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, '0');
+  const day = String(value.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function addCalendarDays(value: Date, count: number) {
+  const date = new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  date.setDate(date.getDate() + count);
+  return date;
+}
+
+function missionDocumentDays(application: Application, agreement?: MissionAgreement | null): MissionDocumentDay[] {
+  const start = localDateFromMissionDay(missionStart(application, agreement));
+  const end = localDateFromMissionDay(missionEnd(application, agreement)) || start;
+  if (!start || !end || end < start) {
+    return [{
+      key: 'undated',
+      label: 'Journée à confirmer',
+      dateLabel: 'Planning à confirmer',
+      uploadNamePrefix: 'journee-a-confirmer',
+    }];
+  }
+
+  const days = Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000) + 1);
+  return Array.from({ length: days }, (_, index) => {
+    const date = addCalendarDays(start, index);
+    const key = dayKey(date);
+    return {
+      key,
+      label: `Jour ${index + 1}`,
+      dateLabel: formatDate(key),
+      uploadNamePrefix: key,
+    };
+  });
 }
 
 function rowPriority(row: MissionRow) {
@@ -409,22 +461,42 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 }
 
 function MissionDocumentsPanel({ row }: { row: MissionRow }) {
-  const [files, setFiles] = useState<File[]>([]);
-  const [submitting, setSubmitting] = useState(false);
+  const documentDays = useMemo(() => missionDocumentDays(row.application, row.agreement), [row.application, row.agreement]);
+  const [filesByDay, setFilesByDay] = useState<Record<string, File[]>>({});
+  const [submittingDay, setSubmittingDay] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const missionTitle = row.application.mission?.title || 'mission';
+  const selectedCount = Object.values(filesByDay).reduce((total, files) => total + files.length, 0);
 
-  async function uploadFiles() {
+  useEffect(() => {
+    setFilesByDay({});
+    setSubmittingDay(null);
+    setMessage(null);
+    setError(null);
+  }, [row.application.id, row.agreement?.id]);
+
+  function setDayFiles(dayKey: string, files: File[]) {
+    setFilesByDay((current) => ({
+      ...current,
+      [dayKey]: files,
+    }));
+    setMessage(null);
+    setError(null);
+  }
+
+  async function uploadFiles(day: MissionDocumentDay) {
+    const files = filesByDay[day.key] || [];
     if (files.length === 0) return;
-    setSubmitting(true);
+    setSubmittingDay(day.key);
     setMessage(null);
     setError(null);
     try {
       for (const file of files) {
+        const categorizedFileName = `${day.uploadNamePrefix} - ${file.name}`;
         const uploadResponse = await api.post<UploadResponse>('/documents/upload-url', {
           documentType: 'OTHER',
-          fileName: file.name,
+          fileName: categorizedFileName,
           mimeType: file.type || 'application/octet-stream',
           sizeBytes: file.size,
         });
@@ -440,12 +512,15 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
 
         await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
       }
-      setFiles([]);
-      setMessage(`${files.length} fichier(s) ajouté(s) aux documents de mission.`);
+      setFilesByDay((current) => ({
+        ...current,
+        [day.key]: [],
+      }));
+      setMessage(`${files.length} fichier(s) ajouté(s) pour ${day.label.toLowerCase()} - ${day.dateLabel}.`);
     } catch (e: any) {
       setError(e.message || 'Upload impossible.');
     } finally {
-      setSubmitting(false);
+      setSubmittingDay(null);
     }
   }
 
@@ -454,34 +529,69 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
       <div className="candidate-current-documents">
         <div>
           <span>Documents de mission</span>
-          <strong>Fichiers produits pendant la mission</strong>
-          <p>Ajoutez ici les documents générés pendant la durée de la mission {missionTitle}. Ils seront conservés dans votre dossier documents MediLink.</p>
+          <strong>Fichiers produits par journée</strong>
+          <p>Ajoutez les documents générés pendant chaque journée de la mission {missionTitle}. Chaque envoi est classé avec la date correspondante dans votre dossier documents MediLink.</p>
         </div>
-        <label className="candidate-current-dropzone">
-          <Input
-            type="file"
-            multiple
-            onChange={(event) => setFiles(Array.from(event.target.files || []))}
-          />
-          <strong>{files.length ? `${files.length} fichier(s) sélectionné(s)` : 'Sélectionner des fichiers'}</strong>
-          <span>Comptes rendus, feuilles de soin, justificatifs ou pièces utiles à transmettre.</span>
-        </label>
-        {files.length > 0 ? (
-          <div className="candidate-current-file-list">
-            {files.map((file) => (
-              <div key={`${file.name}-${file.size}`}>
-                <strong>{file.name}</strong>
-                <span>{Math.max(1, Math.round(file.size / 1024))} Ko</span>
-              </div>
-            ))}
+
+        <div className="candidate-current-doc-summary">
+          <div>
+            <span>Durée couverte</span>
+            <strong>{documentDays.length} journée{documentDays.length > 1 ? 's' : ''}</strong>
           </div>
-        ) : null}
+          <div>
+            <span>Fichiers prêts</span>
+            <strong>{selectedCount}</strong>
+          </div>
+        </div>
+
+        <div className="candidate-current-day-documents">
+          {documentDays.map((day) => {
+            const files = filesByDay[day.key] || [];
+            const isSubmitting = submittingDay === day.key;
+            return (
+              <section key={day.key} className="candidate-current-day-document">
+                <div className="candidate-current-day-head">
+                  <div>
+                    <span>{day.label}</span>
+                    <strong>{day.dateLabel}</strong>
+                  </div>
+                  <small>{files.length ? `${files.length} fichier(s)` : 'Aucun fichier'}</small>
+                </div>
+
+                <label className="candidate-current-dropzone">
+                  <Input
+                    type="file"
+                    multiple
+                    onChange={(event) => setDayFiles(day.key, Array.from(event.target.files || []))}
+                  />
+                  <strong>{files.length ? `${files.length} fichier(s) sélectionné(s)` : 'Sélectionner les documents du jour'}</strong>
+                  <span>Compte rendu, feuilles de soin, justificatifs ou pièces utiles produits ce jour-là.</span>
+                </label>
+
+                {files.length > 0 ? (
+                  <div className="candidate-current-file-list">
+                    {files.map((file) => (
+                      <div key={`${day.key}-${file.name}-${file.size}`}>
+                        <strong>{file.name}</strong>
+                        <span>{Math.max(1, Math.round(file.size / 1024))} Ko</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                <div className="actions">
+                  <Button type="button" disabled={files.length === 0 || Boolean(submittingDay)} onClick={() => void uploadFiles(day)}>
+                    {isSubmitting ? 'Envoi...' : 'Envoyer cette journée'}
+                  </Button>
+                </div>
+              </section>
+            );
+          })}
+        </div>
+
         {message ? <Alert type="success">{message}</Alert> : null}
         {error ? <Alert type="error">{error}</Alert> : null}
         <div className="actions">
-          <Button type="button" disabled={files.length === 0 || submitting} onClick={() => void uploadFiles()}>
-            {submitting ? 'Envoi...' : 'Envoyer les fichiers'}
-          </Button>
           <LinkButton href="/app/profile" variant="light">Voir mon dossier</LinkButton>
         </div>
       </div>

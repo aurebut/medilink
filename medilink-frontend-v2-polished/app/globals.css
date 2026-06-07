@@ -1214,6 +1214,59 @@ button { touch-action: manipulation; }
   line-height: 1.5;
 }
 
+.candidate-current-doc-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.candidate-current-doc-summary > div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.candidate-current-doc-summary span,
+.candidate-current-day-head span,
+.candidate-current-day-head small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.candidate-current-day-documents {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.candidate-current-day-document {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.candidate-current-day-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.candidate-current-day-head > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
 .candidate-current-dropzone {
   display: grid;
   gap: 9px;
@@ -1301,7 +1354,9 @@ button { touch-action: manipulation; }
 
   .candidate-current-grid,
   .candidate-current-info,
-  .candidate-current-detail-grid {
+  .candidate-current-detail-grid,
+  .candidate-current-doc-summary,
+  .candidate-current-day-documents {
     grid-template-columns: 1fr;
   }
 
