@@ -214,8 +214,8 @@ export default function EstablishmentDashboardPage() {
           <Card className="dashboard-focus-card">
             <div className="dashboard-section-head">
               <div>
-                <span>Candidatures</span>
-                <h2>Dossiers reçus</h2>
+                <span>Recrutement</span>
+                <h2>Candidatures</h2>
               </div>
               <LinkButton variant="light" href="/establishment/applications">Tout voir</LinkButton>
             </div>
@@ -307,64 +307,35 @@ export default function EstablishmentDashboardPage() {
           <Card className="dashboard-panel dashboard-missions-panel">
             <div className="toolbar">
               <div>
-                <h2>Candidatures récentes</h2>
-                <p className="small">Les profils qui méritent votre attention en premier.</p>
+                <h2>Suivi des missions</h2>
+                <p className="small">Publication, remplissage et prochaines dates.</p>
               </div>
-              <LinkButton variant="light" href="/establishment/applications">Tout voir</LinkButton>
+              <LinkButton variant="light" href="/establishment/missions">Tout voir</LinkButton>
             </div>
-            {dashboard.sortedApplications.length > 0 ? (
+            {dashboard.missionPipeline.length > 0 ? (
               <div className="dashboard-list">
-                {dashboard.sortedApplications.slice(0, 5).map((application) => (
-                  <div key={application.id} className="dashboard-list-item">
+                {dashboard.missionPipeline.map(({ mission, pendingCount, acceptedCount }) => (
+                  <div key={mission.id} className="dashboard-list-item">
                     <div>
-                      <strong>{candidateName(application)}</strong>
-                      <span>{application.mission?.title || 'Mission à confirmer'}</span>
+                      <strong>{mission.title}</strong>
+                      <span>{formatShortDate(mission.startDate)} &bull; {pendingCount} à traiter &bull; {acceptedCount} validée(s)</span>
                     </div>
                     <div className="dashboard-list-meta">
-                      <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
-                      <span className="small">{formatDate(application.updatedAt || application.createdAt)}</span>
+                      <Badge tone={missionTone(mission.status)}>{statusLabel(mission.status)}</Badge>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
               <div className="dashboard-empty">
-                <strong>Aucune candidature reçue</strong>
-                <p>Vos prochains profils apparaîtront ici dès qu'une mission publiée attirera des candidats.</p>
+                <strong>Aucune mission</strong>
+                <p>Créez une première mission pour lancer vos recrutements.</p>
                 <LinkButton variant="secondary" href="/establishment/missions/new">Créer une mission</LinkButton>
               </div>
             )}
           </Card>
 
           <div className="dashboard-admin-column">
-            <Card className="dashboard-panel">
-              <div className="toolbar">
-                <div>
-                  <h2>Suivi des missions</h2>
-                  <p className="small">Publication, remplissage et prochaines dates.</p>
-                </div>
-                <LinkButton variant="light" href="/establishment/missions">Tout voir</LinkButton>
-              </div>
-              {dashboard.missionPipeline.length > 0 ? (
-                <div className="dashboard-mini-list establishment-mission-list">
-                  {dashboard.missionPipeline.map(({ mission, pendingCount, acceptedCount }) => (
-                    <div key={mission.id}>
-                      <span>
-                        <strong>{mission.title}</strong>
-                        <small>{formatShortDate(mission.startDate)} - {pendingCount} à traiter - {acceptedCount} validée(s)</small>
-                      </span>
-                      <Badge tone={missionTone(mission.status)}>{statusLabel(mission.status)}</Badge>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="dashboard-empty compact">
-                  <strong>Aucune mission</strong>
-                  <p>Créez une première mission pour lancer vos recrutements.</p>
-                </div>
-              )}
-            </Card>
-
             <Card className="dashboard-panel">
               <div className="toolbar">
                 <div>
