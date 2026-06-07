@@ -2263,6 +2263,51 @@ button { touch-action: manipulation; }
   gap: 16px;
   overflow: hidden;
 }
+.establishment-priority-card {
+  min-height: 0;
+}
+.establishment-priority-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .72fr);
+  gap: 16px;
+  align-items: stretch;
+}
+.establishment-priority-copy {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.establishment-priority-copy p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.compact-readiness {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.establishment-mission-list > div {
+  align-items: flex-start;
+}
+.establishment-mission-list span {
+  min-width: 0;
+}
+.establishment-mission-list strong,
+.establishment-mission-list small {
+  display: block;
+}
+.establishment-mission-list strong {
+  overflow: hidden;
+  color: var(--heading);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.establishment-mission-list small {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
 .week-carousel {
   display: flex;
   gap: 14px;
@@ -3496,6 +3541,7 @@ tbody tr:hover { background: #FAFBFD; }
   .dashboard-notification-grid,
   .dashboard-command-grid,
   .dashboard-operations-grid,
+  .establishment-priority-grid,
   .agenda-workspace {
     grid-template-columns: 1fr;
   }
@@ -5636,6 +5682,9 @@ td {
   .dashboard-week-card {
     margin-left: -2px;
     margin-right: -2px;
+  }
+  .compact-readiness {
+    grid-template-columns: 1fr;
   }
   .week-carousel {
     margin: 0 -2px;
