@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import { formatDate, formatDateTime } from '@/lib/format';
+import { formatDateTime } from '@/lib/format';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Mission } from '@/lib/types';
@@ -303,69 +303,6 @@ export default function EstablishmentDashboardPage() {
           </Card>
         </section>
 
-        <section className="dashboard-operations-grid">
-          <Card className="dashboard-panel dashboard-missions-panel">
-            <div className="toolbar">
-              <div>
-                <h2>Suivi des missions</h2>
-                <p className="small">Publication, remplissage et prochaines dates.</p>
-              </div>
-              <LinkButton variant="light" href="/establishment/missions">Tout voir</LinkButton>
-            </div>
-            {dashboard.missionPipeline.length > 0 ? (
-              <div className="dashboard-list">
-                {dashboard.missionPipeline.map(({ mission, pendingCount, acceptedCount }) => (
-                  <div key={mission.id} className="dashboard-list-item">
-                    <div>
-                      <strong>{mission.title}</strong>
-                      <span>{formatShortDate(mission.startDate)} &bull; {pendingCount} à traiter &bull; {acceptedCount} validée(s)</span>
-                    </div>
-                    <div className="dashboard-list-meta">
-                      <Badge tone={missionTone(mission.status)}>{statusLabel(mission.status)}</Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="dashboard-empty">
-                <strong>Aucune mission</strong>
-                <p>Créez une première mission pour lancer vos recrutements.</p>
-                <LinkButton variant="secondary" href="/establishment/missions/new">Créer une mission</LinkButton>
-              </div>
-            )}
-          </Card>
-
-          <div className="dashboard-admin-column">
-            <Card className="dashboard-panel">
-              <div className="toolbar">
-                <div>
-                  <h2>Fiche établissement</h2>
-                  <p className="small">Les repères visibles par les candidats.</p>
-                </div>
-                <LinkButton variant="light" href={`/establishment/edit/${primary.id}`}>Modifier</LinkButton>
-              </div>
-              <div className="dashboard-dossier-summary">
-                <div>
-                  <span>Statut</span>
-                  <strong>{statusLabel(primary.verificationStatus)}</strong>
-                </div>
-                <div>
-                  <span>Ville</span>
-                  <strong>{primary.city || 'À renseigner'}</strong>
-                </div>
-                <div>
-                  <span>Complétion</span>
-                  <strong>{establishmentReady ? 'Prête' : `${completionScore}%`}</strong>
-                </div>
-              </div>
-              <div className="dashboard-feature">
-                <span>Présentation</span>
-                <strong>{primary.city || 'Ville à renseigner'}</strong>
-                <p>{primary.description || 'Ajoutez une présentation pour donner davantage de contexte aux candidats.'}</p>
-              </div>
-            </Card>
-          </div>
-        </section>
       </div>
     </>
   );
