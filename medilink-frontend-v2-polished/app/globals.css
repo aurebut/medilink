@@ -4363,6 +4363,123 @@ tbody tr:hover { background: #FAFBFD; }
     padding: 12px;
     font-size: 16px;
   }
+  .grid-main,
+  .grid-main > *,
+  .current-mission-selector-card,
+  .candidate-current-layout,
+  .candidate-current-detail,
+  .candidate-current-unified,
+  .candidate-current-tab-panel,
+  .candidate-current-pilotage-grid,
+  .candidate-current-route,
+  .candidate-current-documents,
+  .candidate-current-panel,
+  .candidate-current-info > div,
+  .candidate-current-detail-grid > div {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .current-mission-selector-card,
+  .candidate-current-unified,
+  .candidate-current-route,
+  .candidate-current-documents,
+  .candidate-current-panel,
+  .candidate-current-info > div,
+  .candidate-current-detail-grid > div {
+    padding: 12px;
+  }
+  .current-mission-picker-head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .current-mission-picker-head .badge {
+    justify-self: start;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .candidate-page-tabs.billing-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .candidate-page-tabs.billing-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .candidate-page-tabs.billing-tabs button {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding: 9px 12px;
+    white-space: nowrap;
+  }
+  .candidate-command-strip,
+  .candidate-current-grid,
+  .candidate-current-info,
+  .candidate-current-doc-summary,
+  .candidate-current-day-documents,
+  .candidate-current-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .candidate-command-strip {
+    gap: 10px;
+    padding: 12px;
+  }
+  .candidate-command-main h2 {
+    font-size: 20px;
+  }
+  .candidate-command-actions,
+  .candidate-current-tab-panel > div[style*="space-between"] {
+    align-items: stretch !important;
+    flex-direction: column;
+    justify-content: flex-start !important;
+  }
+  .candidate-command-actions .btn,
+  .candidate-command-actions a.btn,
+  .candidate-current-tab-panel .btn {
+    width: 100%;
+    min-width: 0;
+  }
+  .candidate-current-route-head,
+  .candidate-current-route-title,
+  .candidate-current-day-head,
+  .candidate-current-file-list > div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .candidate-current-route-head small {
+    max-width: none;
+    text-align: left;
+  }
+  .candidate-current-route-title small {
+    width: fit-content;
+    max-width: 100%;
+  }
+  .candidate-current-route-list > div {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 10px;
+  }
+  .candidate-current-route-list > div::before {
+    left: 13px;
+    top: 28px;
+  }
+  .candidate-current-route-list > div > span {
+    width: 28px;
+    height: 28px;
+  }
+  .candidate-current-route strong,
+  .candidate-current-panel strong,
+  .candidate-current-detail-grid strong,
+  .candidate-current-info h3 {
+    overflow-wrap: anywhere;
+  }
+  .candidate-current-file-list .btn,
+  .candidate-current-documents .btn {
+    width: 100%;
+  }
   .wizard-panel {
     gap: 16px;
   }
