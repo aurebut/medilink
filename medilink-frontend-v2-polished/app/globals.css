@@ -3429,6 +3429,7 @@ tbody tr:hover { background: #FAFBFD; }
 .mobile-conversation-back { display: none; flex: 0 0 auto; }
 .message-toolbar-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex: 0 0 auto; }
 .mobile-workflow-toggle { display: none; flex: 0 0 auto; }
+.mobile-workflow-action-bar { display: none; }
 .mobile-workflow-menu { display: none; }
 .messages { flex: 1; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 14px 2px; }
 .message { max-width: 72%; border-radius: 12px 12px 12px 4px; padding: 12px 14px; background: #F2F4F8; border: 1px solid #E4E9F2; }
@@ -4450,18 +4451,88 @@ tbody tr:hover { background: #FAFBFD; }
     line-height: 1.15;
   }
   .message-layout-mobile-active .message-toolbar-actions {
-    max-width: 48%;
+    max-width: 52%;
+    align-items: stretch;
   }
   .message-layout-mobile-active .message-toolbar-actions > .badge {
-    max-width: 112px;
+    max-width: 124px;
     white-space: normal;
     text-align: center;
     line-height: 1.15;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .message-layout-mobile-active .mobile-workflow-toggle {
     display: inline-flex;
     min-height: 36px;
     padding: 0 10px;
+  }
+  .message-layout-mobile-active .mobile-workflow-action-bar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(18,35,58,.08);
+    background: #F7FAFC;
+  }
+  .mobile-workflow-action-bar > div:first-child {
+    min-width: 0;
+    display: grid;
+    gap: 1px;
+  }
+  .mobile-workflow-action-bar span {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  .mobile-workflow-action-bar strong {
+    color: var(--heading);
+    font-size: 13px;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  .mobile-workflow-action-buttons {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    max-width: 68%;
+  }
+  .mobile-workflow-action-button {
+    min-height: 36px;
+    padding: 0 11px;
+    border: 1px solid rgba(26,82,160,.22);
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.1;
+    white-space: normal;
+    cursor: pointer;
+  }
+  .mobile-workflow-action-button.is-success {
+    border-color: rgba(14,138,122,.26);
+    background: #0B6F62;
+  }
+  .mobile-workflow-action-button.is-danger {
+    border-color: #FECACA;
+    background: #B42318;
+  }
+  .mobile-workflow-action-button.is-light {
+    border-color: var(--line);
+    background: #fff;
+    color: var(--text);
+  }
+  .mobile-workflow-action-button:disabled {
+    opacity: .55;
+    cursor: not-allowed;
   }
   .message-layout-mobile-active .mobile-workflow-menu {
     display: grid;
@@ -4777,6 +4848,35 @@ tbody tr:hover { background: #FAFBFD; }
 
 @media (max-width: 430px) {
   .container { width: min(100% - 20px, 1180px); }
+  .message-layout-mobile-active .message-pane > .toolbar {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+  .message-layout-mobile-active .message-heading {
+    gap: 7px;
+  }
+  .message-layout-mobile-active .mobile-conversation-back {
+    min-height: 34px;
+    padding-inline: 9px;
+  }
+  .message-layout-mobile-active .message-toolbar-actions {
+    gap: 6px;
+    max-width: 56%;
+  }
+  .message-layout-mobile-active .message-toolbar-actions > .badge {
+    max-width: 108px;
+    padding-inline: 7px;
+    font-size: 11px;
+  }
+  .message-layout-mobile-active .mobile-workflow-toggle {
+    max-width: 88px;
+    padding-inline: 8px;
+    font-size: 11px;
+    white-space: normal;
+  }
+  .message-layout-mobile-active .mobile-workflow-action-bar {
+    padding-inline: 10px;
+  }
   .public-nav {
     align-items: stretch;
     flex-direction: column;

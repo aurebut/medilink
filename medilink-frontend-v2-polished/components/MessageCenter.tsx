@@ -625,6 +625,9 @@ export function MessageCenter() {
           : undefined,
     },
   ];
+  const mobileActionStep = workflowTimelineSteps.find((step) => (
+    step.options?.length && (step.status === 'current' || step.status === 'rejected')
+  )) || workflowTimelineSteps.find((step) => step.options?.length);
 
   return (
     <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -677,11 +680,15 @@ export function MessageCenter() {
                 aria-expanded={mobileOptionsOpen}
                 onClick={() => setMobileOptionsOpen((open) => !open)}
               >
-                Options
+                Plus de détails
               </Button>
             ) : null}
           </div>
         </div>
+
+        {isMobile && mobileActionStep?.options?.length ? (
+          <MobileWorkflowActionBar step={mobileActionStep} />
+        ) : null}
 
         {isMobile && mobileOptionsOpen ? (
           <MobileWorkflowMenu
@@ -760,6 +767,34 @@ export function MessageCenter() {
           <Button disabled={sendingMessage || !body.trim()}>{sendingMessage ? 'Envoi...' : 'Envoyer'}</Button>
         </form>
       </Card> : null}
+    </div>
+  );
+}
+
+function MobileWorkflowActionBar({
+  step,
+}: {
+  step: MobileTimelineStep;
+}) {
+  return (
+    <div className="mobile-workflow-action-bar">
+      <div>
+        <span>Action</span>
+        <strong>{step.title}</strong>
+      </div>
+      <div className="mobile-workflow-action-buttons">
+        {step.options?.map((option) => (
+          <button
+            key={option.label}
+            type="button"
+            className={`mobile-workflow-action-button ${option.tone ? `is-${option.tone}` : ''}`}
+            disabled={option.disabled || option.busy}
+            onClick={option.onSelect}
+          >
+            {option.busy && option.busyLabel ? option.busyLabel : option.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -868,13 +903,6 @@ function MobileWorkflowMenu({
                 <span>{timelineStatusLabel(step.status)}</span>
               </div>
               <p>{step.description}</p>
-              {step.options?.length ? (
-                <div className="mobile-workflow-options">
-                  {step.options.map((option) => (
-                    <MobileWorkflowOptionButton key={option.label} option={option} onClose={onClose} />
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
         ))}
