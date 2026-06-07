@@ -124,7 +124,6 @@ export function PlatformSplash({ label = 'Préparation de votre espace' }: { lab
         <LoadingEmblem />
         <div className="platform-splash-copy">
           <strong>{label}</strong>
-          <span>Synchronisation des données essentielles</span>
         </div>
       </div>
     </div>
