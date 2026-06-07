@@ -38,6 +38,67 @@ const adminNav: NavItem[] = [
   { href: '/admin/missions', label: 'Missions', icon: 'M' },
 ];
 
+const WARMED_PATH_TTL_MS = 60_000;
+const warmedPaths = new Map<string, number>();
+
+function warmApi(paths: string[]) {
+  const now = Date.now();
+  paths.forEach((path) => {
+    const warmedAt = warmedPaths.get(path);
+    if (warmedAt && now - warmedAt < WARMED_PATH_TTL_MS) return;
+    warmedPaths.set(path, now);
+    api.preload(path);
+  });
+}
+
+function idleWarm(paths: string[]) {
+  if (typeof window === 'undefined') return;
+
+  const warm = () => warmApi(paths);
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    cancelIdleCallback?: (id: number) => void;
+  };
+
+  if (idleWindow.requestIdleCallback && idleWindow.cancelIdleCallback) {
+    const id = idleWindow.requestIdleCallback(warm, { timeout: 1800 });
+    return () => idleWindow.cancelIdleCallback?.(id);
+  }
+
+  const id = window.setTimeout(warm, 500);
+  return () => window.clearTimeout(id);
+}
+
+function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: string) {
+  if (area === 'candidate') {
+    if (href === '/app/dashboard') return ['/me/dashboard'];
+    if (href === '/app/search') return ['/missions?limit=50'];
+    if (href === '/app/profile') return ['/me/profile', '/me/documents'];
+    if (href === '/app/notifications') return ['/notifications'];
+    if (href === '/app/messages') return ['/conversations'];
+    if (href === '/app/agenda' || href === '/app/current-missions' || href === '/app/billing' || href === '/app/missions') {
+      return ['/me/applications', '/conversations'];
+    }
+  }
+
+  if (area === 'establishment') {
+    if (href === '/establishment/dashboard') return ['/establishment/dashboard'];
+    if (href === '/establishment/notifications') return ['/notifications'];
+    if (href === '/establishment/messages') return ['/conversations'];
+    if (
+      href === '/establishment/agenda' ||
+      href === '/establishment/missions' ||
+      href === '/establishment/current-missions' ||
+      href === '/establishment/billing' ||
+      href === '/establishment/onboarding'
+    ) {
+      return ['/establishment/dashboard', '/conversations'];
+    }
+  }
+
+  return [];
+}
+
 function areaLabel(area: 'candidate' | 'establishment' | 'admin', profile?: Pick<Profile, 'candidateGender'> | null) {
   if (area === 'candidate') return candidateAreaLabel(profile);
   if (area === 'establishment') return 'Espace établissement';
@@ -188,6 +249,11 @@ export function AppShell({
     }
   }
 
+  function warmRoute(href: string) {
+    router.prefetch(href);
+    warmApi(warmPathsForRoute(area, href));
+  }
+
   useEffect(() => {
     function onDocumentClick(event: MouseEvent) {
       if (!accountMenuRef.current?.contains(event.target as Node)) {
@@ -244,11 +310,26 @@ export function AppShell({
       .catch(() => setCandidateProfile(null));
   }, [area, user?.role]);
 
+  useEffect(() => {
+    if (!user || area === 'admin') return;
+
+    if (area === 'candidate') {
+      return idleWarm(['/me/dashboard', '/me/applications', '/conversations', '/notifications']);
+    }
+
+    return idleWarm(['/establishment/dashboard', '/conversations', '/notifications']);
+  }, [area, user]);
+
   return (
     <div className="shell">
       <aside className={`sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-head">
-          <Link href={userHomeHref} className="brand">
+          <Link
+            href={userHomeHref}
+            className="brand"
+            onFocus={() => warmRoute(userHomeHref)}
+            onMouseEnter={() => warmRoute(userHomeHref)}
+          >
             <span>
               Medi<em>Link</em>
             </span>
@@ -265,6 +346,8 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={`sidebar-link ${active ? 'active' : ''}`}
+                onFocus={() => warmRoute(item.href)}
+                onMouseEnter={() => warmRoute(item.href)}
                 onClick={() => setMobileNavOpen(false)}
               >
                 <span className="nav-main">
@@ -285,11 +368,23 @@ export function AppShell({
               </span>
             </div>
             <div className="mobile-menu-actions">
-              <Link href={userProfileHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+              <Link
+                href={userProfileHref}
+                className="account-menu-item"
+                onFocus={() => warmRoute(userProfileHref)}
+                onMouseEnter={() => warmRoute(userProfileHref)}
+                onClick={() => setMobileNavOpen(false)}
+              >
                 <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
-              <Link href={userAccountHref} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+              <Link
+                href={userAccountHref}
+                className="account-menu-item"
+                onFocus={() => warmRoute(userAccountHref)}
+                onMouseEnter={() => warmRoute(userAccountHref)}
+                onClick={() => setMobileNavOpen(false)}
+              >
                 <span>Paramètres du compte</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
@@ -326,7 +421,13 @@ export function AppShell({
                         Tout effacer
                       </button>
                     ) : null}
-                    <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
+                <Link
+                  href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"}
+                  className="notification-menu-link"
+                  onFocus={() => warmRoute(area === 'candidate' ? "/app/notifications" : "/establishment/notifications")}
+                  onMouseEnter={() => warmRoute(area === 'candidate' ? "/app/notifications" : "/establishment/notifications")}
+                  onClick={() => setNotificationsOpen(false)}
+                >
                       Voir plus
                     </Link>
                   </div>
@@ -434,15 +535,36 @@ export function AppShell({
                 </span>
               </div>
               <div className="account-menu-section">
-                <Link href={userProfileHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                <Link
+                  href={userProfileHref}
+                  className="account-menu-item"
+                  role="menuitem"
+                  onFocus={() => warmRoute(userProfileHref)}
+                  onMouseEnter={() => warmRoute(userProfileHref)}
+                  onClick={() => setAccountMenuOpen(false)}
+                >
                   <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
-                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                <Link
+                  href={userAccountHref}
+                  className="account-menu-item"
+                  role="menuitem"
+                  onFocus={() => warmRoute(userAccountHref)}
+                  onMouseEnter={() => warmRoute(userAccountHref)}
+                  onClick={() => setAccountMenuOpen(false)}
+                >
                   <span>Paramètres du compte</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
-                <Link href={userAccountHref} className="account-menu-item" role="menuitem" onClick={() => setAccountMenuOpen(false)}>
+                <Link
+                  href={userAccountHref}
+                  className="account-menu-item"
+                  role="menuitem"
+                  onFocus={() => warmRoute(userAccountHref)}
+                  onMouseEnter={() => warmRoute(userAccountHref)}
+                  onClick={() => setAccountMenuOpen(false)}
+                >
                   <span>Sécurité et mot de passe</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>

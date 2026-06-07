@@ -21,7 +21,7 @@ type CacheEntry = {
   promise: Promise<unknown>;
 };
 
-const GET_CACHE_TTL_MS = 15_000;
+const GET_CACHE_TTL_MS = 60_000;
 const getCache = new Map<string, CacheEntry>();
 
 function cacheKey(path: string) {
@@ -62,11 +62,13 @@ export function getApiUrl(path: string) {
 
 export function setAuthToken(token: string) {
   if (typeof window === 'undefined') return;
+  clearApiCache();
   window.localStorage.setItem(AUTH_TOKEN_KEY, token);
 }
 
 export function clearAuthToken() {
   if (typeof window === 'undefined') return;
+  clearApiCache();
   window.localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
@@ -133,6 +135,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 
 export const api = {
   get: <T>(path: string) => apiFetch<T>(path, { method: 'GET' }),
+  preload: (path: string) => { void apiFetch(path, { method: 'GET' }).catch(() => undefined); },
   post: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body }),
   patch: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body }),
   delete: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE' }),
