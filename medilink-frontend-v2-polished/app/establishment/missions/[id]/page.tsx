@@ -4,37 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionShareActions } from '@/components/MissionShareActions';
-import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateNoun } from '@/lib/grammar';
-import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLevelOptions, statusLabel } from '@/lib/labels';
+import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getMissionPublicPath } from '@/lib/mission-links';
-import { sectorOptions, specialtyOptions } from '@/lib/profile-options';
-import type { Application, ApplicationStatus, Mission, MissionType, RequiredLevel } from '@/lib/types';
-
-type MissionForm = {
-  title: string;
-  description: string;
-  missionType: MissionType;
-  specialty: string;
-  requiredLevel: RequiredLevel;
-  city: string;
-  location: string;
-  sector: string;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
-  durationHours: string;
-  retrocessionPercentage: string;
-  departmentInfo: string;
-  teamInfo: string;
-  equipmentInfo: string;
-  practicalInfo: string;
-  patientType: string;
-  softwareUsed: string;
-};
+import type { Application, ApplicationStatus, Mission } from '@/lib/types';
 
 function applicationTone(status: ApplicationStatus) {
   if (status === 'ACCEPTED') return 'success';
@@ -48,35 +24,6 @@ function missionTone(status: Mission['status']) {
   if (status === 'PAUSED') return 'warning';
   if (status === 'ARCHIVED') return 'neutral';
   return 'warning';
-}
-
-function dateInput(value?: string | null) {
-  return value?.slice(0, 10) || '';
-}
-
-function missionToForm(mission: Mission): MissionForm {
-  return {
-    title: mission.title || '',
-    description: mission.description || '',
-    missionType: mission.missionType,
-    specialty: mission.specialty || '',
-    requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel,
-    city: mission.city || '',
-    location: mission.location || '',
-    sector: mission.sector || '',
-    startDate: dateInput(mission.startDate),
-    endDate: dateInput(mission.endDate),
-    startTime: mission.startTime || '',
-    endTime: mission.endTime || '',
-    durationHours: mission.durationHours ? String(mission.durationHours) : '',
-    retrocessionPercentage: mission.retrocessionPercentage ? String(mission.retrocessionPercentage) : '',
-    departmentInfo: mission.departmentInfo || '',
-    teamInfo: mission.teamInfo || '',
-    equipmentInfo: mission.equipmentInfo || '',
-    practicalInfo: mission.practicalInfo || '',
-    patientType: mission.patientType || '',
-    softwareUsed: mission.softwareUsed || '',
-  };
 }
 
 function candidateName(application: Application) {
@@ -93,46 +40,12 @@ function missionSchedule(mission: Mission) {
   return hours ? `${dates} - ${hours}` : dates;
 }
 
-function optionalText(value: string) {
-  const next = value.trim();
-  return next || null;
-}
-
-function cleanPayload(form: MissionForm) {
-  return {
-    title: form.title.trim(),
-    description: optionalText(form.description),
-    missionType: form.missionType,
-    specialty: form.specialty,
-    requiredLevel: form.requiredLevel,
-    requiredLevels: [form.requiredLevel],
-    city: form.city.trim(),
-    location: optionalText(form.location),
-    sector: form.sector || null,
-    startDate: form.startDate,
-    endDate: form.endDate || undefined,
-    startTime: form.startTime || null,
-    endTime: form.endTime || null,
-    durationHours: form.durationHours ? Number(form.durationHours) : null,
-    compensationMode: 'RETROCESSION',
-    retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : undefined,
-    departmentInfo: optionalText(form.departmentInfo),
-    teamInfo: optionalText(form.teamInfo),
-    equipmentInfo: optionalText(form.equipmentInfo),
-    practicalInfo: optionalText(form.practicalInfo),
-    patientType: optionalText(form.patientType),
-    softwareUsed: optionalText(form.softwareUsed),
-  };
-}
-
 export default function EstablishmentMissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [mission, setMission] = useState<Mission | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [form, setForm] = useState<MissionForm | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [statusBusy, setStatusBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -144,7 +57,6 @@ export default function EstablishmentMissionDetailPage() {
     try {
       const nextMission = await api.get<Mission>(`/missions/mine/${id}`);
       setMission(nextMission);
-      setForm(missionToForm(nextMission));
 
       try {
         const allApplications = await api.get<Application[]>(`/establishment/applications?establishmentId=${nextMission.establishmentId}`);
@@ -155,7 +67,6 @@ export default function EstablishmentMissionDetailPage() {
     } catch (e: any) {
       setError(e.message);
       setMission(null);
-      setForm(null);
     } finally {
       setLoading(false);
     }
@@ -172,33 +83,6 @@ export default function EstablishmentMissionDetailPage() {
       rejected: applications.filter((application) => application.status === 'REJECTED').length,
     };
   }, [applications]);
-
-  function set(name: keyof MissionForm, value: string) {
-    setForm((current) => current ? { ...current, [name]: value } : current);
-  }
-
-  async function save() {
-    if (!form) return;
-    if (!form.title.trim() || !form.specialty || !form.city.trim() || !form.startDate || !form.retrocessionPercentage) {
-      setError('Titre, spécialité, ville, date de début et rétrocession sont requis.');
-      return;
-    }
-
-    setSaving(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const updated = await api.patch<Mission>(`/missions/${id}`, cleanPayload(form));
-      setMission(updated);
-      setForm(missionToForm(updated));
-      setSuccess('Annonce mise à jour.');
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function changeStatus(action: 'publish' | 'pause' | 'archive') {
     setStatusBusy(action);
@@ -218,7 +102,7 @@ export default function EstablishmentMissionDetailPage() {
 
   if (loading) return <LoadingCard label="Chargement de la mission..." />;
 
-  if (!mission || !form) {
+  if (!mission) {
     return (
       <>
         <PageHeader title="Mission" description="Impossible de charger cette mission établissement." />
@@ -239,6 +123,7 @@ export default function EstablishmentMissionDetailPage() {
         actions={
           <>
             <LinkButton variant="light" href="/establishment/missions">Toutes les missions</LinkButton>
+            <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
             {mission.status === 'PUBLISHED' ? <LinkButton variant="light" href={getMissionPublicPath(mission.id)}>Voir le public</LinkButton> : null}
           </>
         }
@@ -326,6 +211,7 @@ export default function EstablishmentMissionDetailPage() {
           </div>
           <div className="establishment-action-stack">
             <LinkButton href="/establishment/applications" variant="secondary">Voir les candidatures</LinkButton>
+            <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
             <LinkButton href="/establishment/messages" variant="light">Messagerie</LinkButton>
             {mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} showUrl /> : null}
             <MissionDeleteButton mission={mission} onDeleted={() => router.push('/establishment/missions')} />
@@ -333,106 +219,7 @@ export default function EstablishmentMissionDetailPage() {
         </Card>
       </div>
 
-      <div className="establishment-mission-workspace">
-        <Card className="establishment-edit-panel">
-          <div className="toolbar">
-            <div>
-              <h2>Modifier l'annonce</h2>
-              <p className="small">Ces champs alimentent la page publique et la présentation dans les espaces candidats.</p>
-            </div>
-            <Button type="button" disabled={saving} onClick={() => void save()}>
-              {saving ? 'Enregistrement...' : 'Enregistrer'}
-            </Button>
-          </div>
-
-          <div className="form">
-            <div className="form-row">
-              <Field label="Titre">
-                <Input value={form.title} onChange={(event) => set('title', event.target.value)} />
-              </Field>
-              <Field label="Type de mission">
-                <Select value={form.missionType} onChange={(event) => set('missionType', event.target.value as MissionType)}>
-                  {missionTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </Select>
-              </Field>
-            </div>
-            <div className="form-row">
-              <Field label="Spécialité">
-                <Select value={form.specialty} onChange={(event) => set('specialty', event.target.value)}>
-                  <option value="">Sélectionner</option>
-                  {specialtyOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </Select>
-              </Field>
-              <Field label="Profil recherché">
-                <Select value={form.requiredLevel} onChange={(event) => set('requiredLevel', event.target.value as RequiredLevel)}>
-                  {requiredLevelOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </Select>
-              </Field>
-            </div>
-            <Field label="Description">
-              <Textarea rows={5} value={form.description} onChange={(event) => set('description', event.target.value)} />
-            </Field>
-            <div className="form-row">
-              <Field label="Ville">
-                <Input value={form.city} onChange={(event) => set('city', event.target.value)} />
-              </Field>
-              <Field label="Secteur conventionné">
-                <Select value={form.sector} onChange={(event) => set('sector', event.target.value)}>
-                  <option value="">Non précisé</option>
-                  {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                </Select>
-              </Field>
-            </div>
-            <Field label="Lieu précis">
-              <Input value={form.location} onChange={(event) => set('location', event.target.value)} />
-            </Field>
-            <div className="form-row">
-              <Field label="Date début">
-                <Input type="date" value={form.startDate} onChange={(event) => set('startDate', event.target.value)} />
-              </Field>
-              <Field label="Date fin">
-                <Input type="date" value={form.endDate} onChange={(event) => set('endDate', event.target.value)} />
-              </Field>
-            </div>
-            <div className="form-row">
-              <Field label="Heure début">
-                <Input type="time" value={form.startTime} onChange={(event) => set('startTime', event.target.value)} />
-              </Field>
-              <Field label="Heure fin">
-                <Input type="time" value={form.endTime} onChange={(event) => set('endTime', event.target.value)} />
-              </Field>
-            </div>
-            <div className="form-row">
-              <Field label="Durée estimée">
-                <Input type="number" min={1} max={72} value={form.durationHours} onChange={(event) => set('durationHours', event.target.value)} />
-              </Field>
-              <Field label="Rétrocession">
-                <Input type="number" min={1} max={100} value={form.retrocessionPercentage} onChange={(event) => set('retrocessionPercentage', event.target.value)} />
-              </Field>
-            </div>
-            <div className="form-row">
-              <Field label="Patientèle">
-                <Input value={form.patientType} onChange={(event) => set('patientType', event.target.value)} />
-              </Field>
-              <Field label="Logiciel">
-                <Input value={form.softwareUsed} onChange={(event) => set('softwareUsed', event.target.value)} />
-              </Field>
-            </div>
-            <Field label="Service / département">
-              <Textarea rows={3} value={form.departmentInfo} onChange={(event) => set('departmentInfo', event.target.value)} />
-            </Field>
-            <Field label="Équipe sur place">
-              <Textarea rows={3} value={form.teamInfo} onChange={(event) => set('teamInfo', event.target.value)} />
-            </Field>
-            <Field label="Matériel disponible">
-              <Textarea rows={3} value={form.equipmentInfo} onChange={(event) => set('equipmentInfo', event.target.value)} />
-            </Field>
-            <Field label="Informations pratiques">
-              <Textarea rows={3} value={form.practicalInfo} onChange={(event) => set('practicalInfo', event.target.value)} />
-            </Field>
-          </div>
-        </Card>
-
+      <div className="establishment-mission-workspace compact-workspace">
         <Card className="establishment-applications-panel">
           <div className="toolbar">
             <div>

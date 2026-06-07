@@ -2363,7 +2363,6 @@ button { touch-action: manipulation; }
 }
 .establishment-mission-preview,
 .establishment-mission-side,
-.establishment-edit-panel,
 .establishment-applications-panel {
   display: grid;
   gap: 16px;
@@ -2385,12 +2384,44 @@ button { touch-action: manipulation; }
   gap: 16px;
   align-items: start;
 }
-.establishment-edit-panel .form {
-  gap: 14px;
+.establishment-mission-workspace.compact-workspace {
+  grid-template-columns: 1fr;
 }
 .establishment-applications-panel .dashboard-list-meta .btn {
   min-height: 34px;
   padding: 7px 11px;
+}
+.edit-mission-page {
+  display: grid;
+  gap: 18px;
+}
+.edit-mission-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 16px;
+  align-items: start;
+}
+.edit-mission-form {
+  display: grid;
+  gap: 16px;
+}
+.edit-mission-section {
+  display: grid;
+  gap: 16px;
+}
+.edit-mission-section .form {
+  gap: 14px;
+}
+.edit-mission-section .choice-section {
+  margin: 0;
+}
+.edit-mission-summary {
+  position: sticky;
+  top: 18px;
+}
+.edit-mission-summary .mission-draft-summary {
+  display: grid;
+  gap: 14px;
 }
 .week-carousel {
   display: flex;
@@ -3629,6 +3660,7 @@ tbody tr:hover { background: #FAFBFD; }
   .establishment-command-strip,
   .establishment-mission-grid,
   .establishment-mission-workspace,
+  .edit-mission-layout,
   .agenda-workspace {
     grid-template-columns: 1fr;
   }
@@ -3643,6 +3675,9 @@ tbody tr:hover { background: #FAFBFD; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .mission-draft-summary { position: static; }
+  .edit-mission-summary {
+    position: static;
+  }
   .search-filters {
     position: static;
   }

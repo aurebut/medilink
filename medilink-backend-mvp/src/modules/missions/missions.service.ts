@@ -274,6 +274,12 @@ export class MissionsService {
         compensationAmount: dto.compensationMode || dto.retrocessionPercentage ? null : undefined,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         endDate: dto.endDate ? new Date(dto.endDate) : undefined,
+        tags: tags
+          ? {
+              deleteMany: {},
+              create: tags.map((tag: string) => ({ tag })),
+            }
+          : undefined,
       },
       include: this.missionInclude,
     });
