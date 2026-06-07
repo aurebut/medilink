@@ -422,8 +422,7 @@ export default function CandidateDashboardPage() {
           </Card>
         </section>
 
-        <section className="dashboard-operations-grid">
-          <Card className="dashboard-panel dashboard-missions-panel">
+        <Card className="dashboard-panel dashboard-missions-panel">
           <div className="toolbar">
             <div>
               <h2>Suivi des missions</h2>
@@ -455,50 +454,7 @@ export default function CandidateDashboardPage() {
               <LinkButton variant="secondary" href="/app/search">Voir les missions</LinkButton>
             </div>
           )}
-          </Card>
-
-          <div className="dashboard-admin-column">
-            <Card className="dashboard-panel">
-            <div className="toolbar">
-              <div>
-                <h2>Dossier</h2>
-                <p className="small">Profil, documents et conformité.</p>
-              </div>
-              <LinkButton variant="light" href="/app/profile">Gérer</LinkButton>
-            </div>
-            <div className="dashboard-dossier-summary">
-              <div>
-                <span>Profil</span>
-                <strong>{profileReady ? gendered(profile, 'Prêt', 'Prête') : `${completionScore}%`}</strong>
-              </div>
-              <div>
-                <span>Documents valides</span>
-                <strong>{dashboard.approvedDocuments.length}/{documents.length || 0}</strong>
-              </div>
-              <div>
-                <span>A corriger</span>
-                <strong>{dashboard.blockedDocuments.length}</strong>
-              </div>
-            </div>
-            {documents.length > 0 ? (
-              <div className="dashboard-mini-list">
-                {[...dashboard.blockedDocuments, ...dashboard.pendingDocuments, ...dashboard.approvedDocuments].slice(0, 4).map((document) => (
-                  <div key={document.id}>
-                    <span>{document.fileName}</span>
-                    <Badge tone={documentTone(document.verificationStatus)}>{statusLabel(document.verificationStatus)}</Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="dashboard-empty compact">
-                <strong>Aucun document</strong>
-                <p>Ajoutez CV, attestations et justificatifs depuis le profil.</p>
-              </div>
-            )}
-          </Card>
-
-          </div>
-        </section>
+        </Card>
       </div>
     </>
   );
