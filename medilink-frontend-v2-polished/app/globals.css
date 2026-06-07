@@ -6719,6 +6719,59 @@ td {
 }
 
 /* Lightweight loading states */
+.platform-splash {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(26,82,160,.13), transparent 34%),
+    radial-gradient(circle at 82% 76%, rgba(14,138,122,.15), transparent 36%),
+    linear-gradient(135deg, #f8fbff 0%, #ffffff 46%, #f6fbfa 100%);
+}
+.platform-splash-panel {
+  display: grid;
+  width: min(360px, 100%);
+  justify-items: center;
+  gap: 18px;
+  padding: 34px 28px 30px;
+  border: 1px solid rgba(20,39,74,.10);
+  border-radius: 18px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 26px 70px rgba(11,25,41,.12);
+  backdrop-filter: blur(18px);
+}
+.platform-splash-brand {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  color: var(--navy);
+  font-family: var(--serif);
+  font-size: 34px;
+  line-height: 1;
+}
+.platform-splash-brand em {
+  color: var(--blue);
+  font-style: italic;
+}
+.platform-splash-copy {
+  display: grid;
+  gap: 6px;
+  max-width: 260px;
+  text-align: center;
+}
+.platform-splash-copy strong {
+  color: var(--heading);
+  font-size: 16px;
+  line-height: 1.25;
+}
+.platform-splash-copy span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
 .loading-state {
   display: grid;
   width: fit-content;
@@ -6756,6 +6809,17 @@ td {
   to { transform: rotate(360deg); }
 }
 @media (max-width: 620px) {
+  .platform-splash {
+    padding: 18px;
+  }
+  .platform-splash-panel {
+    gap: 16px;
+    padding: 30px 22px 26px;
+    border-radius: 16px;
+  }
+  .platform-splash-brand {
+    font-size: 31px;
+  }
   .loading-state {
     margin: 30px auto;
   }
@@ -6763,6 +6827,9 @@ td {
   .loading-emblem.compact { width: 34px; height: 34px; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .platform-splash {
+    backdrop-filter: none;
+  }
   .loading-ring { animation: none; }
   .loading-ring { transform: rotate(35deg); }
   .agenda-calendar-next,

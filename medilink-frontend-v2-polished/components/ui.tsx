@@ -114,6 +114,23 @@ export function LoadingInline({ label = 'Chargement...' }: { label?: string }) {
   );
 }
 
+export function PlatformSplash({ label = 'Préparation de votre espace' }: { label?: string }) {
+  return (
+    <div className="platform-splash" role="status" aria-label={label}>
+      <div className="platform-splash-panel">
+        <div className="platform-splash-brand">
+          <span>Médi<em>Link</em></span>
+        </div>
+        <LoadingEmblem />
+        <div className="platform-splash-copy">
+          <strong>{label}</strong>
+          <span>Synchronisation des données essentielles</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function LoadingEmblem({ compact = false }: { compact?: boolean }) {
   return (
     <span className={`loading-emblem ${compact ? 'compact' : ''}`} aria-hidden="true">
