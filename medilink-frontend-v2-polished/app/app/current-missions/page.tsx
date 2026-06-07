@@ -5,7 +5,7 @@ import { api, isMockStorageUrl } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
+import { getCandidateBillingMissionPath, getCandidateConversationPath, getCandidateMissionPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -300,6 +300,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)} variant="secondary">Messagerie</LinkButton> : null}
+        {mission?.id ? <LinkButton href={getCandidateMissionPath(mission.id)} variant="light">Voir la mission</LinkButton> : null}
         {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itinéraire</a> : null}
       </div>
     </section>
