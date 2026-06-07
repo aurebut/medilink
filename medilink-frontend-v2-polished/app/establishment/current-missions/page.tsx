@@ -8,7 +8,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, StatCard, Textarea, Button } from '@/components/ui';
+import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, StatCard, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type NotesByApplication = Record<string, string>;
@@ -287,12 +287,42 @@ export default function EstablishmentCurrentMissionsPage() {
     };
   }, [currentApplications]);
 
-  function updateNote(applicationId: string, value: string) {
-    const next = { ...notes, [applicationId]: value };
+  function updateNote(missionId: string, value: string) {
+    const next = { ...notes, [missionId]: value };
     setNotes(next);
     if (primary && typeof window !== 'undefined') {
       window.localStorage.setItem(notesStorageKey(primary.id), JSON.stringify(next));
     }
+  }
+
+  function updateLocalMission(missionId: string, updatedFields: Partial<Mission>) {
+    setApplications((current) =>
+      current.map((app) => {
+        if (app.missionId === missionId && app.mission) {
+          return {
+            ...app,
+            mission: {
+              ...app.mission,
+              ...updatedFields,
+            },
+          };
+        }
+        return app;
+      })
+    );
+
+    setCandidateProfile((current) => {
+      if (current && current.mission.id === missionId) {
+        return {
+          ...current,
+          mission: {
+            ...current.mission,
+            ...updatedFields,
+          },
+        };
+      }
+      return current;
+    });
   }
 
   const selectedRow: MissionRow | null = useMemo(() => {
@@ -423,6 +453,7 @@ export default function EstablishmentCurrentMissionsPage() {
                         candidateProfile={candidateProfile}
                         profileLoading={loadingDetails}
                         setError={setError}
+                        updateLocalMission={updateLocalMission}
                       />
                     </div>
                   )}
@@ -479,18 +510,69 @@ function MissionControlPanel({
   candidateProfile,
   profileLoading,
   setError,
+  updateLocalMission,
 }: {
   row: MissionRow;
   activeSection: MissionSection;
   notes: NotesByApplication;
-  updateNote: (appId: string, val: string) => void;
+  updateNote: (missionId: string, val: string) => void;
   candidateProfile: CandidateProfileForApplication | null;
   profileLoading: boolean;
   setError: (err: string | null) => void;
+  updateLocalMission: (missionId: string, updatedFields: Partial<Mission>) => void;
 }) {
   const mission = row.application.mission;
   const progress = missionProgress(row.application, row.agreement);
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec le candidat pour confirmer les derniers détails.';
+
+  const [isEditingBrief, setIsEditingBrief] = useState(false);
+  const [editDepartmentInfo, setEditDepartmentInfo] = useState('');
+  const [editTeamInfo, setEditTeamInfo] = useState('');
+  const [editSoftwareUsed, setEditSoftwareUsed] = useState('');
+  const [editPracticalInfo, setEditPracticalInfo] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [savingBrief, setSavingBrief] = useState(false);
+
+  useEffect(() => {
+    setIsEditingBrief(false);
+  }, [row.application.id]);
+
+  const startEditing = () => {
+    setEditDepartmentInfo(mission?.departmentInfo || '');
+    setEditTeamInfo(mission?.teamInfo || '');
+    setEditSoftwareUsed(mission?.softwareUsed || '');
+    setEditPracticalInfo(mission?.practicalInfo || '');
+    setEditDescription(mission?.description || '');
+    setIsEditingBrief(true);
+  };
+
+  const saveBrief = async () => {
+    if (!mission?.id) return;
+    setSavingBrief(true);
+    try {
+      await api.patch(`/missions/${mission.id}`, {
+        departmentInfo: editDepartmentInfo,
+        teamInfo: editTeamInfo,
+        softwareUsed: editSoftwareUsed,
+        practicalInfo: editPracticalInfo,
+        description: editDescription,
+      });
+
+      updateLocalMission(mission.id, {
+        departmentInfo: editDepartmentInfo,
+        teamInfo: editTeamInfo,
+        softwareUsed: editSoftwareUsed,
+        practicalInfo: editPracticalInfo,
+        description: editDescription,
+      });
+
+      setIsEditingBrief(false);
+    } catch (e: any) {
+      setError(e.message || 'Impossible de sauvegarder le brief.');
+    } finally {
+      setSavingBrief(false);
+    }
+  };
 
   const detailItems = [
     { label: 'Service', value: mission?.departmentInfo || mission?.sector },
@@ -584,47 +666,138 @@ function MissionControlPanel({
 
       {activeSection === 'brief' ? (
         <div className="candidate-current-tab-panel">
-          <div className="candidate-current-grid">
-            <div className="candidate-current-panel">
-              <span>Mission</span>
-              <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
-              <p>{formatCompensation(row.agreement || mission || {})}</p>
-              <small>{mission?.specialty || 'Spécialité à confirmer'}</small>
-            </div>
-            <div className="candidate-current-panel">
-              <span>Contexte</span>
-              <strong>{mission?.departmentInfo || mission?.sector || 'Service à confirmer'}</strong>
-              <p>{mission?.teamInfo || 'Equipe et organisation à confirmer dans la messagerie.'}</p>
-              <small>{mission?.patientType || 'Patientèle à confirmer'}</small>
-            </div>
-          </div>
-
-          <div className="candidate-current-info">
-            <div>
-              <h3>Consignes publiées</h3>
-              <p>{mission?.practicalInfo || mission?.description || 'Aucune consigne spécifique de l\'établissement renseignée.'}</p>
-            </div>
-            <div>
-              <h3>Notes internes (privées)</h3>
-              <Textarea
-                value={notes[row.application.id] || ''}
-                rows={5}
-                placeholder="Ex: code d'entrée, contact sur place, code parking, documents à vérifier..."
-                onChange={(event) => updateNote(row.application.id, event.target.value)}
-              />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3 style={{ fontSize: 18, margin: 0, color: 'var(--heading)' }}>
+              {isEditingBrief ? 'Modification du brief' : 'Brief & notes'}
+            </h3>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {isEditingBrief ? (
+                <>
+                  <Button variant="success" disabled={savingBrief} onClick={() => void saveBrief()}>
+                    {savingBrief ? 'Enregistrement...' : 'Enregistrer'}
+                  </Button>
+                  <Button variant="light" onClick={() => setIsEditingBrief(false)}>
+                    Annuler
+                  </Button>
+                </>
+              ) : (
+                <Button variant="light" onClick={startEditing}>
+                  Modifier le brief
+                </Button>
+              )}
             </div>
           </div>
 
-          {detailItems.length > 0 ? (
-            <div className="candidate-current-detail-grid">
-              {detailItems.map((item) => (
-                <div key={item.label}>
-                  <span>{item.label}</span>
-                  <strong>{item.value}</strong>
+          {isEditingBrief ? (
+            <div style={{ display: 'grid', gap: 14 }}>
+              <div className="candidate-current-grid">
+                <div className="candidate-current-panel" style={{ display: 'grid', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Service / Département</span>
+                  <Input
+                    type="text"
+                    value={editDepartmentInfo}
+                    onChange={(e) => setEditDepartmentInfo(e.target.value)}
+                    placeholder="Ex: Urgences, Cardiologie..."
+                  />
                 </div>
-              ))}
+                <div className="candidate-current-panel" style={{ display: 'grid', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Équipe & Organisation</span>
+                  <Input
+                    type="text"
+                    value={editTeamInfo}
+                    onChange={(e) => setEditTeamInfo(e.target.value)}
+                    placeholder="Ex: 2 infirmiers, 1 aide-soignant..."
+                  />
+                </div>
+              </div>
+
+              <div className="candidate-current-grid">
+                <div className="candidate-current-panel" style={{ display: 'grid', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Logiciel utilisé</span>
+                  <Input
+                    type="text"
+                    value={editSoftwareUsed}
+                    onChange={(e) => setEditSoftwareUsed(e.target.value)}
+                    placeholder="Ex: Doctolib, Axi Santé..."
+                  />
+                </div>
+                <div className="candidate-current-panel" style={{ display: 'grid', gap: 6 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Description de la mission</span>
+                  <Input
+                    type="text"
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="Ex: Remplacement médecin généraliste..."
+                  />
+                </div>
+              </div>
+
+              <div className="candidate-current-info">
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Consignes de l'établissement (publiées au candidat)</h3>
+                  <Textarea
+                    value={editPracticalInfo}
+                    rows={5}
+                    placeholder="Ex: consignes d'arrivée, parking, déroulement de la journée..."
+                    onChange={(e) => setEditPracticalInfo(e.target.value)}
+                  />
+                </div>
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Notes internes (privées à l'établissement)</h3>
+                  <Textarea
+                    value={notes[mission?.id || ''] || ''}
+                    rows={5}
+                    placeholder="Ex: code d'entrée, contact sur place, code parking, documents à vérifier..."
+                    onChange={(event) => updateNote(mission?.id || '', event.target.value)}
+                  />
+                </div>
+              </div>
             </div>
-          ) : null}
+          ) : (
+            <>
+              <div className="candidate-current-grid">
+                <div className="candidate-current-panel">
+                  <span>Mission</span>
+                  <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
+                  <p>{formatCompensation(row.agreement || mission || {})}</p>
+                  <small>{mission?.specialty || 'Spécialité à confirmer'}</small>
+                </div>
+                <div className="candidate-current-panel">
+                  <span>Contexte</span>
+                  <strong>{mission?.departmentInfo || mission?.sector || 'Service à confirmer'}</strong>
+                  <p>{mission?.teamInfo || 'Equipe et organisation à confirmer dans la messagerie.'}</p>
+                  <small>{mission?.patientType || 'Patientèle à confirmer'}</small>
+                </div>
+              </div>
+
+              <div className="candidate-current-info">
+                <div>
+                  <h3>Consignes publiées</h3>
+                  <p>{mission?.practicalInfo || mission?.description || 'Aucune consigne spécifique de l\'établissement renseignée.'}</p>
+                </div>
+                <div>
+                  <h3>Notes internes (privées)</h3>
+                  <Textarea
+                    value={notes[mission?.id || ''] || ''}
+                    rows={5}
+                    placeholder="Ex: code d'entrée, contact sur place, code parking, documents à vérifier..."
+                    onChange={(event) => updateNote(mission?.id || '', event.target.value)}
+                  />
+                </div>
+              </div>
+
+              {detailItems.length > 0 ? (
+                <div className="candidate-current-detail-grid">
+                  {detailItems.map((item) => (
+                    <div key={item.label}>
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          )}
         </div>
       ) : null}
 
