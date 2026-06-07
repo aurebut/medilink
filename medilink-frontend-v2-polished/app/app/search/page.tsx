@@ -7,6 +7,7 @@ import { missionTypeOptions, requiredLevelOptions } from '@/lib/labels';
 import { Alert, Button, Card, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { MissionCard } from '@/components/MissionCard';
 import { establishmentDepartmentOptions, patientTypeOptions, sectorOptions, softwareOptions } from '@/lib/profile-options';
+import { getCandidateMissionPath, getMissionApplyPath } from '@/lib/mission-links';
 
 const emptyFilters = {
   q: '',
@@ -195,7 +196,14 @@ export default function SearchMissionsPage() {
                   <div className="small">Missions publiées disponibles</div>
                 </div>
               </div>
-              {items.map((mission) => <MissionCard key={mission.id} mission={mission} applyHref={`/app/missions/${mission.id}/apply`} />)}
+              {items.map((mission) => (
+                <MissionCard
+                  key={mission.id}
+                  mission={mission}
+                  detailHref={getCandidateMissionPath(mission.id)}
+                  applyHref={getMissionApplyPath(mission.id)}
+                />
+              ))}
               {!loading && items.length === 0 ? <Card><p>Aucune mission publiée ne correspond aux filtres.</p></Card> : null}
             </>
           )}

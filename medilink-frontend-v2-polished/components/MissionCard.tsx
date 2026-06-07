@@ -20,23 +20,25 @@ function sectorLabel(value?: string | null) {
 export function MissionCard({
   mission,
   applyHref,
+  detailHref,
   onApply,
   canDelete,
   onDeleted,
 }: {
   mission: Mission;
   applyHref?: string;
+  detailHref?: string;
   onApply?: (mission: Mission) => void;
   canDelete?: boolean;
   onDeleted?: (missionId: string) => void;
 }) {
-  const detailHref = `/missions/${mission.id}`;
+  const missionDetailHref = detailHref || `/missions/${mission.id}`;
   const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
 
   return (
     <Card className="mission-card">
       {establishmentPhoto ? (
-        <Link className="mission-card-image" href={detailHref} aria-label={`Voir ${mission.title}`}>
+        <Link className="mission-card-image" href={missionDetailHref} aria-label={`Voir ${mission.title}`}>
           <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
         </Link>
       ) : null}
@@ -88,7 +90,7 @@ export function MissionCard({
 
       <div className="actions">
         {canDelete || mission.status === 'PUBLISHED' ? (
-          <Link className="btn btn-light" href={detailHref}>Voir détail</Link>
+          <Link className="btn btn-light" href={missionDetailHref}>Voir détail</Link>
         ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}

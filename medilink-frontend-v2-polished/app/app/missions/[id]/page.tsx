@@ -12,7 +12,7 @@ import {
 } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getMissionApplyPath, getMissionPublicPath } from '@/lib/mission-links';
+import { getMissionApplyPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { Alert, Badge, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -64,10 +64,97 @@ function contextDetails(mission?: Mission) {
   ].filter((item) => item.value);
 }
 
+function MissionAnnouncementView({
+  mission,
+  application,
+  conversation,
+}: {
+  mission: Mission;
+  application?: Application | null;
+  conversation?: Conversation | null;
+}) {
+  const detailItems = contextDetails(mission);
+  const address = establishmentAddress(mission);
+  const hasApplied = Boolean(application);
+
+  return (
+    <>
+      <PageHeader
+        title={mission.title}
+        description="Annonce de mission consultee dans votre espace candidat."
+        actions={
+          <>
+            <LinkButton href="/app/search" variant="light">Retour aux annonces</LinkButton>
+            {hasApplied ? null : <LinkButton href={getMissionApplyPath(mission.id)}>Postuler</LinkButton>}
+          </>
+        }
+      />
+
+      {application ? (
+        <Alert type="info">
+          Candidature {statusLabel(application.status).toLowerCase()}. La page deviendra votre suivi de mission personnel quand l'etablissement aura valide la mission.
+        </Alert>
+      ) : null}
+
+      <div className="candidate-current-grid">
+        <Card className="candidate-current-panel">
+          <span>Annonce</span>
+          <strong>{missionTypeLabel(mission.missionType)} - {requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</strong>
+          <p>{mission.description || 'Aucune description pour cette mission.'}</p>
+          <small>{mission.specialty || 'Specialite non precisee'}</small>
+        </Card>
+
+        <Card className="candidate-current-panel">
+          <span>Remuneration</span>
+          <strong>{formatCompensation(mission)}</strong>
+          <p>{mission.establishment?.name || 'Etablissement'} - {mission.city}</p>
+          <small>{formatDate(mission.startDate)} {mission.startTime ? `- ${mission.startTime}` : ''}{mission.endTime ? ` / ${mission.endTime}` : ''}</small>
+        </Card>
+      </div>
+
+      <div className="candidate-current-info">
+        <Card>
+          <h3>Informations pratiques</h3>
+          <div className="info-list">
+            <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
+            <div><span>Fin</span><strong>{formatDate(mission.endDate)}</strong></div>
+            <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
+            <div><span>Duree</span><strong>{mission.durationHours || '-'} h</strong></div>
+            <div><span>Adresse</span><strong>{address}</strong></div>
+          </div>
+        </Card>
+
+        <Card>
+          <h3>Etablissement</h3>
+          <p>{mission.establishment?.name || 'Etablissement a confirmer'}</p>
+          <p className="small">{mission.establishment?.description || mission.practicalInfo || 'Les details complementaires seront confirmes dans la messagerie.'}</p>
+        </Card>
+      </div>
+
+      {detailItems.length > 0 ? (
+        <div className="candidate-current-detail-grid">
+          {detailItems.map((item) => (
+            <div key={item.label}>
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+            </div>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="actions">
+        {hasApplied ? null : <LinkButton href={getMissionApplyPath(mission.id)}>Postuler</LinkButton>}
+        {conversation ? <LinkButton href={`/app/messages?id=${conversation.id}`} variant="secondary">Ouvrir la discussion</LinkButton> : null}
+      </div>
+    </>
+  );
+}
+
 export default function CandidateMissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [publicMission, setPublicMission] = useState<Mission | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,13 +162,15 @@ export default function CandidateMissionDetailPage() {
     Promise.all([
       api.get<Application[]>('/me/applications'),
       api.get<Conversation[]>('/conversations'),
-    ]).then(([nextApplications, nextConversations]) => {
+      api.get<Mission>(`/missions/${id}`).catch(() => null),
+    ]).then(([nextApplications, nextConversations, nextMission]) => {
       setApplications(nextApplications);
       setConversations(nextConversations);
+      setPublicMission(nextMission);
     }).catch((e: any) => {
       setError(e.message);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [id]);
 
   const context = useMemo<MissionContext | null>(() => {
     const application = applications.find((item) => item.missionId === id) || null;
@@ -106,12 +195,16 @@ export default function CandidateMissionDetailPage() {
   }
 
   if (!context) {
+    if (publicMission) {
+      return <MissionAnnouncementView mission={publicMission} />;
+    }
+
     return (
       <>
         <PageHeader
           title="Mission"
           description="Cette mission n'est pas encore rattachee a votre espace candidat."
-          actions={<LinkButton href={getMissionPublicPath(id)} variant="light">Voir l'annonce</LinkButton>}
+          actions={<LinkButton href="/app/search" variant="light">Retour aux annonces</LinkButton>}
         />
         <EmptyState
           title="Aucun suivi candidat"
@@ -123,29 +216,16 @@ export default function CandidateMissionDetailPage() {
   }
 
   if (!isPersonalMission(context)) {
-    return (
-      <>
-        <PageHeader
-          title={context.application.mission?.title || 'Mission'}
-          description="Votre candidature est en cours de traitement. La page personnelle s'activera quand la mission sera validee."
-          actions={<LinkButton href={getMissionPublicPath(id)} variant="light">Voir l'annonce</LinkButton>}
+    const mission = context.application.mission || publicMission;
+    if (mission) {
+      return (
+        <MissionAnnouncementView
+          mission={mission}
+          application={context.application}
+          conversation={context.conversation}
         />
-        <Card>
-          <div className="workspace-card-head">
-            <div>
-              <h3>Statut de candidature</h3>
-              <p className="small">{context.application.mission?.establishment?.name || context.application.mission?.city || 'Etablissement a confirmer'}</p>
-            </div>
-            <Badge tone={context.application.status === 'VIEWED' ? 'warning' : 'neutral'}>{statusLabel(context.application.status)}</Badge>
-          </div>
-          <p>Le detail operationnel apparaitra ici des que l'etablissement aura accepte votre candidature ou envoye une proposition.</p>
-          <div className="actions">
-            {context.conversation ? <LinkButton href={`/app/messages?id=${context.conversation.id}`}>Ouvrir la discussion</LinkButton> : null}
-            <LinkButton href={getMissionPublicPath(id)} variant="light">Relire l'annonce</LinkButton>
-          </div>
-        </Card>
-      </>
-    );
+      );
+    }
   }
 
   const mission = context.application.mission;
@@ -230,7 +310,6 @@ export default function CandidateMissionDetailPage() {
       ) : null}
 
       <div className="actions">
-        <LinkButton href={getMissionPublicPath(id)} variant="light">Voir l'annonce publique</LinkButton>
         {context.conversation ? <LinkButton href={`/app/messages?id=${context.conversation.id}`} variant="secondary">Contacter l'etablissement</LinkButton> : null}
       </div>
     </>

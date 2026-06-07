@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import type { Application, Conversation, Mission } from '@/lib/types';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
+import { getCandidateMissionPath } from '@/lib/mission-links';
 import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 type ApplyResult = {
@@ -76,7 +77,7 @@ export default function ApplyMissionPage() {
       <PageHeader
         title="Postuler à la mission"
         description="Relisez les informations, ajoutez un message de candidature si besoin, puis envoyez votre dossier."
-        actions={<LinkButton variant="light" href={`/missions/${mission.id}`}>Retour au détail</LinkButton>}
+        actions={<LinkButton variant="light" href={getCandidateMissionPath(mission.id)}>Retour au détail</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
