@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { api, getApiEventUrl, getApiUrl, getAuthToken } from '@/lib/api';
+import { api, getApiCacheValue, getApiEventUrl, getApiUrl, getAuthToken, subscribeApiCache } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
@@ -222,6 +222,9 @@ export function MessageCenter() {
       if (initialActiveId) {
         setActiveId(initialActiveId);
       }
+      data.slice(0, 3).forEach((conversation) => {
+        api.preload(`/conversations/${conversation.id}/messages`);
+      });
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -235,7 +238,7 @@ export function MessageCenter() {
       if (activeIdRef.current === id) {
         setMessages((prev) => mergeMessages(prev, data));
       }
-      await api.post(`/conversations/${id}/read`, {});
+      await api.postSilent(`/conversations/${id}/read`, {});
     } catch (e: any) {
       setError(e.message);
     }
@@ -255,7 +258,19 @@ export function MessageCenter() {
       setActiveId(initialActiveId);
     }
   }, [isMobile, activeId, conversations, conversationIdParam]);
-  useEffect(() => { void loadConversations(); }, []);
+  useEffect(() => {
+    const unsubscribe = subscribeApiCache<ConversationWithLast[]>('/conversations', (data) => {
+      setConversations(data);
+      const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
+      if (!activeIdRef.current && initialActiveId) setActiveId(initialActiveId);
+      data.slice(0, 3).forEach((conversation) => {
+        api.preload(`/conversations/${conversation.id}/messages`);
+      });
+    });
+
+    void loadConversations();
+    return unsubscribe;
+  }, []);
   useEffect(() => {
     if (conversationIdParam) {
       setActiveId(conversationIdParam);
@@ -264,7 +279,15 @@ export function MessageCenter() {
   useEffect(() => {
     if (!activeId) return;
     setMobileOptionsOpen(false);
-    setMessages([]);
+    const path = `/conversations/${activeId}/messages`;
+    const cachedMessages = getApiCacheValue<Message[]>(path);
+    if (cachedMessages) {
+      void cachedMessages.then((data) => {
+        if (activeIdRef.current === activeId) setMessages(data);
+      });
+    } else {
+      setMessages([]);
+    }
     void loadMessages(activeId);
     const current = conversations.find((c) => c.id === activeId);
     setProposal({
@@ -277,6 +300,14 @@ export function MessageCenter() {
       startTime: current?.mission?.startTime || '',
       endTime: current?.mission?.endTime || '',
       notes: '',
+    });
+  }, [activeId]);
+  useEffect(() => {
+    if (!activeId) return;
+    return subscribeApiCache<Message[]>(`/conversations/${activeId}/messages`, (data) => {
+      if (activeIdRef.current === activeId) {
+        setMessages((prev) => mergeMessages(prev, data));
+      }
     });
   }, [activeId]);
   useEffect(() => {
@@ -310,7 +341,7 @@ export function MessageCenter() {
 
         if (activeIdRef.current === payload.conversationId) {
           setMessages((prev) => mergeMessages(prev, [payload.message]));
-          void api.post(`/conversations/${payload.conversationId}/read`, {});
+          void api.postSilent(`/conversations/${payload.conversationId}/read`, {});
         }
 
         api.get<ConversationWithLast[]>('/conversations')

@@ -15,6 +15,7 @@ export class ApiError extends Error {
 type ApiOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
   cacheMode?: 'default' | 'reload';
+  invalidateCache?: boolean;
 };
 
 type CacheEntry = {
@@ -114,6 +115,17 @@ export function subscribeApiCache<T>(path: string, listener: (value: T) => void)
   };
 }
 
+export function getApiCacheValue<T>(path: string) {
+  const now = Date.now();
+  const cached = getCache.get(cacheKey(path));
+  if (cached && cached.expiresAt > now) return cached.promise as Promise<T>;
+
+  const sessionValue = readSessionCache<T>(path, now);
+  if (sessionValue !== null) return Promise.resolve(sessionValue);
+
+  return null;
+}
+
 export function primeApiCache<T>(path: string, value: T) {
   const expiresAt = Date.now() + GET_CACHE_TTL_MS;
   getCache.set(cacheKey(path), {
@@ -188,7 +200,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
   const token = getAuthToken();
-  const { cacheMode: _cacheMode, ...requestOptions } = options;
+  const { cacheMode: _cacheMode, invalidateCache: _invalidateCache, ...requestOptions } = options;
   const request = fetch(`${API_URL}${path}`, {
     ...requestOptions,
     credentials: 'include',
@@ -229,7 +241,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       expiresAt: now + GET_CACHE_TTL_MS,
       promise: request,
     });
-  } else if (method !== 'GET') {
+  } else if (method !== 'GET' && options.invalidateCache !== false) {
     clearApiCache();
   }
 
@@ -240,6 +252,7 @@ export const api = {
   get: <T>(path: string) => apiFetch<T>(path, { method: 'GET' }),
   preload: (path: string) => { void apiFetch(path, { method: 'GET' }).catch(() => undefined); },
   post: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body }),
+  postSilent: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body, invalidateCache: false }),
   patch: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body }),
   delete: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE' }),
 };

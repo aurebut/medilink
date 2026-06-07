@@ -94,6 +94,9 @@ function warmCandidateWorkspace() {
   void api.get<CandidateDashboardData>('/me/dashboard')
     .then(primeCandidateDashboard)
     .catch(() => undefined);
+  void api.get<Conversation[]>('/conversations')
+    .then((items) => items.slice(0, 3).forEach((item) => api.preload(`/conversations/${item.id}/messages`)))
+    .catch(() => undefined);
   warmApi([
     '/missions?limit=50',
     '/me/profile',
@@ -107,6 +110,9 @@ function warmCandidateWorkspace() {
 function warmEstablishmentWorkspace() {
   void api.get<EstablishmentDashboardData>('/establishment/dashboard')
     .then(primeEstablishmentDashboard)
+    .catch(() => undefined);
+  void api.get<Conversation[]>('/conversations')
+    .then((items) => items.slice(0, 3).forEach((item) => api.preload(`/conversations/${item.id}/messages`)))
     .catch(() => undefined);
   warmApi([
     '/establishments/me',
