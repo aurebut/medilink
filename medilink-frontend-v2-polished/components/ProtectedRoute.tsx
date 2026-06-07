@@ -7,18 +7,19 @@ import { LoadingCard, PlatformSplash } from './ui';
 import type { CandidateDashboardData, Conversation, CurrentUser, EstablishmentDashboardData, UserRole } from '@/lib/types';
 import { defaultRouteForUser } from '@/lib/routes';
 import { api, primeApiCache } from '@/lib/api';
+import { splashSeenKey } from '@/lib/startup-splash';
 
-const PLATFORM_SPLASH_SEEN_KEY = 'medilink_platform_splash_seen';
 const PLATFORM_SPLASH_MIN_MS = 900;
 
-function shouldShowInitialSplash() {
+function shouldShowInitialSplash(user?: CurrentUser | null) {
   if (typeof window === 'undefined') return true;
-  return window.sessionStorage.getItem(PLATFORM_SPLASH_SEEN_KEY) !== 'true';
+  if (!user) return true;
+  return window.sessionStorage.getItem(splashSeenKey(user)) !== 'true';
 }
 
-function markInitialSplashSeen() {
+function markInitialSplashSeen(user: CurrentUser) {
   if (typeof window === 'undefined') return;
-  window.sessionStorage.setItem(PLATFORM_SPLASH_SEEN_KEY, 'true');
+  window.sessionStorage.setItem(splashSeenKey(user), 'true');
 }
 
 function sleep(ms: number) {
@@ -81,7 +82,12 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [showInitialSplash, setShowInitialSplash] = useState(shouldShowInitialSplash);
+  const [showInitialSplash, setShowInitialSplash] = useState(true);
+
+  useEffect(() => {
+    if (loading) return;
+    setShowInitialSplash(shouldShowInitialSplash(user));
+  }, [loading, user?.id]);
 
   useEffect(() => {
     if (loading) return;
@@ -103,7 +109,7 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
       sleep(PLATFORM_SPLASH_MIN_MS),
     ]).then(() => {
       if (cancelled) return;
-      markInitialSplashSeen();
+      markInitialSplashSeen(user);
       setShowInitialSplash(false);
     });
 

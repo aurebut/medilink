@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api, clearAuthToken, setAuthToken } from '@/lib/api';
 import type { CandidateGender, CurrentUser } from '@/lib/types';
+import { resetPlatformSplash } from '@/lib/startup-splash';
 
 type AuthContextValue = {
   user: CurrentUser | null;
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const result = await api.post<{ user: CurrentUser; token: string }>('/auth/login', { email, password });
+    resetPlatformSplash();
     setAuthToken(result.token);
     setUser(result.user);
     return result.user;
@@ -55,13 +57,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(async (data: RegisterPayload) => {
     const result = await api.post<{ user: CurrentUser; token: string }>('/auth/register', data);
+    resetPlatformSplash();
     setAuthToken(result.token);
     setUser(result.user);
     return result.user;
   }, []);
 
   const logout = useCallback(async () => {
-    try { await api.post('/auth/logout'); } finally { clearAuthToken(); setUser(null); }
+    try { await api.post('/auth/logout'); } finally { resetPlatformSplash(); clearAuthToken(); setUser(null); }
   }, []);
 
   const value = useMemo(() => ({ user, loading, refresh, login, register, logout }), [user, loading, refresh, login, register, logout]);
