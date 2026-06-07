@@ -494,6 +494,17 @@ export function MessageCenter() {
     disabled: Boolean(busyAction),
     onSelect: () => void refresh(),
   };
+  const withdrawAction: MobileWorkflowOption | null = candidate && active?.application && !['CANCELLED', 'WITHDRAWN', 'REJECTED'].includes(active.application.status)
+    ? {
+        label: active.application.status === 'ACCEPTED' ? 'Annuler la mission' : 'Retirer candidature',
+        description: active.application.status === 'ACCEPTED'
+          ? 'Annuler votre participation validée pour cette mission.'
+          : 'Retirer votre candidature pour cette mission.',
+        tone: 'danger',
+        disabled: Boolean(busyAction),
+        onSelect: () => void withdrawApplication(active.application!.id, active.application!.status === 'ACCEPTED'),
+      }
+    : null;
   const workflowTimelineSteps: MobileTimelineStep[] = [
     {
       key: 'proposal',
@@ -715,18 +726,6 @@ export function MessageCenter() {
             {isMobile && mobileActionStep?.options?.length ? (
               <MobileWorkflowHeaderAction step={mobileActionStep} />
             ) : null}
-            
-            {candidate && active?.application && !['CANCELLED', 'WITHDRAWN', 'REJECTED'].includes(active.application.status) ? (
-              <Button
-                type="button"
-                variant="danger"
-                className="conversation-action-danger"
-                disabled={Boolean(busyAction)}
-                onClick={() => void withdrawApplication(active.application!.id, active.application!.status === 'ACCEPTED')}
-              >
-                {active.application.status === 'ACCEPTED' ? 'Annuler la mission' : 'Retirer candidature'}
-              </Button>
-            ) : null}
 
             {isMobile ? (
               <Button
@@ -749,6 +748,7 @@ export function MessageCenter() {
             currentStep={mobileCurrentStep}
             nextStep={mobileNextStep}
             refreshAction={refreshAction}
+            withdrawAction={withdrawAction}
             onClose={() => setMobileOptionsOpen(false)}
           />
         ) : null}
@@ -757,6 +757,7 @@ export function MessageCenter() {
           <DesktopWorkflowTimeline
             steps={workflowTimelineSteps}
             refreshAction={refreshAction}
+            withdrawAction={withdrawAction}
           />
         ) : null}
 
@@ -928,6 +929,7 @@ function MobileWorkflowMenu({
   currentStep,
   nextStep,
   refreshAction,
+  withdrawAction,
   onClose,
 }: {
   status: string;
@@ -935,6 +937,7 @@ function MobileWorkflowMenu({
   currentStep?: MobileTimelineStep;
   nextStep?: MobileTimelineStep | null;
   refreshAction: MobileWorkflowOption;
+  withdrawAction?: MobileWorkflowOption | null;
   onClose: () => void;
 }) {
   return (
@@ -995,6 +998,11 @@ function MobileWorkflowMenu({
       </div>
       <div className="mobile-workflow-footer">
         <MobileWorkflowOptionButton option={refreshAction} onClose={onClose} />
+        {withdrawAction ? (
+          <div style={{ marginTop: 8 }}>
+            <MobileWorkflowOptionButton option={withdrawAction} onClose={onClose} />
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -1037,9 +1045,11 @@ function MobileWorkflowOptionButton({
 function DesktopWorkflowTimeline({
   steps,
   refreshAction,
+  withdrawAction,
 }: {
   steps: MobileTimelineStep[];
   refreshAction: MobileWorkflowOption;
+  withdrawAction?: MobileWorkflowOption | null;
 }) {
   return (
     <div className="desktop-workflow-timeline" aria-label="Suivi de mission">
@@ -1048,14 +1058,26 @@ function DesktopWorkflowTimeline({
           <span>Parcours de mission</span>
           <strong>Suivi opérationnel</strong>
         </div>
-        <button
-          type="button"
-          className="desktop-workflow-refresh-button"
-          disabled={refreshAction.disabled || refreshAction.busy}
-          onClick={refreshAction.onSelect}
-        >
-          {refreshAction.busy && refreshAction.busyLabel ? refreshAction.busyLabel : refreshAction.label}
-        </button>
+        <div className="desktop-workflow-head-actions">
+          {withdrawAction ? (
+            <button
+              type="button"
+              className="desktop-workflow-withdraw-button"
+              disabled={withdrawAction.disabled}
+              onClick={withdrawAction.onSelect}
+            >
+              {withdrawAction.label}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="desktop-workflow-refresh-button"
+            disabled={refreshAction.disabled || refreshAction.busy}
+            onClick={refreshAction.onSelect}
+          >
+            {refreshAction.busy && refreshAction.busyLabel ? refreshAction.busyLabel : refreshAction.label}
+          </button>
+        </div>
       </div>
       <div className="desktop-workflow-steps">
         {steps.map((step) => (

@@ -8048,3 +8048,38 @@ td {
     justify-content: center !important;
   }
 }
+
+.desktop-workflow-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.desktop-workflow-withdraw-button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid #FECACA;
+  border-radius: 999px;
+  background: #FEF3F2;
+  color: #B42318;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.desktop-workflow-withdraw-button:hover {
+  background: #FEE2E2;
+  border-color: #FCA5A5;
+  transform: translateY(-0.5px);
+}
+
+.desktop-workflow-withdraw-button:active {
+  transform: translateY(0);
+}
+
+.desktop-workflow-withdraw-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
