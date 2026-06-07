@@ -23,4 +23,9 @@ export class NotificationsController {
   delete(@CurrentUser() user: RequestUser, @Param('id') id: string) {
     return this.notifications.delete(user.id, id);
   }
+
+  @Delete()
+  deleteAll(@CurrentUser() user: RequestUser) {
+    return this.notifications.deleteAll(user.id);
+  }
 }

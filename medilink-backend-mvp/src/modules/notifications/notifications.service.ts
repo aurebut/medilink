@@ -67,6 +67,13 @@ export class NotificationsService {
     return { deleted: true };
   }
 
+  async deleteAll(userId: string) {
+    await this.prisma.notification.deleteMany({
+      where: { userId },
+    });
+    return { deleted: true };
+  }
+
   async notifyApplicationReceived(applicationId: string) {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },

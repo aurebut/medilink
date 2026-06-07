@@ -5679,26 +5679,55 @@ tbody tr:hover { background: #FAFBFD; }
   font-size: 12px;
   font-weight: 800;
 }
+.notification-menu-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.notification-clear-all {
+  flex: 0 0 auto;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.notification-clear-all:hover {
+  color: var(--danger);
+  background: rgba(220, 53, 69, 0.06);
+}
 .notification-menu-list {
   max-height: min(440px, calc(100dvh - 160px));
   overflow: auto;
-  padding: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .notification-menu-item {
   display: grid;
-  gap: 7px;
-  padding: 11px;
-  border-radius: 10px;
-  border: 1px solid transparent;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  transition: all 0.2s ease;
 }
-.notification-menu-item + .notification-menu-item {
-  border-top: 1px solid var(--line);
-  border-radius: 0;
+.notification-menu-item:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 3px 10px rgba(11, 25, 41, 0.03);
 }
 .notification-menu-item.unread {
-  border-color: rgba(183,110,0,.18);
-  border-radius: 10px;
-  background: rgba(183,110,0,.06);
+  border-color: rgba(183, 110, 0, 0.24);
+  background: rgba(183, 110, 0, 0.05);
 }
 .notification-menu-item-head {
   display: flex;

@@ -175,6 +175,19 @@ export function AppShell({
     }
   }
 
+  async function deleteAllNotifications() {
+    const backupNotifications = [...notifications];
+    setNotifications([]);
+    setNotificationsError(null);
+
+    try {
+      await api.delete('/notifications');
+    } catch (e: any) {
+      setNotifications(backupNotifications);
+      setNotificationsError(e.message);
+    }
+  }
+
   useEffect(() => {
     function onDocumentClick(event: MouseEvent) {
       if (!accountMenuRef.current?.contains(event.target as Node)) {
@@ -303,9 +316,20 @@ export function AppShell({
                     <strong>Notifications</strong>
                     <span>{unreadNotifications > 0 ? `${unreadNotifications} non lue${unreadNotifications > 1 ? 's' : ''}` : 'Tout est lu'}</span>
                   </div>
-                  <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
-                    Voir plus
-                  </Link>
+                  <div className="notification-menu-actions">
+                    {notifications.length > 0 ? (
+                      <button
+                        type="button"
+                        className="notification-clear-all"
+                        onClick={() => void deleteAllNotifications()}
+                      >
+                        Tout effacer
+                      </button>
+                    ) : null}
+                    <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
+                      Voir plus
+                    </Link>
+                  </div>
                 </div>
 
                 <div className="notification-menu-list">
