@@ -142,7 +142,7 @@ export function AppShell({
   }
 
   async function loadNotifications() {
-    if (area !== 'candidate') return;
+    if (area === 'admin') return;
 
     setNotificationsLoading(true);
     setNotificationsError(null);
@@ -209,7 +209,7 @@ export function AppShell({
   }, [pathname]);
 
   useEffect(() => {
-    if (area !== 'candidate') {
+    if (area === 'admin') {
       setNotifications([]);
       setConversations([]);
       setNotificationsOpen(false);
@@ -282,8 +282,8 @@ export function AppShell({
                 <span>Paramètres du compte</span>
                 <span className="menu-arrow">&gt;</span>
               </Link>
-              {area === 'candidate' ? (
-                <Link href="/app/notifications" className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
+              {area !== 'admin' ? (
+                <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
                   <span>Notifications</span>
                   <span className="menu-arrow">&gt;</span>
                 </Link>
@@ -296,7 +296,7 @@ export function AppShell({
           </div>
         </nav>
 
-        {area === 'candidate' ? (
+        {area !== 'admin' ? (
           <div className="notification-menu-wrap" ref={notificationsRef}>
             {notificationsOpen ? (
               <div className="notification-menu" role="dialog" aria-label="Notifications recentes">
@@ -305,7 +305,7 @@ export function AppShell({
                     <strong>Notifications</strong>
                     <span>{unreadNotifications > 0 ? `${unreadNotifications} non lue${unreadNotifications > 1 ? 's' : ''}` : 'Tout est lu'}</span>
                   </div>
-                  <Link href="/app/notifications" className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
+                  <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="notification-menu-link" onClick={() => setNotificationsOpen(false)}>
                     Voir plus
                   </Link>
                 </div>
