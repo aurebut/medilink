@@ -109,10 +109,6 @@ export default function CandidateAgendaPage() {
   const missionRows = useMemo(() => buildCandidateMissionHistoryRows(applications, conversations), [applications, conversations]);
 
   const upcomingEvents = events.filter((event) => event.upcoming).slice(0, 8);
-  const acceptedEvents = events.filter((event) => event.application.status === 'ACCEPTED');
-  const proposalEvents = events.filter((event) => latestAgreement(event.conversation)?.status === 'PROPOSED');
-  const activeRows = missionRows.filter(({ application }) => !['REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(application.status));
-  const completedRows = missionRows.filter(({ agreement }) => ['COMPLETED', 'PAYMENT_RELEASED'].includes(agreement?.status || ''));
   const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
@@ -172,31 +168,7 @@ export default function CandidateAgendaPage() {
       <PageHeader
         title="Agenda"
         description="Vue opérationnelle des missions, propositions et disponibilités déclarées."
-        actions={<LinkButton href="/app/profile" variant="light">Modifier mes disponibilités</LinkButton>}
       />
-
-      <div className="agenda-overview">
-        <div>
-          <span>Missions acceptées</span>
-          <strong>{acceptedEvents.length}</strong>
-        </div>
-        <div>
-          <span>Propositions</span>
-          <strong>{proposalEvents.length}</strong>
-        </div>
-        <div>
-          <span>A venir</span>
-          <strong>{upcomingEvents.length}</strong>
-        </div>
-        <div>
-          <span>Actives</span>
-          <strong>{activeRows.length}</strong>
-        </div>
-        <div>
-          <span>Terminées</span>
-          <strong>{completedRows.length}</strong>
-        </div>
-      </div>
 
       <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Navigation de l'agenda" style={{ marginBottom: 18 }}>
         {agendaSections.map((section) => (
