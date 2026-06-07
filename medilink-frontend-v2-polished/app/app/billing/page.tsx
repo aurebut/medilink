@@ -59,7 +59,7 @@ const MICRO_BNC_THRESHOLD = 77700;
 
 const tabs: Array<{ id: BillingTab; label: string }> = [
   { id: 'overview', label: 'Vue d’ensemble' },
-  { id: 'missions', label: 'Missions' },
+  { id: 'missions', label: 'Historique de missions' },
   { id: 'revenues', label: 'Recettes' },
   { id: 'documents', label: 'Justificatifs' },
   { id: 'tax', label: 'Fiscalité' },
