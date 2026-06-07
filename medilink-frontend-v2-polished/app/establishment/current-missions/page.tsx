@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import type { CSSProperties } from 'react';
 import { api, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
@@ -9,7 +8,7 @@ import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelL
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
-import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, StatCard, Textarea, Button, Input } from '@/components/ui';
+import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, StatCard, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type NotesByApplication = Record<string, string>;
@@ -279,15 +278,6 @@ export default function EstablishmentCurrentMissionsPage() {
       .finally(() => setLoadingDetails(false));
   }, [selectedApplicationId, currentApplications]);
 
-  const stats = useMemo(() => {
-    const moments = currentApplications.map((application) => missionMoment(application.mission));
-    return {
-      active: moments.filter((moment) => moment === 'active' || moment === 'today').length,
-      upcoming: moments.filter((moment) => moment === 'upcoming').length,
-      done: moments.filter((moment) => moment === 'done').length,
-    };
-  }, [currentApplications]);
-
   function updateNote(missionId: string, value: string) {
     const next = { ...notes, [missionId]: value };
     setNotes(next);
@@ -342,6 +332,15 @@ export default function EstablishmentCurrentMissionsPage() {
     };
   }, [selectedApplicationId, currentApplications, selectedConversation]);
 
+  const stats = useMemo(() => {
+    const moments = currentApplications.map((application) => missionMoment(application.mission));
+    return {
+      active: moments.filter((moment) => moment === 'active' || moment === 'today').length,
+      upcoming: moments.filter((moment) => moment === 'upcoming').length,
+      done: moments.filter((moment) => moment === 'done').length,
+    };
+  }, [currentApplications]);
+
   if (loading || missionsLoading) return <LoadingCard label="Chargement des missions en cours..." />;
 
   return (
@@ -379,9 +378,47 @@ export default function EstablishmentCurrentMissionsPage() {
 
           <div className="grid-main">
             {/* Sidebar with active missions list */}
-            <Card>
-              <h3 style={{ margin: '0 0 12px 0', fontSize: 16, color: 'var(--heading)' }}>Missions ({currentApplications.length})</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <Card className="current-mission-selector-card">
+              <h3 className="current-mission-desktop-title" style={{ margin: '0 0 12px 0', fontSize: 16, color: 'var(--heading)' }}>Missions ({currentApplications.length})</h3>
+              <div className="current-mission-mobile-select">
+                <div className="current-mission-picker-head">
+                  <div>
+                    <h3>Missions</h3>
+                    <p>{currentApplications.length} mission{currentApplications.length > 1 ? 's' : ''} confirmée{currentApplications.length > 1 ? 's' : ''}</p>
+                  </div>
+                  {selectedRow ? (
+                    <Badge tone={momentTone(missionMoment(selectedRow.application.mission))}>
+                      {momentLabel(missionMoment(selectedRow.application.mission))}
+                    </Badge>
+                  ) : null}
+                </div>
+
+                {currentApplications.length > 1 ? (
+                  <label className="field">
+                    <span className="label">Choisir une mission</span>
+                    <Select
+                      value={selectedApplicationId || ''}
+                      onChange={(event) => setSelectedApplicationId(event.target.value)}
+                      aria-label="Choisir la mission à consulter"
+                    >
+                      {currentApplications.map((app) => (
+                        <option key={app.id} value={app.id}>
+                          {[app.mission?.title || 'Mission', candidateName(app), formatDate(app.mission?.startDate)].filter(Boolean).join(' - ')}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                ) : null}
+
+                {selectedRow ? (
+                  <div className="current-mission-picker-summary">
+                    <strong>{selectedRow.application.mission?.title || 'Mission'}</strong>
+                    <span>{candidateName(selectedRow.application)}</span>
+                    <small>{nextTiming(selectedRow.application)}</small>
+                  </div>
+                ) : null}
+              </div>
+              <div className="current-mission-desktop-list" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {currentApplications.map((app) => {
                   const isSelected = app.id === selectedApplicationId;
                   const moment = missionMoment(app.mission);

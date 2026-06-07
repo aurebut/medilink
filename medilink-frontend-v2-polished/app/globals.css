@@ -506,6 +506,61 @@ button { touch-action: manipulation; }
   margin-bottom: 16px;
 }
 
+.current-mission-mobile-select {
+  display: none;
+}
+
+.current-mission-picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.current-mission-picker-head h3 {
+  margin: 0;
+  color: var(--heading);
+  font-size: 16px;
+}
+
+.current-mission-picker-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.current-mission-picker-summary {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-soft);
+}
+
+.current-mission-picker-summary strong,
+.current-mission-picker-summary span,
+.current-mission-picker-summary small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.current-mission-picker-summary strong {
+  color: var(--heading);
+  font-size: 14px;
+}
+
+.current-mission-picker-summary span {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.current-mission-picker-summary small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .current-missions-empty {
   display: grid;
   gap: 12px;
@@ -3707,6 +3762,15 @@ tbody tr:hover { background: #FAFBFD; }
 
 @media (max-width: 980px) {
   .hero, .grid-main, .grid-2, .grid-3, .message-layout, .wizard-layout { grid-template-columns: 1fr; }
+  .current-missions-stats,
+  .current-mission-desktop-title,
+  .current-mission-desktop-list {
+    display: none !important;
+  }
+  .current-mission-mobile-select {
+    display: grid;
+    gap: 14px;
+  }
   .dashboard-hero,
   .dashboard-main,
   .dashboard-notification-grid,
