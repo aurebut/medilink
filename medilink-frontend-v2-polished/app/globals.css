@@ -7743,3 +7743,102 @@ td {
     line-height: 1.2;
   }
 }
+
+/* ==========================================================================
+   Candidate Ad Search: Secondary Collapsible Filters
+   ========================================================================== */
+
+.extra-filters-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 14px;
+  margin-bottom: 6px;
+  user-select: none;
+}
+
+.extra-filters-toggle-btn:hover {
+  background: rgba(26, 82, 160, 0.08);
+  border-color: rgba(26, 82, 160, 0.24);
+  transform: translateY(-1px);
+}
+
+.extra-filters-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.extra-filters-badge {
+  background: var(--blue);
+  color: #fff;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: auto;
+  margin-right: 10px;
+  box-shadow: 0 2px 6px rgba(26, 82, 160, 0.2);
+}
+
+.extra-filters-toggle-btn .chevron-icon {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--blue);
+}
+
+.extra-filters-toggle-btn .chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.extra-filters-content {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, padding 0.35s ease, margin 0.35s ease;
+  display: grid;
+  gap: 12px;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+.extra-filters-content.open {
+  max-height: 1200px;
+  opacity: 1;
+  padding-top: 14px;
+  margin-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+
+.extra-filters-reset-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  text-align: right;
+  padding: 4px 0;
+  margin-top: 6px;
+  display: inline-block;
+  align-self: end;
+  transition: color 0.15s ease, transform 0.1s ease;
+  width: max-content;
+}
+
+.extra-filters-reset-btn:hover {
+  color: #B42318;
+  transform: scale(1.02);
+}
+
+.extra-filters-reset-btn:active {
+  transform: scale(1);
+}

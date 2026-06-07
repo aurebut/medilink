@@ -41,25 +41,42 @@ function applicationTone(status: string) {
   return 'neutral';
 }
 
+const secondaryFilterKeys = [
+  'missionType',
+  'requiredLevel',
+  'sector',
+  'patientType',
+  'softwareUsed',
+  'hasSecretary',
+  'dateFrom',
+  'retrocessionMin',
+  'retrocessionMax',
+];
+
 export default function SearchMissionsPage() {
   const [activeTab, setActiveTab] = useState<SearchTab>('missions');
   const [items, setItems] = useState<Mission[]>([]);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [extraFiltersOpen, setExtraFiltersOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
   const activeFilters = Object.values(filters).filter(Boolean).length;
+  const activeSecondaryFilters = secondaryFilterKeys.filter(
+    (key) => !!filters[key as keyof typeof filters]
+  ).length;
 
   // Applications state
   const [applications, setApplications] = useState<Application[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
 
-  async function loadMissions() {
+  async function loadMissions(currentFilters = filters) {
     setLoading(true);
     setError(null);
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([k, v]) => { if (v) params.set(k, v); });
+    Object.entries(currentFilters).forEach(([k, v]) => { if (v) params.set(k, v); });
     params.set('limit', '50');
 
     try {
@@ -72,6 +89,49 @@ export default function SearchMissionsPage() {
       setLoading(false);
     }
   }
+
+  const toggleExtraFilters = () => {
+    setExtraFiltersOpen((prev) => {
+      const next = !prev;
+      if (!next) {
+        // Clear all secondary filters and reload
+        const updated = { ...filters };
+        let changed = false;
+        secondaryFilterKeys.forEach((key) => {
+          if (updated[key as keyof typeof filters] !== '') {
+            (updated as any)[key] = '';
+            changed = true;
+          }
+        });
+        if (changed) {
+          setFilters(updated);
+          void loadMissions(updated);
+        }
+      }
+      return next;
+    });
+  };
+
+  const resetExtraFilters = () => {
+    const updated = { ...filters };
+    let changed = false;
+    secondaryFilterKeys.forEach((key) => {
+      if (updated[key as keyof typeof filters] !== '') {
+        (updated as any)[key] = '';
+        changed = true;
+      }
+    });
+    if (changed) {
+      setFilters(updated);
+      void loadMissions(updated);
+    }
+  };
+
+  const resetAllFilters = () => {
+    setFilters(emptyFilters);
+    setExtraFiltersOpen(false);
+    void loadMissions(emptyFilters);
+  };
 
   async function loadApplications() {
     setApplicationsLoading(true);
@@ -192,74 +252,116 @@ export default function SearchMissionsPage() {
                 <Field label="Spécialité">
                   <Input value={filters.specialty} onChange={(e) => set('specialty', e.target.value)} placeholder="Urgences" />
                 </Field>
-                <Field label="Secteur conventionné">
-                  <Select value={filters.sector} onChange={(e) => set('sector', e.target.value)}>
-                    <option value="">Tous</option>
-                    {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="Type de patientèle">
-                  <Select value={filters.patientType} onChange={(e) => set('patientType', e.target.value)}>
-                    <option value="">Tous</option>
-                    {patientTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="Logiciel utilisé">
-                  <Select value={filters.softwareUsed} onChange={(e) => set('softwareUsed', e.target.value)}>
-                    <option value="">Tous</option>
-                    {softwareOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="Présence de secrétaire">
-                  <Select value={filters.hasSecretary} onChange={(e) => set('hasSecretary', e.target.value)}>
-                    <option value="">Tous</option>
-                    <option value="true">Oui</option>
-                    <option value="false">Non</option>
-                  </Select>
-                </Field>
-                <Field label="Type mission">
-                  <Select value={filters.missionType} onChange={(e) => set('missionType', e.target.value as MissionType)}>
-                    <option value="">Tous</option>
-                    {missionTypeOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="Niveau requis">
-                  <Select value={filters.requiredLevel} onChange={(e) => set('requiredLevel', e.target.value as RequiredLevel)}>
-                    <option value="">Tous</option>
-                    {requiredLevelOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </Select>
-                </Field>
-                <Field label="À partir du">
-                  <Input type="date" value={filters.dateFrom} onChange={(e) => set('dateFrom', e.target.value)} />
-                </Field>
-                <div className="form-row">
-                  <Field label="Rétrocession minimum">
-                    <Input
-                      type="number"
-                      min="1"
-                      max="100"
-                      value={filters.retrocessionMin}
-                      onChange={(e) => set('retrocessionMin', e.target.value)}
-                      placeholder="70"
-                    />
+
+                <button
+                  type="button"
+                  className="extra-filters-toggle-btn"
+                  onClick={toggleExtraFilters}
+                  aria-expanded={extraFiltersOpen}
+                  aria-controls="extra-search-filters"
+                >
+                  <span>{extraFiltersOpen ? 'Masquer les options' : 'Plus de filtres'}</span>
+                  {activeSecondaryFilters > 0 && (
+                    <span className="extra-filters-badge">{activeSecondaryFilters}</span>
+                  )}
+                  <svg
+                    className={`chevron-icon ${extraFiltersOpen ? 'open' : ''}`}
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+
+                <div
+                  className={`extra-filters-content ${extraFiltersOpen ? 'open' : ''}`}
+                  id="extra-search-filters"
+                >
+                  <Field label="Secteur conventionné">
+                    <Select value={filters.sector} onChange={(e) => set('sector', e.target.value)}>
+                      <option value="">Tous</option>
+                      {sectorOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </Select>
                   </Field>
-                  <Field label="Rétrocession maximum">
-                    <Input
-                      type="number"
-                      min="1"
-                      max="100"
-                      value={filters.retrocessionMax}
-                      onChange={(e) => set('retrocessionMax', e.target.value)}
-                      placeholder="90"
-                    />
+                  <Field label="Type de patientèle">
+                    <Select value={filters.patientType} onChange={(e) => set('patientType', e.target.value)}>
+                      <option value="">Tous</option>
+                      {patientTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </Select>
                   </Field>
+                  <Field label="Logiciel utilisé">
+                    <Select value={filters.softwareUsed} onChange={(e) => set('softwareUsed', e.target.value)}>
+                      <option value="">Tous</option>
+                      {softwareOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label="Présence de secrétaire">
+                    <Select value={filters.hasSecretary} onChange={(e) => set('hasSecretary', e.target.value)}>
+                      <option value="">Tous</option>
+                      <option value="true">Oui</option>
+                      <option value="false">Non</option>
+                    </Select>
+                  </Field>
+                  <Field label="Type mission">
+                    <Select value={filters.missionType} onChange={(e) => set('missionType', e.target.value as MissionType)}>
+                      <option value="">Tous</option>
+                      {missionTypeOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label="Niveau requis">
+                    <Select value={filters.requiredLevel} onChange={(e) => set('requiredLevel', e.target.value as RequiredLevel)}>
+                      <option value="">Tous</option>
+                      {requiredLevelOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </Select>
+                  </Field>
+                  <Field label="À partir du">
+                    <Input type="date" value={filters.dateFrom} onChange={(e) => set('dateFrom', e.target.value)} />
+                  </Field>
+                  <div className="form-row">
+                    <Field label="Rétrocession minimum">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={filters.retrocessionMin}
+                        onChange={(e) => set('retrocessionMin', e.target.value)}
+                        placeholder="70"
+                      />
+                    </Field>
+                    <Field label="Rétrocession maximum">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={filters.retrocessionMax}
+                        onChange={(e) => set('retrocessionMax', e.target.value)}
+                        placeholder="90"
+                      />
+                    </Field>
+                  </div>
+                  {activeSecondaryFilters > 0 && (
+                    <button
+                      type="button"
+                      className="extra-filters-reset-btn"
+                      onClick={resetExtraFilters}
+                    >
+                      Effacer les filtres additionnels
+                    </button>
+                  )}
                 </div>
+
                 <div className="actions">
                   <Button disabled={loading}>{loading ? 'Chargement...' : 'Rechercher'}</Button>
                   <Button
                     type="button"
                     variant="light"
-                    onClick={() => setFilters(emptyFilters)}
+                    onClick={resetAllFilters}
                   >
                     Réinitialiser
                   </Button>
