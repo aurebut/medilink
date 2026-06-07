@@ -4428,21 +4428,35 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .message-layout-mobile-active .message-pane > .toolbar {
     flex: 0 0 auto;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 8px;
-    min-height: 62px;
-    padding: 9px 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 9px;
+    min-height: 106px;
+    padding: 10px 12px 11px;
     border-bottom: 1px solid var(--line);
     background: rgba(255,255,255,.96);
     backdrop-filter: blur(14px);
   }
+  .message-layout-mobile-active .message-heading {
+    width: 100%;
+    align-items: center;
+  }
+  .message-layout-mobile-active .message-heading > div {
+    min-width: 0;
+  }
   .message-layout-mobile-active .message-heading h2 {
     font-size: 16px;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .message-layout-mobile-active .message-heading .small {
     font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .message-layout-mobile-active .message-pane > .toolbar > .badge {
     flex: 0 0 auto;
@@ -4452,14 +4466,18 @@ tbody tr:hover { background: #FAFBFD; }
     line-height: 1.15;
   }
   .message-layout-mobile-active .message-toolbar-actions {
-    max-width: 62%;
+    width: 100%;
+    max-width: none;
+    display: grid;
+    grid-template-columns: minmax(96px, .9fr) minmax(0, 1.1fr) minmax(96px, .85fr);
     align-items: stretch;
-    gap: 6px;
-    flex-shrink: 1;
+    gap: 7px;
     min-width: 0;
   }
   .message-layout-mobile-active .message-toolbar-actions > .badge {
-    max-width: 112px;
+    max-width: none;
+    min-height: 38px;
+    padding: 5px 8px;
     white-space: normal;
     text-align: center;
     line-height: 1.15;
@@ -4469,38 +4487,37 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .message-layout-mobile-active .mobile-workflow-toggle {
     display: inline-flex;
-    min-height: 36px;
+    width: 100%;
+    min-height: 38px;
     padding: 0 9px;
+    text-align: center;
+    white-space: normal;
   }
   .message-layout-mobile-active .mobile-workflow-header-action {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 4px;
     min-width: 0;
   }
   .mobile-workflow-header-action > span {
-    max-width: 70px;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 900;
-    line-height: 1.1;
-    text-transform: uppercase;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: none;
   }
   .mobile-workflow-header-action > div {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: stretch;
     gap: 5px;
     min-width: 0;
   }
   .mobile-workflow-header-button {
-    min-height: 36px;
-    max-width: 108px;
-    padding: 0 10px;
+    width: 100%;
+    min-height: 38px;
+    max-width: none;
+    padding: 0 9px;
     border: 1px solid rgba(26,82,160,.22);
-    border-radius: 999px;
+    border-radius: 9px;
     background: var(--primary);
     color: #fff;
     font-size: 12px;
@@ -4530,7 +4547,7 @@ tbody tr:hover { background: #FAFBFD; }
     display: grid;
     gap: 12px;
     position: absolute;
-    top: 70px;
+    top: 116px;
     left: 10px;
     right: 10px;
     z-index: 6;
@@ -4929,15 +4946,14 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .message-layout-mobile-active .message-toolbar-actions {
     gap: 6px;
-    max-width: 62%;
+    max-width: none;
   }
   .message-layout-mobile-active .message-toolbar-actions > .badge {
-    max-width: 108px;
+    max-width: none;
     padding-inline: 7px;
     font-size: 11px;
   }
   .message-layout-mobile-active .mobile-workflow-toggle {
-    max-width: 88px;
     padding-inline: 8px;
     font-size: 11px;
     white-space: normal;
