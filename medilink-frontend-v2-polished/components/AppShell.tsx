@@ -23,6 +23,7 @@ const candidateNav: NavItem[] = [
 
 const establishmentNav: NavItem[] = [
   { href: '/establishment/dashboard', label: 'Dashboard', icon: 'D' },
+  { href: '/establishment/agenda', label: 'Agenda', icon: 'A' },
   { href: '/establishment/missions', label: 'Missions', icon: 'M' },
   { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
   { href: '/establishment/billing', label: 'Ma compta', icon: 'C' },
