@@ -2308,6 +2308,90 @@ button { touch-action: manipulation; }
   font-size: 12px;
   line-height: 1.35;
 }
+.establishment-mission-detail-page {
+  display: grid;
+  gap: 18px;
+}
+.establishment-command-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, .24fr) minmax(190px, .32fr) auto;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--line);
+}
+.establishment-command-main,
+.establishment-command-actions {
+  min-width: 0;
+  padding: 18px;
+  background: linear-gradient(180deg, #fff 0%, rgba(248,250,252,.9) 100%);
+}
+.establishment-command-main {
+  display: grid;
+  align-content: center;
+  gap: 9px;
+}
+.establishment-command-main .badge {
+  width: fit-content;
+}
+.establishment-command-main h2 {
+  margin: 0;
+  color: var(--heading);
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.08;
+}
+.establishment-command-main p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.establishment-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.establishment-mission-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, .75fr);
+  gap: 16px;
+  align-items: start;
+}
+.establishment-mission-preview,
+.establishment-mission-side,
+.establishment-edit-panel,
+.establishment-applications-panel {
+  display: grid;
+  gap: 16px;
+}
+.establishment-action-stack {
+  display: grid;
+  gap: 10px;
+}
+.establishment-action-stack .mission-share {
+  display: grid;
+  gap: 10px;
+}
+.establishment-action-stack .mission-share .actions {
+  justify-content: flex-start;
+}
+.establishment-mission-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(340px, .88fr);
+  gap: 16px;
+  align-items: start;
+}
+.establishment-edit-panel .form {
+  gap: 14px;
+}
+.establishment-applications-panel .dashboard-list-meta .btn {
+  min-height: 34px;
+  padding: 7px 11px;
+}
 .week-carousel {
   display: flex;
   gap: 14px;
@@ -3542,6 +3626,9 @@ tbody tr:hover { background: #FAFBFD; }
   .dashboard-command-grid,
   .dashboard-operations-grid,
   .establishment-priority-grid,
+  .establishment-command-strip,
+  .establishment-mission-grid,
+  .establishment-mission-workspace,
   .agenda-workspace {
     grid-template-columns: 1fr;
   }

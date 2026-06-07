@@ -63,6 +63,7 @@ export default function EstablishmentMissionsPage() {
             <MissionCard
               key={m.id}
               mission={m}
+              detailHref={`/establishment/missions/${m.id}`}
               canDelete
               onDeleted={() => setMissions((current) => current.filter((mission) => mission.id !== m.id))}
             />

@@ -119,6 +119,7 @@ export default function MissionPage() {
                   {canManageMission ? (
                     <>
                       <LinkButton variant="light" href="/establishment/missions">Retour aux missions</LinkButton>
+                      <LinkButton href={`/establishment/missions/${mission.id}`}>Gérer dans mon espace</LinkButton>
                       {mission.status === 'PUBLISHED' ? (
                         <MissionShareActions missionId={mission.id} showUrl showPublicLink={false} />
                       ) : null}
