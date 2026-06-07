@@ -6,6 +6,7 @@ import { agreementLabel, agreementTone, conversationForApplication, dateKey, lat
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
+import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation } from '@/lib/types';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
 import { Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
@@ -277,7 +278,7 @@ export default function CandidateAgendaPage() {
                       </div>
                       <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
                       <div className="actions">
-                        {conversation ? <LinkButton href="/app/messages" variant="light">Messagerie</LinkButton> : null}
+                        {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Messagerie</LinkButton> : null}
                         {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
                       </div>
                     </div>

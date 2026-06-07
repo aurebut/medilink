@@ -6,6 +6,7 @@ import { api, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWind
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
+import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, StatCard, Textarea, Button, Input } from '@/components/ui';
@@ -492,7 +493,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
       </div>
       <div className="candidate-command-actions">
         {row.application.conversation ? (
-          <LinkButton href="/establishment/messages" variant="secondary">Messagerie</LinkButton>
+          <LinkButton href={getEstablishmentConversationPath(row.application.conversation.id)} variant="secondary">Messagerie</LinkButton>
         ) : null}
         <LinkButton href={`/establishment/candidates/${row.application.id}`} variant="light">
           Profil candidat
@@ -938,12 +939,12 @@ function MissionControlPanel({
 
           <div className="actions" style={{ marginTop: 20 }}>
             {row.application.conversation ? (
-              <LinkButton href="/establishment/messages">Contacter le candidat</LinkButton>
+              <LinkButton href={getEstablishmentConversationPath(row.application.conversation.id)}>Contacter le candidat</LinkButton>
             ) : null}
             {mission?.id ? (
               <LinkButton href={`/establishment/missions/${mission.id}`} variant="light">Voir l'annonce</LinkButton>
             ) : null}
-            <LinkButton href="/establishment/billing" variant="light">Suivi facturation complet</LinkButton>
+            <LinkButton href={getEstablishmentBillingMissionPath(row.application.conversation, row.agreement)} variant="light">Suivi facturation complet</LinkButton>
           </div>
         </div>
       ) : null}

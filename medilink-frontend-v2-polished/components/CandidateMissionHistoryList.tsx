@@ -2,6 +2,7 @@ import { agreementLabel, agreementNextStep, agreementTone, candidateAmountLabel 
 import { applicationTone, type CandidateMissionHistoryRow } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
+import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
 
 export function CandidateMissionHistoryList({
@@ -46,9 +47,9 @@ export function CandidateMissionHistoryList({
           </div>
 
           <div className="actions">
-            {conversation ? <LinkButton href="/app/messages" variant="light">Ouvrir la discussion</LinkButton> : null}
+            {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Ouvrir la discussion</LinkButton> : null}
             {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Detail mission</LinkButton> : null}
-            <LinkButton href="/app/billing" variant="light">Ma compta</LinkButton>
+            <LinkButton href={getCandidateBillingMissionPath(conversation, agreement)} variant="light">Ma compta</LinkButton>
           </div>
         </Card>
       ))}

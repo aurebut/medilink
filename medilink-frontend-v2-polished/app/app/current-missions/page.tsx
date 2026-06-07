@@ -5,6 +5,7 @@ import { api, isMockStorageUrl } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
+import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -256,7 +257,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <small>{agreementNextStep(row.agreement?.status)}</small>
       </div>
       <div className="candidate-command-actions">
-        {row.conversation ? <LinkButton href="/app/messages" variant="secondary">Messagerie</LinkButton> : null}
+        {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)} variant="secondary">Messagerie</LinkButton> : null}
         {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itineraire</a> : null}
       </div>
     </section>
@@ -407,9 +408,9 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
           </div>
 
           <div className="actions">
-            {row.conversation ? <LinkButton href="/app/messages">Contacter l etablissement</LinkButton> : null}
+            {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)}>Contacter l etablissement</LinkButton> : null}
             {mission?.id ? <LinkButton href={`/app/missions/${mission.id}`} variant="light">Voir la mission</LinkButton> : null}
-            <LinkButton href="/app/billing" variant="light">Suivi compta</LinkButton>
+            <LinkButton href={getCandidateBillingMissionPath(row.conversation, row.agreement)} variant="light">Suivi compta</LinkButton>
           </div>
         </div>
       ) : null}

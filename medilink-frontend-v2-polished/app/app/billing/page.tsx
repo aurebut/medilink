@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api, getApiUrl, getAuthToken } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, latestAgreement } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
+import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Conversation, MissionAgreement } from '@/lib/types';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
 
@@ -634,7 +635,7 @@ function MissionsTab({
                   {busyId === row.conversationId ? 'Téléchargement...' : 'Justificatif PDF'}
                 </Button>
               ) : (
-                <LinkButton href={row.conversationId ? `/app/messages?id=${row.conversationId}` : '/app/messages'} variant="light">Suivre</LinkButton>
+                <LinkButton href={getCandidateConversationPath(row.conversationId)} variant="light">Suivre</LinkButton>
               )}
               {row.hasReceipt ? (
                 <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => onClassify(row.id)}>
@@ -760,7 +761,7 @@ function RevenueTable({
                 ) : row.source === 'MANUAL' ? (
                   <Button type="button" variant="light" onClick={() => onRemoveManual(row.id)}>Retirer</Button>
                 ) : (
-                  <LinkButton href="/app/messages" variant="light">Suivre</LinkButton>
+                  <LinkButton href={getCandidateConversationPath(row.conversationId)} variant="light">Suivre</LinkButton>
                 )}
               </td>
             </tr>

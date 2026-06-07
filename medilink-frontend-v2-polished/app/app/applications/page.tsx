@@ -6,7 +6,7 @@ import { api } from '@/lib/api';
 import type { Application } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
-import { getCandidateMissionPath } from '@/lib/mission-links';
+import { getCandidateConversationPath, getCandidateMissionPath } from '@/lib/mission-links';
 import { Alert, Badge, Button, EmptyState, LoadingCard, PageHeader } from '@/components/ui';
 
 function tone(status: string) {
@@ -75,7 +75,7 @@ export default function ApplicationsPage() {
                   <td><Badge tone={tone(a.status) as any}>{statusLabel(a.status)}</Badge></td>
                   <td>{formatDateTime(a.createdAt)}</td>
                   <td className="actions">
-                    {a.conversation ? <Link className="btn btn-light" href="/app/messages">Messagerie</Link> : null}
+                    {a.conversation ? <Link className="btn btn-light" href={getCandidateConversationPath(a.conversation.id)}>Messagerie</Link> : null}
                     {a.missionId ? (
                       <Link
                         className="btn btn-secondary"

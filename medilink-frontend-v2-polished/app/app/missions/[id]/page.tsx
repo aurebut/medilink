@@ -12,7 +12,7 @@ import {
 } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getMissionApplyPath } from '@/lib/mission-links';
+import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { Alert, Badge, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -144,7 +144,7 @@ function MissionAnnouncementView({
 
       <div className="actions">
         {hasApplied ? null : <LinkButton href={getMissionApplyPath(mission.id)}>Postuler</LinkButton>}
-        {conversation ? <LinkButton href={`/app/messages?id=${conversation.id}`} variant="secondary">Ouvrir la discussion</LinkButton> : null}
+        {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="secondary">Ouvrir la discussion</LinkButton> : null}
       </div>
     </div>
   );
@@ -243,7 +243,7 @@ export default function CandidateMissionDetailPage() {
         actions={
           <>
             <LinkButton href="/app/current-missions" variant="light">Missions en cours</LinkButton>
-            {context.conversation ? <LinkButton href={`/app/messages?id=${context.conversation.id}`}>Messagerie</LinkButton> : null}
+            {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)}>Messagerie</LinkButton> : null}
           </>
         }
       />
@@ -266,7 +266,7 @@ export default function CandidateMissionDetailPage() {
         </div>
         <div className="candidate-command-actions">
           {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itineraire</a> : null}
-          <LinkButton href="/app/billing" variant="secondary">Compta</LinkButton>
+          <LinkButton href={getCandidateBillingMissionPath(context.conversation, context.agreement)} variant="secondary">Compta</LinkButton>
         </div>
       </section>
 
@@ -310,7 +310,7 @@ export default function CandidateMissionDetailPage() {
       ) : null}
 
       <div className="actions">
-        {context.conversation ? <LinkButton href={`/app/messages?id=${context.conversation.id}`} variant="secondary">Contacter l'etablissement</LinkButton> : null}
+        {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)} variant="secondary">Contacter l'etablissement</LinkButton> : null}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { api, getApiUrl, getAuthToken } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
+import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Conversation, MissionAgreement, Application } from '@/lib/types';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { useEstablishments } from '@/components/EstablishmentSelector';
@@ -700,7 +701,7 @@ function MissionsTab({
                   {busyId === row.conversationId ? 'Téléchargement...' : 'Facture PDF'}
                 </Button>
               ) : (
-                <LinkButton href={row.conversationId ? `/establishment/messages?id=${row.conversationId}` : '/establishment/messages'} variant="light">Suivre</LinkButton>
+                <LinkButton href={getEstablishmentConversationPath(row.conversationId)} variant="light">Suivre</LinkButton>
               )}
               {row.hasReceipt ? (
                 <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => onClassify(row.id)}>
@@ -825,7 +826,7 @@ function ExpenseTable({
                 ) : row.source === 'MANUAL' ? (
                   <Button type="button" variant="light" onClick={() => onRemoveManual(row.id)}>Retirer</Button>
                 ) : (
-                  <LinkButton href="/establishment/messages" variant="light">Suivre</LinkButton>
+                  <LinkButton href={getEstablishmentConversationPath(row.conversationId)} variant="light">Suivre</LinkButton>
                 )}
               </td>
             </tr>

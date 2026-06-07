@@ -7,6 +7,7 @@ import type { CandidateProfileForApplication, Document } from '@/lib/types';
 import { documentTypeLabel, medicalStatusLabel as formatMedicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateIs, candidateNoun } from '@/lib/grammar';
+import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: string) {
@@ -82,7 +83,7 @@ export default function EstablishmentCandidateProfilePage() {
           <>
             <LinkButton variant="light" href="/establishment/applications">Retour</LinkButton>
             {data.conversation ? (
-              <LinkButton variant="primary" href="/establishment/messages">Ouvrir la conversation</LinkButton>
+              <LinkButton variant="primary" href={getEstablishmentConversationPath(data.conversation.id)}>Ouvrir la conversation</LinkButton>
             ) : null}
           </>
         }
