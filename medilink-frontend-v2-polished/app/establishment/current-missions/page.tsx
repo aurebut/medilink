@@ -537,6 +537,24 @@ function MissionControlPanel({
     setIsEditingBrief(false);
   }, [row.application.id]);
 
+  const [practicalInfoValue, setPracticalInfoValue] = useState(mission?.practicalInfo || '');
+
+  useEffect(() => {
+    setPracticalInfoValue(mission?.practicalInfo || '');
+  }, [mission?.id]);
+
+  const savePracticalInfo = async (newValue: string) => {
+    if (!mission?.id) return;
+    try {
+      await api.patch(`/missions/${mission.id}`, {
+        practicalInfo: newValue || null,
+      });
+      updateLocalMission(mission.id, { practicalInfo: newValue });
+    } catch (e: any) {
+      setError(e.message || 'Impossible de sauvegarder les consignes.');
+    }
+  };
+
   const startEditing = () => {
     setEditDepartmentInfo(mission?.departmentInfo || '');
     setEditTeamInfo(mission?.teamInfo || '');
@@ -771,12 +789,18 @@ function MissionControlPanel({
               </div>
 
               <div className="candidate-current-info">
-                <div>
-                  <h3>Consignes publiées</h3>
-                  <p>{mission?.practicalInfo || mission?.description || 'Aucune consigne spécifique de l\'établissement renseignée.'}</p>
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Consignes publiées (candidat)</h3>
+                  <Textarea
+                    value={practicalInfoValue}
+                    rows={5}
+                    placeholder="Aucune consigne spécifique de l'établissement renseignée. Cliquez ici pour écrire..."
+                    onChange={(e) => setPracticalInfoValue(e.target.value)}
+                    onBlur={(e) => void savePracticalInfo(e.target.value)}
+                  />
                 </div>
-                <div>
-                  <h3>Notes internes (privées)</h3>
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Notes internes (privées)</h3>
                   <Textarea
                     value={notes[mission?.id || ''] || ''}
                     rows={5}
