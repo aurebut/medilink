@@ -70,12 +70,12 @@ function missionDateRange(application: Application, agreement?: MissionAgreement
   const start = missionStart(application, agreement);
   const end = missionEnd(application, agreement);
   if (!start) {
-    return { primary: 'A confirmer', secondary: 'Fin a confirmer' };
+    return { primary: 'À confirmer', secondary: 'Fin à confirmer' };
   }
 
   return {
     primary: formatDate(start),
-    secondary: end ? `Fin ${formatDate(end)}` : 'Fin a confirmer',
+    secondary: end ? `Fin ${formatDate(end)}` : 'Fin à confirmer',
   };
 }
 
@@ -93,11 +93,11 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
 
   return [
-    { key: 'confirmed', label: 'Mission confirmee', helper: 'La mission est validee avec l etablissement.', status: confirmed ? 'Valide' : 'A confirmer', active: confirmed && !scheduleStarted, done: confirmed },
-    { key: 'started', label: 'Debut de mission', helper: scheduleStarted ? 'La mission a demarre selon le planning confirme.' : 'Cette etape se validera au debut de la mission.', status: scheduleStarted ? 'Demarree' : 'A venir', active: confirmed && !scheduleStarted, done: scheduleStarted },
-    { key: 'documents', label: 'Documents de mission', helper: 'Deposer les fichiers generes pendant toute la duree de la mission.', status: scheduleStarted ? 'A deposer' : 'A venir', active: active || (scheduleStarted && !completed), done: false },
-    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a ete validee.' : scheduleEnded ? 'La date de fin est passee, en attente de validation.' : 'Cette etape se validera apres la fin de mission.', status: completed ? 'Validee' : scheduleEnded ? 'A valider' : 'A venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libere.' : paymentSecured ? 'Paiement securise, liberation apres validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libere' : paymentSecured ? 'Securise' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec l’établissement.', status: confirmed ? 'Validé' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
+    { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', active: confirmed && !scheduleStarted, done: scheduleStarted },
+    { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant toute la durée de la mission.', status: scheduleStarted ? 'À déposer' : 'À venir', active: active || (scheduleStarted && !completed), done: false },
+    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a été validée.' : scheduleEnded ? 'La date de fin est passée, en attente de validation.' : 'Cette étape se validera après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
+    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
 
@@ -112,7 +112,7 @@ function establishmentAddress(mission?: Mission) {
     mission?.location || establishment?.address,
     mission?.city || establishment?.city,
     establishment?.country,
-  ].filter(Boolean).join(', ') || 'Adresse a confirmer';
+  ].filter(Boolean).join(', ') || 'Adresse à confirmer';
 }
 
 function readableList(values?: string[] | null) {
@@ -185,7 +185,7 @@ export default function CandidateCurrentMissionsPage() {
     <>
       <PageHeader
         title="Missions en cours"
-        description="Votre suivi de mission cote candidat : depart, consignes, etablissement et prochaines actions."
+        description="Votre suivi de mission côté candidat : départ, consignes, établissement et prochaines actions."
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
@@ -193,12 +193,12 @@ export default function CandidateCurrentMissionsPage() {
       {rows.length === 0 ? (
         <EmptyState
           title="Aucune mission en cours"
-          description="Une mission apparait ici des qu'une candidature est acceptee ou qu'une proposition est envoyee par un etablissement."
+          description="Une mission apparaît ici dès qu’une candidature est acceptée ou qu’une proposition est envoyée par un établissement."
           action={<LinkButton href="/app/search">Trouver une mission</LinkButton>}
         />
       ) : (
         <>
-          <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections de la mission selectionnee">
+          <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections de la mission sélectionnée">
             {missionSections.map((section) => (
               <button
                 key={section.id}
@@ -227,17 +227,17 @@ export default function CandidateCurrentMissionsPage() {
 function MissionCommandStrip({ row }: { row: MissionRow }) {
   const mission = row.application.mission;
   const address = establishmentAddress(mission);
-  const hasAddress = address !== 'Adresse a confirmer';
+  const hasAddress = address !== 'Adresse à confirmer';
   const dates = missionDateRange(row.application, row.agreement);
   return (
     <section className="candidate-command-strip" aria-label="Mission prioritaire">
       <div className="candidate-command-main">
         <span>Prochaine mission</span>
-        <h2>{mission?.title || 'Mission confirmee'}</h2>
-        <p>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'} - {address}</p>
+        <h2>{mission?.title || 'Mission confirmée'}</h2>
+        <p>{mission?.establishment?.name || mission?.city || 'Établissement à confirmer'} - {address}</p>
       </div>
       <div className="candidate-command-stat">
-        <span>Debut</span>
+        <span>Début</span>
         <strong>{dates.primary}</strong>
         <small>{dates.secondary}</small>
       </div>
@@ -248,7 +248,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)} variant="secondary">Messagerie</LinkButton> : null}
-        {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itineraire</a> : null}
+        {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itinéraire</a> : null}
       </div>
     </section>
   );
@@ -259,18 +259,18 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
   const establishment = mission?.establishment;
   const progress = missionProgress(row.application, row.agreement);
   const address = establishmentAddress(mission);
-  const hasAddress = address !== 'Adresse a confirmer';
+  const hasAddress = address !== 'Adresse à confirmer';
   const detailItems = [
     { label: 'Service', value: mission?.departmentInfo || mission?.sector },
-    { label: 'Equipe', value: mission?.teamInfo },
-    { label: 'Materiel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) },
+    { label: 'Équipe', value: mission?.teamInfo },
+    { label: 'Matériel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) },
     { label: 'Logiciel', value: mission?.softwareUsed || establishment?.softwareUsed },
     { label: 'Patients / jour', value: mission?.averagePatientsPerDay ? `${mission.averagePatientsPerDay}` : null },
-    { label: 'Secretariat', value: mission?.hasSecretary ? mission.secretaryType || 'Disponible' : null },
+    { label: 'Secrétariat', value: mission?.hasSecretary ? mission.secretaryType || 'Disponible' : null },
     { label: 'Parking', value: mission?.parkingAvailable ? 'Disponible' : null },
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
-  const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Echanger avec l etablissement pour confirmer les derniers details.';
+  const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
   return (
     <section className="candidate-current-detail candidate-current-unified">
       {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
@@ -313,24 +313,24 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
               <span>Mission</span>
               <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
               <p>{formatCompensation(row.agreement || mission || {})}</p>
-              <small>{mission?.specialty || 'Specialite a confirmer'}</small>
+              <small>{mission?.specialty || 'Spécialité à confirmer'}</small>
             </div>
             <div className="candidate-current-panel">
               <span>Contexte</span>
-              <strong>{mission?.departmentInfo || mission?.sector || 'Service a confirmer'}</strong>
-              <p>{mission?.teamInfo || 'Equipe et organisation a confirmer dans la messagerie.'}</p>
-              <small>{mission?.patientType || establishment?.patientType || 'Patientele a confirmer'}</small>
+              <strong>{mission?.departmentInfo || mission?.sector || 'Service à confirmer'}</strong>
+              <p>{mission?.teamInfo || 'Équipe et organisation à confirmer dans la messagerie.'}</p>
+              <small>{mission?.patientType || establishment?.patientType || 'Patientèle à confirmer'}</small>
             </div>
           </div>
 
           <div className="candidate-current-info">
             <div>
-              <h3>Consignes de l etablissement</h3>
-              <p>{mission?.practicalInfo || mission?.description || 'Les consignes detaillees seront ajoutees par l etablissement ou envoyees dans la messagerie.'}</p>
+              <h3>Consignes de l’établissement</h3>
+              <p>{mission?.practicalInfo || mission?.description || 'Les consignes détaillées seront ajoutées par l’établissement ou envoyées dans la messagerie.'}</p>
             </div>
             <div>
-              <h3>Materiel & environnement</h3>
-              <p>{mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'Materiel a confirmer avant le depart.'}</p>
+              <h3>Matériel & environnement</h3>
+              <p>{mission?.equipmentInfo || readableList(mission?.equipmentAvailable) || 'Matériel à confirmer avant le départ.'}</p>
             </div>
           </div>
 
@@ -353,25 +353,25 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
             <div className="candidate-current-panel candidate-current-map-panel">
               <span>Adresse</span>
               <strong>{address}</strong>
-              <p>{mission?.city || establishment?.city || 'Ville a confirmer'}</p>
-              {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Ouvrir l itineraire</a> : null}
+              <p>{mission?.city || establishment?.city || 'Ville à confirmer'}</p>
+              {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Ouvrir l’itinéraire</a> : null}
             </div>
             <div className="candidate-current-panel">
               <span>Contact</span>
-              <strong>{establishment?.name || 'Etablissement a confirmer'}</strong>
+              <strong>{establishment?.name || 'Établissement à confirmer'}</strong>
               <p>{establishment?.phone || establishment?.email || 'Contact via la messagerie MediLink'}</p>
-              <small>{establishment?.website || 'Site web non renseigne'}</small>
+              <small>{establishment?.website || 'Site web non renseigné'}</small>
             </div>
           </div>
 
           <div className="candidate-current-info">
             <div>
-              <h3>Acces</h3>
-              <p>{mission?.parkingAvailable ? 'Parking disponible.' : 'Parking a confirmer.'} {mission?.accommodationProvided ? 'Logement fourni.' : 'Logement non renseigne.'}</p>
+              <h3>Accès</h3>
+              <p>{mission?.parkingAvailable ? 'Parking disponible.' : 'Parking à confirmer.'} {mission?.accommodationProvided ? 'Logement fourni.' : 'Logement non renseigné.'}</p>
             </div>
             <div>
               <h3>Point de contact</h3>
-              <p>{row.conversation ? 'Conversation ouverte avec l etablissement.' : 'Aucune conversation rattachee pour le moment.'}</p>
+              <p>{row.conversation ? 'Conversation ouverte avec l’établissement.' : 'Aucune conversation rattachée pour le moment.'}</p>
             </div>
           </div>
         </div>
@@ -385,20 +385,20 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
         <div className="candidate-current-tab-panel">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
-              <span>Remuneration</span>
+              <span>Rémunération</span>
               <strong>{formatCompensation(row.agreement || mission || {})}</strong>
               <p>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</p>
-              <small>{row.agreement?.terms || 'Conditions a retrouver dans la proposition ou la messagerie.'}</small>
+              <small>{row.agreement?.terms || 'Conditions à retrouver dans la proposition ou la messagerie.'}</small>
             </div>
             <div className="candidate-current-panel">
               <span>Prochaine action</span>
               <strong>{nextStep}</strong>
-              <p>Le suivi comptable sera alimente au fil des validations de mission et de paiement.</p>
+              <p>Le suivi comptable sera alimenté au fil des validations de mission et de paiement.</p>
             </div>
           </div>
 
           <div className="actions">
-            {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)}>Contacter l etablissement</LinkButton> : null}
+            {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)}>Contacter l’établissement</LinkButton> : null}
             {mission?.id ? <LinkButton href={`/app/missions/${mission.id}`} variant="light">Voir la mission</LinkButton> : null}
             <LinkButton href={getCandidateBillingMissionPath(row.conversation, row.agreement)} variant="light">Suivi compta</LinkButton>
           </div>
@@ -441,7 +441,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
         await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
       }
       setFiles([]);
-      setMessage(`${files.length} fichier(s) ajoute(s) aux documents de mission.`);
+      setMessage(`${files.length} fichier(s) ajouté(s) aux documents de mission.`);
     } catch (e: any) {
       setError(e.message || 'Upload impossible.');
     } finally {
@@ -455,7 +455,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
         <div>
           <span>Documents de mission</span>
           <strong>Fichiers produits pendant la mission</strong>
-          <p>Ajoutez ici les documents generes pendant la duree de la mission {missionTitle}. Ils seront conserves dans votre dossier documents MediLink.</p>
+          <p>Ajoutez ici les documents générés pendant la durée de la mission {missionTitle}. Ils seront conservés dans votre dossier documents MediLink.</p>
         </div>
         <label className="candidate-current-dropzone">
           <Input
@@ -463,8 +463,8 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
             multiple
             onChange={(event) => setFiles(Array.from(event.target.files || []))}
           />
-          <strong>{files.length ? `${files.length} fichier(s) selectionne(s)` : 'Selectionner des fichiers'}</strong>
-          <span>Comptes rendus, feuilles de soin, justificatifs ou pieces utiles a transmettre.</span>
+          <strong>{files.length ? `${files.length} fichier(s) sélectionné(s)` : 'Sélectionner des fichiers'}</strong>
+          <span>Comptes rendus, feuilles de soin, justificatifs ou pièces utiles à transmettre.</span>
         </label>
         {files.length > 0 ? (
           <div className="candidate-current-file-list">
