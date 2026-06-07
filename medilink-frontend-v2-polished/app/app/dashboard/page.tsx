@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api, primeApiCache } from '@/lib/api';
+import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
@@ -92,19 +92,26 @@ export default function CandidateDashboardPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
+  function applyDashboardData(data: CandidateDashboardData) {
+    primeApiCache('/me/profile', data.profile);
+    primeApiCache('/me/documents', data.documents);
+    primeApiCache('/me/applications', data.applications);
+    primeApiCache('/conversations', data.conversations);
+    primeApiCache('/notifications', data.notifications);
+    setProfile(data.profile);
+    setDocuments(data.documents);
+    setApplications(data.applications);
+    setConversations(data.conversations);
+    setNotifications(data.notifications);
+  }
+
   useEffect(() => {
-    api.get<CandidateDashboardData>('/me/dashboard').then((data) => {
-      primeApiCache('/me/profile', data.profile);
-      primeApiCache('/me/documents', data.documents);
-      primeApiCache('/me/applications', data.applications);
-      primeApiCache('/conversations', data.conversations);
-      primeApiCache('/notifications', data.notifications);
-      setProfile(data.profile);
-      setDocuments(data.documents);
-      setApplications(data.applications);
-      setConversations(data.conversations);
-      setNotifications(data.notifications);
-    }).finally(() => setLoading(false));
+    const unsubscribe = subscribeApiCache<CandidateDashboardData>('/me/dashboard', applyDashboardData);
+    api.get<CandidateDashboardData>('/me/dashboard')
+      .then(applyDashboardData)
+      .finally(() => setLoading(false));
+
+    return unsubscribe;
   }, []);
 
   const dashboard = useMemo(() => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api, primeApiCache } from '@/lib/api';
+import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
@@ -54,25 +54,30 @@ export default function EstablishmentDashboardPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [dashboardLoading, setDashboardLoading] = useState(true);
 
+  function applyDashboardData(data: EstablishmentDashboardData) {
+    setPrimary(data.establishment);
+    setApplications(data.applications);
+    setMissions(data.missions);
+    setConversations(data.conversations);
+    if (data.establishment) {
+      primeApiCache('/establishments/me', [data.establishment]);
+      primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
+      primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+    }
+    primeApiCache('/conversations', data.conversations);
+  }
+
   useEffect(() => {
+    const unsubscribe = subscribeApiCache<EstablishmentDashboardData>('/establishment/dashboard', applyDashboardData);
     setDashboardLoading(true);
-    api.get<EstablishmentDashboardData>('/establishment/dashboard').then((data) => {
-      setPrimary(data.establishment);
-      setApplications(data.applications);
-      setMissions(data.missions);
-      setConversations(data.conversations);
-      if (data.establishment) {
-        primeApiCache('/establishments/me', [data.establishment]);
-        primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
-        primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
-      }
-      primeApiCache('/conversations', data.conversations);
-    }).catch(() => {
+    api.get<EstablishmentDashboardData>('/establishment/dashboard').then(applyDashboardData).catch(() => {
       setPrimary(null);
       setApplications([]);
       setMissions([]);
       setConversations([]);
     }).finally(() => setDashboardLoading(false));
+
+    return unsubscribe;
   }, []);
 
   const dashboard = useMemo(() => {

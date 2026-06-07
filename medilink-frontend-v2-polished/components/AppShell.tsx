@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { api, primeApiCache } from '@/lib/api';
+import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
@@ -348,6 +348,18 @@ export function AppShell({
   }, [area]);
 
   useEffect(() => {
+    if (area === 'admin') return;
+
+    const unsubscribeNotifications = subscribeApiCache<Notification[]>('/notifications', setNotifications);
+    const unsubscribeConversations = subscribeApiCache<Conversation[]>('/conversations', setConversations);
+
+    return () => {
+      unsubscribeNotifications();
+      unsubscribeConversations();
+    };
+  }, [area]);
+
+  useEffect(() => {
     if (area !== 'candidate' || user?.role !== 'CANDIDATE') {
       setCandidateProfile(null);
       return;
@@ -356,6 +368,11 @@ export function AppShell({
     api.get<Profile>('/me/profile')
       .then(setCandidateProfile)
       .catch(() => setCandidateProfile(null));
+  }, [area, user?.role]);
+
+  useEffect(() => {
+    if (area !== 'candidate' || user?.role !== 'CANDIDATE') return;
+    return subscribeApiCache<Profile>('/me/profile', setCandidateProfile);
   }, [area, user?.role]);
 
   useEffect(() => {

@@ -14,6 +14,7 @@ export class ApiError extends Error {
 
 type ApiOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
+  cacheMode?: 'default' | 'reload';
 };
 
 type CacheEntry = {
@@ -22,8 +23,11 @@ type CacheEntry = {
 };
 
 const GET_CACHE_TTL_MS = 5 * 60_000;
+const REVALIDATE_THROTTLE_MS = 15_000;
 const SESSION_CACHE_PREFIX = 'medilink_api_cache:';
 const getCache = new Map<string, CacheEntry>();
+const revalidatedAt = new Map<string, number>();
+const cacheListeners = new Map<string, Set<(value: unknown) => void>>();
 
 function cacheKey(path: string) {
   return path;
@@ -62,9 +66,26 @@ function writeSessionCache<T>(path: string, value: T, expiresAt: number) {
   }
 }
 
+function emitApiCacheUpdate<T>(path: string, value: T) {
+  const listeners = cacheListeners.get(cacheKey(path));
+  if (!listeners?.size) return;
+  listeners.forEach((listener) => listener(value));
+}
+
+function revalidateApiCache(path: string) {
+  const key = cacheKey(path);
+  const now = Date.now();
+  const last = revalidatedAt.get(key);
+  if (last && now - last < REVALIDATE_THROTTLE_MS) return;
+
+  revalidatedAt.set(key, now);
+  void apiFetch(path, { method: 'GET', cacheMode: 'reload' }).catch(() => undefined);
+}
+
 export function clearApiCache(path?: string) {
   if (!path) {
     getCache.clear();
+    revalidatedAt.clear();
     if (typeof window !== 'undefined') {
       Object.keys(window.sessionStorage)
         .filter((key) => key.startsWith(SESSION_CACHE_PREFIX))
@@ -74,9 +95,23 @@ export function clearApiCache(path?: string) {
   }
 
   getCache.delete(cacheKey(path));
+  revalidatedAt.delete(cacheKey(path));
   if (typeof window !== 'undefined') {
     window.sessionStorage.removeItem(sessionCacheKey(path));
   }
+}
+
+export function subscribeApiCache<T>(path: string, listener: (value: T) => void) {
+  const key = cacheKey(path);
+  const listeners = cacheListeners.get(key) || new Set<(value: unknown) => void>();
+  const wrapped = listener as (value: unknown) => void;
+  listeners.add(wrapped);
+  cacheListeners.set(key, listeners);
+
+  return () => {
+    listeners.delete(wrapped);
+    if (!listeners.size) cacheListeners.delete(key);
+  };
 }
 
 export function primeApiCache<T>(path: string, value: T) {
@@ -86,6 +121,7 @@ export function primeApiCache<T>(path: string, value: T) {
     promise: Promise.resolve(value),
   });
   writeSessionCache(path, value, expiresAt);
+  emitApiCacheUpdate(path, value);
 }
 
 export function getAuthToken() {
@@ -127,12 +163,14 @@ function normalizeError(payload: any): string {
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
   const method = (options.method || 'GET').toUpperCase();
   const canUseCache = method === 'GET' && options.body === undefined;
+  const shouldReadCache = canUseCache && options.cacheMode !== 'reload';
   const key = cacheKey(path);
   const now = Date.now();
 
-  if (canUseCache) {
+  if (shouldReadCache) {
     const cached = getCache.get(key);
     if (cached && cached.expiresAt > now) {
+      revalidateApiCache(path);
       return cached.promise as Promise<T>;
     }
 
@@ -143,19 +181,21 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
         expiresAt: now + GET_CACHE_TTL_MS,
         promise,
       });
+      revalidateApiCache(path);
       return promise;
     }
   }
 
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
   const token = getAuthToken();
+  const { cacheMode: _cacheMode, ...requestOptions } = options;
   const request = fetch(`${API_URL}${path}`, {
-    ...options,
+    ...requestOptions,
     credentials: 'include',
     headers: {
       ...(hasJsonBody ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
+      ...(requestOptions.headers || {}),
     },
     body: hasJsonBody ? JSON.stringify(options.body) : (options.body as BodyInit | undefined),
   }).then(async (response) => {
@@ -169,7 +209,14 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       throw new ApiError(normalizeError(payload), response.status, payload);
     }
 
-    if (canUseCache) writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
+    if (canUseCache) {
+      writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
+      getCache.set(key, {
+        expiresAt: now + GET_CACHE_TTL_MS,
+        promise: Promise.resolve(payload as T),
+      });
+      emitApiCacheUpdate(path, payload as T);
+    }
 
     return payload as T;
   }).catch((error) => {
@@ -177,7 +224,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     throw error;
   });
 
-  if (canUseCache) {
+  if (canUseCache && options.cacheMode !== 'reload') {
     getCache.set(key, {
       expiresAt: now + GET_CACHE_TTL_MS,
       promise: request,
