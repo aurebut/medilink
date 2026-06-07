@@ -94,8 +94,8 @@ export function MissionCard({
         ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
         {onApply ? <Button onClick={() => onApply(mission)}>Postuler</Button> : null}
-        {canDelete && mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} showPublicLink={false} /> : null}
-        {canDelete ? <MissionDeleteButton mission={mission} onDeleted={onDeleted} /> : null}
+        {canDelete && mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} showPublicLink={false} iconOnly /> : null}
+        {canDelete ? <MissionDeleteButton mission={mission} onDeleted={onDeleted} iconOnly /> : null}
       </div>
     </Card>
   );

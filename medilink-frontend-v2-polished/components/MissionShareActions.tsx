@@ -25,10 +25,12 @@ export function MissionShareActions({
   missionId,
   showUrl = false,
   showPublicLink = true,
+  iconOnly = false,
 }: {
   missionId: string;
   showUrl?: boolean;
   showPublicLink?: boolean;
+  iconOnly?: boolean;
 }) {
   const [origin, setOrigin] = useState('');
   const [copied, setCopied] = useState(false);
@@ -46,12 +48,27 @@ export function MissionShareActions({
   }
 
   return (
-    <div className="mission-share">
+    <div className={`mission-share ${iconOnly ? 'icon-share' : ''}`}>
       {showUrl ? (
         <Input aria-label="Lien public de la mission" readOnly value={publicUrl} onFocus={(e) => e.target.select()} />
       ) : null}
       <div className="actions">
-        <Button type="button" variant="light" onClick={copy}>{copied ? 'Lien copie' : 'Copier le lien'}</Button>
+        <Button
+          type="button"
+          variant="light"
+          className={iconOnly ? 'icon-action-button' : ''}
+          aria-label={copied ? 'Lien public copié' : 'Copier le lien public'}
+          title={copied ? 'Lien copié' : 'Partager'}
+          onClick={copy}
+        >
+          {iconOnly ? (
+            <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
+              <path d="M16 6l-4-4-4 4" />
+              <path d="M12 2v14" />
+            </svg>
+          ) : copied ? 'Lien copie' : 'Copier le lien'}
+        </Button>
         {showPublicLink ? <LinkButton variant="light" href={publicPath}>Voir le lien public</LinkButton> : null}
       </div>
     </div>
