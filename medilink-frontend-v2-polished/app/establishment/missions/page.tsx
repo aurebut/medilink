@@ -113,7 +113,7 @@ export default function EstablishmentMissionsPage() {
   return (
     <>
       <PageHeader
-        title="Annonce"
+        title="Annonce et candidature"
         description="Publiez vos missions et traitez les candidatures reçues depuis le même espace."
         actions={
           primary ? (
