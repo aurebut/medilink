@@ -163,18 +163,6 @@ function timelineSteps(row: AccountingRow) {
   ];
 }
 
-function remainingActions(row: AccountingRow) {
-  const actions = [];
-  if (row.agreement?.status === 'PROPOSED') actions.push('Répondre à la proposition finale.');
-  if (row.agreement?.status === 'PAYMENT_REQUIRED') actions.push("Attendre la confirmation de l'établissement.");
-  if (row.agreement?.status === 'FUNDS_SECURED') actions.push('Réaliser la mission puis attendre la validation de fin.');
-  if (row.agreement?.status === 'COMPLETED') actions.push("Faire valider la rétrocession par l'établissement.");
-  if (row.agreement?.status === 'PAYMENT_RELEASED' && !row.hasReceipt) actions.push('Générer ou récupérer le justificatif de mission.');
-  if (row.hasReceipt && !row.classified) actions.push('Marquer le justificatif comme classé.');
-  if (row.amount <= 0 && row.agreement?.status === 'PAYMENT_RELEASED') actions.push('Renseigner le montant réellement validé.');
-  return actions.length ? actions : ['Aucune action comptable urgente.'];
-}
-
 export default function CandidateBillingPage() {
   const [activeTab, setActiveTab] = useState<BillingTab>('overview');
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -599,8 +587,6 @@ function MissionsTab({
   onClassify: (id: string) => void;
 }) {
   const missionRows = rows.filter((row) => row.source === 'MEDILINK');
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const selectedRow = missionRows.find((row) => row.id === selectedId) || missionRows[0];
 
   if (missionRows.length === 0) {
     return <EmptyState title="Aucune mission comptable" description="Les accords MediLink apparaîtront ici dès qu'une proposition sera créée." action={<LinkButton href="/app/messages">Ouvrir la messagerie</LinkButton>} />;
@@ -612,16 +598,7 @@ function MissionsTab({
         {missionRows.map((row) => (
           <section
             key={row.id}
-            className={`card billing-mission-card ${selectedRow?.id === row.id ? 'selected' : ''}`}
-            role="button"
-            tabIndex={0}
-            onClick={() => setSelectedId(row.id)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                setSelectedId(row.id);
-              }
-            }}
+            className="card billing-mission-card"
           >
             <div className="billing-mission-head">
               <div>
@@ -651,12 +628,13 @@ function MissionsTab({
             </div>
 
             <div className="actions" onClick={(event) => event.stopPropagation()}>
+              <LinkButton href={`/app/billing/${encodeURIComponent(row.id)}`} variant="secondary">Voir le détail</LinkButton>
               {row.conversationId && row.hasReceipt ? (
                 <Button variant="light" disabled={busyId === row.conversationId} onClick={() => void onDownload(row.conversationId!)}>
                   {busyId === row.conversationId ? 'Téléchargement...' : 'Justificatif PDF'}
                 </Button>
               ) : (
-                <LinkButton href="/app/messages" variant="light">Suivre</LinkButton>
+                <LinkButton href={row.conversationId ? `/app/messages?id=${row.conversationId}` : '/app/messages'} variant="light">Suivre</LinkButton>
               )}
               {row.hasReceipt ? (
                 <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => onClassify(row.id)}>
@@ -668,103 +646,7 @@ function MissionsTab({
         ))}
       </div>
 
-      {selectedRow ? (
-        <MissionAccountingDetail
-          row={selectedRow}
-          busyId={busyId}
-          onDownload={onDownload}
-          onClassify={onClassify}
-        />
-      ) : null}
     </div>
-  );
-}
-
-function MissionAccountingDetail({
-  row,
-  busyId,
-  onDownload,
-  onClassify,
-}: {
-  row: AccountingRow;
-  busyId: string | null;
-  onDownload: (conversationId: string) => Promise<void>;
-  onClassify: (id: string) => void;
-}) {
-  const estimatedAmount = row.agreement?.amount && row.agreement.amount > 0
-    ? formatMoney(row.agreement.amount, row.currency)
-    : row.agreement?.retrocessionPercentage
-      ? `${row.agreement.retrocessionPercentage}% des honoraires encaissés`
-      : 'À renseigner';
-  const validatedAmount = row.amount > 0 ? formatMoney(row.amount, row.currency) : 'Non validé';
-  const actions = remainingActions(row);
-
-  return (
-    <Card className="billing-mission-detail">
-      <div className="billing-detail-head">
-        <div>
-          <span>Mission selectionnee</span>
-          <Badge tone={agreementTone(row.agreement?.status)}>{agreementLabel(row.agreement?.status)}</Badge>
-          <h2>{row.mission}</h2>
-          <p>{row.client}</p>
-        </div>
-      </div>
-
-      <div className="billing-detail-grid">
-        <div><span>Établissement</span><strong>{row.client}</strong></div>
-        <div><span>Date</span><strong>{formatDate(row.date)}</strong></div>
-        <div><span>Rétrocession</span><strong>{row.agreement?.retrocessionPercentage ? `${row.agreement.retrocessionPercentage}%` : 'À renseigner'}</strong></div>
-        <div><span>Montant estimé</span><strong>{estimatedAmount}</strong></div>
-        <div><span>Montant validé</span><strong>{validatedAmount}</strong></div>
-        <div><span>Justificatif</span><strong>{row.hasReceipt ? 'Disponible' : 'Non disponible'}</strong></div>
-      </div>
-
-      <div className="billing-detail-section">
-        <h3>Timeline complète</h3>
-        <div className="billing-detail-timeline">
-          {timelineSteps(row).map((step) => (
-            <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
-              <span aria-hidden="true" />
-              <div>
-                <strong>{step.label}</strong>
-                <small>{step.done ? 'Terminé' : step.active ? 'En cours' : 'À venir'}</small>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="billing-detail-section">
-        <h3>Actions restantes</h3>
-        <div className="billing-action-list">
-          {actions.map((action) => (
-            <div key={action}>
-              <span aria-hidden="true" />
-              <strong>{action}</strong>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="billing-detail-section">
-        <h3>Notes</h3>
-        <p>{row.notes || row.agreement?.terms || 'Aucune note comptable pour cette mission.'}</p>
-      </div>
-
-      <div className="actions">
-        {row.conversationId ? <LinkButton href="/app/messages" variant="light">Ouvrir l’échange</LinkButton> : null}
-        {row.conversationId && row.hasReceipt ? (
-          <Button variant="light" disabled={busyId === row.conversationId} onClick={() => void onDownload(row.conversationId!)}>
-            {busyId === row.conversationId ? 'Téléchargement...' : 'Télécharger le justificatif'}
-          </Button>
-        ) : null}
-        {row.hasReceipt ? (
-          <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => onClassify(row.id)}>
-            {row.classified ? 'Classé' : 'Marquer classé'}
-          </Button>
-        ) : null}
-      </div>
-    </Card>
   );
 }
 

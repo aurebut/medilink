@@ -6500,10 +6500,7 @@ td {
 }
 
 .billing-missions-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, .48fr);
-  gap: 16px;
-  align-items: start;
+  display: block;
 }
 
 .billing-mission-list {
@@ -6514,20 +6511,13 @@ td {
 .billing-mission-card {
   display: grid;
   gap: 16px;
-  cursor: pointer;
   outline: none;
-  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  transition: border-color .18s ease, box-shadow .18s ease;
 }
 
-.billing-mission-card:hover,
-.billing-mission-card:focus-visible,
-.billing-mission-card.selected {
+.billing-mission-card:hover {
   border-color: rgba(14,138,122,.34);
   box-shadow: 0 16px 44px rgba(11,25,41,.08);
-}
-
-.billing-mission-card:focus-visible {
-  transform: translateY(-1px);
 }
 
 .billing-mission-head {
@@ -6650,11 +6640,21 @@ td {
 }
 
 .billing-mission-detail {
-  position: sticky;
-  top: 20px;
   display: grid;
   gap: 16px;
   min-width: 0;
+}
+
+.billing-detail-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, .42fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.billing-detail-side {
+  display: grid;
+  gap: 16px;
 }
 
 .billing-detail-head h2 {
@@ -6873,6 +6873,7 @@ td {
   .billing-workspace,
   .billing-missions-workspace,
   .billing-overview-grid,
+  .billing-detail-page,
   .billing-doc-grid,
   .billing-export-grid,
   .billing-tax-grid {
