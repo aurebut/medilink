@@ -408,6 +408,24 @@ export function MessageCenter() {
     }
   }
 
+  async function withdrawApplication(appId: string, isAccepted: boolean) {
+    const confirmMessage = isAccepted 
+      ? 'Annuler cette mission ?' 
+      : 'Retirer cette candidature ?';
+      
+    if (!confirm(confirmMessage)) return;
+    setBusyAction('withdraw');
+    setError(null);
+    try {
+      await api.post(`/applications/${appId}/withdraw`, {});
+      await refresh();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyAction(null);
+    }
+  }
+
   async function downloadInvoice(kind: 'recruiter' | 'candidate') {
     if (!activeId) return;
     setBusyAction(`download-${kind}`);
@@ -678,6 +696,16 @@ export function MessageCenter() {
           </div>
           <div className="message-toolbar-actions">
             <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+            {candidate && active?.application && !['CANCELLED', 'WITHDRAWN', 'REJECTED'].includes(active.application.status) ? (
+              <Button
+                type="button"
+                variant="danger"
+                disabled={Boolean(busyAction)}
+                onClick={() => void withdrawApplication(active.application!.id, active.application!.status === 'ACCEPTED')}
+              >
+                {active.application.status === 'ACCEPTED' ? 'Annuler la mission' : 'Retirer candidature'}
+              </Button>
+            ) : null}
             {isMobile && mobileActionStep?.options?.length ? (
               <MobileWorkflowHeaderAction step={mobileActionStep} />
             ) : null}
