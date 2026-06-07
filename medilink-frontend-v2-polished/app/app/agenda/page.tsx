@@ -329,8 +329,8 @@ export default function CandidateAgendaPage() {
       <Card className="agenda-list-card">
         <div className="toolbar">
           <div>
-            <h2>Historique d'événements</h2>
-            <p className="small">Les dernières candidatures, propositions et missions traitées.</p>
+            <h2>Historique des missions</h2>
+            <p className="small">Les dernières propositions, missions acceptées et fins de mission.</p>
           </div>
           <LinkButton href="/app/agenda/missions" variant="light">Voir tout</LinkButton>
         </div>
