@@ -328,6 +328,21 @@ export type MissionAgreement = {
 
 export type Paginated<T> = { items: T[]; total: number };
 
+export type CandidateDashboardData = {
+  profile: Profile;
+  documents: Document[];
+  applications: Application[];
+  conversations: Conversation[];
+  notifications: Notification[];
+};
+
+export type EstablishmentDashboardData = {
+  establishment: Establishment | null;
+  applications: Application[];
+  missions: Mission[];
+  conversations: Conversation[];
+};
+
 
 export type CandidateProfileForApplication = {
   application: Application;

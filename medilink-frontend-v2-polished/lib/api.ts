@@ -16,6 +16,34 @@ type ApiOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
 };
 
+type CacheEntry = {
+  expiresAt: number;
+  promise: Promise<unknown>;
+};
+
+const GET_CACHE_TTL_MS = 15_000;
+const getCache = new Map<string, CacheEntry>();
+
+function cacheKey(path: string) {
+  return path;
+}
+
+export function clearApiCache(path?: string) {
+  if (!path) {
+    getCache.clear();
+    return;
+  }
+
+  getCache.delete(cacheKey(path));
+}
+
+export function primeApiCache<T>(path: string, value: T) {
+  getCache.set(cacheKey(path), {
+    expiresAt: Date.now() + GET_CACHE_TTL_MS,
+    promise: Promise.resolve(value),
+  });
+}
+
 export function getAuthToken() {
   if (typeof window === 'undefined') return null;
   return window.localStorage.getItem(AUTH_TOKEN_KEY);
@@ -51,9 +79,21 @@ function normalizeError(payload: any): string {
 }
 
 export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promise<T> {
+  const method = (options.method || 'GET').toUpperCase();
+  const canUseCache = method === 'GET' && options.body === undefined;
+  const key = cacheKey(path);
+  const now = Date.now();
+
+  if (canUseCache) {
+    const cached = getCache.get(key);
+    if (cached && cached.expiresAt > now) {
+      return cached.promise as Promise<T>;
+    }
+  }
+
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
   const token = getAuthToken();
-  const response = await fetch(`${API_URL}${path}`, {
+  const request = fetch(`${API_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
@@ -62,19 +102,33 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       ...(options.headers || {}),
     },
     body: hasJsonBody ? JSON.stringify(options.body) : (options.body as BodyInit | undefined),
+  }).then(async (response) => {
+    if (response.status === 204) return undefined as T;
+
+    const text = await response.text();
+    let payload: any = null;
+    try { payload = text ? JSON.parse(text) : null; } catch { payload = text ? { message: text } : null; }
+
+    if (!response.ok) {
+      throw new ApiError(normalizeError(payload), response.status, payload);
+    }
+
+    return payload as T;
+  }).catch((error) => {
+    if (canUseCache) getCache.delete(key);
+    throw error;
   });
 
-  if (response.status === 204) return undefined as T;
-
-  const text = await response.text();
-  let payload: any = null;
-  try { payload = text ? JSON.parse(text) : null; } catch { payload = text ? { message: text } : null; }
-
-  if (!response.ok) {
-    throw new ApiError(normalizeError(payload), response.status, payload);
+  if (canUseCache) {
+    getCache.set(key, {
+      expiresAt: now + GET_CACHE_TTL_MS,
+      promise: request,
+    });
+  } else if (method !== 'GET') {
+    clearApiCache();
   }
 
-  return payload as T;
+  return request;
 }
 
 export const api = {

@@ -2,13 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, primeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
-import type { Application, Conversation, Document, Notification, Profile } from '@/lib/types';
+import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
@@ -93,18 +93,17 @@ export default function CandidateDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get<Profile>('/me/profile'),
-      api.get<Document[]>('/me/documents'),
-      api.get<Application[]>('/me/applications'),
-      api.get<Conversation[]>('/conversations'),
-      api.get<Notification[]>('/notifications'),
-    ]).then(([p, d, a, c, n]) => {
-      setProfile(p);
-      setDocuments(d);
-      setApplications(a);
-      setConversations(c);
-      setNotifications(n);
+    api.get<CandidateDashboardData>('/me/dashboard').then((data) => {
+      primeApiCache('/me/profile', data.profile);
+      primeApiCache('/me/documents', data.documents);
+      primeApiCache('/me/applications', data.applications);
+      primeApiCache('/conversations', data.conversations);
+      primeApiCache('/notifications', data.notifications);
+      setProfile(data.profile);
+      setDocuments(data.documents);
+      setApplications(data.applications);
+      setConversations(data.conversations);
+      setNotifications(data.notifications);
     }).finally(() => setLoading(false));
   }, []);
 

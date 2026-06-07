@@ -5,6 +5,7 @@ import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EstablishmentsModule } from './modules/establishments/establishments.module';
 import { MissionsModule } from './modules/missions/missions.module';
@@ -29,6 +30,7 @@ import { UsersModule } from './modules/users/users.module';
     MissionsModule,
     ApplicationsModule,
     ConversationsModule,
+    DashboardModule,
     AdminModule,
   ],
 })

@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, primeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
-import type { Application, Conversation, Mission } from '@/lib/types';
-import { useEstablishments } from '@/components/EstablishmentSelector';
+import type { Application, Conversation, Establishment, EstablishmentDashboardData, Mission } from '@/lib/types';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
@@ -49,35 +48,32 @@ function messagePreview(body?: string | null) {
 }
 
 export default function EstablishmentDashboardPage() {
-  const { primary, loading } = useEstablishments();
+  const [primary, setPrimary] = useState<Establishment | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [missions, setMissions] = useState<Mission[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [dashboardLoading, setDashboardLoading] = useState(true);
 
   useEffect(() => {
-    if (!primary) {
-      setApplications([]);
-      setMissions([]);
-      setConversations([]);
-      return;
-    }
-
     setDashboardLoading(true);
-    Promise.all([
-      api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`),
-      api.get<Mission[]>(`/missions/mine?establishmentId=${primary.id}`),
-      api.get<Conversation[]>('/conversations'),
-    ]).then(([nextApplications, nextMissions, nextConversations]) => {
-      setApplications(nextApplications);
-      setMissions(nextMissions);
-      setConversations(nextConversations.filter((conversation) => conversation.establishmentId === primary.id));
+    api.get<EstablishmentDashboardData>('/establishment/dashboard').then((data) => {
+      setPrimary(data.establishment);
+      setApplications(data.applications);
+      setMissions(data.missions);
+      setConversations(data.conversations);
+      if (data.establishment) {
+        primeApiCache('/establishments/me', [data.establishment]);
+        primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
+        primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+      }
+      primeApiCache('/conversations', data.conversations);
     }).catch(() => {
+      setPrimary(null);
       setApplications([]);
       setMissions([]);
       setConversations([]);
     }).finally(() => setDashboardLoading(false));
-  }, [primary]);
+  }, []);
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {
@@ -142,7 +138,7 @@ export default function EstablishmentDashboardPage() {
     };
   }, [applications, conversations, missions]);
 
-  if (loading) return <LoadingCard />;
+  if (dashboardLoading) return <LoadingCard label="Chargement..." />;
 
   if (!primary) {
     return (
