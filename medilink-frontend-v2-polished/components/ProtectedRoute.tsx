@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { LoadingCard, PlatformSplash } from './ui';
-import type { CurrentUser, UserRole } from '@/lib/types';
+import type { CandidateDashboardData, Conversation, CurrentUser, EstablishmentDashboardData, UserRole } from '@/lib/types';
 import { defaultRouteForUser } from '@/lib/routes';
-import { api } from '@/lib/api';
+import { api, primeApiCache } from '@/lib/api';
 
 const PLATFORM_SPLASH_SEEN_KEY = 'medilink_platform_splash_seen';
 const PLATFORM_SPLASH_MIN_MS = 900;
@@ -21,23 +21,59 @@ function markInitialSplashSeen() {
   window.sessionStorage.setItem(PLATFORM_SPLASH_SEEN_KEY, 'true');
 }
 
-function warmStartupData(user: CurrentUser | null) {
+function sleep(ms: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function primeCandidateDashboard(data: CandidateDashboardData) {
+  primeApiCache('/me/profile', data.profile);
+  primeApiCache('/me/documents', data.documents);
+  primeApiCache('/me/applications', data.applications);
+  primeApiCache('/conversations', data.conversations);
+  primeApiCache('/notifications', data.notifications);
+}
+
+function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
+  if (data.establishment) {
+    primeApiCache('/establishments/me', [data.establishment]);
+    primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
+    primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+  }
+  primeApiCache('/conversations', data.conversations);
+}
+
+async function preloadConversationMessages(conversations: Conversation[]) {
+  await Promise.allSettled(
+    conversations.slice(0, 3).map((conversation) => api.get(`/conversations/${conversation.id}/messages`)),
+  );
+}
+
+async function warmStartupData(user: CurrentUser | null) {
   if (!user) return;
 
   if (user.role === 'CANDIDATE') {
-    api.preload('/me/dashboard');
-    api.preload('/me/applications');
-    api.preload('/conversations');
-    api.preload('/notifications');
-    api.preload('/missions?limit=50');
+    const [dashboardResult] = await Promise.allSettled([
+      api.get<CandidateDashboardData>('/me/dashboard'),
+      api.get('/missions?limit=50'),
+    ]);
+
+    if (dashboardResult.status === 'fulfilled') {
+      primeCandidateDashboard(dashboardResult.value);
+      await preloadConversationMessages(dashboardResult.value.conversations);
+    }
     return;
   }
 
   if (user.role.startsWith('ESTABLISHMENT_')) {
-    api.preload('/establishment/dashboard');
-    api.preload('/establishments/me');
-    api.preload('/conversations');
-    api.preload('/notifications');
+    const [dashboardResult] = await Promise.allSettled([
+      api.get<EstablishmentDashboardData>('/establishment/dashboard'),
+      api.get('/notifications'),
+    ]);
+
+    if (dashboardResult.status === 'fulfilled') {
+      primeEstablishmentDashboard(dashboardResult.value);
+      await preloadConversationMessages(dashboardResult.value.conversations);
+    }
   }
 }
 
@@ -61,13 +97,19 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
   useEffect(() => {
     if (loading || !user || !showInitialSplash) return;
 
-    warmStartupData(user);
-    const timeout = window.setTimeout(() => {
+    let cancelled = false;
+    void Promise.allSettled([
+      warmStartupData(user),
+      sleep(PLATFORM_SPLASH_MIN_MS),
+    ]).then(() => {
+      if (cancelled) return;
       markInitialSplashSeen();
       setShowInitialSplash(false);
-    }, PLATFORM_SPLASH_MIN_MS);
+    });
 
-    return () => window.clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+    };
   }, [loading, showInitialSplash, user]);
 
   if (loading) {
