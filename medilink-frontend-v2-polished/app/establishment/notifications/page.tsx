@@ -13,7 +13,7 @@ function getNotificationLink(notification: Notification) {
     return `/establishment/messages?id=${data.conversationId}`;
   }
   if (data.missionId) {
-    return '/establishment/applications';
+    return '/establishment/missions?tab=applications';
   }
   return null;
 }

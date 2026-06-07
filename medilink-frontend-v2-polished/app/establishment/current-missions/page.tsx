@@ -349,7 +349,7 @@ export default function EstablishmentCurrentMissionsPage() {
       <PageHeader
         title="Missions en cours"
         description="Suivez les missions pourvues, le candidat assigné et les détails opérationnels à garder sous la main."
-        actions={<LinkButton href="/establishment/applications">Voir les candidatures</LinkButton>}
+        actions={<LinkButton href="/establishment/missions?tab=applications">Voir les candidatures</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
@@ -365,7 +365,7 @@ export default function EstablishmentCurrentMissionsPage() {
           <h2>Aucune mission en cours</h2>
           <p>Les missions apparaissent ici dès qu'une candidature est acceptée. Vous pourrez ensuite suivre le planning, contacter le candidat et ajouter vos notes terrain.</p>
           <div className="actions">
-            <LinkButton href="/establishment/applications">Traiter les candidatures</LinkButton>
+            <LinkButton href="/establishment/missions?tab=applications">Traiter les candidatures</LinkButton>
             <LinkButton variant="light" href="/establishment/missions/new">Créer une mission</LinkButton>
           </div>
         </Card>

@@ -149,7 +149,7 @@ export default function EstablishmentDashboardPage() {
     : missions.length === 0
       ? { label: 'Publier votre première mission', href: '/establishment/missions/new', helper: 'Créez une offre claire pour commencer à recevoir des candidatures qualifiées.' }
       : dashboard.pendingApplications.length > 0
-        ? { label: 'Traiter les candidatures', href: '/establishment/applications', helper: `${dashboard.pendingApplications.length} dossier(s) attendent votre attention.` }
+        ? { label: 'Traiter les candidatures', href: '/establishment/missions?tab=applications', helper: `${dashboard.pendingApplications.length} dossier(s) attendent votre attention.` }
         : { label: 'Piloter vos missions', href: '/establishment/missions', helper: 'Gardez vos besoins à jour et anticipez vos prochaines recherches.' };
 
   return (
@@ -217,7 +217,7 @@ export default function EstablishmentDashboardPage() {
                 <span>Recrutement</span>
                 <h2>Candidatures</h2>
               </div>
-              <LinkButton variant="light" href="/establishment/applications">Tout voir</LinkButton>
+              <LinkButton variant="light" href="/establishment/missions?tab=applications">Tout voir</LinkButton>
             </div>
             <div className="dashboard-message-summary">
               <div>

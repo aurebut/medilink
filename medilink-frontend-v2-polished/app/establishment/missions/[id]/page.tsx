@@ -210,7 +210,7 @@ export default function EstablishmentMissionDetailPage() {
             <div><span>Refusées</span><strong>{stats.rejected}</strong></div>
           </div>
           <div className="establishment-action-stack">
-            <LinkButton href="/establishment/applications" variant="secondary">Voir les candidatures</LinkButton>
+            <LinkButton href="/establishment/missions?tab=applications" variant="secondary">Voir les candidatures</LinkButton>
             <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
             <LinkButton href="/establishment/messages" variant="light">Messagerie</LinkButton>
             {mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} showUrl /> : null}
@@ -226,7 +226,7 @@ export default function EstablishmentMissionDetailPage() {
               <h2>Candidatures liées</h2>
               <p className="small">Vue rapide des profils reçus sur cette mission.</p>
             </div>
-            <LinkButton href="/establishment/applications" variant="light">Tout voir</LinkButton>
+            <LinkButton href="/establishment/missions?tab=applications" variant="light">Tout voir</LinkButton>
           </div>
           {applications.length > 0 ? (
             <div className="dashboard-list">

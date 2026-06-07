@@ -81,7 +81,7 @@ export default function EstablishmentCandidateProfilePage() {
         description={`Profil ${candidateLabel} consultable dans le cadre d'une candidature recue.`}
         actions={
           <>
-            <LinkButton variant="light" href="/establishment/applications">Retour</LinkButton>
+            <LinkButton variant="light" href="/establishment/missions?tab=applications">Retour</LinkButton>
             {data.conversation ? (
               <LinkButton variant="primary" href={getEstablishmentConversationPath(data.conversation.id)}>Ouvrir la conversation</LinkButton>
             ) : null}

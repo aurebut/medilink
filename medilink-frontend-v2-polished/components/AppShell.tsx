@@ -24,10 +24,9 @@ const candidateNav: NavItem[] = [
 const establishmentNav: NavItem[] = [
   { href: '/establishment/dashboard', label: 'Dashboard', icon: 'D' },
   { href: '/establishment/agenda', label: 'Agenda', icon: 'A' },
-  { href: '/establishment/missions', label: 'Missions', icon: 'M' },
+  { href: '/establishment/missions', label: 'Annonce', icon: 'A' },
   { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
   { href: '/establishment/billing', label: 'Ma compta', icon: 'C' },
-  { href: '/establishment/applications', label: 'Candidatures', icon: 'C' },
   { href: '/establishment/messages', label: 'Messagerie', icon: 'M' },
 ];
 
@@ -77,7 +76,7 @@ function getNotificationLink(notification: Notification, area: 'candidate' | 'es
   }
   if (data.missionId) {
     if (area === 'candidate') return '/app/missions';
-    if (area === 'establishment') return '/establishment/applications';
+    if (area === 'establishment') return '/establishment/missions?tab=applications';
   }
   return null;
 }
