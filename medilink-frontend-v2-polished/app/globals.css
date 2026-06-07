@@ -6775,6 +6775,7 @@ td {
 
 .billing-tabs {
   display: flex;
+  width: fit-content;
   gap: 6px;
   overflow-x: auto;
   padding: 5px;
