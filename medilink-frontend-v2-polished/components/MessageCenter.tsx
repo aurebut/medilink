@@ -682,42 +682,61 @@ export function MessageCenter() {
       </Card> : null}
 
       {showMessagePane ? <Card className="message-pane">
-        <div className="toolbar">
-          <div className="message-heading">
-            {isMobile ? (
-              <Button type="button" variant="light" className="mobile-conversation-back" onClick={() => setActiveId(null)}>
-                Retour
-              </Button>
-            ) : null}
-            <div>
-              <h2>{active?.mission?.title || 'Conversation'}</h2>
-              <div className="small">{active?.establishment?.name} - {active?.mission?.city}</div>
+        <div className="toolbar conversation-header">
+          <div className="conversation-header-top">
+            <div className="conversation-header-title-wrapper">
+              {isMobile ? (
+                <button
+                  type="button"
+                  className="conversation-back-button"
+                  onClick={() => setActiveId(null)}
+                  aria-label="Retour"
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                  </svg>
+                </button>
+              ) : null}
+              <div className="conversation-title-meta">
+                <h2>{active?.mission?.title || 'Conversation'}</h2>
+                <div className="conversation-subtitle">{active?.establishment?.name} • {active?.mission?.city}</div>
+              </div>
+            </div>
+            
+            <div className="conversation-status-badge">
+              <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>
+                {currentStatus}
+              </Badge>
             </div>
           </div>
-          <div className="message-toolbar-actions">
-            <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+
+          <div className="conversation-header-actions">
+            {isMobile && mobileActionStep?.options?.length ? (
+              <MobileWorkflowHeaderAction step={mobileActionStep} />
+            ) : null}
+            
             {candidate && active?.application && !['CANCELLED', 'WITHDRAWN', 'REJECTED'].includes(active.application.status) ? (
               <Button
                 type="button"
                 variant="danger"
+                className="conversation-action-danger"
                 disabled={Boolean(busyAction)}
                 onClick={() => void withdrawApplication(active.application!.id, active.application!.status === 'ACCEPTED')}
               >
                 {active.application.status === 'ACCEPTED' ? 'Annuler la mission' : 'Retirer candidature'}
               </Button>
             ) : null}
-            {isMobile && mobileActionStep?.options?.length ? (
-              <MobileWorkflowHeaderAction step={mobileActionStep} />
-            ) : null}
+
             {isMobile ? (
               <Button
                 type="button"
                 variant="light"
-                className="mobile-workflow-toggle"
+                className="conversation-action-toggle"
                 aria-expanded={mobileOptionsOpen}
                 onClick={() => setMobileOptionsOpen((open) => !open)}
               >
-                Plus de détails
+                {mobileOptionsOpen ? 'Masquer détails' : 'Plus de détails'}
               </Button>
             ) : null}
           </div>
