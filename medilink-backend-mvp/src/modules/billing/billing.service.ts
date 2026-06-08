@@ -6,7 +6,7 @@ import {
   Prisma,
   PublicationCreditStatus,
 } from '@prisma/client';
-import Stripe from 'stripe';
+import Stripe = require('stripe');
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { PermissionsService } from '../permissions/permissions.service';
