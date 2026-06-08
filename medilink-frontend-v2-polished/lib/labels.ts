@@ -26,7 +26,6 @@ export const establishmentTypeOptions: Array<{ value: EstablishmentType; label: 
   { value: 'CLINIC', label: 'Clinique privée' },
   { value: 'CABINET', label: 'Cabinet' },
   { value: 'MEDICAL_SERVICE', label: 'Service médical' },
-  { value: 'AGENCY', label: 'Agence' },
   { value: 'OTHER', label: 'Autre' },
 ];
 
