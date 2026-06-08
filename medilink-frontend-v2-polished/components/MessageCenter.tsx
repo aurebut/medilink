@@ -156,6 +156,7 @@ export function MessageCenter() {
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
   const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
+  const [desktopTimelineOpen, setDesktopTimelineOpen] = useState(true);
   const [proposal, setProposal] = useState<ProposalForm>({
     compensationMode: 'RETROCESSION',
     amount: '',
@@ -777,6 +778,18 @@ export function MessageCenter() {
                 {mobileOptionsOpen ? 'Masquer détails' : 'Plus de détails'}
               </Button>
             ) : null}
+
+            {!isMobile && !desktopTimelineOpen ? (
+              <Button
+                type="button"
+                variant="light"
+                className="conversation-action-toggle desktop-timeline-toggle"
+                aria-expanded={desktopTimelineOpen}
+                onClick={() => setDesktopTimelineOpen(true)}
+              >
+                Timeline
+              </Button>
+            ) : null}
           </div>
         </div>
 
@@ -792,11 +805,12 @@ export function MessageCenter() {
           />
         ) : null}
 
-        {!isMobile ? (
+        {!isMobile && desktopTimelineOpen ? (
           <DesktopWorkflowTimeline
             steps={workflowTimelineSteps}
             refreshAction={refreshAction}
             withdrawAction={withdrawAction}
+            onCollapse={() => setDesktopTimelineOpen(false)}
           />
         ) : null}
 
@@ -1085,10 +1099,12 @@ function DesktopWorkflowTimeline({
   steps,
   refreshAction,
   withdrawAction,
+  onCollapse,
 }: {
   steps: MobileTimelineStep[];
   refreshAction: MobileWorkflowOption;
   withdrawAction?: MobileWorkflowOption | null;
+  onCollapse: () => void;
 }) {
   return (
     <div className="desktop-workflow-timeline" aria-label="Suivi de mission">
@@ -1115,6 +1131,13 @@ function DesktopWorkflowTimeline({
             onClick={refreshAction.onSelect}
           >
             {refreshAction.busy && refreshAction.busyLabel ? refreshAction.busyLabel : refreshAction.label}
+          </button>
+          <button
+            type="button"
+            className="desktop-workflow-collapse-button"
+            onClick={onCollapse}
+          >
+            Replier
           </button>
         </div>
       </div>
