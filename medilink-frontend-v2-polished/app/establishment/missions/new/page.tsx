@@ -28,11 +28,18 @@ import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 const steps = [
   { title: 'Type', helper: 'Cadre de la mission' },
   { title: 'Besoin', helper: 'Titre et spécialité' },
-  { title: 'Contexte', helper: 'Logiciel et équipe' },
+  { title: 'Description', helper: 'Description du poste' },
+  { title: 'Contexte', helper: 'Service et logiciel' },
+  { title: 'Secrétariat', helper: 'Secrétariat et patientèle' },
+  { title: 'Cabinet', helper: 'Organisation et équipement' },
+  { title: 'Infos sup', helper: 'Détails sur place' },
   { title: 'Lieu', helper: 'Ville et adresse' },
+  { title: 'Accès', helper: 'Logement et transports' },
   { title: 'Planning', helper: 'Dates et horaires' },
-  { title: 'Budget', helper: 'Rémunération' },
-  { title: 'Publication', helper: 'Visibilité' },
+  { title: 'Budget', helper: 'Rémunération et durée' },
+  { title: 'Critères', helper: 'Mobilité et durées' },
+  { title: 'Préférences', helper: 'Logiciel et patientèle' },
+  { title: 'Publication', helper: 'Tags et visibilité' },
   { title: 'Récap', helper: 'Validation finale' },
 ];
 
@@ -96,14 +103,14 @@ export default function NewMissionPage() {
     if (step === 1 && (!form.title || !form.specialty)) {
       return 'Ajoutez un titre et une spécialité pour continuer.';
     }
-    if (step === 3 && !form.city) {
+    if (step === 7 && !form.city) {
       return 'Indiquez au moins la ville de la mission.';
     }
-    if (step === 4) {
+    if (step === 9) {
       if (!form.startDate) return 'Choisissez une date de début.';
       if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
     }
-    if (step === 5 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
+    if (step === 10 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
       return 'Indiquez le pourcentage de rétrocession.';
     }
     return null;
@@ -318,9 +325,6 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <Input required value={form.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Garde aux urgences - nuit" />
         </Field>
         <SingleChoiceField required label="Spécialité" value={form.specialty || ''} options={specialtyOptions} onChange={(value) => set('specialty', value)} />
-        <Field label="Description">
-          <Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Contexte, équipe sur place, attentes principales..." />
-        </Field>
       </div>
     );
   }
@@ -329,12 +333,36 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Ajoutez le contexte terrain</h2>
-          <p>Ces informations aident le candidat à comprendre l'environnement avant de postuler.</p>
+          <h2>Description de la mission</h2>
+          <p>Précisez les attentes générales ou le type d'activité.</p>
+        </div>
+        <Field label="Description">
+          <Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Contexte, équipe sur place, attentes principales..." />
+        </Field>
+      </div>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Service et outils</h2>
+          <p>Indiquez le cadre de travail et les logiciels utilisés au quotidien.</p>
         </div>
         <MultiChoiceTextField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
-        <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
         <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
+      </div>
+    );
+  }
+
+  if (step === 4) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Secrétariat et patientèle</h2>
+          <p>Indiquez la présence de secrétariat et le type de patients.</p>
+        </div>
         <Field label="Présence de secrétaire">
           <Select
             value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
@@ -346,6 +374,18 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           </Select>
         </Field>
         <SingleChoiceField label="Type de secretariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
+        <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
+      </div>
+    );
+  }
+
+  if (step === 5) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Activité et équipement</h2>
+          <p>Indiquez la charge moyenne de travail et le matériel disponible.</p>
+        </div>
         <div className="form-row">
           <Field label="Patients par jour en moyenne">
             <Input type="number" min={0} value={form.averagePatientsPerDay ?? ''} onChange={(e) => set('averagePatientsPerDay', e.target.value)} placeholder="Ex : 25" />
@@ -362,6 +402,17 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           </Field>
         </div>
         <MultiChoiceField label="Materiel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
+      </div>
+    );
+  }
+
+  if (step === 6) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Informations complémentaires</h2>
+          <p>Ajoutez des détails sur l'équipe présente ou le matériel disponible.</p>
+        </div>
         <Field label="Équipe sur place">
           <Textarea value={form.teamInfo || ''} onChange={(e) => set('teamInfo', e.target.value)} placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..." />
         </Field>
@@ -372,7 +423,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 3) {
+  if (step === 7) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -384,9 +435,17 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Lieu précis">
           <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
         </Field>
-        <Field label="Infos pratiques d'accès">
-          <Textarea value={form.practicalInfo || ''} onChange={(e) => set('practicalInfo', e.target.value)} placeholder="Accès badge, entrée de nuit, transports, contact à l'arrivée..." />
-        </Field>
+      </div>
+    );
+  }
+
+  if (step === 8) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Hébergement et accès</h2>
+          <p>Précisez les conditions d'accueil et d'accès pour les candidats.</p>
+        </div>
         <ChoiceSection title="Options d'accueil">
           <BooleanChoice
             label="Logement proposé"
@@ -399,11 +458,14 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             onChange={(value) => set('parkingAvailable', value)}
           />
         </ChoiceSection>
+        <Field label="Infos pratiques d'accès">
+          <Textarea value={form.practicalInfo || ''} onChange={(e) => set('practicalInfo', e.target.value)} placeholder="Accès badge, entrée de nuit, transports, contact à l'arrivée..." />
+        </Field>
       </div>
     );
   }
 
-  if (step === 4) {
+  if (step === 9) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -422,21 +484,21 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             <Input type="time" value={form.endTime || ''} onChange={(e) => set('endTime', e.target.value)} />
           </Field>
         </div>
-        <Field label="Durée estimée en heures">
-          <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
-        </Field>
-        <SingleChoiceField label="Format de durée" value={form.preferredDuration || ''} options={durationOptions} onChange={(value) => set('preferredDuration', value)} />
       </div>
     );
   }
 
-  if (step === 5) {
+  if (step === 10) {
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Quel mode de rémunération afficher ?</h2>
-          <p>Indiquez le pourcentage de rétrocession d'honoraires affiché aux candidats.</p>
+          <h2>Durée et rémunération</h2>
+          <p>Indiquez la durée de la mission et le taux de rétrocession.</p>
         </div>
+        <Field label="Durée estimée en heures">
+          <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
+        </Field>
+        <SingleChoiceField label="Format de durée" value={form.preferredDuration || ''} options={durationOptions} onChange={(value) => set('preferredDuration', value)} />
         <Field label="Pourcentage de rétrocession">
           <Input type="number" min={1} max={100} value={form.retrocessionPercentage || ''} onChange={(e) => set('retrocessionPercentage', e.target.value)} placeholder="70" />
         </Field>
@@ -444,28 +506,47 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 6) {
+  if (step === 11) {
     return (
       <div className="wizard-step-content">
         <div>
-          <h2>Comment voulez-vous la publier ?</h2>
-          <p>Ajoutez quelques tags pour la recherche, puis choisissez publication immédiate ou brouillon.</p>
+          <h2>Critères de profil (1/2)</h2>
+          <p>Définissez les préférences de mobilité et les durées idéales.</p>
+        </div>
+        <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
+        <MultiChoiceField label="Durées proposées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+        <MultiChoiceField label="Horaires non proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+      </div>
+    );
+  }
+
+  if (step === 12) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Critères de profil (2/2)</h2>
+          <p>Indiquez la patientèle acceptée, les logiciels requis et la rémunération minimale.</p>
+        </div>
+        <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
+        <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
+        <Field label="Remuneration minimale indicative (EUR)">
+          <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
+        </Field>
+      </div>
+    );
+  }
+
+  if (step === 13) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Mode de publication</h2>
+          <p>Ajoutez quelques tags de recherche, puis choisissez le statut de publication.</p>
         </div>
         <Field label="Tags, séparés par virgule">
           <Input value={form.tagsText || ''} onChange={(e) => set('tagsText', e.target.value)} placeholder="urgent, nuit, week-end" />
         </Field>
         <MultiChoiceField label="Types de missions associés" values={form.acceptedMissionTypes || []} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-        <div className="profile-preferences-section">
-          <h3>Criteres proposes</h3>
-          <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-          <MultiChoiceField label="Durées proposées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-          <MultiChoiceField label="Horaires non proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
-          <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
-          <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-          <Field label="Remuneration minimale indicative (EUR)">
-            <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
-          </Field>
-        </div>
         <div className="publish-choice">
           <button type="button" className={form.publishNow ? 'active' : ''} onClick={() => set('publishNow', true)}>
             <strong>Publier maintenant</strong>
