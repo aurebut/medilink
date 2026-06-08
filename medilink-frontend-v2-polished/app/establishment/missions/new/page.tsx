@@ -26,7 +26,8 @@ import {
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
 
 const steps = [
-  { title: 'Type', helper: 'Cadre de la mission' },
+  { title: 'Format', helper: 'Format de la mission' },
+  { title: 'Profil', helper: 'Niveaux de profil requis' },
   { title: 'Besoin', helper: 'Titre et spécialité' },
   { title: 'Description', helper: 'Description du poste' },
   { title: 'Contexte', helper: 'Service et logiciel' },
@@ -100,17 +101,17 @@ export default function NewMissionPage() {
   }
 
   function validateCurrentStep() {
-    if (step === 1 && (!form.title || !form.specialty)) {
+    if (step === 2 && (!form.title || !form.specialty)) {
       return 'Ajoutez un titre et une spécialité pour continuer.';
     }
-    if (step === 7 && !form.city) {
+    if (step === 8 && !form.city) {
       return 'Indiquez au moins la ville de la mission.';
     }
-    if (step === 9) {
+    if (step === 10) {
       if (!form.startDate) return 'Choisissez une date de début.';
       if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
     }
-    if (step === 10 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
+    if (step === 11 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
       return 'Indiquez le pourcentage de rétrocession.';
     }
     return null;
@@ -291,7 +292,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       <div className="wizard-step-content">
         <div>
           <h2>Quel type de mission voulez-vous publier ?</h2>
-          <p>Choisissez le format et le niveau attendu pour cadrer la recherche des candidats.</p>
+          <p>Choisissez le format de la mission.</p>
         </div>
         <ChoiceSection title="Type de mission">
           <ChoiceGrid
@@ -300,6 +301,17 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             onChange={(value) => set('missionType', value)}
           />
         </ChoiceSection>
+      </div>
+    );
+  }
+
+  if (step === 1) {
+    return (
+      <div className="wizard-step-content">
+        <div>
+          <h2>Types de profils recherchés</h2>
+          <p>Choisissez le niveau attendu pour cadrer la recherche des candidats.</p>
+        </div>
         <ChoiceSection title="Types de profils recherchés">
           <MultiChoiceGrid
             values={form.requiredLevels || []}
@@ -314,7 +326,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 1) {
+  if (step === 2) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -329,7 +341,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 2) {
+  if (step === 3) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -343,7 +355,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 3) {
+  if (step === 4) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -356,7 +368,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 4) {
+  if (step === 5) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -379,7 +391,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 5) {
+  if (step === 6) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -406,7 +418,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 6) {
+  if (step === 7) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -423,7 +435,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 7) {
+  if (step === 8) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -439,7 +451,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 8) {
+  if (step === 9) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -465,7 +477,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 9) {
+  if (step === 10) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -488,7 +500,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 10) {
+  if (step === 11) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -506,7 +518,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 11) {
+  if (step === 12) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -520,7 +532,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 12) {
+  if (step === 13) {
     return (
       <div className="wizard-step-content">
         <div>
@@ -536,7 +548,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
     );
   }
 
-  if (step === 13) {
+  if (step === 14) {
     return (
       <div className="wizard-step-content">
         <div>
