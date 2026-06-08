@@ -9,7 +9,7 @@ import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Establishment, EstablishmentDashboardData, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
-import { buildWeekCarousel, dateKey, dateRangeKeys, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
+import { buildCalendarEventWeeks, buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
 
 function dayNumber(value: Date) {
@@ -119,13 +119,17 @@ export default function EstablishmentDashboardPage() {
       }));
 
     const agendaRows = buildEstablishmentAgendaRows(missions, applications, conversations);
-    const agendaRowsByDay = new Map<string, typeof agendaRows>();
-    agendaRows.forEach((row) => {
-      dateRangeKeys(row.date, row.endDate).forEach((key) => {
-        agendaRowsByDay.set(key, [...(agendaRowsByDay.get(key) || []), row]);
-      });
-    });
     const weekCarousel = buildWeekCarousel(new Date(), 8);
+    const weekEventWeeks = buildCalendarEventWeeks(
+      weekCarousel.map((week) => week.days),
+      agendaRows,
+      {
+        getKey: (row) => row.mission.id,
+        getStart: (row) => row.date,
+        getEnd: (row) => row.endDate,
+        maxLanes: 2,
+      },
+    );
     const nextAgendaItem = agendaRows
       .filter((row) => row.date)
       .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
@@ -142,8 +146,8 @@ export default function EstablishmentDashboardPage() {
       sortedConversations,
       missionPipeline,
       agendaRows,
-      agendaRowsByDay,
       weekCarousel,
+      weekEventWeeks,
       nextAgendaItem,
       upcomingMissions,
     };
@@ -221,7 +225,6 @@ export default function EstablishmentDashboardPage() {
                 </div>
                 <div className="week-grid">
                   {week.days.map((day, index) => {
-                    const rows = dashboard.agendaRowsByDay.get(dateKey(day)) || [];
                     const today = dateKey(day) === dateKey(new Date());
                     return (
                       <div key={dateKey(day)} className={`week-day ${today ? 'today' : ''}`}>
@@ -229,18 +232,28 @@ export default function EstablishmentDashboardPage() {
                           <span>{weekDayLabels[index]}</span>
                           <strong>{dayNumber(day)}</strong>
                         </div>
-                        <div className="week-day-body">
-                          {rows.slice(0, 2).map((row) => (
-                            <div key={row.mission.id} className={`week-event is-${establishmentMissionTone(row)}`}>
-                              <strong>{row.mission.title}</strong>
-                              <span>{row.mission.startTime || establishmentMissionLabel(row)}</span>
-                            </div>
-                          ))}
-                          {rows.length > 2 ? <span className="week-more">+{rows.length - 2}</span> : null}
-                        </div>
+                        <div className="week-day-body" />
                       </div>
                     );
                   })}
+                  <div className="week-event-layer">
+                    {dashboard.weekEventWeeks[weekIndex].segments.map((segment) => (
+                      <div
+                        key={`${segment.key}-${segment.startIndex}-${segment.endIndex}`}
+                        className={`week-span-event is-${establishmentMissionTone(segment.item)} ${segment.isStart ? 'starts' : 'continues'} ${segment.isEnd ? 'ends' : 'continues'}`}
+                        style={{
+                          gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}`,
+                          gridRow: segment.lane + 1,
+                        }}
+                      >
+                        <strong>{segment.item.mission.title}</strong>
+                        <span>{segment.item.mission.startTime || establishmentMissionLabel(segment.item)}</span>
+                      </div>
+                    ))}
+                    {dashboard.weekEventWeeks[weekIndex].hiddenCount > 0 ? (
+                      <span className="week-span-more">+{dashboard.weekEventWeeks[weekIndex].hiddenCount}</span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}

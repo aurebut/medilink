@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementTone, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementTone, buildCalendarEventWeeks, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
@@ -112,6 +112,22 @@ export default function CandidateAgendaPage() {
 
   const upcomingEvents = events.filter((event) => event.upcoming).slice(0, 8);
   const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
+  const calendarWeeks = useMemo(
+    () => Array.from({ length: 6 }, (_, index) => calendarDays.slice(index * 7, index * 7 + 7)),
+    [calendarDays],
+  );
+  const calendarEventWeeks = useMemo(
+    () => buildCalendarEventWeeks(
+      calendarWeeks.map((week) => week.map((day) => day.date)),
+      events,
+      {
+        getKey: (event) => event.application.id,
+        getStart: (event) => event.date,
+        getEnd: (event) => event.endDate,
+      },
+    ),
+    [calendarWeeks, events],
+  );
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
     events.forEach((event) => {
@@ -223,39 +239,65 @@ export default function CandidateAgendaPage() {
                 onTouchStart={(event) => setTouchStartX(event.touches[0]?.clientX ?? null)}
                 onTouchEnd={(event) => onCalendarTouchEnd(event.changedTouches[0]?.clientX ?? touchStartX ?? 0)}
               >
-                {weekDayLabels.map((day) => (
-                  <div key={day} className="agenda-weekday">{day}</div>
-                ))}
-                {calendarDays.map((day) => {
-                  const dayEvents = eventsByDay.get(day.key) || [];
-                  const hasNote = Boolean(notes[day.key]);
-                  if (!day.inMonth) {
-                    return <div key={day.key} className="agenda-day agenda-day-outside" aria-hidden="true" />;
-                  }
-                  return (
-                    <button
-                      key={day.key}
-                      type="button"
-                      className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
-                      onClick={() => {
-                        setSelectedDay(day.key);
-                        setDetailOpen(true);
-                      }}
-                    >
-                      <div className="agenda-day-number">{day.date.getDate()}</div>
-                      <div className="agenda-day-events">
-                        {hasNote ? <span className="agenda-note-dot">Note</span> : null}
-                        {dayEvents.slice(0, 3).map(({ application, agreement }) => (
-                          <div key={application.id} className={`agenda-event is-${agreementTone(agreement?.status)}`}>
-                            <strong>{application.mission?.title || 'Mission'}</strong>
-                            <span>{application.mission?.startTime || agreementLabel(agreement?.status)}</span>
-                          </div>
+                <div className="agenda-calendar-weekdays">
+                  {weekDayLabels.map((day) => (
+                    <div key={day} className="agenda-weekday">{day}</div>
+                  ))}
+                </div>
+                <div className="agenda-calendar-body">
+                  {calendarWeeks.map((week, weekIndex) => (
+                    <div key={calendarEventWeeks[weekIndex].key} className="agenda-week-row">
+                      {week.map((day) => {
+                        const dayEvents = eventsByDay.get(day.key) || [];
+                        const hasNote = Boolean(notes[day.key]);
+                        if (!day.inMonth) {
+                          return <div key={day.key} className="agenda-day agenda-day-outside" aria-hidden="true" />;
+                        }
+                        return (
+                          <button
+                            key={day.key}
+                            type="button"
+                            className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
+                            onClick={() => {
+                              setSelectedDay(day.key);
+                              setDetailOpen(true);
+                            }}
+                          >
+                            <div className="agenda-day-number">{day.date.getDate()}</div>
+                            <div className="agenda-day-events">
+                              {hasNote ? <span className="agenda-note-dot">Note</span> : null}
+                              {dayEvents.length > 0 ? <span className="agenda-day-count">{dayEvents.length}</span> : null}
+                            </div>
+                          </button>
+                        );
+                      })}
+                      <div className="agenda-event-layer">
+                        {calendarEventWeeks[weekIndex].segments.map((segment) => (
+                          <button
+                            key={`${segment.key}-${segment.startIndex}-${segment.endIndex}`}
+                            type="button"
+                            tabIndex={-1}
+                            className={`agenda-span-event is-${agreementTone(segment.item.agreement?.status)} ${segment.isStart ? 'starts' : 'continues'} ${segment.isEnd ? 'ends' : 'continues'}`}
+                            style={{
+                              gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}`,
+                              gridRow: segment.lane + 1,
+                            }}
+                            onClick={() => {
+                              setSelectedDay(dateKey(calendarEventWeeks[weekIndex].days[segment.startIndex]));
+                              setDetailOpen(true);
+                            }}
+                          >
+                            <strong>{segment.item.application.mission?.title || 'Mission'}</strong>
+                            <span>{segment.item.application.mission?.startTime || agreementLabel(segment.item.agreement?.status)}</span>
+                          </button>
                         ))}
-                        {dayEvents.length > 3 ? <span className="agenda-more">+{dayEvents.length - 3}</span> : null}
+                        {calendarEventWeeks[weekIndex].hiddenCount > 0 ? (
+                          <span className="agenda-span-more">+{calendarEventWeeks[weekIndex].hiddenCount}</span>
+                        ) : null}
                       </div>
-                    </button>
-                  );
-                })}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {detailOpen ? (

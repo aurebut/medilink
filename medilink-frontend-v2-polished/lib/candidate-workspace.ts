@@ -85,6 +85,12 @@ function calendarDate(value: string | Date) {
   return typeof value === 'string' ? new Date(value) : value;
 }
 
+function dayDiff(start: Date, end: Date) {
+  const startDate = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const endDate = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  return Math.round((endDate.getTime() - startDate.getTime()) / 86400000);
+}
+
 export function dateKey(value?: string | Date | null) {
   if (!value) return 'undated';
   const date = calendarDate(value);
@@ -146,4 +152,90 @@ export function weekRangeLabel(start: Date) {
   const end = addDays(start, 6);
   const dayFormatter = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' });
   return `${dayFormatter.format(start)} - ${dayFormatter.format(end)}`;
+}
+
+export type CalendarEventSegment<T> = {
+  item: T;
+  key: string;
+  lane: number;
+  startIndex: number;
+  endIndex: number;
+  isStart: boolean;
+  isEnd: boolean;
+};
+
+export type CalendarEventWeek<T> = {
+  key: string;
+  start: Date;
+  days: Date[];
+  segments: CalendarEventSegment<T>[];
+  hiddenCount: number;
+};
+
+export function buildCalendarEventWeeks<T>(
+  weeks: Date[][],
+  items: T[],
+  options: {
+    getKey: (item: T) => string;
+    getStart: (item: T) => string | Date | null | undefined;
+    getEnd: (item: T) => string | Date | null | undefined;
+    maxLanes?: number;
+  },
+): CalendarEventWeek<T>[] {
+  const maxLanes = options.maxLanes ?? 3;
+
+  return weeks.map((days) => {
+    const weekStart = days[0];
+    const weekEnd = days[days.length - 1];
+    const candidateSegments = items
+      .map((item) => {
+        const start = options.getStart(item);
+        if (!start) return null;
+        const startDate = calendarDate(start);
+        if (Number.isNaN(startDate.getTime())) return null;
+
+        const end = options.getEnd(item);
+        const endDate = end ? calendarDate(end) : startDate;
+        const normalizedEnd = !Number.isNaN(endDate.getTime()) && endDate >= startDate ? endDate : startDate;
+        if (normalizedEnd < weekStart || startDate > weekEnd) return null;
+
+        return {
+          item,
+          key: options.getKey(item),
+          startIndex: Math.max(0, dayDiff(weekStart, startDate)),
+          endIndex: Math.min(6, dayDiff(weekStart, normalizedEnd)),
+          isStart: startDate >= weekStart,
+          isEnd: normalizedEnd <= weekEnd,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => {
+        if (!a || !b) return 0;
+        if (a.startIndex !== b.startIndex) return a.startIndex - b.startIndex;
+        return b.endIndex - b.startIndex - (a.endIndex - a.startIndex);
+      }) as Array<Omit<CalendarEventSegment<T>, 'lane'>>;
+
+    const laneEnds: number[] = [];
+    const segments: CalendarEventSegment<T>[] = [];
+    let hiddenCount = 0;
+
+    candidateSegments.forEach((segment) => {
+      const lane = laneEnds.findIndex((endIndex) => endIndex < segment.startIndex);
+      const nextLane = lane === -1 ? laneEnds.length : lane;
+      if (nextLane >= maxLanes) {
+        hiddenCount += 1;
+        return;
+      }
+      laneEnds[nextLane] = segment.endIndex;
+      segments.push({ ...segment, lane: nextLane });
+    });
+
+    return {
+      key: dateKey(weekStart),
+      start: weekStart,
+      days,
+      segments,
+      hiddenCount,
+    };
+  });
 }

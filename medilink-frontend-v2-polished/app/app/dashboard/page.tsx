@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
-import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementNextStep, agreementTone, buildCalendarEventWeeks, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, missionEndDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
@@ -162,13 +162,17 @@ export default function CandidateDashboardPage() {
         return bTime - aTime;
       })
       .slice(0, 3);
-    const missionRowsByDay = new Map<string, typeof missionRows>();
-    missionRows.forEach((row) => {
-      dateRangeKeys(row.date, row.endDate).forEach((key) => {
-        missionRowsByDay.set(key, [...(missionRowsByDay.get(key) || []), row]);
-      });
-    });
     const weekCarousel = buildWeekCarousel(new Date(), 8);
+    const weekEventWeeks = buildCalendarEventWeeks(
+      weekCarousel.map((week) => week.days),
+      missionRows,
+      {
+        getKey: (row) => row.application.id,
+        getStart: (row) => row.date,
+        getEnd: (row) => row.endDate,
+        maxLanes: 2,
+      },
+    );
 
     return {
       sortedApplications,
@@ -184,8 +188,8 @@ export default function CandidateDashboardPage() {
       nextAgendaItem,
       latestReceivedMessages,
       unreadReceivedMessages,
-      missionRowsByDay,
       weekCarousel,
+      weekEventWeeks,
       sortedConversations,
     };
   }, [applications, conversations, documents, notifications, profile?.userId]);
@@ -285,7 +289,6 @@ export default function CandidateDashboardPage() {
                 </div>
                 <div className="week-grid">
                   {week.days.map((day, index) => {
-                    const rows = dashboard.missionRowsByDay.get(dateKey(day)) || [];
                     const today = dateKey(day) === dateKey(new Date());
                     return (
                       <div key={dateKey(day)} className={`week-day ${today ? 'today' : ''}`}>
@@ -293,18 +296,28 @@ export default function CandidateDashboardPage() {
                           <span>{weekDayLabels[index]}</span>
                           <strong>{dayNumber(day)}</strong>
                         </div>
-                        <div className="week-day-body">
-                          {rows.slice(0, 2).map(({ application, agreement }) => (
-                            <div key={application.id} className={`week-event is-${agreementTone(agreement?.status)}`}>
-                              <strong>{application.mission?.title || 'Mission'}</strong>
-                              <span>{application.mission?.startTime || agreementLabel(agreement?.status)}</span>
-                            </div>
-                          ))}
-                          {rows.length > 2 ? <span className="week-more">+{rows.length - 2}</span> : null}
-                        </div>
+                        <div className="week-day-body" />
                       </div>
                     );
                   })}
+                  <div className="week-event-layer">
+                    {dashboard.weekEventWeeks[weekIndex].segments.map((segment) => (
+                      <div
+                        key={`${segment.key}-${segment.startIndex}-${segment.endIndex}`}
+                        className={`week-span-event is-${agreementTone(segment.item.agreement?.status)} ${segment.isStart ? 'starts' : 'continues'} ${segment.isEnd ? 'ends' : 'continues'}`}
+                        style={{
+                          gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}`,
+                          gridRow: segment.lane + 1,
+                        }}
+                      >
+                        <strong>{segment.item.application.mission?.title || 'Mission'}</strong>
+                        <span>{segment.item.application.mission?.startTime || agreementLabel(segment.item.agreement?.status)}</span>
+                      </div>
+                    ))}
+                    {dashboard.weekEventWeeks[weekIndex].hiddenCount > 0 ? (
+                      <span className="week-span-more">+{dashboard.weekEventWeeks[weekIndex].hiddenCount}</span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ))}
