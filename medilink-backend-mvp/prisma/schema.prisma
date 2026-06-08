@@ -191,6 +191,31 @@ enum AgreementEventType {
   INVOICES_GENERATED
 }
 
+enum EstablishmentSubscriptionStatus {
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  PAUSED
+}
+
+enum PublicationCreditStatus {
+  PENDING_PAYMENT
+  AVAILABLE
+  RESERVED
+  CONSUMED
+  REFUNDED
+  EXPIRED
+}
+
+enum PublicationCreditSource {
+  ONE_TIME_PAYMENT
+  ADMIN_GRANT
+}
+
 model User {
   id            String     @id @default(uuid())
   email         String     @unique
@@ -384,6 +409,9 @@ model Establishment {
   missions      Mission[]
   conversations Conversation[]
   photos        EstablishmentPhoto[]
+  billingCustomer BillingCustomer?
+  subscription  EstablishmentSubscription?
+  publicationCredits PublicationCredit[]
 
   @@index([sector])
   @@index([patientType])
@@ -477,6 +505,7 @@ model Mission {
   applications  Application[]
   conversations Conversation[]
   agreements    MissionAgreement[]
+  publicationCredit PublicationCredit?
 
   @@index([status])
   @@index([missionType])
@@ -486,6 +515,68 @@ model Mission {
   @@index([patientType])
   @@index([softwareUsed])
   @@index([startDate])
+}
+
+model BillingCustomer {
+  id               String   @id @default(uuid())
+  establishmentId  String   @unique
+  stripeCustomerId String   @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+}
+
+model EstablishmentSubscription {
+  id                     String                         @id @default(uuid())
+  establishmentId        String                         @unique
+  stripeSubscriptionId   String                         @unique
+  stripePriceId          String?
+  status                 EstablishmentSubscriptionStatus
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean                        @default(false)
+  canceledAt             DateTime?
+  createdAt              DateTime                       @default(now())
+  updatedAt              DateTime                       @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model PublicationCredit {
+  id                      String                  @id @default(uuid())
+  establishmentId         String
+  missionId               String?                 @unique
+  source                  PublicationCreditSource @default(ONE_TIME_PAYMENT)
+  status                  PublicationCreditStatus @default(PENDING_PAYMENT)
+  amount                  Int                     @default(3999)
+  currency                String                  @default("EUR")
+  stripeCheckoutSessionId String?                 @unique
+  stripePaymentIntentId   String?
+  paidAt                  DateTime?
+  reservedAt              DateTime?
+  consumedAt              DateTime?
+  refundedAt              DateTime?
+  expiresAt               DateTime?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  mission       Mission?      @relation(fields: [missionId], references: [id], onDelete: SetNull)
+
+  @@index([establishmentId, status])
+  @@index([stripePaymentIntentId])
+}
+
+model BillingEvent {
+  id            String   @id @default(uuid())
+  provider      String   @default("stripe")
+  providerEventId String @unique
+  eventType     String
+  processedAt   DateTime @default(now())
+  payload       Json?
 }
 
 model MissionTag {

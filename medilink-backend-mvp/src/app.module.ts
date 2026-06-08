@@ -4,6 +4,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DocumentsModule } from './modules/documents/documents.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './modules/users/users.module';
     NotificationsModule,
     PermissionsModule,
     AuthModule,
+    BillingModule,
     UsersModule,
     ProfilesModule,
     DocumentsModule,

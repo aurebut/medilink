@@ -23,7 +23,7 @@ import {
   softwareOptions,
   specialtyOptions,
 } from '@/lib/profile-options';
-import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
+import type { Establishment, EstablishmentBillingStatus, Mission, MissionType, RequiredLevel } from '@/lib/types';
 
 const steps = [
   { title: 'Format', helper: 'Format de la mission' },
@@ -65,6 +65,10 @@ export default function NewMissionPage() {
   const [error, setError] = useState<string | null>(null);
   const [createdMission, setCreatedMission] = useState<Mission | null>(null);
   const [saving, setSaving] = useState(false);
+  const [billingStatus, setBillingStatus] = useState<EstablishmentBillingStatus | null>(null);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
+  const [billingNotice, setBillingNotice] = useState<string | null>(null);
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
@@ -77,6 +81,32 @@ export default function NewMissionPage() {
     if (!primary || selectedEstablishmentId) return;
     setSelectedEstablishmentId(primary.id);
   }, [primary, selectedEstablishmentId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const status = new URLSearchParams(window.location.search).get('billing');
+    if (status === 'subscription-success') {
+      setBillingNotice("Abonnement confirme. L'activation peut prendre quelques secondes apres validation Stripe.");
+    } else if (status === 'credit-success') {
+      setBillingNotice("Credit de publication confirme. Il reste disponible tant que vous ne creez pas d'annonce.");
+    } else if (status === 'cancelled') {
+      setBillingNotice("Paiement annule. Aucun credit n'est consomme tant que le paiement n'est pas confirme.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEstablishment?.id) {
+      setBillingStatus(null);
+      return;
+    }
+
+    setBillingLoading(true);
+    setError(null);
+    api.reload<EstablishmentBillingStatus>(`/billing/establishments/${selectedEstablishment.id}/status`)
+      .then(setBillingStatus)
+      .catch((e: any) => setError(e.message))
+      .finally(() => setBillingLoading(false));
+  }, [selectedEstablishment?.id]);
 
   useEffect(() => {
     if (!selectedEstablishment) return;
@@ -183,6 +213,24 @@ export default function NewMissionPage() {
     setCreatedMission(null);
   }
 
+  async function startBillingCheckout(kind: 'subscription' | 'credit') {
+    if (!selectedEstablishment?.id) return;
+
+    setBillingBusy(kind);
+    setError(null);
+    try {
+      const endpoint = kind === 'subscription'
+        ? '/billing/checkout/subscription'
+        : '/billing/checkout/publication-credit';
+      const response = await api.post<{ url: string }>(endpoint, { establishmentId: selectedEstablishment.id });
+      window.location.href = response.url;
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBillingBusy(null);
+    }
+  }
+
   if (loading) return <LoadingCard />;
 
   if (establishments.length === 0) {
@@ -221,12 +269,38 @@ export default function NewMissionPage() {
     );
   }
 
+  if (billingLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
+
+  if (!billingStatus.canCreateMission) {
+    return (
+      <PublicationPaymentGate
+        establishments={establishments}
+        selectedEstablishmentId={selectedEstablishmentId}
+        setSelectedEstablishmentId={setSelectedEstablishmentId}
+        billingStatus={billingStatus}
+        billingNotice={billingNotice}
+        error={error}
+        busy={billingBusy}
+        onSubscribe={() => void startBillingCheckout('subscription')}
+        onBuyCredit={() => void startBillingCheckout('credit')}
+      />
+    );
+  }
+
   return (
     <div className="new-mission-page">
       <PageHeader
         title="Créer une mission"
         description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
       />
+      {billingNotice ? <Alert type="success">{billingNotice}</Alert> : null}
+      {billingStatus.hasActiveSubscription ? (
+        <Alert type="success">Abonnement actif : vous pouvez creer et publier vos annonces sans paiement unitaire.</Alert>
+      ) : billingStatus.availableCredits > 0 ? (
+        <Alert type="success">
+          {billingStatus.availableCredits} credit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un credit sera utilise pour cette mission, meme si vous la gardez en brouillon.
+        </Alert>
+      ) : null}
       <div className="wizard-layout">
         <Card className="wizard-panel">
           <div className="wizard-progress">
@@ -284,6 +358,117 @@ export default function NewMissionPage() {
       </div>
     </div>
   );
+}
+
+function PublicationPaymentGate({
+  establishments,
+  selectedEstablishmentId,
+  setSelectedEstablishmentId,
+  billingStatus,
+  billingNotice,
+  error,
+  busy,
+  onSubscribe,
+  onBuyCredit,
+}: {
+  establishments: Establishment[];
+  selectedEstablishmentId: string;
+  setSelectedEstablishmentId: (id: string) => void;
+  billingStatus: EstablishmentBillingStatus;
+  billingNotice: string | null;
+  error: string | null;
+  busy: 'subscription' | 'credit' | null;
+  onSubscribe: () => void;
+  onBuyCredit: () => void;
+}) {
+  const subscriptionAmount = formatCents(billingStatus.prices.monthlySubscription.amount, billingStatus.prices.monthlySubscription.currency);
+  const creditAmount = formatCents(billingStatus.prices.publicationCredit.amount, billingStatus.prices.publicationCredit.currency);
+
+  return (
+    <div className="new-mission-page">
+      <PageHeader
+        title="Publier une annonce"
+        description="Choisissez votre mode d'acces avant de remplir le formulaire. Aucun formulaire long ne vous est demande avant paiement."
+      />
+
+      {billingNotice ? <Alert type="info">{billingNotice}</Alert> : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
+      {!billingStatus.stripeConfigured ? (
+        <Alert type="error">Stripe n'est pas encore configure sur le serveur. Ajoutez les cles Render avant d'activer les paiements.</Alert>
+      ) : null}
+
+      <Card className="card-highlight publication-access-card">
+        <div className="toolbar">
+          <div>
+            <h2>Votre annonce reste acquise</h2>
+            <p>Si vous payez une publication unique et que vous quittez le formulaire, le credit reste disponible pour votre prochaine annonce.</p>
+          </div>
+          <Badge tone="warning">Paiement avant formulaire</Badge>
+        </div>
+
+        <Field label="Etablissement">
+          <Select value={selectedEstablishmentId} onChange={(event) => setSelectedEstablishmentId(event.target.value)}>
+            {establishments.map((establishment) => (
+              <option key={establishment.id} value={establishment.id}>
+                {establishment.name}{establishment.city ? ` - ${establishment.city}` : ''}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </Card>
+
+      <div className="publication-plan-grid">
+        <Card className="publication-plan-card">
+          <div>
+            <Badge tone="success">Recommande</Badge>
+            <h2>Abonnement etablissement</h2>
+            <p>Pour publier plusieurs annonces sans repasser par un paiement unitaire.</p>
+          </div>
+          <div className="publication-price">
+            <strong>{subscriptionAmount}</strong>
+            <span>/ mois</span>
+          </div>
+          <ul className="publication-plan-list">
+            <li>Publications incluses tant que l'abonnement est actif</li>
+            <li>Gestion de l'abonnement et des factures via Stripe</li>
+            <li>Creation en brouillon ou publication immediate</li>
+          </ul>
+          <Button type="button" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onSubscribe}>
+            {busy === 'subscription' ? 'Redirection...' : "S'abonner"}
+          </Button>
+        </Card>
+
+        <Card className="publication-plan-card">
+          <div>
+            <Badge tone="neutral">A l'unite</Badge>
+            <h2>Credit de publication</h2>
+            <p>Pour publier une seule annonce, avec un credit conserve si vous ne terminez pas tout de suite.</p>
+          </div>
+          <div className="publication-price">
+            <strong>{creditAmount}</strong>
+            <span>une fois</span>
+          </div>
+          <ul className="publication-plan-list">
+            <li>Valable pour une annonce</li>
+            <li>Reste disponible tant qu'aucune mission n'est creee</li>
+            <li>Permet aussi de creer un brouillon paye</li>
+          </ul>
+          <Button type="button" variant="secondary" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onBuyCredit}>
+            {busy === 'credit' ? 'Redirection...' : 'Payer une annonce'}
+          </Button>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function formatCents(amount: number, currency = 'EUR') {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount / 100);
 }
 
 function StepContent({ step, form, set }: { step: number; form: any; set: (name: string, value: unknown) => void }) {

@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CompensationMode, EstablishmentMemberRole, MissionStatus } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { BillingService } from '../billing/billing.service';
 import { StorageService } from '../documents/storage.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,6 +16,7 @@ export class MissionsService {
     private readonly permissions: PermissionsService,
     private readonly audit: AuditService,
     private readonly storage: StorageService,
+    private readonly billing: BillingService,
   ) {}
 
   async create(user: RequestUser, dto: CreateMissionDto) {
@@ -47,6 +49,7 @@ export class MissionsService {
     }
 
     const establishment = await this.resolveEstablishment(user, dto);
+    await this.billing.assertCanCreateMission(establishment.id);
 
     const mission = await this.prisma.mission.create({
       data: {
@@ -100,6 +103,13 @@ export class MissionsService {
       },
       include: this.missionInclude,
     });
+
+    try {
+      await this.billing.attachPublicationAccessToMission(establishment.id, mission.id);
+    } catch (error) {
+      await this.prisma.mission.delete({ where: { id: mission.id } });
+      throw error;
+    }
 
     await this.audit.log({
       actorUserId: user.id,
@@ -295,7 +305,10 @@ export class MissionsService {
   }
 
   async setStatus(user: RequestUser, missionId: string, status: MissionStatus) {
-    await this.permissions.ensureMissionManager(user.id, missionId);
+    const mission = await this.permissions.ensureMissionManager(user.id, missionId);
+    if (status === MissionStatus.PUBLISHED) {
+      await this.billing.assertCanPublishMission(mission.establishmentId, missionId);
+    }
 
     const updated = await this.prisma.mission.update({
       where: { id: missionId },

@@ -45,6 +45,10 @@ S3_FORCE_PATH_STYLE=true
 SIGNED_URL_TTL_SECONDS=300
 RESEND_API_KEY=
 EMAIL_FROM=Medilink <no-reply@medilink.local>
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_ESTABLISHMENT_MONTHLY=
+STRIPE_PRICE_MISSION_PUBLICATION=
 ```
 
 After the first deployment, copy the Render service URL.
@@ -73,3 +77,18 @@ After Vercel gives you the frontend URL, update Render's `FRONTEND_URL` with tha
 In production, the API sets the session cookie with `SameSite=None` and `Secure` so login works when the frontend is hosted on Vercel and the API is hosted on Render.
 
 For a real production app, keep `STORAGE_PROVIDER=s3` with the private Supabase Storage bucket and configure a real email sender.
+
+## Stripe billing
+
+For establishment publication payments, create two Stripe Prices:
+
+- recurring monthly price: `59.99 EUR`, used as `STRIPE_PRICE_ESTABLISHMENT_MONTHLY`
+- one-time price: `39.99 EUR`, used as `STRIPE_PRICE_MISSION_PUBLICATION`
+
+Create a webhook endpoint pointing to:
+
+```txt
+https://YOUR_RENDER_SERVICE.onrender.com/api/billing/webhooks/stripe
+```
+
+Listen at minimum to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, and `invoice.payment_failed`, then copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET`.

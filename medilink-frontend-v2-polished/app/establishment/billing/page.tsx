@@ -5,7 +5,7 @@ import { api, getApiUrl, getAuthToken } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
-import type { Conversation, MissionAgreement, Application } from '@/lib/types';
+import type { Conversation, EstablishmentBillingStatus, MissionAgreement, Application } from '@/lib/types';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { candidateNounCapitalized } from '@/lib/grammar';
@@ -53,13 +53,14 @@ type DashboardData = {
   alerts: Array<{ tone: 'neutral' | 'success' | 'warning' | 'danger'; title: string; row: AccountingRow | null }>;
 };
 
-type BillingTab = 'overview' | 'missions' | 'expenses' | 'documents' | 'budget' | 'exports';
+type BillingTab = 'overview' | 'subscription' | 'missions' | 'expenses' | 'documents' | 'budget' | 'exports';
 
 const STORAGE_KEY = 'medilink_establishment_billing_v2';
 const DEFAULT_BUDGET_LIMIT = 150000;
 
 const tabs: Array<{ id: BillingTab; label: string }> = [
   { id: 'overview', label: 'Vue d’ensemble' },
+  { id: 'subscription', label: 'Abonnement' },
   { id: 'missions', label: 'Historique de missions' },
   { id: 'expenses', label: 'Dépenses' },
   { id: 'documents', label: 'Factures' },
@@ -217,9 +218,13 @@ export default function RecruiterBillingPage() {
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'AVAILABLE' | 'PENDING' | 'COMPLETED' | 'MANUAL' | 'PROPOSED'>('ALL');
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [billingStatus, setBillingStatus] = useState<EstablishmentBillingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const queryTab = new URLSearchParams(window.location.search).get('tab');
+    if (queryTab === 'subscription') setActiveTab('subscription');
+
     const stored = readStoredState();
     setManualRows(stored.manualRows);
     setBudgetLimit(stored.budgetLimit);
@@ -235,6 +240,17 @@ export default function RecruiterBillingPage() {
       })
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
+  }, [primary]);
+
+  useEffect(() => {
+    if (!primary) {
+      setBillingStatus(null);
+      return;
+    }
+
+    api.reload<EstablishmentBillingStatus>(`/billing/establishments/${primary.id}/status`)
+      .then(setBillingStatus)
+      .catch((e: any) => setError(e.message));
   }, [primary]);
 
   useEffect(() => {
@@ -420,6 +436,21 @@ export default function RecruiterBillingPage() {
     downloadTextFile(`medilink-etablissement-compta-${selectedYear}${scope === 'filtered' ? '-filtre' : ''}.csv`, buildCsv(rows));
   }
 
+  async function openBillingPortal() {
+    if (!primary) return;
+
+    setBusyId('billing-portal');
+    setError(null);
+    try {
+      const response = await api.post<{ url: string }>('/billing/portal', { establishmentId: primary.id });
+      window.location.href = response.url;
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   if (establishmentLoading || loading) return <LoadingCard />;
 
   if (!primary) {
@@ -475,6 +506,14 @@ export default function RecruiterBillingPage() {
         />
       ) : null}
 
+      {activeTab === 'subscription' ? (
+        <SubscriptionTab
+          billingStatus={billingStatus}
+          busy={busyId === 'billing-portal'}
+          onOpenPortal={() => void openBillingPortal()}
+        />
+      ) : null}
+
       {activeTab === 'missions' ? (
         <MissionsTab rows={yearRows} busyId={busyId} onDownload={downloadRecruiterInvoice} onClassify={toggleClassified} />
       ) : null}
@@ -511,6 +550,76 @@ export default function RecruiterBillingPage() {
       ) : null}
     </>
   );
+}
+
+function SubscriptionTab({
+  billingStatus,
+  busy,
+  onOpenPortal,
+}: {
+  billingStatus: EstablishmentBillingStatus | null;
+  busy: boolean;
+  onOpenPortal: () => void;
+}) {
+  if (!billingStatus) return <LoadingCard label="Chargement de l'abonnement..." />;
+
+  const status = billingStatus.subscription?.status;
+  const renewsAt = billingStatus.subscription?.currentPeriodEnd;
+
+  return (
+    <div className="billing-tax-grid">
+      <Card className="dashboard-panel billing-tax-card">
+        <div>
+          <span>Acces publication</span>
+          <h2>{billingStatus.hasActiveSubscription ? 'Abonnement actif' : billingStatus.availableCredits > 0 ? 'Credit disponible' : 'Paiement requis'}</h2>
+          <p>
+            {billingStatus.hasActiveSubscription
+              ? 'Les annonces peuvent etre creees en brouillon ou publiees sans paiement unitaire.'
+              : billingStatus.availableCredits > 0
+                ? 'Votre prochain formulaire utilisera un credit deja paye. Il reste acquis tant que vous ne creez pas de mission.'
+                : 'Choisissez un abonnement ou un paiement unique avant de creer une nouvelle annonce.'}
+          </p>
+        </div>
+        <div className="billing-provision-grid">
+          <div><span>Credits disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
+          <div><span>Publications utilisees</span><strong>{billingStatus.consumedCredits}</strong></div>
+          <div><span>Abonnement</span><strong>{status || 'Inactif'}</strong></div>
+          <div><span>Renouvellement</span><strong>{renewsAt ? formatDate(renewsAt) : '-'}</strong></div>
+        </div>
+        <div className="actions">
+          <LinkButton href="/establishment/missions/new">Creer une annonce</LinkButton>
+          <Button type="button" variant="light" disabled={!billingStatus.stripeConfigured || busy} onClick={onOpenPortal}>
+            {busy ? 'Ouverture...' : 'Gerer sur Stripe'}
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="dashboard-panel">
+        <div className="toolbar compact">
+          <div>
+            <h2>Tarifs de publication</h2>
+            <p className="small">Le paiement est demande avant le formulaire pour garder une experience transparente.</p>
+          </div>
+        </div>
+        <div className="billing-provision-grid">
+          <div><span>Abonnement</span><strong>{formatCents(billingStatus.prices.monthlySubscription.amount, billingStatus.prices.monthlySubscription.currency)} / mois</strong></div>
+          <div><span>Annonce unique</span><strong>{formatCents(billingStatus.prices.publicationCredit.amount, billingStatus.prices.publicationCredit.currency)}</strong></div>
+        </div>
+        {!billingStatus.stripeConfigured ? (
+          <Alert type="error">Stripe n'est pas encore configure sur le serveur Render.</Alert>
+        ) : null}
+      </Card>
+    </div>
+  );
+}
+
+function formatCents(amount: number, currency = 'EUR') {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount / 100);
 }
 
 function OverviewTab({

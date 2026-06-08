@@ -3699,6 +3699,46 @@ tbody tr:hover { background: #FAFBFD; }
   opacity: .55;
   cursor: not-allowed;
 }
+
+.publication-access-card {
+  margin-bottom: 18px;
+}
+
+.publication-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.publication-plan-card {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.publication-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.publication-price strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.publication-price span {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.publication-plan-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
 .desktop-workflow-collapse-button {
   flex: 0 0 auto;
   min-height: 34px;

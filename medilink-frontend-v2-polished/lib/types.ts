@@ -35,6 +35,15 @@ export type MissionAgreementStatus =
 export type EscrowPaymentStatus = 'REQUIRES_PAYMENT' | 'SECURED' | 'RELEASED' | 'REFUNDED' | 'FAILED' | 'DISPUTED';
 export type InvoiceType = 'RECRUITER_INVOICE' | 'CANDIDATE_RECEIPT';
 export type InvoiceStatus = 'GENERATED' | 'VOID';
+export type EstablishmentSubscriptionStatus =
+  | 'INCOMPLETE'
+  | 'INCOMPLETE_EXPIRED'
+  | 'TRIALING'
+  | 'ACTIVE'
+  | 'PAST_DUE'
+  | 'CANCELED'
+  | 'UNPAID'
+  | 'PAUSED';
 
 export type CurrentUser = {
   id: string;
@@ -159,6 +168,33 @@ export type Establishment = {
   updatedAt: string;
   photos?: EstablishmentPhoto[];
   members?: Array<{ id: string; establishmentId: string; userId: string; role: EstablishmentMemberRole; user?: CurrentUser }>;
+};
+
+export type EstablishmentBillingStatus = {
+  establishmentId: string;
+  hasActiveSubscription: boolean;
+  canCreateMission: boolean;
+  availableCredits: number;
+  reservedCredits: number;
+  consumedCredits: number;
+  stripeConfigured: boolean;
+  subscription?: {
+    id: string;
+    establishmentId: string;
+    stripeSubscriptionId: string;
+    stripePriceId?: string | null;
+    status: EstablishmentSubscriptionStatus;
+    currentPeriodStart?: string | null;
+    currentPeriodEnd?: string | null;
+    cancelAtPeriodEnd: boolean;
+    canceledAt?: string | null;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
+  prices: {
+    monthlySubscription: { amount: number; currency: string };
+    publicationCredit: { amount: number; currency: string };
+  };
 };
 
 export type MissionTag = { id: string; missionId: string; tag: string };
