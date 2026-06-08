@@ -7614,18 +7614,24 @@ td {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .billing-doc-card,
 .billing-export-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
   min-width: 0;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: #fff;
+}
+
+.billing-doc-card > div:first-child,
+.billing-export-card > div:first-child {
+  flex: 1;
 }
 
 .billing-doc-meta {
@@ -7658,10 +7664,12 @@ td {
 .billing-checklist-card {
   display: grid;
   gap: 14px;
+  grid-column: span 3;
 }
 
 .billing-checklist {
   display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -7699,8 +7707,13 @@ td {
     grid-template-columns: 1fr;
   }
 
-  .billing-tax-card {
+  .billing-tax-card,
+  .billing-checklist-card {
     grid-column: auto;
+  }
+
+  .billing-checklist {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .billing-timeline {
@@ -7882,6 +7895,10 @@ td {
   .billing-table .small {
     font-size: 10px;
     line-height: 1.2;
+  }
+
+  .billing-checklist {
+    grid-template-columns: 1fr;
   }
 }
 
