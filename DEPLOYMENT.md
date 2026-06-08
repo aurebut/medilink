@@ -10,7 +10,7 @@ Recommended free MVP setup:
 
 Create a free Supabase project, then copy the Postgres connection string.
 
-Use the pooled connection string if Supabase offers one. Prisma accepts both the direct and pooled Postgres URLs.
+Use the pooled connection string for `DATABASE_URL`, preferably the transaction pooler for the runtime app. Also copy the direct connection string as `DIRECT_URL`; Prisma uses it for migrations so deploys do not compete with the session pooler connection limit.
 
 Create a private Supabase Storage bucket for user documents, then create S3 access keys for that project. The backend uses signed S3-compatible URLs, so files go directly from the Vercel frontend to Supabase Storage while document metadata stays in Supabase Postgres.
 
@@ -32,6 +32,7 @@ PORT=10000
 API_PUBLIC_URL=https://YOUR_RENDER_SERVICE.onrender.com
 FRONTEND_URL=https://YOUR_VERCEL_PROJECT.vercel.app
 DATABASE_URL=YOUR_SUPABASE_POSTGRES_URL
+DIRECT_URL=YOUR_SUPABASE_DIRECT_POSTGRES_URL
 SESSION_COOKIE_NAME=medilink_session
 SESSION_SECRET=GENERATE_A_LONG_RANDOM_VALUE
 SESSION_MAX_AGE_DAYS=30
