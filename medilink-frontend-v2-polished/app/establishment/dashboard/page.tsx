@@ -9,7 +9,7 @@ import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Establishment, EstablishmentDashboardData, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
-import { buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
+import { buildWeekCarousel, dateKey, dateRangeKeys, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
 
 function dayNumber(value: Date) {
@@ -121,15 +121,16 @@ export default function EstablishmentDashboardPage() {
     const agendaRows = buildEstablishmentAgendaRows(missions, applications, conversations);
     const agendaRowsByDay = new Map<string, typeof agendaRows>();
     agendaRows.forEach((row) => {
-      const key = dateKey(row.date);
-      agendaRowsByDay.set(key, [...(agendaRowsByDay.get(key) || []), row]);
+      dateRangeKeys(row.date, row.endDate).forEach((key) => {
+        agendaRowsByDay.set(key, [...(agendaRowsByDay.get(key) || []), row]);
+      });
     });
     const weekCarousel = buildWeekCarousel(new Date(), 8);
     const nextAgendaItem = agendaRows
       .filter((row) => row.date)
       .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
-    const today = new Date().setHours(0, 0, 0, 0);
-    const upcomingMissions = agendaRows.filter((row) => row.date && new Date(row.date).getTime() >= today);
+    const todayKey = dateKey(new Date());
+    const upcomingMissions = agendaRows.filter((row) => row.date && dateKey(row.endDate || row.date) >= todayKey);
 
     return {
       sortedApplications,

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
-import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementNextStep, agreementTone, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
@@ -135,6 +135,7 @@ export default function CandidateDashboardPage() {
         conversation,
         agreement,
         date: missionDateValue(application, agreement),
+        endDate: missionEndDateValue(application, agreement),
       };
     });
     const proposedAgreements = missionRows.filter((row) => row.agreement?.status === 'PROPOSED');
@@ -163,8 +164,9 @@ export default function CandidateDashboardPage() {
       .slice(0, 3);
     const missionRowsByDay = new Map<string, typeof missionRows>();
     missionRows.forEach((row) => {
-      const key = dateKey(row.date);
-      missionRowsByDay.set(key, [...(missionRowsByDay.get(key) || []), row]);
+      dateRangeKeys(row.date, row.endDate).forEach((key) => {
+        missionRowsByDay.set(key, [...(missionRowsByDay.get(key) || []), row]);
+      });
     });
     const weekCarousel = buildWeekCarousel(new Date(), 8);
 
