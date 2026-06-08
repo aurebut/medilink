@@ -6617,9 +6617,9 @@ td {
 
   .new-mission-page .wizard-panel {
     gap: 12px;
-    max-height: calc(100dvh - 148px);
+    max-height: none;
     padding: 12px;
-    overflow: hidden;
+    overflow: visible;
     border-radius: 12px;
   }
 
@@ -6694,9 +6694,9 @@ td {
   .new-mission-page .wizard-step-content {
     gap: 11px;
     min-height: 0;
-    max-height: calc(100dvh - 360px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    max-height: none;
+    overflow-y: visible;
+    overscroll-behavior: auto;
     padding-right: 2px;
   }
 
@@ -6785,11 +6785,11 @@ td {
   }
 
   .new-mission-page .wizard-panel {
-    max-height: calc(100dvh - 112px);
+    max-height: none;
   }
 
   .new-mission-page .wizard-step-content {
-    max-height: calc(100dvh - 300px);
+    max-height: none;
   }
 }
 

@@ -6,6 +6,17 @@ export function latestAgreement(conversation?: Conversation | null) {
   return conversation?.agreements?.[0] || null;
 }
 
+const CLOSED_APPLICATION_STATUSES = ['REJECTED', 'WITHDRAWN', 'CANCELLED'];
+const CLOSED_AGREEMENT_STATUSES = ['REJECTED', 'CANCELLED', 'EXPIRED'];
+
+export function isCandidateAgendaApplication(
+  application: Application,
+  agreement?: MissionAgreement | null,
+) {
+  return !CLOSED_APPLICATION_STATUSES.includes(application.status)
+    && !CLOSED_AGREEMENT_STATUSES.includes(agreement?.status || '');
+}
+
 export function agreementTone(status?: MissionAgreementStatus | null): 'neutral' | 'success' | 'warning' | 'danger' {
   if (!status) return 'neutral';
   if (['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status)) return 'success';

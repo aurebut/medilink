@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementTone, buildCalendarEventWeeks, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementTone, buildCalendarEventWeeks, conversationForApplication, dateKey, dateRangeKeys, isCandidateAgendaApplication, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
@@ -90,21 +90,23 @@ export default function CandidateAgendaPage() {
     const now = new Date();
     const todayKey = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
 
-    return sortByMissionDate(applications.map((application) => {
+    return sortByMissionDate(applications.flatMap((application) => {
       const conversation = conversationForApplication(application, conversations);
       const agreement = latestAgreement(conversation);
+      if (!isCandidateAgendaApplication(application, agreement)) return [];
+
       const date = missionDateValue(application, agreement);
       const endDate = missionEndDateValue(application, agreement);
       const dateTime = date ? new Date(date).getTime() : null;
 
-      return {
+      return [{
         application,
         conversation,
         agreement,
         date,
         endDate,
         upcoming: dateTime === null || dateKey(endDate || date) >= todayKey,
-      };
+      }];
     }));
   }, [applications, conversations]);
 
