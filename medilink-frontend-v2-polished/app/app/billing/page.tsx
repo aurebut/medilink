@@ -52,7 +52,7 @@ type DashboardData = {
   alerts: Array<{ tone: 'neutral' | 'success' | 'warning' | 'danger'; title: string; row: AccountingRow | null }>;
 };
 
-type BillingTab = 'overview' | 'missions' | 'revenues' | 'documents' | 'tax' | 'exports';
+type BillingTab = 'overview' | 'revenues' | 'documents' | 'tax' | 'exports';
 
 const STORAGE_KEY = 'medilink_candidate_billing_v2';
 const DEFAULT_PROVISION_RATE = 45;
@@ -60,7 +60,6 @@ const MICRO_BNC_THRESHOLD = 77700;
 
 const tabs: Array<{ id: BillingTab; label: string }> = [
   { id: 'overview', label: 'Vue d’ensemble' },
-  { id: 'missions', label: 'Historique de missions' },
   { id: 'revenues', label: 'Recettes' },
   { id: 'documents', label: 'Justificatifs' },
   { id: 'tax', label: 'Fiscalité' },
@@ -403,13 +402,8 @@ export default function CandidateBillingPage() {
           provisionRate={provisionRate}
           selectedYear={selectedYear}
           setProvisionRate={setProvisionRate}
-          openMissions={() => setActiveTab('missions')}
           openDocuments={() => setActiveTab('documents')}
         />
-      ) : null}
-
-      {activeTab === 'missions' ? (
-        <MissionsTab rows={yearRows} busyId={busyId} onDownload={downloadCandidateInvoice} onClassify={toggleClassified} />
       ) : null}
 
       {activeTab === 'revenues' ? (
@@ -451,14 +445,12 @@ function OverviewTab({
   provisionRate,
   selectedYear,
   setProvisionRate,
-  openMissions,
   openDocuments,
 }: {
   dashboard: DashboardData;
   provisionRate: number;
   selectedYear: number;
   setProvisionRate: (value: number) => void;
-  openMissions: () => void;
   openDocuments: () => void;
 }) {
   return (
@@ -531,7 +523,6 @@ function OverviewTab({
               <h2>Alertes d’action</h2>
               <p className="small">Les sujets comptables à traiter en priorité.</p>
             </div>
-            <Button type="button" variant="light" onClick={openMissions}>Voir les missions</Button>
           </div>
           {dashboard.alerts.length > 0 ? (
             <div className="billing-alert-list">
