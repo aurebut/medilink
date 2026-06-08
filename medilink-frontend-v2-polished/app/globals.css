@@ -2566,9 +2566,9 @@ button { touch-action: manipulation; }
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(148,163,184,.28);
   border-radius: 16px;
-  background: var(--line);
+  background: rgba(148,163,184,.20);
 }
 .week-day {
   min-height: 150px;
@@ -2577,10 +2577,11 @@ button { touch-action: manipulation; }
   gap: 10px;
   min-width: 0;
   padding: 12px;
-  background: #fff;
+  background: #FCFDFE;
 }
 .week-day.today {
-  box-shadow: inset 0 0 0 2px rgba(14,138,122,.42);
+  background: #F7FFFC;
+  box-shadow: inset 0 0 0 2px rgba(14,138,122,.32);
 }
 .week-day-head {
   display: flex;
@@ -2658,53 +2659,55 @@ button { touch-action: manipulation; }
 }
 .week-event-layer {
   position: absolute;
-  inset: 58px 6px 10px;
+  inset: 59px 7px 10px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-auto-rows: 28px;
-  gap: 6px 0;
+  grid-auto-rows: 26px;
+  gap: 7px 0;
   pointer-events: none;
 }
 .week-span-event,
 .agenda-span-event {
+  --event-bg: #2563EB;
+  --event-bg-soft: #1D4ED8;
   min-width: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1px;
-  padding: 4px 10px;
-  border: 1px solid rgba(26,82,160,.14);
+  padding: 4px 11px;
+  border: 1px solid rgba(255,255,255,.18);
   border-radius: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(26,82,160,.10));
-  color: var(--heading);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  background: linear-gradient(90deg, var(--event-bg), var(--event-bg-soft));
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(15,23,42,.10), inset 0 1px 0 rgba(255,255,255,.18);
 }
 .week-span-event.starts,
 .agenda-span-event.starts {
-  margin-left: 6px;
-  border-top-left-radius: 999px;
-  border-bottom-left-radius: 999px;
+  margin-left: 7px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 .week-span-event.ends,
 .agenda-span-event.ends {
-  margin-right: 6px;
-  border-top-right-radius: 999px;
-  border-bottom-right-radius: 999px;
+  margin-right: 7px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 .week-span-event.is-success,
 .agenda-span-event.is-success {
-  border-color: rgba(14,138,122,.20);
-  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(14,138,122,.13));
+  --event-bg: #0E8A7A;
+  --event-bg-soft: #0B6F62;
 }
 .week-span-event.is-warning,
 .agenda-span-event.is-warning {
-  border-color: rgba(183,110,0,.20);
-  background: linear-gradient(180deg, rgba(255,255,255,.80), rgba(183,110,0,.14));
+  --event-bg: #D97706;
+  --event-bg-soft: #B45309;
 }
 .week-span-event.is-danger,
 .agenda-span-event.is-danger {
-  border-color: rgba(185,28,28,.18);
-  background: linear-gradient(180deg, rgba(255,255,255,.78), #FEF3F2);
+  --event-bg: #DC2626;
+  --event-bg-soft: #B91C1C;
 }
 .week-span-event strong,
 .week-span-event span,
@@ -2719,12 +2722,13 @@ button { touch-action: manipulation; }
   font-size: 11px;
   line-height: 1.15;
   font-weight: 850;
+  color: #fff;
 }
 .week-span-event span,
 .agenda-span-event span,
 .week-span-more,
 .agenda-span-more {
-  color: var(--muted);
+  color: rgba(255,255,255,.82);
   font-size: 10px;
   line-height: 1.1;
 }
@@ -2785,9 +2789,9 @@ button { touch-action: manipulation; }
 }
 .agenda-calendar {
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(148,163,184,.28);
   border-radius: 16px;
-  background: var(--line);
+  background: rgba(148,163,184,.20);
   transform-origin: center;
   will-change: transform, opacity;
 }
@@ -2830,34 +2834,35 @@ button { touch-action: manipulation; }
   font: inherit;
   text-align: left;
   cursor: pointer;
-  min-height: 124px;
+  min-height: 128px;
   display: grid;
   align-content: start;
   gap: 7px;
   min-width: 0;
   padding: 9px;
-  background: #fff;
+  background: #FCFDFE;
   transition: background .15s ease, box-shadow .15s ease;
 }
 .agenda-day:hover {
-  background: #FBFCFE;
+  background: #F7FAFD;
 }
 .agenda-day.muted {
   background: #F8FAFC;
 }
 .agenda-day-outside {
-  min-height: 124px;
-  background: #F8FAFC;
+  min-height: 128px;
+  background: #F3F6FA;
   cursor: default;
   pointer-events: none;
 }
 .agenda-day.today {
-  box-shadow: inset 0 0 0 2px rgba(14,138,122,.42);
+  background: #F7FFFC;
+  box-shadow: inset 0 0 0 2px rgba(14,138,122,.32);
 }
 .agenda-day.selected {
   position: relative;
   z-index: 1;
-  box-shadow: inset 0 0 0 2px rgba(26,82,160,.50);
+  box-shadow: inset 0 0 0 2px rgba(37,99,235,.38);
 }
 .agenda-day:focus-visible {
   outline: 3px solid rgba(26,82,160,.22);
@@ -2889,11 +2894,11 @@ button { touch-action: manipulation; }
 }
 .agenda-event-layer {
   position: absolute;
-  inset: 43px 6px 9px;
+  inset: 44px 7px 10px;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-auto-rows: 27px;
-  gap: 5px 0;
+  grid-auto-rows: 26px;
+  gap: 7px 0;
   pointer-events: none;
 }
 .agenda-span-event {
@@ -6398,12 +6403,14 @@ td {
     padding: 9px;
   }
   .week-event-layer {
-    inset: 54px 5px 8px;
-    grid-auto-rows: 20px;
+    inset: 54px 6px 8px;
+    grid-auto-rows: 18px;
     gap: 5px 0;
   }
   .week-span-event {
     padding: 0 6px;
+    border-radius: 0;
+    box-shadow: none;
   }
   .week-span-event strong {
     font-size: 10px;
@@ -6455,12 +6462,12 @@ td {
     gap: 1px;
   }
   .agenda-day {
-    min-height: 76px;
+    min-height: 82px;
     gap: 5px;
     padding: 6px;
   }
   .agenda-day-outside {
-    min-height: 76px;
+    min-height: 82px;
   }
   .agenda-day-popover {
     position: fixed;
@@ -6493,8 +6500,8 @@ td {
     align-content: flex-start;
   }
   .agenda-event-layer {
-    inset: 35px 5px 7px;
-    grid-auto-rows: 10px;
+    inset: 35px 6px 8px;
+    grid-auto-rows: 9px;
     gap: 4px 0;
   }
   .agenda-span-event {
@@ -6507,12 +6514,12 @@ td {
     box-shadow: none;
   }
   .agenda-span-event.starts {
-    margin-left: 5px;
+    margin-left: 4px;
     border-top-left-radius: 999px;
     border-bottom-left-radius: 999px;
   }
   .agenda-span-event.ends {
-    margin-right: 5px;
+    margin-right: 4px;
     border-top-right-radius: 999px;
     border-bottom-right-radius: 999px;
   }
