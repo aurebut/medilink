@@ -100,12 +100,32 @@ export default function NewMissionPage() {
       return;
     }
 
+    let cancelled = false;
+    const path = `/billing/establishments/${selectedEstablishment.id}/status`;
+
     setBillingLoading(true);
+    setBillingStatus(null);
     setError(null);
-    api.reload<EstablishmentBillingStatus>(`/billing/establishments/${selectedEstablishment.id}/status`)
-      .then(setBillingStatus)
-      .catch((e: any) => setError(e.message))
-      .finally(() => setBillingLoading(false));
+    api.get<EstablishmentBillingStatus>(path)
+      .then((status) => {
+        if (cancelled) return;
+        setBillingStatus(status);
+        setBillingLoading(false);
+        return api.reload<EstablishmentBillingStatus>(path)
+          .then((freshStatus) => {
+            if (!cancelled) setBillingStatus(freshStatus);
+          })
+          .catch(() => undefined);
+      })
+      .catch((e: any) => {
+        if (cancelled) return;
+        setError(e.message);
+        setBillingLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [selectedEstablishment?.id]);
 
   useEffect(() => {

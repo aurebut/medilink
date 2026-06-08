@@ -87,6 +87,7 @@ function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
     primeApiCache('/establishments/me', [data.establishment]);
     primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
     primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+    warmApi([`/billing/establishments/${data.establishment.id}/status`]);
   }
   primeApiCache('/conversations', data.conversations);
 }
@@ -112,6 +113,11 @@ function warmEstablishmentWorkspace() {
   void api.get<EstablishmentDashboardData>('/establishment/dashboard')
     .then(primeEstablishmentDashboard)
     .catch(() => undefined);
+  void api.get<Array<{ id: string }>>('/establishments/me')
+    .then((items) => {
+      items.slice(0, 3).forEach((item) => warmApi([`/billing/establishments/${item.id}/status`]));
+    })
+    .catch(() => undefined);
   void api.get<Conversation[]>('/conversations')
     .then((items) => items.slice(0, 3).forEach((item) => api.preload(`/conversations/${item.id}/messages`)))
     .catch(() => undefined);
@@ -136,6 +142,7 @@ function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: 
 
   if (area === 'establishment') {
     if (href === '/establishment/dashboard') return ['/establishment/dashboard'];
+    if (href === '/establishment/missions/new') return ['/establishment/dashboard', '/establishments/me'];
     if (href === '/establishment/notifications') return ['/notifications'];
     if (href === '/establishment/messages') return ['/conversations'];
     if (
@@ -402,7 +409,7 @@ export function AppShell({
       return idleWarm(['/me/dashboard', '/missions?limit=50', '/me/profile', '/me/documents', '/me/applications', '/conversations', '/notifications']);
     }
 
-    prefetchRoutes(router, establishmentNav.map((item) => item.href));
+    prefetchRoutes(router, [...establishmentNav.map((item) => item.href), '/establishment/missions/new']);
     return idleWarm(['/establishment/dashboard', '/establishments/me', '/conversations', '/notifications']);
   }, [area, router, user]);
 
