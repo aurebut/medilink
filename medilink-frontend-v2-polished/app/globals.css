@@ -1690,6 +1690,7 @@ button { touch-action: manipulation; }
 .profile-photo-controls { flex: 1; min-width: 0; }
 .profile-photo-controls h2 { margin-bottom: 4px; }
 .profile-photo-controls .field { margin: 12px 0; }
+.profile-main-panel { display: grid; gap: 16px; min-width: 0; }
 .profile-preferences-section {
   display: grid;
   gap: 14px;

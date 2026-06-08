@@ -35,9 +35,19 @@ type UploadResponse = {
   expiresInSeconds: number;
 };
 
+type ProfileTab = 'identity' | 'professional' | 'missions' | 'documents';
+
+const profileTabs: Array<{ id: ProfileTab; label: string }> = [
+  { id: 'identity', label: 'Identité' },
+  { id: 'professional', label: 'Professionnel' },
+  { id: 'missions', label: 'Missions' },
+  { id: 'documents', label: 'Documents' },
+];
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [form, setForm] = useState<any>({});
+  const [activeTab, setActiveTab] = useState<ProfileTab>('identity');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarInputKey, setAvatarInputKey] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -102,7 +112,7 @@ export default function ProfilePage() {
       const updated = await api.patch<Profile>('/me/profile', payload);
       setProfile(updated);
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
-      setMessage(`Profil ${gendered(updated, 'mis à jour', 'mise à jour')}.`);
+      setMessage(`Profil ${gendered(updated, 'mis a jour', 'mise a jour')}.`);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -141,7 +151,7 @@ export default function ProfilePage() {
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
       setAvatarFile(null);
       setAvatarInputKey((key) => key + 1);
-      setMessage('Photo de profil mise à jour.');
+      setMessage('Photo de profil mise a jour.');
     } catch (e: any) {
       setError(e.message || 'Erreur upload photo.');
     } finally {
@@ -162,7 +172,7 @@ export default function ProfilePage() {
       setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
       setMessage(healthVerificationMessage(updated.healthVerificationStatus));
     } catch (e: any) {
-      setError(e.message || 'Vérification RPPS impossible.');
+      setError(e.message || 'Verification RPPS impossible.');
       try {
         const refreshed = await api.get<Profile>('/me/profile');
         setProfile(refreshed);
@@ -187,7 +197,7 @@ export default function ProfilePage() {
     <>
       <PageHeader
         title="Mon profil"
-        description={`Identite, informations professionnelles, preferences de missions et documents verifiables pour ${gendered(form, 'un candidat', 'une candidate')}.`}
+        description={`Identité, informations professionnelles, préférences de missions et documents vérifiables pour ${gendered(form, 'un candidat', 'une candidate')}.`}
       />
 
       <div className="grid-main">
@@ -228,153 +238,184 @@ export default function ProfilePage() {
             <div className="divider" />
             <p className="small">À renseigner en priorité : ville, statut médical, spécialité, mobilité, missions acceptées et CV.</p>
           </Card>
-
         </div>
 
-        <Card>
-          <h2>Informations {gendered(form, 'candidat', 'candidate')}</h2>
-          <form className="form" onSubmit={submit}>
-            {message ? <Alert type="success">{message}</Alert> : null}
-            {error ? <Alert type="error">{error}</Alert> : null}
-
-            <div className="profile-preferences-section">
-              <div className="toolbar">
-                <div>
-                  <h3>Vérification professionnelle</h3>
-                  <p className="small">Contrôle automatique via l'Annuaire Santé ANS à partir du RPPS.</p>
-                </div>
-                <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
-                  {healthVerificationLabel(profile.healthVerificationStatus)}
-                </Badge>
-              </div>
-              <Field label="Numero RPPS">
-                <Input
-                  inputMode="numeric"
-                  value={form.rpps || ''}
-                  onChange={(e) => set('rpps', e.target.value)}
-                  placeholder="Ex : 10001234567"
-                />
-              </Field>
-              {profile.verifiedProfession || profile.verifiedSpecialty ? (
-                <div className="info-list">
-                  {profile.verifiedProfession ? (
-                    <div>
-                      <span>Profession validée</span>
-                      <strong>{profile.verifiedProfession}</strong>
-                    </div>
-                  ) : null}
-                  {profile.verifiedSpecialty ? (
-                    <div>
-                      <span>Spécialité validée</span>
-                      <strong>{profile.verifiedSpecialty}</strong>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-              <Button
+        <div className="profile-main-panel">
+          <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections du profil">
+            {profileTabs.map((tab) => (
+              <button
+                key={tab.id}
                 type="button"
-                variant="secondary"
-                disabled={verifyingHealth || !String(form.rpps || '').trim()}
-                onClick={verifyHealthProfessional}
+                className={activeTab === tab.id ? 'active' : ''}
+                onClick={() => setActiveTab(tab.id)}
+                role="tab"
+                aria-selected={activeTab === tab.id}
               >
-                {verifyingHealth ? 'Vérification...' : 'Valider mon compte'}
-              </Button>
-            </div>
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-            <div className="form-row">
-              <Field label="Prenom"><Input value={form.firstName || ''} onChange={(e) => set('firstName', e.target.value)} /></Field>
-              <Field label="Nom"><Input value={form.lastName || ''} onChange={(e) => set('lastName', e.target.value)} /></Field>
-            </div>
+          {activeTab === 'documents' ? (
+            <DocumentSection />
+          ) : (
+            <Card>
+              <h2>
+                {activeTab === 'identity' ? `Identité ${gendered(form, 'candidat', 'candidate')}` : null}
+                {activeTab === 'professional' ? 'Parcours professionnel' : null}
+                {activeTab === 'missions' ? 'Préférences de missions' : null}
+              </h2>
+              <form className="form" onSubmit={submit}>
+                {message ? <Alert type="success">{message}</Alert> : null}
+                {error ? <Alert type="error">{error}</Alert> : null}
 
-            <div className="form-row">
-              <Field label="Sexe / accord grammatical">
-                <Select value={form.candidateGender || ''} onChange={(e) => set('candidateGender', e.target.value as CandidateGender)}>
-                  <option value="">Selectionner</option>
-                  <option value="FEMININE">Feminin</option>
-                  <option value="MASCULINE">Masculin</option>
-                </Select>
-              </Field>
-              <SingleChoiceField label="Ville" value={form.city || ''} options={cityOptions} onChange={(value) => set('city', value)} />
-            </div>
+                {activeTab === 'identity' ? (
+                  <>
+                    <div className="form-row">
+                      <Field label="Prenom"><Input value={form.firstName || ''} onChange={(e) => set('firstName', e.target.value)} /></Field>
+                      <Field label="Nom"><Input value={form.lastName || ''} onChange={(e) => set('lastName', e.target.value)} /></Field>
+                    </div>
 
-            <div className="form-row">
-              <SingleChoiceField label="Pays" value={form.country || 'France'} options={countryOptions} onChange={(value) => set('country', value)} />
-              <Field label="Statut medical">
-                <Select value={form.medicalStatus || ''} onChange={(e) => set('medicalStatus', e.target.value as MedicalStatus)}>
-                  <option value="">Selectionner</option>
-                  {candidateMedicalStatusOptions.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {medicalStatusLabel(o.value, form)}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            </div>
+                    <div className="form-row">
+                      <Field label="Sexe / accord grammatical">
+                        <Select value={form.candidateGender || ''} onChange={(e) => set('candidateGender', e.target.value as CandidateGender)}>
+                          <option value="">Selectionner</option>
+                          <option value="FEMININE">Feminin</option>
+                          <option value="MASCULINE">Masculin</option>
+                        </Select>
+                      </Field>
+                      <SingleChoiceField label="Ville" value={form.city || ''} options={cityOptions} onChange={(value) => set('city', value)} />
+                    </div>
 
-            <div className="form-row">
-              <MultiChoiceTextField
-                label="Spécialité"
-                value={form.specialty || ''}
-                options={specialtyOptions}
-                onChange={(value) => set('specialty', value)}
-              />
-              <MultiChoiceTextField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
-            </div>
+                    <SingleChoiceField label="Pays" value={form.country || 'France'} options={countryOptions} onChange={(value) => set('country', value)} />
 
-            {form.medicalStatus === 'OTHER' ? (
-              <Field label="Statut personnalise">
-                <Input value={form.medicalStatusOther || ''} onChange={(e) => set('medicalStatusOther', e.target.value)} placeholder="Ex : assistant specialiste..." />
-              </Field>
-            ) : null}
+                    <Field label="Bio"><Textarea value={form.bio || ''} onChange={(e) => set('bio', e.target.value)} placeholder="Quelques lignes pour présenter votre profil." /></Field>
+                  </>
+                ) : null}
 
-            <SingleChoiceField label="Hôpital / faculté" value={form.hospitalOrFaculty || ''} options={hospitalOrFacultyOptions} onChange={(value) => set('hospitalOrFaculty', value)} />
+                {activeTab === 'professional' ? (
+                  <>
+                    <div className="profile-preferences-section">
+                      <div className="toolbar">
+                        <div>
+                          <h3>Vérification professionnelle</h3>
+                          <p className="small">Contrôle automatique via l'Annuaire Santé ANS à partir du RPPS.</p>
+                        </div>
+                        <Badge tone={healthVerificationTone(profile.healthVerificationStatus)}>
+                          {healthVerificationLabel(profile.healthVerificationStatus)}
+                        </Badge>
+                      </div>
+                      <Field label="Numero RPPS">
+                        <Input
+                          inputMode="numeric"
+                          value={form.rpps || ''}
+                          onChange={(e) => set('rpps', e.target.value)}
+                          placeholder="Ex : 10001234567"
+                        />
+                      </Field>
+                      {profile.verifiedProfession || profile.verifiedSpecialty ? (
+                        <div className="info-list">
+                          {profile.verifiedProfession ? (
+                            <div>
+                              <span>Profession validée</span>
+                              <strong>{profile.verifiedProfession}</strong>
+                            </div>
+                          ) : null}
+                          {profile.verifiedSpecialty ? (
+                            <div>
+                              <span>Spécialité validée</span>
+                              <strong>{profile.verifiedSpecialty}</strong>
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : null}
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        disabled={verifyingHealth || !String(form.rpps || '').trim()}
+                        onClick={verifyHealthProfessional}
+                      >
+                        {verifyingHealth ? 'Vérification...' : 'Valider mon compte'}
+                      </Button>
+                    </div>
 
-            <div className="form-row">
-              <Field label="Annees d'experience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
-              <MultiChoiceField label="Compétences" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
-            </div>
+                    <div className="form-row">
+                      <Field label="Statut medical">
+                        <Select value={form.medicalStatus || ''} onChange={(e) => set('medicalStatus', e.target.value as MedicalStatus)}>
+                          <option value="">Selectionner</option>
+                          {candidateMedicalStatusOptions.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {medicalStatusLabel(o.value, form)}
+                            </option>
+                          ))}
+                        </Select>
+                      </Field>
+                      <MultiChoiceTextField
+                        label="Spécialité"
+                        value={form.specialty || ''}
+                        options={specialtyOptions}
+                        onChange={(value) => set('specialty', value)}
+                      />
+                    </div>
 
-            <Field label="Disponibilites"><Textarea value={form.availabilityNotes || ''} onChange={(e) => set('availabilityNotes', e.target.value)} placeholder="Ex : nuits, week-ends, gardes ponctuelles..." /></Field>
+                    {form.medicalStatus === 'OTHER' ? (
+                      <Field label="Statut personnalise">
+                        <Input value={form.medicalStatusOther || ''} onChange={(e) => set('medicalStatusOther', e.target.value)} placeholder="Ex : assistant specialiste..." />
+                      </Field>
+                    ) : null}
 
-            <div className="profile-preferences-section">
-              <h3>Preferences de missions</h3>
+                    <div className="form-row">
+                      <MultiChoiceTextField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
+                      <SingleChoiceField label="Hôpital / faculté" value={form.hospitalOrFaculty || ''} options={hospitalOrFacultyOptions} onChange={(value) => set('hospitalOrFaculty', value)} />
+                    </div>
 
-              <MultiChoiceField label="Villes acceptees" values={safeArray(form.preferredCities)} options={cityOptions} onChange={(values) => set('preferredCities', values)} />
+                    <div className="form-row">
+                      <Field label="Annees d'experience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
+                      <MultiChoiceField label="Compétences" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
+                    </div>
+                  </>
+                ) : null}
 
-              <div className="form-row">
-                <Field label="Rayon maximum (km)">
-                  <Input type="number" min={0} max={1000} value={form.maxTravelRadiusKm ?? ''} onChange={(e) => set('maxTravelRadiusKm', e.target.value)} placeholder="Ex : 50" />
-                </Field>
-                <Field label="Remuneration minimale (EUR)">
-                  <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
-                </Field>
-              </div>
+                {activeTab === 'missions' ? (
+                  <>
+                    <Field label="Disponibilites"><Textarea value={form.availabilityNotes || ''} onChange={(e) => set('availabilityNotes', e.target.value)} placeholder="Ex : nuits, week-ends, gardes ponctuelles..." /></Field>
 
-              <MultiChoiceField label="Mobilite" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-              <MultiChoiceField label="Types de missions acceptees" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-              <MultiChoiceField label="Durée préférée" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-              <MultiChoiceField label="Horaires refuses" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
-              <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-              <MultiChoiceField label="Patientele acceptee" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
+                    <MultiChoiceField label="Villes acceptees" values={safeArray(form.preferredCities)} options={cityOptions} onChange={(values) => set('preferredCities', values)} />
 
-              <div className="form-row">
-                <BooleanPreference label="Secrétaire obligatoire" value={form.secretaryRequired} onChange={(value) => set('secretaryRequired', value)} />
-                <BooleanPreference label="Logement obligatoire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
-              </div>
+                    <div className="form-row">
+                      <Field label="Rayon maximum (km)">
+                        <Input type="number" min={0} max={1000} value={form.maxTravelRadiusKm ?? ''} onChange={(e) => set('maxTravelRadiusKm', e.target.value)} placeholder="Ex : 50" />
+                      </Field>
+                      <Field label="Remuneration minimale (EUR)">
+                        <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
+                      </Field>
+                    </div>
 
-              <div className="form-row">
-                <BooleanPreference label="Paiement rapide important" value={form.fastPaymentImportant} onChange={(value) => set('fastPaymentImportant', value)} />
-                <SingleChoiceField label="Niveau de pression accepte" value={form.acceptedPressureLevel || ''} options={pressureLevelOptions} onChange={(value) => set('acceptedPressureLevel', value)} />
-              </div>
-            </div>
+                    <MultiChoiceField label="Mobilite" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
+                    <MultiChoiceField label="Types de missions acceptees" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
+                    <MultiChoiceField label="Durée préférée" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+                    <MultiChoiceField label="Horaires refuses" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+                    <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
+                    <MultiChoiceField label="Patientele acceptee" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
 
-            <Field label="Bio"><Textarea value={form.bio || ''} onChange={(e) => set('bio', e.target.value)} placeholder="Quelques lignes pour presenter votre profil." /></Field>
-            <Button disabled={saving}>{saving ? 'Sauvegarde...' : 'Enregistrer le profil'}</Button>
-          </form>
-        </Card>
+                    <div className="form-row">
+                      <BooleanPreference label="Secrétaire obligatoire" value={form.secretaryRequired} onChange={(value) => set('secretaryRequired', value)} />
+                      <BooleanPreference label="Logement obligatoire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
+                    </div>
+
+                    <div className="form-row">
+                      <BooleanPreference label="Paiement rapide important" value={form.fastPaymentImportant} onChange={(value) => set('fastPaymentImportant', value)} />
+                      <SingleChoiceField label="Niveau de pression accepte" value={form.acceptedPressureLevel || ''} options={pressureLevelOptions} onChange={(value) => set('acceptedPressureLevel', value)} />
+                    </div>
+                  </>
+                ) : null}
+
+                <Button disabled={saving}>{saving ? 'Sauvegarde...' : 'Enregistrer'}</Button>
+              </form>
+            </Card>
+          )}
+        </div>
       </div>
-
-      <div style={{ marginTop: 16 }}><DocumentSection /></div>
     </>
   );
 }
@@ -382,17 +423,17 @@ export default function ProfilePage() {
 function healthVerificationLabel(status?: HealthVerificationStatus | null) {
   switch (status) {
     case 'VERIFIED':
-      return 'Vérifié';
+      return 'Verifie';
     case 'PENDING':
-      return 'Vérification...';
+      return 'Verification...';
     case 'NOT_FOUND':
       return 'RPPS introuvable';
     case 'MISMATCH':
-      return 'Identité différente';
+      return 'Identite differente';
     case 'ERROR':
       return 'Erreur ANS';
     default:
-      return 'Non vérifié';
+      return 'Non verifie';
   }
 }
 
@@ -406,10 +447,10 @@ function healthVerificationTone(
 }
 
 function healthVerificationMessage(status?: HealthVerificationStatus | null) {
-  if (status === 'VERIFIED') return 'Compte professionnel vérifié.';
-  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouvé pour ce RPPS.';
-  if (status === 'MISMATCH') return 'RPPS trouvé, mais le nom ou le prénom ne correspond pas au profil.';
-  return 'Vérification RPPS terminée.';
+  if (status === 'VERIFIED') return 'Compte professionnel verifie.';
+  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouve pour ce RPPS.';
+  if (status === 'MISMATCH') return 'RPPS trouve, mais le nom ou le prenom ne correspond pas au profil.';
+  return 'Verification RPPS terminee.';
 }
 
 function safeArray(value: unknown): string[] {
