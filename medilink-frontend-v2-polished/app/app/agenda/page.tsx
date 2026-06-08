@@ -24,7 +24,7 @@ function buildCalendarDays(anchor: Date) {
     date.setDate(start.getDate() + index);
     days.push({
       date,
-      key: date.toISOString().slice(0, 10),
+      key: dateKey(date),
       inMonth: date.getMonth() === anchor.getMonth(),
       isToday: date.toDateString() === new Date().toDateString(),
     });
