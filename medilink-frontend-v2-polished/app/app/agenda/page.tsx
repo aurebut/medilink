@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
-import { agreementLabel, agreementTone, conversationForApplication, dateKey, latestAgreement, missionDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
+import { agreementLabel, agreementTone, conversationForApplication, dateKey, dateRangeKeys, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
@@ -88,12 +88,13 @@ export default function CandidateAgendaPage() {
 
   const events = useMemo(() => {
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const todayKey = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate()));
 
     return sortByMissionDate(applications.map((application) => {
       const conversation = conversationForApplication(application, conversations);
       const agreement = latestAgreement(conversation);
       const date = missionDateValue(application, agreement);
+      const endDate = missionEndDateValue(application, agreement);
       const dateTime = date ? new Date(date).getTime() : null;
 
       return {
@@ -101,7 +102,8 @@ export default function CandidateAgendaPage() {
         conversation,
         agreement,
         date,
-        upcoming: dateTime === null || dateTime >= startOfToday,
+        endDate,
+        upcoming: dateTime === null || dateKey(endDate || date) >= todayKey,
       };
     }));
   }, [applications, conversations]);
@@ -113,8 +115,9 @@ export default function CandidateAgendaPage() {
   const eventsByDay = useMemo(() => {
     const map = new Map<string, typeof events>();
     events.forEach((event) => {
-      const key = dateKey(event.date);
-      map.set(key, [...(map.get(key) || []), event]);
+      dateRangeKeys(event.date, event.endDate).forEach((key) => {
+        map.set(key, [...(map.get(key) || []), event]);
+      });
     });
     return map;
   }, [events]);

@@ -8,6 +8,7 @@ export type EstablishmentAgendaRow = {
   conversation?: Conversation | null;
   agreement?: MissionAgreement | null;
   date?: string | null;
+  endDate?: string | null;
 };
 
 export function isValidatedMission(mission: Mission) {
@@ -22,6 +23,10 @@ export function candidateName(application?: Application | null) {
 
 export function missionDateValue(mission: Mission, agreement?: MissionAgreement | null) {
   return agreement?.startDate || mission.startDate || null;
+}
+
+export function missionEndDateValue(mission: Mission, agreement?: MissionAgreement | null) {
+  return agreement?.endDate || mission.endDate || null;
 }
 
 export function conversationForMission(
@@ -61,6 +66,7 @@ export function buildEstablishmentAgendaRows(
         mission,
         ...context,
         date: missionDateValue(mission, context.agreement),
+        endDate: missionEndDateValue(mission, context.agreement),
       };
     })
     .sort((a, b) => {

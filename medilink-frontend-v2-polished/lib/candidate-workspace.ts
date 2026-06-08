@@ -63,6 +63,10 @@ export function missionDateValue(application: Application, agreement?: MissionAg
   return agreement?.startDate || application.mission?.startDate || null;
 }
 
+export function missionEndDateValue(application: Application, agreement?: MissionAgreement | null) {
+  return agreement?.endDate || application.mission?.endDate || null;
+}
+
 export function sortByMissionDate<T extends { date?: string | null }>(items: T[]) {
   return [...items].sort((a, b) => {
     const aTime = a.date ? new Date(a.date).getTime() : Number.MAX_SAFE_INTEGER;
@@ -71,14 +75,42 @@ export function sortByMissionDate<T extends { date?: string | null }>(items: T[]
   });
 }
 
+function calendarDate(value: string | Date) {
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    }
+  }
+  return typeof value === 'string' ? new Date(value) : value;
+}
+
 export function dateKey(value?: string | Date | null) {
   if (!value) return 'undated';
-  const date = typeof value === 'string' ? new Date(value) : value;
+  const date = calendarDate(value);
   if (Number.isNaN(date.getTime())) return 'undated';
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+export function dateRangeKeys(start?: string | Date | null, end?: string | Date | null) {
+  const startDate = start ? calendarDate(start) : null;
+  if (!startDate || Number.isNaN(startDate.getTime())) return ['undated'];
+
+  const endDate = end ? calendarDate(end) : startDate;
+  const normalizedEnd = endDate && !Number.isNaN(endDate.getTime()) && endDate >= startDate ? endDate : startDate;
+  const keys: string[] = [];
+  const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const last = new Date(normalizedEnd.getFullYear(), normalizedEnd.getMonth(), normalizedEnd.getDate());
+
+  while (cursor <= last) {
+    keys.push(dateKey(cursor));
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  return keys;
 }
 
 export function startOfWeek(value: Date) {

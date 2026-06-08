@@ -5,7 +5,7 @@ import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissi
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
-import { dateKey, weekDayLabels } from '@/lib/candidate-workspace';
+import { dateKey, dateRangeKeys, weekDayLabels } from '@/lib/candidate-workspace';
 import {
   buildEstablishmentAgendaRows,
   candidateName,
@@ -121,19 +121,19 @@ export default function EstablishmentAgendaPage() {
     [missions, applications, conversations],
   );
 
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-  const upcomingRows = rows.filter((row) => !row.date || new Date(row.date).getTime() >= startOfToday);
+  const todayKey = dateKey(new Date());
+  const upcomingRows = rows.filter((row) => !row.date || dateKey(row.endDate || row.date) >= todayKey);
   const filledRows = rows.filter((row) => row.mission.status === 'FILLED' || row.selectedApplication?.status === 'ACCEPTED');
   const proposalRows = rows.filter((row) => ['PROPOSED', 'PAYMENT_REQUIRED'].includes(row.agreement?.status || ''));
   const completedRows = rows.filter((row) => ['COMPLETED', 'PAYMENT_RELEASED'].includes(row.agreement?.status || ''));
-  const upcomingEvents = rows.filter((row) => row.date && new Date(row.date).getTime() >= startOfToday).slice(0, 8);
+  const upcomingEvents = rows.filter((row) => row.date && dateKey(row.endDate || row.date) >= todayKey).slice(0, 8);
   const calendarDays = useMemo(() => buildCalendarDays(calendarMonth), [calendarMonth]);
   const rowsByDay = useMemo(() => {
     const map = new Map<string, typeof rows>();
     rows.forEach((row) => {
-      const key = dateKey(row.date);
-      map.set(key, [...(map.get(key) || []), row]);
+      dateRangeKeys(row.date, row.endDate).forEach((key) => {
+        map.set(key, [...(map.get(key) || []), row]);
+      });
     });
     return map;
   }, [rows]);
