@@ -6616,11 +6616,13 @@ td {
   }
 
   .new-mission-page .wizard-panel {
-    gap: 12px;
+    gap: 16px;
     max-height: none;
-    padding: 12px;
+    padding: 16px;
     overflow: visible;
-    border-radius: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   }
 
   .new-mission-page .wizard-progress {
@@ -6668,42 +6670,46 @@ td {
   }
 
   .new-mission-page .wizard-form {
-    gap: 12px;
+    gap: 16px;
     min-height: 0;
   }
 
   .new-mission-page .field {
-    gap: 5px;
+    gap: 6px;
   }
 
   .new-mission-page .label {
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--heading);
   }
 
   .new-mission-page .input,
   .new-mission-page .select,
   .new-mission-page .textarea {
-    min-height: 42px;
-    padding: 9px 10px;
+    min-height: 48px;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 12px;
   }
 
   .new-mission-page .textarea {
-    min-height: 78px;
+    min-height: 96px;
   }
 
   .new-mission-page .wizard-step-content {
-    gap: 11px;
+    gap: 16px;
     min-height: 0;
     max-height: none;
     overflow-y: visible;
     overscroll-behavior: auto;
-    padding-right: 2px;
+    padding-right: 0;
   }
 
   .new-mission-page .wizard-step-content h2 {
-    margin-bottom: 4px;
-    font-size: 22px;
-    line-height: 1.08;
+    margin-bottom: 6px;
+    font-size: 24px;
+    line-height: 1.1;
   }
 
   .new-mission-page .wizard-step-content p {
@@ -6714,8 +6720,8 @@ td {
   .new-mission-page .choice-section,
   .new-mission-page .profile-preferences-section {
     gap: 8px;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 12px;
+    border-radius: 12px;
   }
 
   .new-mission-page .choice-grid {
@@ -6724,10 +6730,11 @@ td {
 
   .new-mission-page .choice-grid button,
   .new-mission-page .publish-choice button {
-    min-height: 44px;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 14px;
+    min-height: 50px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
   }
 
   .new-mission-page .publish-choice span {
@@ -6736,17 +6743,19 @@ td {
   }
 
   .new-mission-page .boolean-choice {
-    gap: 8px;
+    gap: 10px;
     padding: 0;
   }
 
   .new-mission-page .segmented-control button {
-    min-height: 38px;
-    padding: 8px 10px;
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
   }
 
   .new-mission-page .mission-draft-summary.compact {
-    padding: 10px;
+    padding: 12px;
   }
 
   .new-mission-page .mission-draft-summary.compact .info-list {
@@ -6758,15 +6767,24 @@ td {
   }
 
   .new-mission-page .wizard-actions {
-    position: sticky;
-    z-index: 8;
-    bottom: 0;
-    flex: 0 0 auto;
-    margin: 0 -12px -12px;
-    padding: 10px 12px max(10px, env(safe-area-inset-bottom));
-    border-top: 1px solid var(--line);
-    background: rgba(255,255,255,.94);
-    backdrop-filter: blur(10px);
+    position: static;
+    margin-top: 24px;
+    padding: 0;
+    border-top: 0;
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+  }
+
+  .new-mission-page .wizard-actions .btn {
+    flex: 1;
+    min-height: 48px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
   }
 }
 
