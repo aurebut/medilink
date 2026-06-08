@@ -8,6 +8,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath, getCandidateMissionPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -215,6 +216,15 @@ export default function CandidateCurrentMissionsPage() {
       unsubscribeConversations();
     };
   }, []);
+
+  useAutoRefresh(async () => {
+    const [nextApplications, nextConversations] = await Promise.all([
+      api.reload<Application[]>('/me/applications'),
+      api.reload<Conversation[]>('/conversations'),
+    ]);
+    setApplications(nextApplications);
+    setConversations(nextConversations);
+  }, { enabled: !loading, intervalMs: 10_000 });
 
   const rows = useMemo(() => {
     return applications

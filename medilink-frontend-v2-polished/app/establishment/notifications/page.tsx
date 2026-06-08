@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Notification } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatDateTime } from '@/lib/format';
 import { Alert, Badge, Button, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
@@ -35,17 +36,20 @@ export default function RecruiterNotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
     try {
-      setItems(await api.get<Notification[]>('/notifications'));
+      setItems(options.reload
+        ? await api.reload<Notification[]>('/notifications')
+        : await api.get<Notification[]>('/notifications'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading, intervalMs: 30_000 });
 
   if (loading) return <LoadingCard label="Chargement des notifications..." />;
 

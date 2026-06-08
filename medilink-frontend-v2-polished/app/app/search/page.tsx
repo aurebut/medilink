@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Application, Mission, MissionType, Paginated, RequiredLevel } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { missionTypeOptions, requiredLevelOptions, statusLabel } from '@/lib/labels';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { MissionCard } from '@/components/MissionCard';
@@ -72,21 +73,24 @@ export default function SearchMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [applicationsLoading, setApplicationsLoading] = useState(true);
 
-  async function loadMissions(currentFilters = filters) {
-    setLoading(true);
+  async function loadMissions(currentFilters = filters, options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
     Object.entries(currentFilters).forEach(([k, v]) => { if (v) params.set(k, v); });
     params.set('limit', '50');
 
     try {
-      const result = await api.get<Paginated<Mission>>(`/missions?${params}`);
+      const path = `/missions?${params}`;
+      const result = options.reload
+        ? await api.reload<Paginated<Mission>>(path)
+        : await api.get<Paginated<Mission>>(path);
       setItems(result.items);
       setTotal(result.total);
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
@@ -133,15 +137,17 @@ export default function SearchMissionsPage() {
     void loadMissions(emptyFilters);
   };
 
-  async function loadApplications() {
-    setApplicationsLoading(true);
+  async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setApplicationsLoading(true);
     setError(null);
     try {
-      setApplications(await api.get<Application[]>('/me/applications'));
+      setApplications(options.reload
+        ? await api.reload<Application[]>('/me/applications')
+        : await api.get<Application[]>('/me/applications'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setApplicationsLoading(false);
+      if (!options.silent) setApplicationsLoading(false);
     }
   }
 
@@ -160,6 +166,13 @@ export default function SearchMissionsPage() {
       void loadApplications();
     }
   }, [activeTab]);
+
+  useAutoRefresh(() => {
+    if (activeTab === 'missions') {
+      return loadMissions(filters, { silent: true, reload: true });
+    }
+    return loadApplications({ silent: true, reload: true });
+  }, { enabled: activeTab === 'missions' ? !loading : !applicationsLoading, intervalMs: 15_000 });
 
   function set(name: string, value: string) {
     setFilters((prev) => ({ ...prev, [name]: value }));

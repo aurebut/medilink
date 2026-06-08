@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api, getApiCacheValue, getApiEventUrl, getApiUrl, getAuthToken, subscribeApiCache } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
@@ -214,9 +215,11 @@ export function MessageCenter() {
               ? 'Proposition envoyée'
               : 'Discussion';
 
-  async function loadConversations() {
+  async function loadConversations(options: { reload?: boolean } = {}) {
     try {
-      const data = await api.get<ConversationWithLast[]>('/conversations');
+      const data = options.reload
+        ? await api.reload<ConversationWithLast[]>('/conversations')
+        : await api.get<ConversationWithLast[]>('/conversations');
       setConversations(data);
       const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
       if (initialActiveId) {
@@ -232,9 +235,12 @@ export function MessageCenter() {
     }
   }
 
-  async function loadMessages(id: string) {
+  async function loadMessages(id: string, options: { reload?: boolean } = {}) {
     try {
-      const data = await api.get<Message[]>(`/conversations/${id}/messages`);
+      const path = `/conversations/${id}/messages`;
+      const data = options.reload
+        ? await api.reload<Message[]>(path)
+        : await api.get<Message[]>(path);
       if (activeIdRef.current === id) {
         setMessages((prev) => mergeMessages(prev, data));
       }
@@ -302,6 +308,8 @@ export function MessageCenter() {
       notes: '',
     });
   }, [activeId]);
+
+  useAutoRefresh(() => refresh({ reload: true }), { enabled: !loading, intervalMs: 10_000 });
   useEffect(() => {
     if (!activeId) return;
     return subscribeApiCache<Message[]>(`/conversations/${activeId}/messages`, (data) => {
@@ -355,9 +363,9 @@ export function MessageCenter() {
     return () => source.close();
   }, []);
 
-  async function refresh() {
-    if (activeId) await loadMessages(activeId);
-    await loadConversations();
+  async function refresh(options: { reload?: boolean } = {}) {
+    if (activeId) await loadMessages(activeId, options);
+    await loadConversations(options);
   }
 
   async function send(e?: FormEvent) {

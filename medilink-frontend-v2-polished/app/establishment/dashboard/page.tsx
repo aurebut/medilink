@@ -7,6 +7,7 @@ import { formatDateTime } from '@/lib/format';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import type { Application, Conversation, Establishment, EstablishmentDashboardData, Mission } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
@@ -79,6 +80,10 @@ export default function EstablishmentDashboardPage() {
 
     return unsubscribe;
   }, []);
+
+  useAutoRefresh(async () => {
+    applyDashboardData(await api.reload<EstablishmentDashboardData>('/establishment/dashboard'));
+  }, { enabled: !dashboardLoading, intervalMs: 60_000 });
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {

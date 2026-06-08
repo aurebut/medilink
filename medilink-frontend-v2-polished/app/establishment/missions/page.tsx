@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Application, ApplicationStatus, Mission } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { formatDateTime } from '@/lib/format';
 import { candidateNoun } from '@/lib/grammar';
@@ -53,32 +54,38 @@ export default function EstablishmentMissionsPage() {
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
   }
 
-  async function loadMissions() {
+  async function loadMissions(options: { silent?: boolean; reload?: boolean } = {}) {
     if (!primary) return;
 
-    setMissionsLoading(true);
+    if (!options.silent) setMissionsLoading(true);
     try {
       setError(null);
-      setMissions(await api.get<Mission[]>(`/missions/mine?establishmentId=${primary.id}`));
+      const path = `/missions/mine?establishmentId=${primary.id}`;
+      setMissions(options.reload
+        ? await api.reload<Mission[]>(path)
+        : await api.get<Mission[]>(path));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setMissionsLoading(false);
+      if (!options.silent) setMissionsLoading(false);
     }
   }
 
-  async function loadApplications() {
+  async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
     if (!primary) return;
 
-    setApplicationsLoading(true);
+    if (!options.silent) setApplicationsLoading(true);
     try {
       setError(null);
-      const data = await api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`);
+      const path = `/establishment/applications?establishmentId=${primary.id}`;
+      const data = options.reload
+        ? await api.reload<Application[]>(path)
+        : await api.get<Application[]>(path);
       setApplications(data);
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setApplicationsLoading(false);
+      if (!options.silent) setApplicationsLoading(false);
     }
   }
 
@@ -92,6 +99,14 @@ export default function EstablishmentMissionsPage() {
     void loadMissions();
     void loadApplications();
   }, [primary]);
+
+  useAutoRefresh(async () => {
+    if (activeTab === 'missions') {
+      await loadMissions({ silent: true, reload: true });
+      return;
+    }
+    await loadApplications({ silent: true, reload: true });
+  }, { enabled: Boolean(primary) && !missionsLoading && !applicationsLoading, intervalMs: 15_000 });
 
   async function updateApplication(id: string, status: ApplicationStatus) {
     try {

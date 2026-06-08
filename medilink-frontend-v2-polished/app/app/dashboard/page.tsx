@@ -9,6 +9,7 @@ import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
 import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 function applicationTone(status: Application['status']) {
@@ -113,6 +114,10 @@ export default function CandidateDashboardPage() {
 
     return unsubscribe;
   }, []);
+
+  useAutoRefresh(async () => {
+    applyDashboardData(await api.reload<CandidateDashboardData>('/me/dashboard'));
+  }, { enabled: !loading, intervalMs: 60_000 });
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {

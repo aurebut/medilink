@@ -8,6 +8,7 @@ import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
 import type { CandidateDashboardData, Conversation, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
 
 type NavItem = { href: string; label: string; icon: string };
@@ -252,17 +253,19 @@ export function AppShell({
     router.push('/login');
   }
 
-  async function loadNotifications() {
+  async function loadNotifications(options: { silent?: boolean; reload?: boolean } = {}) {
     if (area === 'admin') return;
 
-    setNotificationsLoading(true);
+    if (!options.silent) setNotificationsLoading(true);
     setNotificationsError(null);
     try {
-      setNotifications(await api.get<Notification[]>('/notifications'));
+      setNotifications(options.reload
+        ? await api.reload<Notification[]>('/notifications')
+        : await api.get<Notification[]>('/notifications'));
     } catch (e: any) {
       setNotificationsError(e.message);
     } finally {
-      setNotificationsLoading(false);
+      if (!options.silent) setNotificationsLoading(false);
     }
   }
 
@@ -352,6 +355,16 @@ export function AppShell({
       .then(setConversations)
       .catch(() => {});
   }, [area]);
+
+  useAutoRefresh(async () => {
+    if (area === 'admin') return;
+    const [nextNotifications, nextConversations] = await Promise.all([
+      api.reload<Notification[]>('/notifications'),
+      api.reload<Conversation[]>('/conversations'),
+    ]);
+    setNotifications(nextNotifications);
+    setConversations(nextConversations);
+  }, { enabled: Boolean(user) && area !== 'admin', intervalMs: 30_000 });
 
   useEffect(() => {
     if (area === 'admin') return;

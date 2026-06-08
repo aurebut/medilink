@@ -8,6 +8,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
@@ -235,6 +236,17 @@ export default function EstablishmentCurrentMissionsPage() {
       unsubscribeConversations();
     };
   }, [primary]);
+
+  useAutoRefresh(async () => {
+    if (!primary) return;
+    const applicationsPath = `/establishment/applications?establishmentId=${primary.id}`;
+    const [nextApplications, nextConversations] = await Promise.all([
+      api.reload<Application[]>(applicationsPath),
+      api.reload<Conversation[]>('/conversations'),
+    ]);
+    setApplications(nextApplications);
+    setConversations(nextConversations);
+  }, { enabled: Boolean(primary) && !missionsLoading, intervalMs: 10_000 });
 
   useEffect(() => {
     if (!primary || typeof window === 'undefined') return;

@@ -250,6 +250,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
 
 export const api = {
   get: <T>(path: string) => apiFetch<T>(path, { method: 'GET' }),
+  reload: <T>(path: string) => apiFetch<T>(path, { method: 'GET', cacheMode: 'reload' }),
   preload: (path: string) => { void apiFetch(path, { method: 'GET' }).catch(() => undefined); },
   post: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body }),
   postSilent: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'POST', body, invalidateCache: false }),
