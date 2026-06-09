@@ -36,17 +36,23 @@ export class BillingService {
     await this.ensureBillingManager(user.id, establishmentId);
     const access = await this.getPublicationAccess(establishmentId);
 
-    const draftMissionsCount = await this.prisma.mission.count({
+    const draftMissions = await this.prisma.mission.findMany({
       where: {
         establishmentId,
         status: MissionStatus.DRAFT,
+      },
+      select: {
+        id: true,
+        title: true,
+        startDate: true,
+        specialty: true,
       },
     });
 
     return {
       establishmentId,
       hasActiveSubscription: access.hasActiveSubscription,
-      canCreateMission: access.hasActiveSubscription || (access.availableCredits - draftMissionsCount) > 0,
+      canCreateMission: access.hasActiveSubscription || (access.availableCredits - draftMissions.length) > 0,
       availableCredits: access.availableCredits,
       reservedCredits: access.reservedCredits,
       consumedCredits: access.consumedCredits,
@@ -56,6 +62,7 @@ export class BillingService {
         publicationCredit: { amount: 3999, currency: 'EUR' },
       },
       stripeConfigured: Boolean(this.stripe),
+      drafts: draftMissions,
     };
   }
 

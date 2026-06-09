@@ -195,6 +195,12 @@ export type EstablishmentBillingStatus = {
     monthlySubscription: { amount: number; currency: string };
     publicationCredit: { amount: number; currency: string };
   };
+  drafts?: Array<{
+    id: string;
+    title: string;
+    specialty: string;
+    startDate: string;
+  }>;
 };
 
 export type MissionTag = { id: string; missionId: string; tag: string };

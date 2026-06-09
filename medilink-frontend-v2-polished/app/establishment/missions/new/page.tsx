@@ -196,6 +196,7 @@ export default function NewMissionPage() {
   const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
+  const [forceShowPaymentGate, setForceShowPaymentGate] = useState(false);
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [loadingDraft, setLoadingDraft] = useState(false);
@@ -551,6 +552,18 @@ export default function NewMissionPage() {
   }
 
   if (billingLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
+
+  if (!billingStatus.canCreateMission && !forceShowPaymentGate && billingStatus.drafts && billingStatus.drafts.length > 0) {
+    return (
+      <DraftIntermediaryPage
+        drafts={billingStatus.drafts}
+        establishments={establishments}
+        selectedEstablishmentId={selectedEstablishmentId}
+        setSelectedEstablishmentId={setSelectedEstablishmentId}
+        onShowPayment={() => setForceShowPaymentGate(true)}
+      />
+    );
+  }
 
   if (!billingStatus.canCreateMission) {
     return (
@@ -1274,5 +1287,94 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
         <div><span>Parking</span><strong>{form.parkingAvailable === undefined ? '-' : form.parkingAvailable ? 'Oui' : 'Non'}</strong></div>
       </div>
     </Card>
+  );
+}
+
+function DraftIntermediaryPage({
+  drafts,
+  establishments,
+  selectedEstablishmentId,
+  setSelectedEstablishmentId,
+  onShowPayment,
+}: {
+  drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
+  establishments: Establishment[];
+  selectedEstablishmentId: string;
+  setSelectedEstablishmentId: (id: string) => void;
+  onShowPayment: () => void;
+}) {
+  return (
+    <div className="new-mission-page">
+      <PageHeader
+        title="Reprendre votre brouillon"
+        description="Vous avez un brouillon de mission en cours. Pour créer une nouvelle mission en parallèle, un crédit supplémentaire est requis."
+      />
+
+      <div style={{ marginBottom: 20 }}>
+        <Card className="card-highlight publication-access-card">
+          <div className="toolbar" style={{ marginBottom: 12 }}>
+            <div>
+              <h2>Brouillon{drafts.length > 1 ? 's' : ''} en cours trouvé{drafts.length > 1 ? 's' : ''}</h2>
+              <p>
+                Plutôt que de recommencer à zéro ou de payer maintenant, vous pouvez reprendre la saisie de votre annonce là où vous vous étiez arrêté.
+              </p>
+            </div>
+            <Badge tone="warning">Action requise</Badge>
+          </div>
+
+          <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
+            {drafts.map((draft) => (
+              <div
+                key={draft.id}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '16px 20px',
+                  background: 'rgba(20, 39, 74, 0.02)',
+                  border: '1px solid var(--line)',
+                  borderRadius: 10,
+                }}
+              >
+                <div>
+                  <strong style={{ fontSize: 16, color: 'var(--heading)' }}>{draft.title || 'Mission sans titre'}</strong>
+                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                    <span>Spécialité : {draft.specialty || 'Non précisée'}</span>
+                    {draft.startDate ? (
+                      <>
+                        <span style={{ margin: '0 8px' }}>•</span>
+                        <span>Début le {formatDate(draft.startDate)}</span>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    window.location.href = `/establishment/missions/new?draftId=${draft.id}`;
+                  }}
+                >
+                  Reprendre le brouillon
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <div style={{ textAlign: 'center', marginTop: 24 }}>
+        <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 12 }}>
+          Vous souhaitez ignorer ce brouillon et créer une autre annonce ?
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+          <Button type="button" variant="light" onClick={onShowPayment}>
+            Voir les options de paiement
+          </Button>
+          <LinkButton href="/establishment/missions" variant="light">
+            Retourner au tableau de bord
+          </LinkButton>
+        </div>
+      </div>
+    </div>
   );
 }
