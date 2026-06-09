@@ -6840,10 +6840,14 @@ td {
   .new-mission-page .wizard-form {
     gap: 16px;
     min-height: 0;
+    width: 100%;
+    max-width: 100%;
   }
 
   .new-mission-page .field {
     gap: 6px;
+    width: 100%;
+    max-width: 100%;
   }
 
   .new-mission-page .label {
@@ -6855,10 +6859,28 @@ td {
   .new-mission-page .input,
   .new-mission-page .select,
   .new-mission-page .textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
     min-height: 48px;
     padding: 12px 14px;
     font-size: 16px;
     border-radius: 12px;
+  }
+
+  .new-mission-page .form-row {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .new-mission-page .input[type="date"],
+  .new-mission-page .input[type="time"] {
+    inline-size: 100%;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    -webkit-appearance: none;
+    appearance: none;
   }
 
   .new-mission-page .textarea {
