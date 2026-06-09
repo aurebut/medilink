@@ -50,6 +50,8 @@ const initialForm = {
   requiredLevels: ['INTERN'] as RequiredLevel[],
   compensationMode: 'RETROCESSION',
   compensationCurrency: 'EUR',
+  durationHours: '8',
+  retrocessionPercentage: '70',
   publishNow: true,
 };
 
@@ -647,7 +649,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         </div>
         <div className="form-row">
           <Field label="Patients par jour en moyenne">
-            <Input type="number" min={0} value={form.averagePatientsPerDay ?? ''} onChange={(e) => set('averagePatientsPerDay', e.target.value)} placeholder="Ex : 25" />
+            <NumberStepper min={0} step={1} value={form.averagePatientsPerDay ?? ''} onChange={(value) => set('averagePatientsPerDay', value)} placeholder="Ex : 25" />
           </Field>
           <Field label="Cabinet pluridisciplinaire">
             <Select
@@ -755,11 +757,11 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <p>Indiquez la durée de la mission et le taux de rétrocession.</p>
         </div>
         <Field label="Durée estimée en heures">
-          <Input type="number" min={1} max={72} value={form.durationHours || ''} onChange={(e) => set('durationHours', e.target.value)} />
+          <NumberStepper min={1} max={72} step={1} value={form.durationHours || ''} onChange={(value) => set('durationHours', value)} />
         </Field>
         <SingleChoiceField label="Format de durée" value={form.preferredDuration || ''} options={durationOptions} onChange={(value) => set('preferredDuration', value)} />
         <Field label="Pourcentage de rétrocession">
-          <Input type="number" min={1} max={100} value={form.retrocessionPercentage || ''} onChange={(e) => set('retrocessionPercentage', e.target.value)} placeholder="70" />
+          <NumberStepper min={1} max={100} step={1} value={form.retrocessionPercentage || ''} onChange={(value) => set('retrocessionPercentage', value)} suffix="%" />
         </Field>
       </div>
     );
@@ -789,7 +791,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
         <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
         <Field label="Remuneration minimale indicative (EUR)">
-          <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
+          <NumberStepper min={0} step={50} value={form.minimumCompensation ?? ''} onChange={(value) => set('minimumCompensation', value)} placeholder="Ex : 600" suffix="EUR" />
         </Field>
       </div>
     );
@@ -827,6 +829,57 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <p>Si tout est bon, créez la mission. Le lien partageable sera affiché juste après.</p>
       </div>
       <MissionDraftSummary form={form} compact />
+    </div>
+  );
+}
+
+function NumberStepper({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  placeholder,
+  suffix,
+}: {
+  value: string | number;
+  onChange: (value: string) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  placeholder?: string;
+  suffix?: string;
+}) {
+  const numericValue = value === '' || value == null ? undefined : Number(value);
+
+  function clamp(next: number) {
+    if (Number.isNaN(next)) return '';
+    const withMin = min == null ? next : Math.max(min, next);
+    return String(max == null ? withMin : Math.min(max, withMin));
+  }
+
+  function nudge(direction: 1 | -1) {
+    const base = numericValue == null || Number.isNaN(numericValue) ? min ?? 0 : numericValue;
+    onChange(clamp(base + direction * step));
+  }
+
+  return (
+    <div className="number-stepper">
+      <Input
+        type="number"
+        min={min}
+        max={max}
+        step={step}
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={(e) => onChange(e.target.value === '' ? '' : clamp(Number(e.target.value)))}
+        placeholder={placeholder}
+      />
+      {suffix ? <span className="number-stepper-suffix">{suffix}</span> : null}
+      <div className="number-stepper-actions">
+        <button type="button" aria-label="Augmenter" onClick={() => nudge(1)}>▲</button>
+        <button type="button" aria-label="Diminuer" onClick={() => nudge(-1)}>▼</button>
+      </div>
     </div>
   );
 }

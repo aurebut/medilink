@@ -3247,6 +3247,47 @@ button { touch-action: manipulation; }
 .textarea { min-height: 112px; resize: vertical; }
 .input:focus, .select:focus, .textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(26,82,160,.10); }
 .input::placeholder, .textarea::placeholder { color: var(--muted-2); }
+.number-stepper { position: relative; display: grid; min-width: 0; }
+.number-stepper .input { padding-right: 76px; }
+.number-stepper .input::-webkit-outer-spin-button,
+.number-stepper .input::-webkit-inner-spin-button { margin: 0; -webkit-appearance: none; }
+.number-stepper .input[type="number"] { -moz-appearance: textfield; }
+.number-stepper-suffix {
+  position: absolute;
+  top: 50%;
+  right: 44px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  pointer-events: none;
+}
+.number-stepper-actions {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  bottom: 5px;
+  display: grid;
+  width: 30px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+.number-stepper-actions button {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--heading);
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+}
+.number-stepper-actions button + button { border-top: 1px solid var(--line); }
+.number-stepper-actions button:hover { background: #fff; }
 
 .btn {
   border: 0; border-radius: 8px; padding: 10px 16px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
