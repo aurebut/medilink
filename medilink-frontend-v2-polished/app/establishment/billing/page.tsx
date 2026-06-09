@@ -648,7 +648,7 @@ function OverviewTab({
           </div>
           <div className="billing-overview-kpis">
             <div>
-              <span>Régalées</span>
+              <span>Réglées</span>
               <strong>{dashboard.paidRows.length}</strong>
               <small>{formatMoney(dashboard.totalExpenses)} sur l'exercice</small>
             </div>

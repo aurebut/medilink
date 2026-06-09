@@ -7463,7 +7463,8 @@ td {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  align-items: center;
+  align-items: stretch;
+  align-self: start;
   min-height: 96px;
   padding-left: 6px;
   border-left: 1px solid rgba(26,82,160,.10);
@@ -7471,11 +7472,11 @@ td {
 
 .billing-overview-kpis > div {
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: 5px;
   min-width: 0;
   min-height: 86px;
-  padding: 0 14px;
+  padding: 12px 14px 0;
 }
 
 .billing-overview-kpis > div + div {
