@@ -12,11 +12,12 @@ import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionCard } from '@/components/MissionCard';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
-type AnnouncementTab = 'missions' | 'applications';
+type AnnouncementTab = 'missions' | 'applications' | 'drafts';
 
 const tabs: Array<{ id: AnnouncementTab; label: string }> = [
   { id: 'missions', label: 'Missions' },
   { id: 'applications', label: 'Candidatures' },
+  { id: 'drafts', label: 'Brouillons' },
 ];
 
 function applicationTone(status: string) {
@@ -40,14 +41,15 @@ export default function EstablishmentMissionsPage() {
     if (typeof window === 'undefined') return;
     const queryTab = new URLSearchParams(window.location.search).get('tab');
     if (queryTab === 'applications') setActiveTab('applications');
+    if (queryTab === 'drafts') setActiveTab('drafts');
   }, []);
 
   function selectTab(tab: AnnouncementTab) {
     setActiveTab(tab);
     if (typeof window === 'undefined') return;
     const url = new URL(window.location.href);
-    if (tab === 'applications') {
-      url.searchParams.set('tab', 'applications');
+    if (tab === 'applications' || tab === 'drafts') {
+      url.searchParams.set('tab', tab);
     } else {
       url.searchParams.delete('tab');
     }
@@ -101,7 +103,7 @@ export default function EstablishmentMissionsPage() {
   }, [primary]);
 
   useAutoRefresh(async () => {
-    if (activeTab === 'missions') {
+    if (activeTab === 'missions' || activeTab === 'drafts') {
       await loadMissions({ silent: true, reload: true });
       return;
     }
@@ -121,8 +123,13 @@ export default function EstablishmentMissionsPage() {
     }
   }
 
-  if (loading || (primary && activeTab === 'missions' && missionsLoading) || (primary && activeTab === 'applications' && applicationsLoading)) {
-    return <LoadingCard label={activeTab === 'applications' ? 'Chargement des candidatures...' : 'Chargement des missions...'} />;
+  if (loading || (primary && (activeTab === 'missions' || activeTab === 'drafts') && missionsLoading) || (primary && activeTab === 'applications' && applicationsLoading)) {
+    const loadingLabel = activeTab === 'applications'
+      ? 'Chargement des candidatures...'
+      : activeTab === 'drafts'
+        ? 'Chargement des brouillons...'
+        : 'Chargement des missions...';
+    return <LoadingCard label={loadingLabel} />;
   }
 
   return (
@@ -163,7 +170,12 @@ export default function EstablishmentMissionsPage() {
         </Card>
       ) : activeTab === 'missions' ? (
         <MissionsTab
-          missions={missions}
+          missions={missions.filter((mission) => mission.status !== 'DRAFT')}
+          onMissionDeleted={(missionId) => setMissions((current) => current.filter((mission) => mission.id !== missionId))}
+        />
+      ) : activeTab === 'drafts' ? (
+        <DraftsTab
+          missions={missions.filter((mission) => mission.status === 'DRAFT')}
           onMissionDeleted={(missionId) => setMissions((current) => current.filter((mission) => mission.id !== missionId))}
         />
       ) : (
@@ -191,6 +203,38 @@ function MissionsTab({
         <h2>Aucune mission</h2>
         <p>Créez une mission pour la publier, la partager ou la gérer depuis cet espace.</p>
         <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="grid mission-list">
+      {missions.map((m) => (
+        <MissionCard
+          key={m.id}
+          mission={m}
+          detailHref={`/establishment/missions/${m.id}`}
+          canDelete
+          onDeleted={() => onMissionDeleted(m.id)}
+        />
+      ))}
+    </div>
+  );
+}
+
+function DraftsTab({
+  missions,
+  onMissionDeleted,
+}: {
+  missions: Mission[];
+  onMissionDeleted: (missionId: string) => void;
+}) {
+  if (missions.length === 0) {
+    return (
+      <Card>
+        <h2>Aucun brouillon</h2>
+        <p>Les missions gardees en brouillon apparaitront ici avant publication.</p>
+        <LinkButton href="/establishment/missions/new">Creer une mission</LinkButton>
       </Card>
     );
   }
