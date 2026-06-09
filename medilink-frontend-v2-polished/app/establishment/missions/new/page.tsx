@@ -6,7 +6,7 @@ import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
-import { api } from '@/lib/api';
+import { api, clearApiCache } from '@/lib/api';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLevelOptions } from '@/lib/labels';
 import {
@@ -197,6 +197,7 @@ export default function NewMissionPage() {
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
   const [forceShowPaymentGate, setForceShowPaymentGate] = useState(false);
+  const [billingTrigger, setBillingTrigger] = useState(0);
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [loadingDraft, setLoadingDraft] = useState(false);
@@ -313,7 +314,7 @@ export default function NewMissionPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedEstablishment?.id]);
+  }, [selectedEstablishment?.id, billingTrigger]);
 
   useEffect(() => {
     if (!selectedEstablishment) return;
@@ -561,6 +562,7 @@ export default function NewMissionPage() {
         selectedEstablishmentId={selectedEstablishmentId}
         setSelectedEstablishmentId={setSelectedEstablishmentId}
         onShowPayment={() => setForceShowPaymentGate(true)}
+        onDeleted={() => setBillingTrigger((t) => t + 1)}
       />
     );
   }
@@ -1296,19 +1298,43 @@ function DraftIntermediaryPage({
   selectedEstablishmentId,
   setSelectedEstablishmentId,
   onShowPayment,
+  onDeleted,
 }: {
   drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
   establishments: Establishment[];
   selectedEstablishmentId: string;
   setSelectedEstablishmentId: (id: string) => void;
   onShowPayment: () => void;
+  onDeleted: () => void;
 }) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleDelete(draftId: string) {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer définitivement ce brouillon ? Cette action libèrera votre crédit de publication.")) {
+      return;
+    }
+
+    setDeletingId(draftId);
+    setDeleteError(null);
+    try {
+      await api.delete(`/missions/${draftId}`);
+      clearApiCache('/establishment/dashboard');
+      onDeleted();
+    } catch (err: any) {
+      setDeleteError(err.message || "Impossible de supprimer le brouillon.");
+      setDeletingId(null);
+    }
+  }
+
   return (
     <div className="new-mission-page">
       <PageHeader
-        title="Reprendre votre brouillon"
-        description="Vous avez un brouillon de mission en cours. Pour créer une nouvelle mission en parallèle, un crédit supplémentaire est requis."
+        title="Brouillon en cours"
+        description="Vous avez déjà un brouillon de mission en attente de publication."
       />
+
+      {deleteError ? <Alert type="error">{deleteError}</Alert> : null}
 
       <div style={{ marginBottom: 20 }}>
         <Card className="card-highlight publication-access-card">
@@ -1316,7 +1342,7 @@ function DraftIntermediaryPage({
             <div>
               <h2>Brouillon{drafts.length > 1 ? 's' : ''} en cours trouvé{drafts.length > 1 ? 's' : ''}</h2>
               <p>
-                Plutôt que de recommencer à zéro ou de payer maintenant, vous pouvez reprendre la saisie de votre annonce là où vous vous étiez arrêté.
+                Pour créer une nouvelle mission, vous pouvez soit reprendre votre brouillon existant, soit le supprimer pour récupérer votre crédit de publication et recommencer à zéro.
               </p>
             </div>
             <Badge tone="warning">Action requise</Badge>
@@ -1348,27 +1374,48 @@ function DraftIntermediaryPage({
                     ) : null}
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  onClick={() => {
-                    window.location.href = `/establishment/missions/new?draftId=${draft.id}`;
-                  }}
-                >
-                  Reprendre le brouillon
-                </Button>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <Button
+                    type="button"
+                    disabled={deletingId !== null}
+                    onClick={() => {
+                      window.location.href = `/establishment/missions/new?draftId=${draft.id}`;
+                    }}
+                  >
+                    Reprendre
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    disabled={deletingId !== null}
+                    onClick={() => void handleDelete(draft.id)}
+                  >
+                    {deletingId === draft.id ? 'Suppression...' : 'Supprimer & libérer le crédit'}
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         </Card>
       </div>
 
+      <div style={{ marginBottom: 20 }}>
+        <Alert type="info">
+          <strong>Comment ça marche ?</strong>
+          <p style={{ margin: '4px 0 0 0', fontSize: 13 }}>
+            Comme vous n'avez pas d'abonnement actif, vos brouillons sont limités par vos crédits de publication achetés (1 crédit = 1 annonce active ou en cours de saisie). 
+            <strong> Supprimer un brouillon libère immédiatement son crédit</strong>, vous permettant de créer une toute nouvelle mission à partir de zéro sans payer de frais supplémentaires.
+          </p>
+        </Alert>
+      </div>
+
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 12 }}>
-          Vous souhaitez ignorer ce brouillon et créer une autre annonce ?
+          Vous souhaitez conserver ce brouillon et créer une autre annonce en parallèle ?
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
           <Button type="button" variant="light" onClick={onShowPayment}>
-            Voir les options de paiement
+            Acheter un crédit supplémentaire
           </Button>
           <LinkButton href="/establishment/missions" variant="light">
             Retourner au tableau de bord
