@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   EstablishmentMemberRole,
   EstablishmentSubscriptionStatus,
+  MissionStatus,
   Prisma,
   PublicationCreditStatus,
 } from '@prisma/client';
@@ -35,10 +36,17 @@ export class BillingService {
     await this.ensureBillingManager(user.id, establishmentId);
     const access = await this.getPublicationAccess(establishmentId);
 
+    const draftMissionsCount = await this.prisma.mission.count({
+      where: {
+        establishmentId,
+        status: MissionStatus.DRAFT,
+      },
+    });
+
     return {
       establishmentId,
       hasActiveSubscription: access.hasActiveSubscription,
-      canCreateMission: access.hasActiveSubscription || access.availableCredits > 0,
+      canCreateMission: access.hasActiveSubscription || (access.availableCredits - draftMissionsCount) > 0,
       availableCredits: access.availableCredits,
       reservedCredits: access.reservedCredits,
       consumedCredits: access.consumedCredits,
@@ -150,7 +158,16 @@ export class BillingService {
 
   async assertCanCreateMission(establishmentId: string) {
     const access = await this.getPublicationAccess(establishmentId);
-    if (access.hasActiveSubscription || access.availableCredits > 0) return;
+    if (access.hasActiveSubscription) return;
+
+    const draftMissionsCount = await this.prisma.mission.count({
+      where: {
+        establishmentId,
+        status: MissionStatus.DRAFT,
+      },
+    });
+
+    if (access.availableCredits - draftMissionsCount > 0) return;
 
     throw new BadRequestException({
       code: 'PUBLICATION_PAYMENT_REQUIRED',
