@@ -591,9 +591,7 @@ export default function NewMissionPage() {
         description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
       />
       <div className="wizard-layout">
-        {billingReturnStatus === 'credit-success' ? (
-          <CreditPurchaseBanner billingStatus={billingStatus} />
-        ) : billingNotice ? (
+        {billingNotice ? (
           <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
         ) : null}
         {billingStatus.hasActiveSubscription ? (
