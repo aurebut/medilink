@@ -163,16 +163,6 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const start = startDateTime(application, agreement);
   const end = endDateTime(application, agreement);
   const now = new Date();
-  const mission = application.mission;
-  const hasLocation = Boolean(mission?.location || mission?.city);
-  const hasEstablishmentInfo = Boolean(
-    mission?.practicalInfo
-      || mission?.departmentInfo
-      || mission?.teamInfo
-      || mission?.equipmentInfo
-      || mission?.equipmentAvailable?.length
-  );
-  const detailsProvided = hasLocation && hasEstablishmentInfo;
   const confirmed = application.status === 'ACCEPTED' || Boolean(agreement);
   const active = Boolean(start && end && now >= start && now <= end);
   const scheduleStarted = Boolean(start && now >= start);
@@ -182,11 +172,11 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
 
   return [
-    { key: 'confirmed', label: 'Candidat validé', helper: "L'affectation du candidat est confirmée.", status: confirmed ? 'Confirmé' : 'A confirmer', active: confirmed && !detailsProvided, done: confirmed },
-    { key: 'establishment-info', label: 'Brief opérationnel', helper: detailsProvided ? 'Les infos terrain et consignes sont renseignées.' : 'Consignes, équipe ou matériel à renseigner.', status: detailsProvided ? 'Complet' : 'A renseigner', active: confirmed && !detailsProvided, done: detailsProvided },
-    { key: 'documents', label: 'Documents de mission', helper: 'Fichiers et pièces utiles déposés pour la mission.', status: scheduleStarted ? 'A suivre' : 'A venir', active: active || (scheduleStarted && !completed), done: false },
-    { key: 'completed', label: 'Clôture de mission', helper: completed ? 'La fin de mission est validée.' : scheduleEnded ? 'A valider après la fin de mission.' : 'Cette étape sera validée après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'A valider' : 'A venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Règlement / Rétrocession', helper: paymentReleased ? 'Le paiement a été libéré au candidat.' : paymentSecured ? 'Fonds sécurisés sur le compte tiers.' : 'En attente de versement.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec le candidat.', status: confirmed ? 'Validé' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
+    { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', active: confirmed && !scheduleStarted, done: scheduleStarted },
+    { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant toute la durée de la mission.', status: scheduleStarted ? 'À déposer' : 'À venir', active: active || (scheduleStarted && !completed), done: false },
+    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a été validée.' : scheduleEnded ? 'La date de fin est passée, en attente de validation.' : 'Cette étape se validera après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
+    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
 
