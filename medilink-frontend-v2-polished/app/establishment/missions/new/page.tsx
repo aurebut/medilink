@@ -584,19 +584,19 @@ export default function NewMissionPage() {
         title="Créer une mission"
         description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
       />
-      {billingReturnStatus === 'credit-success' ? (
-        <CreditPurchaseBanner billingStatus={billingStatus} />
-      ) : billingNotice ? (
-        <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
-      ) : null}
-      {billingStatus.hasActiveSubscription ? (
-        <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
-      ) : billingStatus.availableCredits > 0 ? (
-        <Alert type="success">
-          {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Il sera débité quand un candidat acceptera la mission.
-        </Alert>
-      ) : null}
       <div className="wizard-layout">
+        {billingReturnStatus === 'credit-success' ? (
+          <CreditPurchaseBanner billingStatus={billingStatus} />
+        ) : billingNotice ? (
+          <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
+        ) : null}
+        {billingStatus.hasActiveSubscription ? (
+          <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
+        ) : billingStatus.availableCredits > 0 ? (
+          <Alert type="success">
+            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Il sera débité quand un candidat acceptera la mission.
+          </Alert>
+        ) : null}
         <Card className="wizard-panel">
           <div className="wizard-progress">
             <div className="toolbar">
