@@ -110,10 +110,10 @@ export default function NewMissionPage() {
       setBillingNotice("Abonnement confirme. L'activation peut prendre quelques secondes apres validation Stripe.");
     } else if (status === 'credit-success') {
       setBillingReturnStatus('credit-success');
-      setBillingNotice("Credit de publication confirme. Il reste disponible jusqu'a l'acceptation d'une mission par un candidat.");
+      setBillingNotice("Crédit de publication confirmé. Il reste disponible jusqu'à l'acceptation d'une mission par un candidat.");
     } else if (status === 'cancelled') {
       setBillingReturnStatus('cancelled');
-      setBillingNotice("Paiement annule. Aucun credit n'est consomme tant que le paiement n'est pas confirme.");
+      setBillingNotice("Paiement annulé. Aucun crédit n'est consommé tant que le paiement n'est pas confirmé.");
     }
   }, []);
 
@@ -607,14 +607,14 @@ function CreditPurchaseBanner({
   return (
     <Card className={`publication-credit-success ${compact ? 'compact' : ''}`}>
       <div className="publication-credit-success-main">
-        <Badge tone="success">Credit confirme</Badge>
-        <h2>Votre credit mission est disponible</h2>
-        <p>Vous pouvez preparer ou publier votre annonce. Le credit sera debite uniquement quand un candidat acceptera la mission.</p>
+        <Badge tone="success">Crédit confirmé</Badge>
+        <h2>Votre crédit mission est disponible</h2>
+        <p>Vous pouvez préparer ou publier votre annonce. Le crédit sera débité uniquement quand un candidat acceptera la mission.</p>
       </div>
       <div className="publication-credit-success-stats">
         <div><span>Disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
-        <div><span>Reserves</span><strong>{billingStatus.reservedCredits}</strong></div>
-        <div><span>Utilises</span><strong>{billingStatus.consumedCredits}</strong></div>
+        <div><span>Réservés</span><strong>{billingStatus.reservedCredits}</strong></div>
+        <div><span>Utilisés</span><strong>{billingStatus.consumedCredits}</strong></div>
       </div>
       <div className="actions">
         <LinkButton href="/establishment/onboarding" variant="light">Voir mon etablissement</LinkButton>
