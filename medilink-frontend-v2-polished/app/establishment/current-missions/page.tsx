@@ -172,11 +172,11 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
 
   return [
-    { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec le candidat.', status: confirmed ? 'Validé' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
+    { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec le candidat.', status: confirmed ? 'Validée' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
     { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', active: confirmed && !scheduleStarted, done: scheduleStarted },
-    { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant toute la durée de la mission.', status: scheduleStarted ? 'À déposer' : 'À venir', active: active || (scheduleStarted && !completed), done: false },
+    { key: 'documents', label: 'Documents de mission', helper: 'Le candidat doit déposer les fichiers générés pendant toute la durée de la mission.', status: scheduleStarted ? 'À déposer' : 'À venir', active: active || (scheduleStarted && !completed), done: false },
     { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a été validée.' : scheduleEnded ? 'La date de fin est passée, en attente de validation.' : 'Cette étape se validera après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement du candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
 
