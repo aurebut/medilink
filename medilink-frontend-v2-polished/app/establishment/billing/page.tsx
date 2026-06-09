@@ -570,26 +570,26 @@ function SubscriptionTab({
     <div className="billing-tax-grid">
       <Card className="dashboard-panel billing-tax-card">
         <div>
-          <span>Acces publication</span>
-          <h2>{billingStatus.hasActiveSubscription ? 'Abonnement actif' : billingStatus.availableCredits > 0 ? 'Credit disponible' : 'Paiement requis'}</h2>
+          <span>Accès publication</span>
+          <h2>{billingStatus.hasActiveSubscription ? 'Abonnement actif' : billingStatus.availableCredits > 0 ? 'Crédit disponible' : 'Paiement requis'}</h2>
           <p>
             {billingStatus.hasActiveSubscription
               ? 'Les annonces peuvent etre creees en brouillon ou publiees sans paiement unitaire.'
               : billingStatus.availableCredits > 0
-                ? "Un credit deja paye est disponible. Il sera debite quand un candidat acceptera une mission."
+                ? "Un crédit déjà payé est disponible. Il sera débité quand un candidat acceptera une mission."
                 : 'Choisissez un abonnement ou un paiement unique avant de creer une nouvelle annonce.'}
           </p>
         </div>
         <div className="billing-provision-grid">
-          <div><span>Credits disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
-          <div><span>Publications utilisees</span><strong>{billingStatus.consumedCredits}</strong></div>
+          <div><span>Crédits disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
+          <div><span>Publications utilisées</span><strong>{billingStatus.consumedCredits}</strong></div>
           <div><span>Abonnement</span><strong>{status || 'Inactif'}</strong></div>
           <div><span>Renouvellement</span><strong>{renewsAt ? formatDate(renewsAt) : '-'}</strong></div>
         </div>
         <div className="actions">
-          <LinkButton href="/establishment/missions/new">Creer une annonce</LinkButton>
+          <LinkButton href="/establishment/missions/new">Créer une annonce</LinkButton>
           <Button type="button" variant="light" disabled={!billingStatus.stripeConfigured || busy} onClick={onOpenPortal}>
-            {busy ? 'Ouverture...' : 'Gerer sur Stripe'}
+            {busy ? 'Ouverture...' : 'Gérer sur Stripe'}
           </Button>
         </div>
       </Card>
@@ -598,7 +598,7 @@ function SubscriptionTab({
         <div className="toolbar compact">
           <div>
             <h2>Tarifs de publication</h2>
-            <p className="small">Le paiement est demande avant le formulaire pour garder une experience transparente.</p>
+            <p className="small">Le paiement est demandé avant le formulaire pour garder une expérience transparente.</p>
           </div>
         </div>
         <div className="billing-provision-grid">

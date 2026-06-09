@@ -465,7 +465,7 @@ function EstablishmentCreditSummary({
   if (loading && !status) {
     return (
       <div className="establishment-credit-card is-loading">
-        <span>Acces publication</span>
+        <span>Accès publication</span>
         <strong>Verification...</strong>
       </div>
     );
@@ -495,9 +495,9 @@ function EstablishmentCreditSummary({
           {status.hasActiveSubscription
             ? 'Les annonces peuvent etre publiees sans paiement unitaire.'
             : available > 0
-              ? "Debit uniquement quand un candidat accepte une mission."
+              ? "Débit uniquement quand un candidat accepte une mission."
               : reserved > 0
-                ? "Reserve a une annonce publiee, debite a l'acceptation candidat."
+                ? "Réservé à une annonce publiée, débité à l'acceptation candidat."
                 : 'Ajoutez un credit pour publier une annonce unique.'}
         </p>
       </div>

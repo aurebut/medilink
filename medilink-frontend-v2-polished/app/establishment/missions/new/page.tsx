@@ -418,10 +418,10 @@ export default function NewMissionPage() {
         <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
       ) : null}
       {billingStatus.hasActiveSubscription ? (
-        <Alert type="success">Abonnement actif : vous pouvez creer et publier vos annonces sans paiement unitaire.</Alert>
+        <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
       ) : billingStatus.availableCredits > 0 ? (
         <Alert type="success">
-          {billingStatus.availableCredits} credit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Il sera debite quand un candidat acceptera la mission.
+          {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Il sera débité quand un candidat acceptera la mission.
         </Alert>
       ) : null}
       <div className="wizard-layout">
@@ -519,7 +519,7 @@ function PublicationPaymentGate({
     <div className="new-mission-page">
       <PageHeader
         title="Publier une annonce"
-        description="Choisissez votre mode d'acces avant de remplir le formulaire. Aucun formulaire long ne vous est demande avant paiement."
+        description="Choisissez votre mode d'accès avant de remplir le formulaire. Aucun formulaire long ne vous est demandé avant paiement."
       />
 
       {billingReturnStatus === 'credit-success' ? (
@@ -536,7 +536,7 @@ function PublicationPaymentGate({
         <div className="toolbar">
           <div>
             <h2>Votre annonce reste acquise</h2>
-            <p>Si vous payez une publication unique, le credit reste disponible tant qu'aucun candidat n'a accepte une mission.</p>
+            <p>Si vous payez une publication unique, le crédit reste disponible tant qu'aucun candidat n'a accepté une mission.</p>
           </div>
           <Badge tone="warning">Paiement avant formulaire</Badge>
         </div>
@@ -577,7 +577,7 @@ function PublicationPaymentGate({
           <div>
             <Badge tone="neutral">A l'unite</Badge>
             <h2>Credit de publication</h2>
-            <p>Pour publier une annonce unique, avec un credit debite seulement apres acceptation candidat.</p>
+            <p>Pour publier une annonce unique, avec un crédit débité seulement après acceptation candidat.</p>
           </div>
           <div className="publication-price">
             <strong>{creditAmount}</strong>
@@ -585,7 +585,7 @@ function PublicationPaymentGate({
           </div>
           <ul className="publication-plan-list">
             <li>Valable pour une annonce</li>
-            <li>Reserve a la publication, debite a l'acceptation candidat</li>
+            <li>Réservé à la publication, débité à l'acceptation candidat</li>
             <li>Permet aussi de preparer un brouillon</li>
           </ul>
           <Button type="button" variant="secondary" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onBuyCredit}>
