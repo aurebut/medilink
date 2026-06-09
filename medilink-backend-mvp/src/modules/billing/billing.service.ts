@@ -274,6 +274,28 @@ export class BillingService {
     });
   }
 
+  async refundPublicationCreditForCancelledMission(
+    establishmentId: string,
+    missionId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+
+    await client.publicationCredit.updateMany({
+      where: {
+        establishmentId,
+        missionId,
+        status: { in: [PublicationCreditStatus.RESERVED, PublicationCreditStatus.CONSUMED] },
+      },
+      data: {
+        missionId: null,
+        status: PublicationCreditStatus.AVAILABLE,
+        reservedAt: null,
+        consumedAt: null,
+      },
+    });
+  }
+
   async assertCanPublishMission(establishmentId: string, missionId: string) {
     const access = await this.getPublicationAccess(establishmentId);
     if (access.hasActiveSubscription) return;

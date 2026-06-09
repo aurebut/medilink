@@ -313,7 +313,7 @@ export class MissionsService {
     }
 
     if (status === MissionStatus.ARCHIVED) {
-      await this.billing.releaseReservedPublicationCreditForMission(mission.establishmentId, missionId);
+      await this.billing.refundPublicationCreditForCancelledMission(mission.establishmentId, missionId);
     }
 
     const updated = await this.prisma.mission.update({
@@ -338,7 +338,7 @@ export class MissionsService {
   async delete(user: RequestUser, missionId: string) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
 
-    await this.billing.releaseReservedPublicationCreditForMission(mission.establishmentId, missionId);
+    await this.billing.refundPublicationCreditForCancelledMission(mission.establishmentId, missionId);
 
     await this.prisma.mission.delete({
       where: { id: missionId },

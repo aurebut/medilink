@@ -15,6 +15,7 @@ import {
 } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { BillingService } from '../billing/billing.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -48,6 +49,7 @@ export class ApplicationsService {
     private readonly permissions: PermissionsService,
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
+    private readonly billing: BillingService,
   ) {}
 
   async apply(user: RequestUser, missionId: string, dto: ApplyDto) {
@@ -313,6 +315,14 @@ export class ApplicationsService {
         },
       });
 
+      if (dto.status === ApplicationStatus.CANCELLED) {
+        await this.billing.refundPublicationCreditForCancelledMission(
+          application.mission.establishmentId,
+          application.missionId,
+          tx,
+        );
+      }
+
       return updatedApplication;
     });
 
@@ -331,6 +341,7 @@ export class ApplicationsService {
   async withdraw(user: RequestUser, applicationId: string) {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
+      include: { mission: true },
     });
 
     if (!application) {
@@ -350,18 +361,30 @@ export class ApplicationsService {
       throw new BadRequestException('Cette candidature ne peut plus être modifiée.');
     }
 
-    const updated = await this.prisma.application.update({
-      where: { id: application.id },
-      data: { status: targetStatus },
-    });
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const updatedApplication = await tx.application.update({
+        where: { id: application.id },
+        data: { status: targetStatus },
+      });
 
-    await this.prisma.applicationStatusHistory.create({
-      data: {
-        applicationId: application.id,
-        oldStatus: application.status,
-        newStatus: targetStatus,
-        changedByUserId: user.id,
-      },
+      await tx.applicationStatusHistory.create({
+        data: {
+          applicationId: application.id,
+          oldStatus: application.status,
+          newStatus: targetStatus,
+          changedByUserId: user.id,
+        },
+      });
+
+      if (targetStatus === ApplicationStatus.CANCELLED) {
+        await this.billing.refundPublicationCreditForCancelledMission(
+          application.mission.establishmentId,
+          application.missionId,
+          tx,
+        );
+      }
+
+      return updatedApplication;
     });
 
     await this.audit.log({
