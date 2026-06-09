@@ -298,16 +298,11 @@ export default function NewMissionPage() {
     setBillingLoading(true);
     setBillingStatus(null);
     setError(null);
-    api.get<EstablishmentBillingStatus>(path)
+    api.reload<EstablishmentBillingStatus>(path)
       .then((status) => {
         if (cancelled) return;
         setBillingStatus(status);
         setBillingLoading(false);
-        return api.reload<EstablishmentBillingStatus>(path)
-          .then((freshStatus) => {
-            if (!cancelled) setBillingStatus(freshStatus);
-          })
-          .catch(() => undefined);
       })
       .catch((e: any) => {
         if (cancelled) return;
@@ -433,6 +428,10 @@ export default function NewMissionPage() {
       draftMissionIdRef.current = mission.id;
       setDraftMissionId(mission.id);
       setDraftStatus('saved');
+
+      clearApiCache(`/billing/establishments/${selectedEstablishment.id}/status`);
+      clearApiCache('/establishment/dashboard');
+      clearApiCache(`/missions/mine?establishmentId=${selectedEstablishment.id}`);
     } catch {
       draftDirtyRef.current = true;
       setDraftStatus('error');
