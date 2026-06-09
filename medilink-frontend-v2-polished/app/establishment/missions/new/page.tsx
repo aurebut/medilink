@@ -70,6 +70,71 @@ function sectorLabel(value?: string | null) {
   return sectorOptions.find((option) => option.value === value)?.label || value || '-';
 }
 
+function dateInput(value?: string | null) {
+  return value?.slice(0, 10) || '';
+}
+
+function findStoppedStep(form: any) {
+  if (!form.title || form.title === 'Mission sans titre' || !form.specialty || form.specialty === 'Specialite a preciser') {
+    return 2;
+  }
+  if (!form.city || form.city === 'Ville a preciser') {
+    return 8;
+  }
+  if (!form.startDate) {
+    return 10;
+  }
+  if (!form.retrocessionPercentage) {
+    return 11;
+  }
+  return 14;
+}
+
+function missionToWizardForm(mission: any) {
+  const tagsText = mission.tags?.map((tag: any) => tag.tag).join(', ') || '';
+  return {
+    missionType: mission.missionType || 'GARDE',
+    requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel || 'INTERN',
+    requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean),
+    compensationMode: mission.compensationMode || 'RETROCESSION',
+    compensationCurrency: mission.compensationCurrency || 'EUR',
+    durationHours: mission.durationHours != null ? String(mission.durationHours) : '8',
+    retrocessionPercentage: mission.retrocessionPercentage != null ? String(mission.retrocessionPercentage) : '70',
+    publishNow: mission.status === 'PUBLISHED',
+    title: mission.title === 'Mission sans titre' ? '' : mission.title || '',
+    specialty: mission.specialty === 'Specialite a preciser' ? '' : mission.specialty || '',
+    description: mission.description || '',
+    departmentInfo: mission.departmentInfo || '',
+    softwareUsed: mission.softwareUsed || '',
+    hasSecretary: mission.hasSecretary,
+    secretaryType: mission.secretaryType || '',
+    patientType: mission.patientType || '',
+    averagePatientsPerDay: mission.averagePatientsPerDay != null ? String(mission.averagePatientsPerDay) : '',
+    isMultidisciplinary: mission.isMultidisciplinary,
+    equipmentAvailable: mission.equipmentAvailable || [],
+    teamInfo: mission.teamInfo || '',
+    equipmentInfo: mission.equipmentInfo || '',
+    city: mission.city === 'Ville a preciser' ? '' : mission.city || '',
+    sector: mission.sector || '',
+    location: mission.location || '',
+    accommodationProvided: mission.accommodationProvided,
+    parkingAvailable: mission.parkingAvailable,
+    practicalInfo: mission.practicalInfo || '',
+    startDate: dateInput(mission.startDate),
+    endDate: dateInput(mission.endDate),
+    startTime: mission.startTime || '',
+    endTime: mission.endTime || '',
+    mobilityOptions: mission.mobilityOptions || [],
+    preferredDurations: mission.preferredDurations || [],
+    refusedSchedules: mission.refusedSchedules || [],
+    acceptedPatientTypes: mission.acceptedPatientTypes || [],
+    knownSoftware: mission.knownSoftware || [],
+    minimumCompensation: mission.minimumCompensation != null ? String(mission.minimumCompensation) : '',
+    tagsText,
+    acceptedMissionTypes: mission.acceptedMissionTypes || [],
+  };
+}
+
 export default function NewMissionPage() {
   const { establishments, primary, loading } = useEstablishments();
   const [form, setForm] = useState<any>(initialForm);
@@ -85,6 +150,7 @@ export default function NewMissionPage() {
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [loadingDraft, setLoadingDraft] = useState(false);
   const draftMissionIdRef = useRef<string | null>(null);
   const draftDirtyRef = useRef(false);
   const autosaveInFlightRef = useRef(false);
@@ -101,6 +167,49 @@ export default function NewMissionPage() {
     if (!primary || selectedEstablishmentId) return;
     setSelectedEstablishmentId(primary.id);
   }, [primary, selectedEstablishmentId]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const draftId = searchParams.get('draftId') || searchParams.get('id');
+    if (!draftId) return;
+
+    setLoadingDraft(true);
+    api.get<any>(`/missions/mine/${draftId}`)
+      .then((m) => {
+        const parsedForm = missionToWizardForm(m);
+        setForm(parsedForm);
+        setDraftMissionId(m.id);
+        draftMissionIdRef.current = m.id;
+        if (m.establishmentId) {
+          setSelectedEstablishmentId(m.establishmentId);
+        }
+
+        const savedStep = localStorage.getItem(`draft_step_${m.id}`);
+        if (savedStep) {
+          const parsedStep = parseInt(savedStep, 10);
+          if (!isNaN(parsedStep) && parsedStep >= 0 && parsedStep < steps.length) {
+            setStep(parsedStep);
+          } else {
+            setStep(findStoppedStep(parsedForm));
+          }
+        } else {
+          setStep(findStoppedStep(parsedForm));
+        }
+      })
+      .catch((err) => {
+        setError("Impossible de charger le brouillon : " + err.message);
+      })
+      .finally(() => {
+        setLoadingDraft(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (draftMissionId) {
+      localStorage.setItem(`draft_step_${draftMissionId}`, String(step));
+    }
+  }, [step, draftMissionId]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -349,7 +458,7 @@ export default function NewMissionPage() {
     }
   }
 
-  if (loading) return <LoadingCard />;
+  if (loading || loadingDraft) return <LoadingCard label={loadingDraft ? "Chargement du brouillon..." : "Chargement..."} />;
 
   if (establishments.length === 0) {
     return (

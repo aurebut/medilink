@@ -414,42 +414,193 @@ function BillingStatusPanel({
   onOpenPortal: () => void;
 }) {
   const subscription = status.subscription;
-  const subscriptionLabel = subscription?.status || 'Inactif';
-  const periodEnd = subscription?.currentPeriodEnd ? formatDate(subscription.currentPeriodEnd) : '-';
+  const isSubscribed = status.hasActiveSubscription;
+  const subscriptionLabel = isSubscribed ? 'Actif' : 'Inactif';
+  const periodEnd = subscription?.currentPeriodEnd ? formatDate(subscription.currentPeriodEnd) : null;
+  const isCancelled = subscription?.cancelAtPeriodEnd;
+
+  const monthlySubPrice = formatCents(status.prices.monthlySubscription.amount, status.prices.monthlySubscription.currency);
+  const singleCreditPrice = formatCents(status.prices.publicationCredit.amount, status.prices.publicationCredit.currency);
 
   return (
-    <div className="establishment-billing-panel">
-      <div className="billing-provision-grid">
-        <div><span>Crédits disponibles</span><strong>{status.availableCredits}</strong></div>
-        <div><span>Crédits réservés</span><strong>{status.reservedCredits}</strong></div>
-        <div><span>Crédits utilisés</span><strong>{status.consumedCredits}</strong></div>
-        <div><span>Abonnement</span><strong>{subscriptionLabel}</strong></div>
-        <div><span>Renouvellement</span><strong>{periodEnd}</strong></div>
-        <div><span>Résiliation prévue</span><strong>{subscription?.cancelAtPeriodEnd ? 'Oui' : 'Non'}</strong></div>
+    <div className="premium-billing-panel">
+      {/* 1. Status overview hero */}
+      <div className="premium-billing-hero">
+        <div className="hero-status-glow"></div>
+        <div className="hero-content">
+          <span className="hero-pretitle">Aperçu du compte</span>
+          <div className="hero-title-row">
+            <h2>Mode de publication</h2>
+            {isSubscribed ? (
+              <span className="premium-badge badge-success">Abonnement Actif</span>
+            ) : status.availableCredits > 0 ? (
+              <span className="premium-badge badge-info">{status.availableCredits} Crédit{status.availableCredits > 1 ? 's' : ''} disponible{status.availableCredits > 1 ? 's' : ''}</span>
+            ) : (
+              <span className="premium-badge badge-warning">Aucun crédit actif</span>
+            )}
+          </div>
+          <p className="hero-desc">
+            {isSubscribed 
+              ? "Vous bénéficiez de publications de missions illimitées. Votre facturation est gérée automatiquement via Stripe."
+              : "Vous publiez vos missions à l'unité. Les crédits achetés sont débités uniquement lorsqu'un candidat accepte votre mission."
+            }
+          </p>
+        </div>
       </div>
 
-      <div className="billing-provision-grid">
-        <div><span>Abonnement mensuel</span><strong>{formatCents(status.prices.monthlySubscription.amount, status.prices.monthlySubscription.currency)}</strong></div>
-        <div><span>Crédit mission</span><strong>{formatCents(status.prices.publicationCredit.amount, status.prices.publicationCredit.currency)}</strong></div>
+      {/* 2. Visual KPI Metrics */}
+      <div className="premium-kpi-grid">
+        <div className="premium-kpi-card highlight-kpi">
+          <div className="kpi-icon">🎫</div>
+          <div className="kpi-info">
+            <span>Crédits Disponibles</span>
+            <strong>{status.availableCredits}</strong>
+            <small>Prêts pour publication</small>
+          </div>
+        </div>
+
+        <div className="premium-kpi-card">
+          <div className="kpi-icon">⏳</div>
+          <div className="kpi-info">
+            <span>Crédits Réservés</span>
+            <strong>{status.reservedCredits}</strong>
+            <small>Sur annonces en ligne</small>
+          </div>
+        </div>
+
+        <div className="premium-kpi-card">
+          <div className="kpi-icon">✅</div>
+          <div className="kpi-info">
+            <span>Crédits Utilisés</span>
+            <strong>{status.consumedCredits}</strong>
+            <small>Missions validées</small>
+          </div>
+        </div>
+
+        <div className={`premium-kpi-card status-card ${isSubscribed ? 'subscribed' : 'unsubscribed'}`}>
+          <div className="kpi-icon">💳</div>
+          <div className="kpi-info">
+            <span>Formule Abonnement</span>
+            <strong>{subscriptionLabel}</strong>
+            {isSubscribed && periodEnd ? (
+              <small>
+                {isCancelled ? 'Ferme le ' : 'Renouvellement : '}
+                {periodEnd}
+              </small>
+            ) : (
+              <small>Publications unitaires</small>
+            )}
+          </div>
+        </div>
       </div>
 
       {!status.stripeConfigured ? (
         <Alert type="error">Stripe n'est pas encore configuré sur le serveur.</Alert>
       ) : null}
 
-      <div className="actions">
-        <Button type="button" disabled={!status.stripeConfigured || subscribing} onClick={onSubscribe}>
-          {subscribing ? 'Redirection...' : "S'abonner"}
-        </Button>
-        <Button type="button" variant="secondary" disabled={!status.stripeConfigured || buyingCredit} onClick={onBuyCredit}>
-          {buyingCredit ? 'Redirection...' : 'Acheter un crédit'}
-        </Button>
-        <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
-          {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
-        </Button>
-        <LinkButton href="/establishment/missions/new" variant={status.canCreateMission ? 'secondary' : 'light'}>
-          Créer une mission
-        </LinkButton>
+      {/* 3. Side-by-side Pricing Plan Cards */}
+      <div className="premium-pricing-section">
+        <h3>Nos Formules d'Accès</h3>
+        <div className="premium-plans-grid">
+          
+          {/* Card 1: Subscription */}
+          <div className={`premium-plan-card ${isSubscribed ? 'active-plan' : ''}`}>
+            {isSubscribed && <div className="plan-ribbon">Formule Actuelle</div>}
+            <div className="plan-header">
+              <span className="plan-badge">Abonnement</span>
+              <h4>Accès Illimité</h4>
+              <p>Idéal pour recruter régulièrement sans limites.</p>
+            </div>
+            <div className="plan-price">
+              <strong>{monthlySubPrice}</strong>
+              <span>/ mois</span>
+            </div>
+            <ul className="plan-features">
+              <li>
+                <span className="feature-check">✓</span>
+                Publications de missions illimitées
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Gestion automatique des brouillons
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Aucun paiement unitaire par mission
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Résiliation en un clic via Stripe
+              </li>
+            </ul>
+            <div className="plan-action">
+              {isSubscribed ? (
+                <Button type="button" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
+                  {openingPortal ? 'Ouverture...' : 'Gérer mon abonnement'}
+                </Button>
+              ) : (
+                <Button type="button" disabled={!status.stripeConfigured || subscribing} onClick={onSubscribe}>
+                  {subscribing ? 'Redirection...' : "S'abonner"}
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Card 2: Single Credit */}
+          <div className={`premium-plan-card ${!isSubscribed && status.availableCredits > 0 ? 'active-plan' : ''}`}>
+            <div className="plan-header">
+              <span className="plan-badge badge-neutral">À l'unité</span>
+              <h4>Crédit Mission</h4>
+              <p>Idéal pour les recrutements ponctuels ou d'urgence.</p>
+            </div>
+            <div className="plan-price">
+              <strong>{singleCreditPrice}</strong>
+              <span>/ mission</span>
+            </div>
+            <ul className="plan-features">
+              <li>
+                <span className="feature-check">✓</span>
+                Achat d'un crédit de publication unique
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Débité uniquement à l'acceptation candidat
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Crédit valable sans limite de durée
+              </li>
+              <li>
+                <span className="feature-check">✓</span>
+                Brouillons gratuits et illimités
+              </li>
+            </ul>
+            <div className="plan-action">
+              <Button type="button" variant="secondary" disabled={!status.stripeConfigured || buyingCredit} onClick={onBuyCredit}>
+                {buyingCredit ? 'Redirection...' : 'Acheter un crédit'}
+              </Button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 4. Bottom Main Actions */}
+      <div className="premium-billing-actions">
+        {isSubscribed || status.availableCredits > 0 ? (
+          <LinkButton href="/establishment/missions/new" variant="secondary">
+            Créer et publier une mission
+          </LinkButton>
+        ) : (
+          <LinkButton href="/establishment/missions/new" variant="light">
+            Préparer un brouillon de mission
+          </LinkButton>
+        )}
+        {!isSubscribed && (
+          <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
+            {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
+          </Button>
+        )}
       </div>
     </div>
   );

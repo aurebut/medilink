@@ -123,7 +123,11 @@ export default function EstablishmentMissionDetailPage() {
         actions={
           <>
             <LinkButton variant="light" href="/establishment/missions">Toutes les missions</LinkButton>
-            <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
+            {mission.status === 'DRAFT' ? (
+              <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+            ) : (
+              <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
+            )}
             {mission.status === 'PUBLISHED' ? <LinkButton variant="light" href={getMissionPublicPath(mission.id)}>Voir le public</LinkButton> : null}
           </>
         }
@@ -211,7 +215,11 @@ export default function EstablishmentMissionDetailPage() {
           </div>
           <div className="establishment-action-stack">
             <LinkButton href="/establishment/missions?tab=applications" variant="secondary">Voir les candidatures</LinkButton>
-            <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
+            {mission.status === 'DRAFT' ? (
+              <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+            ) : (
+              <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
+            )}
             <LinkButton href="/establishment/messages" variant="light">Messagerie</LinkButton>
             {mission.status === 'PUBLISHED' ? <MissionShareActions missionId={mission.id} showUrl /> : null}
             <MissionDeleteButton mission={mission} onDeleted={() => router.push('/establishment/missions')} />

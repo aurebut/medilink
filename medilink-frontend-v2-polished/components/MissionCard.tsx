@@ -32,7 +32,10 @@ export function MissionCard({
   canDelete?: boolean;
   onDeleted?: (missionId: string) => void;
 }) {
-  const missionDetailHref = detailHref || `/missions/${mission.id}`;
+  const isDraftManager = mission.status === 'DRAFT' && canDelete;
+  const missionDetailHref = isDraftManager
+    ? `/establishment/missions/new?draftId=${mission.id}`
+    : (detailHref || `/missions/${mission.id}`);
   const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
 
   return (
@@ -89,7 +92,9 @@ export function MissionCard({
       ) : null}
 
       <div className="actions">
-        {canDelete || mission.status === 'PUBLISHED' ? (
+        {isDraftManager ? (
+          <Link className="btn btn-primary" href={missionDetailHref}>Reprendre le brouillon</Link>
+        ) : canDelete || mission.status === 'PUBLISHED' ? (
           <Link className="btn btn-light" href={missionDetailHref}>Voir détail</Link>
         ) : null}
         {applyHref ? <Link className="btn btn-primary" href={applyHref}>Postuler</Link> : null}
