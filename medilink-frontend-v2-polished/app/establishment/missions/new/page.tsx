@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, ReactNode } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
@@ -55,6 +55,17 @@ const initialForm = {
   publishNow: true,
 };
 
+function tomorrowDateInput() {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().slice(0, 10);
+}
+
+function optionalText(value?: unknown) {
+  const next = String(value || '').trim();
+  return next || undefined;
+}
+
 function sectorLabel(value?: string | null) {
   return sectorOptions.find((option) => option.value === value)?.label || value || '-';
 }
@@ -72,6 +83,12 @@ export default function NewMissionPage() {
   const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
+  const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
+  const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const draftMissionIdRef = useRef<string | null>(null);
+  const draftDirtyRef = useRef(false);
+  const autosaveInFlightRef = useRef(false);
+  const hasSubmittedRef = useRef(false);
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
@@ -153,6 +170,7 @@ export default function NewMissionPage() {
   }, [selectedEstablishment]);
 
   function set(name: string, value: unknown) {
+    draftDirtyRef.current = true;
     setForm((p: any) => ({ ...p, [name]: value }));
   }
 
@@ -188,24 +206,24 @@ export default function NewMissionPage() {
     setStep((value) => Math.max(value - 1, 0));
   }
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
-    if (!isLastStep) {
-      next();
-      return;
-    }
+  const buildMissionPayload = useCallback((publishNow: boolean) => {
+    const title = optionalText(form.title) || 'Mission sans titre';
+    const specialty = optionalText(form.specialty) || 'Specialite a preciser';
+    const city = optionalText(form.city) || optionalText(selectedEstablishment?.city) || 'Ville a preciser';
+    const startDate = form.startDate || tomorrowDateInput();
 
-    setSaving(true);
-    setError(null);
-
-    const payload = {
+    return {
       ...form,
+      title,
+      specialty,
+      city,
+      startDate,
       establishmentId: selectedEstablishment?.id,
       requiredLevel: form.requiredLevels?.[0] || form.requiredLevel,
       requiredLevels: form.requiredLevels?.length ? form.requiredLevels : [form.requiredLevel],
       compensationMode: 'RETROCESSION',
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
-      retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : undefined,
+      retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : 70,
       compensationAmount: undefined,
       secretaryType: form.secretaryType || undefined,
       averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? undefined : Number(form.averagePatientsPerDay),
@@ -218,15 +236,84 @@ export default function NewMissionPage() {
       refusedSchedules: cleanArray(form.refusedSchedules),
       acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
       knownSoftware: cleanArray(form.knownSoftware),
-      tags: String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean),
+      tags: String(form.tagsText || '').split(',').map((x: string) => x.trim()).filter(Boolean),
+      publishNow,
     };
+  }, [form, selectedEstablishment?.city, selectedEstablishment?.id]);
+
+  useEffect(() => {
+    draftMissionIdRef.current = draftMissionId;
+  }, [draftMissionId]);
+
+  const saveDraft = useCallback(async () => {
+    if (!draftDirtyRef.current || autosaveInFlightRef.current || hasSubmittedRef.current) return;
+    if (!selectedEstablishment?.id || !billingStatus?.canCreateMission) return;
+
+    autosaveInFlightRef.current = true;
+    setDraftStatus('saving');
+
+    const payload = buildMissionPayload(false);
+    delete payload.tagsText;
+    draftDirtyRef.current = false;
+
+    try {
+      const mission = draftMissionIdRef.current
+        ? await api.patchSilent<Mission>(`/missions/${draftMissionIdRef.current}`, { ...payload, publishNow: undefined })
+        : await api.postSilent<Mission>('/missions', payload);
+
+      draftMissionIdRef.current = mission.id;
+      setDraftMissionId(mission.id);
+      setDraftStatus('saved');
+    } catch {
+      draftDirtyRef.current = true;
+      setDraftStatus('error');
+    } finally {
+      autosaveInFlightRef.current = false;
+    }
+  }, [billingStatus?.canCreateMission, buildMissionPayload, selectedEstablishment?.id]);
+
+  async function waitForAutosave() {
+    for (let index = 0; index < 20 && autosaveInFlightRef.current; index += 1) {
+      await new Promise((resolve) => window.setTimeout(resolve, 100));
+    }
+  }
+
+  useEffect(() => {
+    if (!draftDirtyRef.current || hasSubmittedRef.current || createdMission) return;
+    const timeout = window.setTimeout(() => {
+      void saveDraft();
+    }, 1200);
+
+    return () => window.clearTimeout(timeout);
+  }, [form, selectedEstablishmentId, createdMission, saveDraft]);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!isLastStep) {
+      next();
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    hasSubmittedRef.current = true;
+    await waitForAutosave();
+
+    const payload = buildMissionPayload(true);
     delete payload.tagsText;
 
     try {
-      const mission = await api.post<Mission>('/missions', payload);
-      setCreatedMission(mission);
+      if (draftMissionIdRef.current) {
+        await api.patch<Mission>(`/missions/${draftMissionIdRef.current}`, { ...payload, publishNow: undefined });
+        const mission = await api.post<Mission>(`/missions/${draftMissionIdRef.current}/publish`);
+        setCreatedMission(mission);
+      } else {
+        const mission = await api.post<Mission>('/missions', payload);
+        setCreatedMission(mission);
+      }
     } catch (e: any) {
       setError(e.message);
+      hasSubmittedRef.current = false;
     } finally {
       setSaving(false);
     }
@@ -237,6 +324,11 @@ export default function NewMissionPage() {
     setStep(0);
     setError(null);
     setCreatedMission(null);
+    setDraftMissionId(null);
+    setDraftStatus('idle');
+    draftMissionIdRef.current = null;
+    draftDirtyRef.current = false;
+    hasSubmittedRef.current = false;
   }
 
   async function startBillingCheckout(kind: 'subscription' | 'credit') {
@@ -341,7 +433,12 @@ export default function NewMissionPage() {
                 <strong className="wizard-current-step">{steps[step].title}</strong>
                 <span className="small">{steps[step].helper}</span>
               </div>
-              <span className="small">{progress}% complété</span>
+              <div className="wizard-progress-meta">
+                <span className="small">{progress}% complété</span>
+                {draftStatus === 'saving' ? <span className="small">Sauvegarde...</span> : null}
+                {draftStatus === 'saved' ? <span className="small">Brouillon sauvegardé</span> : null}
+                {draftStatus === 'error' ? <span className="small">Brouillon non sauvegardé</span> : null}
+              </div>
             </div>
             <div className="progress" aria-label={`Progression ${progress}%`}>
               <span style={{ width: `${progress}%` }} />
@@ -356,6 +453,7 @@ export default function NewMissionPage() {
                 value={selectedEstablishmentId}
                 onChange={(e) => {
                   const next = establishments.find((item) => item.id === e.target.value);
+                  draftDirtyRef.current = true;
                   setSelectedEstablishmentId(e.target.value);
                   setForm((current: any) => ({
                     ...current,

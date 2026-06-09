@@ -3311,6 +3311,7 @@ button { touch-action: manipulation; }
 .wizard-layout { display: grid; width: 100%; max-width: 820px; gap: 16px; align-items: start; min-width: 0; }
 .wizard-panel { display: grid; gap: 20px; }
 .wizard-progress { display: grid; gap: 12px; }
+.wizard-progress-meta { display: grid; justify-items: end; gap: 3px; text-align: right; }
 .wizard-current-step { display: block; margin: 8px 0 4px; color: var(--heading); font-size: 18px; }
 .wizard-form { gap: 20px; }
 .wizard-step-content { display: grid; gap: 16px; }
@@ -6857,6 +6858,14 @@ td {
 
   .new-mission-page .wizard-progress .toolbar > .small {
     display: none;
+  }
+
+  .new-mission-page .wizard-progress .toolbar > .wizard-progress-meta {
+    display: flex;
+    grid-template-columns: none;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
   }
 
   .new-mission-page .wizard-current-step {
