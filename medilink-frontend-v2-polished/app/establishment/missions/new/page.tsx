@@ -74,19 +74,76 @@ function dateInput(value?: string | null) {
   return value?.slice(0, 10) || '';
 }
 
-function findStoppedStep(form: any) {
-  if (!form.title || form.title === 'Mission sans titre' || !form.specialty || form.specialty === 'Specialite a preciser') {
-    return 2;
+function findStoppedStep(form: any, establishment?: any) {
+  const tomorrow = tomorrowDateInput();
+
+  const isUnchanged = (stepIdx: number): boolean => {
+    switch (stepIdx) {
+      case 2:
+        return (!form.title || form.title === 'Mission sans titre') &&
+               (!form.specialty || form.specialty === 'Specialite a preciser');
+      case 3:
+        return !form.description;
+      case 4:
+        return !form.departmentInfo &&
+               (!form.softwareUsed || (establishment && form.softwareUsed === establishment.softwareUsed));
+      case 5:
+        return (form.hasSecretary === undefined || form.hasSecretary === null || (establishment && form.hasSecretary === establishment.hasSecretary)) &&
+               (!form.secretaryType || (establishment && form.secretaryType === establishment.secretaryType)) &&
+               (!form.patientType || (establishment && form.patientType === establishment.patientType));
+      case 6:
+        return (!form.averagePatientsPerDay || (establishment && String(form.averagePatientsPerDay) === String(establishment.averagePatientsPerDay ?? ''))) &&
+               (form.isMultidisciplinary === undefined || form.isMultidisciplinary === null || (establishment && form.isMultidisciplinary === establishment.isMultidisciplinary)) &&
+               (!form.equipmentAvailable || form.equipmentAvailable.length === 0 || (establishment && JSON.stringify(form.equipmentAvailable) === JSON.stringify(establishment.equipmentAvailable || [])));
+      case 7:
+        return !form.teamInfo && !form.equipmentInfo;
+      case 8:
+        return (!form.city || form.city === 'Ville a preciser' || (establishment && form.city === establishment.city)) &&
+               (!form.sector || (establishment && form.sector === establishment.sector)) &&
+               (!form.location || (establishment && form.location === establishment.address));
+      case 9:
+        return (form.accommodationProvided === undefined || form.accommodationProvided === null) &&
+               (form.parkingAvailable === undefined || form.parkingAvailable === null) &&
+               !form.practicalInfo;
+      case 10:
+        return (!form.startDate || form.startDate === tomorrow) &&
+               !form.endDate &&
+               !form.startTime &&
+               !form.endTime;
+      case 11:
+        return (!form.durationHours || form.durationHours === '8') &&
+               !form.preferredDuration &&
+               (!form.retrocessionPercentage || form.retrocessionPercentage === '70');
+      case 12:
+        return (!form.mobilityOptions || form.mobilityOptions.length === 0) &&
+               (!form.preferredDurations || form.preferredDurations.length === 0) &&
+               (!form.refusedSchedules || form.refusedSchedules.length === 0);
+      case 13:
+        return (!form.acceptedPatientTypes || form.acceptedPatientTypes.length === 0) &&
+               (!form.knownSoftware || form.knownSoftware.length === 0) &&
+               !form.minimumCompensation;
+      case 14:
+        return !form.tagsText &&
+               (!form.acceptedMissionTypes || form.acceptedMissionTypes.length === 0);
+      default:
+        return true;
+    }
+  };
+
+  // Find the first step s from 2 to 14 such that s and all steps after it are unchanged
+  for (let s = 2; s <= 14; s++) {
+    let allUnchangedAfter = true;
+    for (let i = s; i <= 14; i++) {
+      if (!isUnchanged(i)) {
+        allUnchangedAfter = false;
+        break;
+      }
+    }
+    if (allUnchangedAfter) {
+      return s;
+    }
   }
-  if (!form.city || form.city === 'Ville a preciser') {
-    return 8;
-  }
-  if (!form.startDate) {
-    return 10;
-  }
-  if (!form.retrocessionPercentage) {
-    return 11;
-  }
+
   return 14;
 }
 
@@ -155,6 +212,7 @@ export default function NewMissionPage() {
   const draftDirtyRef = useRef(false);
   const autosaveInFlightRef = useRef(false);
   const hasSubmittedRef = useRef(false);
+  const hasFetchedRef = useRef(false);
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
@@ -169,11 +227,14 @@ export default function NewMissionPage() {
   }, [primary, selectedEstablishmentId]);
 
   useEffect(() => {
+    if (loading) return;
+    if (hasFetchedRef.current) return;
     if (typeof window === 'undefined') return;
     const searchParams = new URLSearchParams(window.location.search);
     const draftId = searchParams.get('draftId') || searchParams.get('id');
     if (!draftId) return;
 
+    hasFetchedRef.current = true;
     setLoadingDraft(true);
     api.get<any>(`/missions/mine/${draftId}`)
       .then((m) => {
@@ -185,16 +246,18 @@ export default function NewMissionPage() {
           setSelectedEstablishmentId(m.establishmentId);
         }
 
+        const establishment = establishments.find((item) => item.id === (m.establishmentId || primary?.id)) || primary;
+
         const savedStep = localStorage.getItem(`draft_step_${m.id}`);
         if (savedStep) {
           const parsedStep = parseInt(savedStep, 10);
           if (!isNaN(parsedStep) && parsedStep >= 0 && parsedStep < steps.length) {
             setStep(parsedStep);
           } else {
-            setStep(findStoppedStep(parsedForm));
+            setStep(findStoppedStep(parsedForm, establishment));
           }
         } else {
-          setStep(findStoppedStep(parsedForm));
+          setStep(findStoppedStep(parsedForm, establishment));
         }
       })
       .catch((err) => {
@@ -203,7 +266,7 @@ export default function NewMissionPage() {
       .finally(() => {
         setLoadingDraft(false);
       });
-  }, []);
+  }, [loading, establishments, primary]);
 
   useEffect(() => {
     if (draftMissionId) {
