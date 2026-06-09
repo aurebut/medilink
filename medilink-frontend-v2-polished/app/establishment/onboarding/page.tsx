@@ -587,20 +587,9 @@ function BillingStatusPanel({
 
       {/* 4. Bottom Main Actions */}
       <div className="premium-billing-actions">
-        {isSubscribed || status.availableCredits > 0 ? (
-          <LinkButton href="/establishment/missions/new" variant="secondary">
-            Créer et publier une mission
-          </LinkButton>
-        ) : (
-          <LinkButton href="/establishment/missions/new" variant="light">
-            Préparer un brouillon de mission
-          </LinkButton>
-        )}
-        {!isSubscribed && (
-          <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
-            {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
-          </Button>
-        )}
+        <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
+          {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
+        </Button>
       </div>
     </div>
   );
