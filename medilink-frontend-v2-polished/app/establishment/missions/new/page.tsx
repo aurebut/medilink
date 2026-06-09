@@ -38,8 +38,6 @@ const steps = [
   { title: 'Accès', helper: 'Logement et transports' },
   { title: 'Planning', helper: 'Dates et horaires' },
   { title: 'Budget', helper: 'Rémunération et durée' },
-  { title: 'Critères', helper: 'Mobilité et durées' },
-  { title: 'Préférences', helper: 'Logiciel et patientèle' },
   { title: 'Publication', helper: 'Tags et visibilité' },
   { title: 'Récap', helper: 'Validation finale' },
 ];
@@ -113,16 +111,9 @@ function findStoppedStep(form: any, establishment?: any) {
       case 11:
         return (!form.durationHours || form.durationHours === '8') &&
                !form.preferredDuration &&
-               (!form.retrocessionPercentage || form.retrocessionPercentage === '70');
-      case 12:
-        return (!form.mobilityOptions || form.mobilityOptions.length === 0) &&
-               (!form.preferredDurations || form.preferredDurations.length === 0) &&
-               (!form.refusedSchedules || form.refusedSchedules.length === 0);
-      case 13:
-        return (!form.acceptedPatientTypes || form.acceptedPatientTypes.length === 0) &&
-               (!form.knownSoftware || form.knownSoftware.length === 0) &&
+               (!form.retrocessionPercentage || form.retrocessionPercentage === '70') &&
                !form.minimumCompensation;
-      case 14:
+      case 12:
         return !form.tagsText &&
                (!form.acceptedMissionTypes || form.acceptedMissionTypes.length === 0);
       default:
@@ -130,10 +121,10 @@ function findStoppedStep(form: any, establishment?: any) {
     }
   };
 
-  // Find the first step s from 2 to 14 such that s and all steps after it are unchanged
-  for (let s = 2; s <= 14; s++) {
+  // Find the first step s from 2 to 12 such that s and all steps after it are unchanged
+  for (let s = 2; s <= 12; s++) {
     let allUnchangedAfter = true;
-    for (let i = s; i <= 14; i++) {
+    for (let i = s; i <= 12; i++) {
       if (!isUnchanged(i)) {
         allUnchangedAfter = false;
         break;
@@ -144,7 +135,7 @@ function findStoppedStep(form: any, establishment?: any) {
     }
   }
 
-  return 14;
+  return 12;
 }
 
 function missionToWizardForm(mission: any) {
@@ -1036,7 +1027,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       <div className="wizard-step-content">
         <div>
           <h2>Durée et rémunération</h2>
-          <p>Indiquez la durée de la mission et le taux de rétrocession.</p>
+          <p>Indiquez la durée de la mission, le taux de rétrocession et la rémunération minimale.</p>
         </div>
         <Field label="Durée estimée en heures">
           <NumberStepper min={1} max={72} step={1} value={form.durationHours || ''} onChange={(value) => set('durationHours', value)} />
@@ -1045,41 +1036,14 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Pourcentage de rétrocession">
           <NumberStepper min={1} max={100} step={1} value={form.retrocessionPercentage || ''} onChange={(value) => set('retrocessionPercentage', value)} suffix="%" />
         </Field>
-      </div>
-    );
-  }
-
-  if (step === 12) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Critères de profil (1/2)</h2>
-          <p>Définissez les préférences de mobilité et les durées idéales.</p>
-        </div>
-        <MultiChoiceField label="Mobilite utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-        <MultiChoiceField label="Durées proposées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-        <MultiChoiceField label="Horaires non proposes" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
-      </div>
-    );
-  }
-
-  if (step === 13) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Critères de profil (2/2)</h2>
-          <p>Indiquez la patientèle acceptée, les logiciels requis et la rémunération minimale.</p>
-        </div>
-        <MultiChoiceField label="Patienteles acceptees" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
-        <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-        <Field label="Remuneration minimale indicative (EUR)">
+        <Field label="Rémunération minimale indicative (EUR)">
           <NumberStepper min={0} step={50} value={form.minimumCompensation ?? ''} onChange={(value) => set('minimumCompensation', value)} placeholder="Ex : 600" suffix="EUR" />
         </Field>
       </div>
     );
   }
 
-  if (step === 14) {
+  if (step === 12) {
     return (
       <div className="wizard-step-content">
         <div>
