@@ -227,28 +227,7 @@ export default function EstablishmentAgendaPage() {
         </Card>
       ) : (
         <>
-          <div className="agenda-overview">
-            <div>
-              <span>Missions publiees</span>
-              <strong>{rows.length}</strong>
-            </div>
-            <div>
-              <span>Pourvues</span>
-              <strong>{filledRows.length}</strong>
-            </div>
-            <div>
-              <span>Propositions</span>
-              <strong>{proposalRows.length}</strong>
-            </div>
-            <div>
-              <span>A venir</span>
-              <strong>{upcomingRows.length}</strong>
-            </div>
-            <div>
-              <span>Terminees</span>
-              <strong>{completedRows.length}</strong>
-            </div>
-          </div>
+
 
           <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Navigation de l'agenda" style={{ marginBottom: 18 }}>
             {agendaSections.map((section) => (
