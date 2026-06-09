@@ -198,55 +198,71 @@ export default function EstablishmentOnboardingPage() {
       {error ? <Alert type="error">{error}</Alert> : null}
 
       {activeTab === 'establishments' ? (
-        <Card>
-          <h2>Mes établissements</h2>
-          {establishments.length === 0 ? <p>Aucun établissement.</p> : null}
-          {establishments.map((establishment) => (
-            <div key={establishment.id} className="toolbar" style={{ marginTop: 12 }}>
-              <div>
-                <strong>{establishment.name}</strong>
-                <br />
-                <span className="small">
-                  {establishmentTypeLabel(establishment.type)} - {establishment.city || 'Ville non renseignée'}
-                </span>
-                <br />
-                <span className="small">
-                  {sectorLabel(establishment.sector)}
-                  {establishment.patientType ? ` - ${establishment.patientType}` : ''}
-                  {establishment.softwareUsed ? ` - ${establishment.softwareUsed}` : ''}
-                  {` - ${booleanLabel(establishment.hasSecretary)}`}
-                </span>
-                <br />
-                <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
-                  {statusLabel(establishment.verificationStatus)}
-                </Badge>
-                <div className="stat" style={{ marginTop: 12 }}>
-                  <span>Complétion du profil</span>
-                  <strong>{establishment.completionScore}%</strong>
-                  <ProgressBar value={establishment.completionScore} />
+        <div className="establishment-list-container">
+          {establishments.length === 0 ? (
+            <Card>
+              <h2>Mes établissements</h2>
+              <p>Aucun établissement.</p>
+            </Card>
+          ) : (
+            establishments.map((establishment) => (
+              <div key={establishment.id} className="establishment-item-card">
+                <div className="establishment-card-header">
+                  <div className="establishment-header-left">
+                    <h3>{establishment.name}</h3>
+                    <div className="meta-details">
+                      <strong>{establishmentTypeLabel(establishment.type)}</strong> • {establishment.city || 'Ville non renseignée'}
+                      <br />
+                      {sectorLabel(establishment.sector)}
+                      {establishment.patientType ? ` • ${establishment.patientType}` : ''}
+                      {establishment.softwareUsed ? ` • ${establishment.softwareUsed}` : ''}
+                      {` • ${booleanLabel(establishment.hasSecretary)}`}
+                    </div>
+                  </div>
+                  <div className="establishment-header-right">
+                    <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
+                      {statusLabel(establishment.verificationStatus)}
+                    </Badge>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      disabled={deletingId === establishment.id}
+                      onClick={() => void remove(establishment)}
+                      style={{ padding: '6px 12px', fontSize: '13px' }}
+                    >
+                      {deletingId === establishment.id ? 'Suppression...' : 'Supprimer'}
+                    </Button>
+                  </div>
                 </div>
-                <EstablishmentCreditSummary
-                  status={billingByEstablishment[establishment.id]}
-                  loading={billingLoadingIds[establishment.id]}
-                />
-                <div className="divider" />
-                <div style={{ marginTop: 8 }}>
-                  <LinkButton href={`/establishment/edit/${establishment.id}`} variant="secondary">
-                    Modifier l'établissement ({establishment.photos?.length || 0})
-                  </LinkButton>
+
+                <div className="establishment-card-body">
+                  <div className="establishment-profile-column">
+                    <div className="establishment-completion-box">
+                      <span>Complétion du profil</span>
+                      <strong>{establishment.completionScore}%</strong>
+                      <ProgressBar value={establishment.completionScore} />
+                    </div>
+                    <div>
+                      <LinkButton
+                        href={`/establishment/edit/${establishment.id}`}
+                        variant="secondary"
+                      >
+                        Modifier l'établissement ({establishment.photos?.length || 0})
+                      </LinkButton>
+                    </div>
+                  </div>
+
+                  <div className="establishment-billing-column">
+                    <EstablishmentCreditSummary
+                      status={billingByEstablishment[establishment.id]}
+                      loading={billingLoadingIds[establishment.id]}
+                    />
+                  </div>
                 </div>
               </div>
-              <Button
-                type="button"
-                variant="danger"
-                disabled={deletingId === establishment.id}
-                onClick={() => void remove(establishment)}
-              >
-                {deletingId === establishment.id ? 'Suppression...' : 'Supprimer'}
-              </Button>
-            </div>
-          ))}
-        </Card>
+            ))
+          )}
+        </div>
       ) : null}
 
       {activeTab === 'create' ? (
