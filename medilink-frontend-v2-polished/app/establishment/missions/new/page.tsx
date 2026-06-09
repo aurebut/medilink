@@ -25,6 +25,13 @@ import {
 } from '@/lib/profile-options';
 import type { Establishment, EstablishmentBillingStatus, Mission, MissionType, RequiredLevel } from '@/lib/types';
 
+type DraftSummary = {
+  id: string;
+  title: string;
+  specialty: string;
+  startDate: string;
+};
+
 const steps = [
   { title: 'Format', helper: 'Format de la mission' },
   { title: 'Profil', helper: 'Niveaux de profil requis' },
@@ -70,6 +77,23 @@ function sectorLabel(value?: string | null) {
 
 function dateInput(value?: string | null) {
   return value?.slice(0, 10) || '';
+}
+
+function missionToDraftSummary(mission: Pick<Mission, 'id' | 'title' | 'specialty' | 'startDate'>): DraftSummary {
+  return {
+    id: mission.id,
+    title: mission.title,
+    specialty: mission.specialty,
+    startDate: mission.startDate,
+  };
+}
+
+function mergeDraftSummaries(...groups: Array<DraftSummary[] | undefined>) {
+  const byId = new Map<string, DraftSummary>();
+  groups.flatMap((group) => group || []).forEach((draft) => {
+    byId.set(draft.id, draft);
+  });
+  return Array.from(byId.values());
 }
 
 function findStoppedStep(form: any, establishment?: any) {
@@ -199,6 +223,8 @@ export default function NewMissionPage() {
   const [forceShowPaymentGate, setForceShowPaymentGate] = useState(false);
   const [forceNewMission, setForceNewMission] = useState(false);
   const [billingTrigger, setBillingTrigger] = useState(0);
+  const [existingDrafts, setExistingDrafts] = useState<DraftSummary[]>([]);
+  const [draftsLoading, setDraftsLoading] = useState(false);
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [loadingDraft, setLoadingDraft] = useState(false);
@@ -308,6 +334,40 @@ export default function NewMissionPage() {
         if (cancelled) return;
         setError(e.message);
         setBillingLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEstablishment?.id, billingTrigger]);
+
+  useEffect(() => {
+    if (!selectedEstablishment?.id) {
+      setExistingDrafts([]);
+      setDraftsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    const path = `/missions/mine?establishmentId=${selectedEstablishment.id}`;
+
+    setDraftsLoading(true);
+    api.reload<Mission[]>(path)
+      .then((missions) => {
+        if (cancelled) return;
+        setExistingDrafts(
+          missions
+            .filter((mission) => mission.status === 'DRAFT')
+            .map(missionToDraftSummary),
+        );
+      })
+      .catch((e: any) => {
+        if (cancelled) return;
+        setError(e.message);
+        setExistingDrafts([]);
+      })
+      .finally(() => {
+        if (!cancelled) setDraftsLoading(false);
       });
 
     return () => {
@@ -555,27 +615,32 @@ export default function NewMissionPage() {
     );
   }
 
-  if (billingLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
+  if (billingLoading || draftsLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
 
-  const hasDrafts = billingStatus.drafts && billingStatus.drafts.length > 0;
-  const showDraftIntermediary = hasDrafts && !draftMissionId && !forceNewMission;
+  const drafts = mergeDraftSummaries(existingDrafts, billingStatus.drafts);
+  const localCanCreateMission = billingStatus.hasActiveSubscription || (billingStatus.availableCredits - drafts.length) > 0;
+  const hasBlockingDrafts = !billingStatus.hasActiveSubscription && drafts.length > 0 && !localCanCreateMission;
+  const showDraftIntermediary = hasBlockingDrafts && !draftMissionId && !forceNewMission && !forceShowPaymentGate;
 
   if (showDraftIntermediary) {
     return (
       <DraftIntermediaryPage
-        drafts={billingStatus.drafts || []}
+        drafts={drafts}
         establishments={establishments}
         selectedEstablishmentId={selectedEstablishmentId}
         setSelectedEstablishmentId={setSelectedEstablishmentId}
         onShowPayment={() => setForceShowPaymentGate(true)}
-        onDeleted={() => setBillingTrigger((t) => t + 1)}
-        canCreateNew={billingStatus.canCreateMission}
+        onDeleted={(draftId) => {
+          setExistingDrafts((current) => current.filter((draft) => draft.id !== draftId));
+          setBillingTrigger((t) => t + 1);
+        }}
+        canCreateNew={localCanCreateMission}
         onCreateNew={() => setForceNewMission(true)}
       />
     );
   }
 
-  if (!billingStatus.canCreateMission) {
+  if (forceShowPaymentGate || !localCanCreateMission) {
     return (
       <PublicationPaymentGate
         establishments={establishments}
@@ -1313,7 +1378,7 @@ function DraftIntermediaryPage({
   selectedEstablishmentId: string;
   setSelectedEstablishmentId: (id: string) => void;
   onShowPayment: () => void;
-  onDeleted: () => void;
+  onDeleted: (draftId: string) => void;
   canCreateNew: boolean;
   onCreateNew: () => void;
 }) {
@@ -1330,7 +1395,7 @@ function DraftIntermediaryPage({
     try {
       await api.delete(`/missions/${draftId}`);
       clearApiCache('/establishment/dashboard');
-      onDeleted();
+      onDeleted(draftId);
     } catch (err: any) {
       setDeleteError(err.message || "Impossible de supprimer le brouillon.");
       setDeletingId(null);
