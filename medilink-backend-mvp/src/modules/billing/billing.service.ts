@@ -163,6 +163,16 @@ export class BillingService {
     const access = await this.getPublicationAccess(establishmentId);
     if (access.hasActiveSubscription) return { source: 'SUBSCRIPTION' };
 
+    const existing = await this.prisma.publicationCredit.findFirst({
+      where: {
+        establishmentId,
+        missionId,
+        status: { in: [PublicationCreditStatus.RESERVED, PublicationCreditStatus.CONSUMED] },
+      },
+    });
+
+    if (existing) return { source: 'PUBLICATION_CREDIT', credit: existing };
+
     const credit = await this.prisma.publicationCredit.findFirst({
       where: {
         establishmentId,
@@ -183,9 +193,8 @@ export class BillingService {
       where: { id: credit.id, status: PublicationCreditStatus.AVAILABLE },
       data: {
         missionId,
-        status: PublicationCreditStatus.CONSUMED,
+        status: PublicationCreditStatus.RESERVED,
         reservedAt: new Date(),
-        consumedAt: new Date(),
       },
     });
 
@@ -195,6 +204,74 @@ export class BillingService {
 
     const updated = await this.prisma.publicationCredit.findUnique({ where: { id: credit.id } });
     return { source: 'PUBLICATION_CREDIT', credit: updated };
+  }
+
+  async consumePublicationCreditForAcceptedMission(
+    establishmentId: string,
+    missionId: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const access = await this.getPublicationAccess(establishmentId);
+    if (access.hasActiveSubscription) return { source: 'SUBSCRIPTION' };
+
+    const existingConsumed = await client.publicationCredit.findFirst({
+      where: {
+        establishmentId,
+        missionId,
+        status: PublicationCreditStatus.CONSUMED,
+      },
+    });
+
+    if (existingConsumed) return { source: 'PUBLICATION_CREDIT', credit: existingConsumed };
+
+    const reserved = await client.publicationCredit.findFirst({
+      where: {
+        establishmentId,
+        missionId,
+        status: PublicationCreditStatus.RESERVED,
+      },
+      orderBy: { reservedAt: 'asc' },
+    });
+
+    if (!reserved) {
+      throw new BadRequestException({
+        code: 'PUBLICATION_PAYMENT_REQUIRED',
+        message: 'Aucun credit de publication reserve pour cette mission.',
+        establishmentId,
+        missionId,
+      });
+    }
+
+    const consumed = await client.publicationCredit.updateMany({
+      where: { id: reserved.id, status: PublicationCreditStatus.RESERVED },
+      data: {
+        status: PublicationCreditStatus.CONSUMED,
+        consumedAt: new Date(),
+      },
+    });
+
+    if (consumed.count === 0) {
+      return this.consumePublicationCreditForAcceptedMission(establishmentId, missionId, tx);
+    }
+
+    const updated = await client.publicationCredit.findUnique({ where: { id: reserved.id } });
+    return { source: 'PUBLICATION_CREDIT', credit: updated };
+  }
+
+  async releaseReservedPublicationCreditForMission(establishmentId: string, missionId: string) {
+    await this.prisma.publicationCredit.updateMany({
+      where: {
+        establishmentId,
+        missionId,
+        status: PublicationCreditStatus.RESERVED,
+      },
+      data: {
+        missionId: null,
+        status: PublicationCreditStatus.AVAILABLE,
+        reservedAt: null,
+      },
+    });
   }
 
   async assertCanPublishMission(establishmentId: string, missionId: string) {

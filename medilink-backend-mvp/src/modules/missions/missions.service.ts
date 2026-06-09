@@ -104,11 +104,13 @@ export class MissionsService {
       include: this.missionInclude,
     });
 
-    try {
-      await this.billing.attachPublicationAccessToMission(establishment.id, mission.id);
-    } catch (error) {
-      await this.prisma.mission.delete({ where: { id: mission.id } });
-      throw error;
+    if (dto.publishNow) {
+      try {
+        await this.billing.attachPublicationAccessToMission(establishment.id, mission.id);
+      } catch (error) {
+        await this.prisma.mission.delete({ where: { id: mission.id } });
+        throw error;
+      }
     }
 
     await this.audit.log({
@@ -307,7 +309,11 @@ export class MissionsService {
   async setStatus(user: RequestUser, missionId: string, status: MissionStatus) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
     if (status === MissionStatus.PUBLISHED) {
-      await this.billing.assertCanPublishMission(mission.establishmentId, missionId);
+      await this.billing.attachPublicationAccessToMission(mission.establishmentId, missionId);
+    }
+
+    if (status === MissionStatus.ARCHIVED) {
+      await this.billing.releaseReservedPublicationCreditForMission(mission.establishmentId, missionId);
     }
 
     const updated = await this.prisma.mission.update({
@@ -331,6 +337,8 @@ export class MissionsService {
 
   async delete(user: RequestUser, missionId: string) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
+
+    await this.billing.releaseReservedPublicationCreditForMission(mission.establishmentId, missionId);
 
     await this.prisma.mission.delete({
       where: { id: missionId },

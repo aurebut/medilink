@@ -576,7 +576,7 @@ function SubscriptionTab({
             {billingStatus.hasActiveSubscription
               ? 'Les annonces peuvent etre creees en brouillon ou publiees sans paiement unitaire.'
               : billingStatus.availableCredits > 0
-                ? 'Votre prochain formulaire utilisera un credit deja paye. Il reste acquis tant que vous ne creez pas de mission.'
+                ? "Un credit deja paye est disponible. Il sera debite quand un candidat acceptera une mission."
                 : 'Choisissez un abonnement ou un paiement unique avant de creer une nouvelle annonce.'}
           </p>
         </div>

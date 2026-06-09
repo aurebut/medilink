@@ -12,6 +12,7 @@ import {
 } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { BillingService } from '../billing/billing.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -30,6 +31,7 @@ export class ConversationsService {
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
     private readonly events: ConversationEventsService,
+    private readonly billing: BillingService,
   ) {}
 
   async list(user: RequestUser) {
@@ -230,6 +232,12 @@ export class ConversationsService {
           },
         },
       });
+
+      await this.billing.consumePublicationCreditForAcceptedMission(
+        conversation.establishmentId,
+        conversation.missionId,
+        tx,
+      );
 
       await tx.application.update({
         where: { id: conversation.applicationId },
