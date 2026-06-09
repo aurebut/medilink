@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Establishment, EstablishmentBillingStatus, EstablishmentType } from '@/lib/types';
+import { formatDate } from '@/lib/format';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
@@ -21,6 +22,14 @@ import {
   softwareOptions,
 } from '@/lib/profile-options';
 
+type EstablishmentInfoTab = 'establishments' | 'create' | 'billing';
+
+const infoTabs: Array<{ id: EstablishmentInfoTab; label: string }> = [
+  { id: 'establishments', label: 'Mes établissements' },
+  { id: 'create', label: 'Créer' },
+  { id: 'billing', label: 'Achat et abonnement' },
+];
+
 function sectorLabel(value?: string | null) {
   return sectorOptions.find((option) => option.value === value)?.label || value || 'Secteur non renseigné';
 }
@@ -34,16 +43,24 @@ function booleanLabel(value?: boolean | null) {
 export default function EstablishmentOnboardingPage() {
   const { establishments, loading, reload } = useEstablishments();
   const [form, setForm] = useState<any>({ type: 'HOSPITAL', country: 'France' });
+  const [activeTab, setActiveTab] = useState<EstablishmentInfoTab>('establishments');
   const [billingByEstablishment, setBillingByEstablishment] = useState<Record<string, EstablishmentBillingStatus>>({});
   const [billingLoadingIds, setBillingLoadingIds] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [billingBusyId, setBillingBusyId] = useState<string | null>(null);
 
   function set(name: string, value: unknown) {
     setForm((p: any) => ({ ...p, [name]: value }));
   }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const queryTab = new URLSearchParams(window.location.search).get('tab');
+    if (queryTab === 'create' || queryTab === 'billing') setActiveTab(queryTab);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,6 +83,18 @@ export default function EstablishmentOnboardingPage() {
     };
   }, [establishments]);
 
+  function selectTab(tab: EstablishmentInfoTab) {
+    setActiveTab(tab);
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (tab === 'establishments') {
+      url.searchParams.delete('tab');
+    } else {
+      url.searchParams.set('tab', tab);
+    }
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+
   async function submit(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -86,6 +115,7 @@ export default function EstablishmentOnboardingPage() {
       });
       setMessage('Établissement créé.');
       await reload();
+      setActiveTab('establishments');
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -113,16 +143,63 @@ export default function EstablishmentOnboardingPage() {
     }
   }
 
+  async function startBillingCheckout(kind: 'subscription' | 'credit', establishmentId: string) {
+    setBillingBusyId(`${kind}:${establishmentId}`);
+    setError(null);
+    setMessage(null);
+    try {
+      const endpoint = kind === 'subscription'
+        ? '/billing/checkout/subscription'
+        : '/billing/checkout/publication-credit';
+      const response = await api.post<{ url: string }>(endpoint, { establishmentId });
+      window.location.href = response.url;
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBillingBusyId(null);
+    }
+  }
+
+  async function openBillingPortal(establishmentId: string) {
+    setBillingBusyId(`portal:${establishmentId}`);
+    setError(null);
+    setMessage(null);
+    try {
+      const response = await api.post<{ url: string }>('/billing/portal', { establishmentId });
+      window.location.href = response.url;
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBillingBusyId(null);
+    }
+  }
+
   if (loading) return <LoadingCard />;
 
   return (
     <>
       <PageHeader title="Établissement" description="Créez ou consultez votre établissement recruteur." />
-      <div className="grid-2">
+      <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections établissement" style={{ marginBottom: 18 }}>
+        {infoTabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            className={activeTab === tab.id ? 'active' : ''}
+            onClick={() => selectTab(tab.id)}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {message ? <Alert type="success">{message}</Alert> : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
+
+      {activeTab === 'establishments' ? (
         <Card>
           <h2>Mes établissements</h2>
-          {message ? <Alert type="success">{message}</Alert> : null}
-          {error ? <Alert type="error">{error}</Alert> : null}
           {establishments.length === 0 ? <p>Aucun établissement.</p> : null}
           {establishments.map((establishment) => (
             <div key={establishment.id} className="toolbar" style={{ marginTop: 12 }}>
@@ -170,7 +247,9 @@ export default function EstablishmentOnboardingPage() {
             </div>
           ))}
         </Card>
+      ) : null}
 
+      {activeTab === 'create' ? (
         <Card>
           <h2>Créer un établissement</h2>
           <form className="form" onSubmit={submit}>
@@ -236,8 +315,143 @@ export default function EstablishmentOnboardingPage() {
             <Button disabled={saving}>{saving ? 'Création...' : 'Créer'}</Button>
           </form>
         </Card>
-      </div>
+      ) : null}
+
+      {activeTab === 'billing' ? (
+        <EstablishmentBillingTab
+          establishments={establishments}
+          billingByEstablishment={billingByEstablishment}
+          billingLoadingIds={billingLoadingIds}
+          busyId={billingBusyId}
+          onSubscribe={(establishmentId) => void startBillingCheckout('subscription', establishmentId)}
+          onBuyCredit={(establishmentId) => void startBillingCheckout('credit', establishmentId)}
+          onOpenPortal={(establishmentId) => void openBillingPortal(establishmentId)}
+        />
+      ) : null}
     </>
+  );
+}
+
+function EstablishmentBillingTab({
+  establishments,
+  billingByEstablishment,
+  billingLoadingIds,
+  busyId,
+  onSubscribe,
+  onBuyCredit,
+  onOpenPortal,
+}: {
+  establishments: Establishment[];
+  billingByEstablishment: Record<string, EstablishmentBillingStatus>;
+  billingLoadingIds: Record<string, boolean>;
+  busyId: string | null;
+  onSubscribe: (establishmentId: string) => void;
+  onBuyCredit: (establishmentId: string) => void;
+  onOpenPortal: (establishmentId: string) => void;
+}) {
+  if (establishments.length === 0) {
+    return (
+      <Card>
+        <h2>Achat et abonnement</h2>
+        <p>Créez d'abord un établissement pour activer les achats de crédits et les abonnements.</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="grid">
+      {establishments.map((establishment) => {
+        const status = billingByEstablishment[establishment.id];
+        const loading = billingLoadingIds[establishment.id];
+
+        return (
+          <Card key={establishment.id} className="dashboard-panel">
+            <div className="toolbar compact">
+              <div>
+                <h2>{establishment.name}</h2>
+                <p className="small">{establishment.city || 'Ville non renseignée'} - {establishmentTypeLabel(establishment.type)}</p>
+              </div>
+              {status?.hasActiveSubscription ? <Badge tone="success">Abonnement actif</Badge> : <Badge tone="warning">Accès publication</Badge>}
+            </div>
+
+            {loading && !status ? (
+              <LoadingCard label="Chargement de l'abonnement..." />
+            ) : status ? (
+              <BillingStatusPanel
+                status={status}
+                subscribing={busyId === `subscription:${establishment.id}`}
+                buyingCredit={busyId === `credit:${establishment.id}`}
+                openingPortal={busyId === `portal:${establishment.id}`}
+                onSubscribe={() => onSubscribe(establishment.id)}
+                onBuyCredit={() => onBuyCredit(establishment.id)}
+                onOpenPortal={() => onOpenPortal(establishment.id)}
+              />
+            ) : (
+              <Alert type="error">Impossible de charger les informations d'achat.</Alert>
+            )}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+function BillingStatusPanel({
+  status,
+  subscribing,
+  buyingCredit,
+  openingPortal,
+  onSubscribe,
+  onBuyCredit,
+  onOpenPortal,
+}: {
+  status: EstablishmentBillingStatus;
+  subscribing: boolean;
+  buyingCredit: boolean;
+  openingPortal: boolean;
+  onSubscribe: () => void;
+  onBuyCredit: () => void;
+  onOpenPortal: () => void;
+}) {
+  const subscription = status.subscription;
+  const subscriptionLabel = subscription?.status || 'Inactif';
+  const periodEnd = subscription?.currentPeriodEnd ? formatDate(subscription.currentPeriodEnd) : '-';
+
+  return (
+    <div className="establishment-billing-panel">
+      <div className="billing-provision-grid">
+        <div><span>Crédits disponibles</span><strong>{status.availableCredits}</strong></div>
+        <div><span>Crédits réservés</span><strong>{status.reservedCredits}</strong></div>
+        <div><span>Crédits utilisés</span><strong>{status.consumedCredits}</strong></div>
+        <div><span>Abonnement</span><strong>{subscriptionLabel}</strong></div>
+        <div><span>Renouvellement</span><strong>{periodEnd}</strong></div>
+        <div><span>Résiliation prévue</span><strong>{subscription?.cancelAtPeriodEnd ? 'Oui' : 'Non'}</strong></div>
+      </div>
+
+      <div className="billing-provision-grid">
+        <div><span>Abonnement mensuel</span><strong>{formatCents(status.prices.monthlySubscription.amount, status.prices.monthlySubscription.currency)}</strong></div>
+        <div><span>Crédit mission</span><strong>{formatCents(status.prices.publicationCredit.amount, status.prices.publicationCredit.currency)}</strong></div>
+      </div>
+
+      {!status.stripeConfigured ? (
+        <Alert type="error">Stripe n'est pas encore configuré sur le serveur.</Alert>
+      ) : null}
+
+      <div className="actions">
+        <Button type="button" disabled={!status.stripeConfigured || subscribing} onClick={onSubscribe}>
+          {subscribing ? 'Redirection...' : "S'abonner"}
+        </Button>
+        <Button type="button" variant="secondary" disabled={!status.stripeConfigured || buyingCredit} onClick={onBuyCredit}>
+          {buyingCredit ? 'Redirection...' : 'Acheter un crédit'}
+        </Button>
+        <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
+          {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
+        </Button>
+        <LinkButton href="/establishment/missions/new" variant={status.canCreateMission ? 'secondary' : 'light'}>
+          Créer une mission
+        </LinkButton>
+      </div>
+    </div>
   );
 }
 
@@ -299,6 +513,13 @@ function EstablishmentCreditSummary({
       </div>
     </div>
   );
+}
+
+function formatCents(amount: number, currency = 'EUR') {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency,
+  }).format(amount / 100);
 }
 
 function safeArray(value: unknown): string[] {
