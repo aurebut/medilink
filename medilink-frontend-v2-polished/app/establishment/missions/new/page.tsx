@@ -197,6 +197,7 @@ export default function NewMissionPage() {
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
   const [forceShowPaymentGate, setForceShowPaymentGate] = useState(false);
+  const [forceNewMission, setForceNewMission] = useState(false);
   const [billingTrigger, setBillingTrigger] = useState(0);
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -283,6 +284,9 @@ export default function NewMissionPage() {
   }, []);
 
   useEffect(() => {
+    setForceNewMission(false);
+    setForceShowPaymentGate(false);
+
     if (!selectedEstablishment?.id) {
       setBillingStatus(null);
       return;
@@ -554,15 +558,20 @@ export default function NewMissionPage() {
 
   if (billingLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
 
-  if (!billingStatus.canCreateMission && !forceShowPaymentGate && billingStatus.drafts && billingStatus.drafts.length > 0) {
+  const hasDrafts = billingStatus.drafts && billingStatus.drafts.length > 0;
+  const showDraftIntermediary = hasDrafts && !draftMissionId && !forceNewMission;
+
+  if (showDraftIntermediary) {
     return (
       <DraftIntermediaryPage
-        drafts={billingStatus.drafts}
+        drafts={billingStatus.drafts || []}
         establishments={establishments}
         selectedEstablishmentId={selectedEstablishmentId}
         setSelectedEstablishmentId={setSelectedEstablishmentId}
         onShowPayment={() => setForceShowPaymentGate(true)}
         onDeleted={() => setBillingTrigger((t) => t + 1)}
+        canCreateNew={billingStatus.canCreateMission}
+        onCreateNew={() => setForceNewMission(true)}
       />
     );
   }
@@ -1297,6 +1306,8 @@ function DraftIntermediaryPage({
   setSelectedEstablishmentId,
   onShowPayment,
   onDeleted,
+  canCreateNew,
+  onCreateNew,
 }: {
   drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
   establishments: Establishment[];
@@ -1304,6 +1315,8 @@ function DraftIntermediaryPage({
   setSelectedEstablishmentId: (id: string) => void;
   onShowPayment: () => void;
   onDeleted: () => void;
+  canCreateNew: boolean;
+  onCreateNew: () => void;
 }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -1412,9 +1425,15 @@ function DraftIntermediaryPage({
           Vous souhaitez conserver ce brouillon et créer une autre annonce en parallèle ?
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-          <Button type="button" variant="light" onClick={onShowPayment}>
-            Acheter un crédit supplémentaire
-          </Button>
+          {canCreateNew ? (
+            <Button type="button" onClick={onCreateNew}>
+              Créer une nouvelle mission
+            </Button>
+          ) : (
+            <Button type="button" variant="light" onClick={onShowPayment}>
+              Acheter un crédit supplémentaire
+            </Button>
+          )}
           <LinkButton href="/establishment/missions" variant="light">
             Retourner au tableau de bord
           </LinkButton>
