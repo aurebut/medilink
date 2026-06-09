@@ -368,7 +368,6 @@ export default function EstablishmentCurrentMissionsPage() {
       <PageHeader
         title="Missions en cours"
         description="Suivez les missions pourvues, le candidat assigné et les détails opérationnels à garder sous la main."
-        actions={<LinkButton href="/establishment/missions?tab=applications">Voir les candidatures</LinkButton>}
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
