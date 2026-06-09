@@ -69,6 +69,7 @@ export default function NewMissionPage() {
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
+  const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
@@ -86,10 +87,13 @@ export default function NewMissionPage() {
     if (typeof window === 'undefined') return;
     const status = new URLSearchParams(window.location.search).get('billing');
     if (status === 'subscription-success') {
+      setBillingReturnStatus('subscription-success');
       setBillingNotice("Abonnement confirme. L'activation peut prendre quelques secondes apres validation Stripe.");
     } else if (status === 'credit-success') {
+      setBillingReturnStatus('credit-success');
       setBillingNotice("Credit de publication confirme. Il reste disponible jusqu'a l'acceptation d'une mission par un candidat.");
     } else if (status === 'cancelled') {
+      setBillingReturnStatus('cancelled');
       setBillingNotice("Paiement annule. Aucun credit n'est consomme tant que le paiement n'est pas confirme.");
     }
   }, []);
@@ -299,6 +303,7 @@ export default function NewMissionPage() {
         setSelectedEstablishmentId={setSelectedEstablishmentId}
         billingStatus={billingStatus}
         billingNotice={billingNotice}
+        billingReturnStatus={billingReturnStatus}
         error={error}
         busy={billingBusy}
         onSubscribe={() => void startBillingCheckout('subscription')}
@@ -313,7 +318,11 @@ export default function NewMissionPage() {
         title="Créer une mission"
         description={selectedEstablishment ? `Établissement : ${selectedEstablishment.name}` : 'Choisissez un établissement pour rattacher la mission.'}
       />
-      {billingNotice ? <Alert type="success">{billingNotice}</Alert> : null}
+      {billingReturnStatus === 'credit-success' ? (
+        <CreditPurchaseBanner billingStatus={billingStatus} />
+      ) : billingNotice ? (
+        <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
+      ) : null}
       {billingStatus.hasActiveSubscription ? (
         <Alert type="success">Abonnement actif : vous pouvez creer et publier vos annonces sans paiement unitaire.</Alert>
       ) : billingStatus.availableCredits > 0 ? (
@@ -386,6 +395,7 @@ function PublicationPaymentGate({
   setSelectedEstablishmentId,
   billingStatus,
   billingNotice,
+  billingReturnStatus,
   error,
   busy,
   onSubscribe,
@@ -396,6 +406,7 @@ function PublicationPaymentGate({
   setSelectedEstablishmentId: (id: string) => void;
   billingStatus: EstablishmentBillingStatus;
   billingNotice: string | null;
+  billingReturnStatus: 'subscription-success' | 'credit-success' | 'cancelled' | null;
   error: string | null;
   busy: 'subscription' | 'credit' | null;
   onSubscribe: () => void;
@@ -411,7 +422,11 @@ function PublicationPaymentGate({
         description="Choisissez votre mode d'acces avant de remplir le formulaire. Aucun formulaire long ne vous est demande avant paiement."
       />
 
-      {billingNotice ? <Alert type="info">{billingNotice}</Alert> : null}
+      {billingReturnStatus === 'credit-success' ? (
+        <CreditPurchaseBanner billingStatus={billingStatus} compact />
+      ) : billingNotice ? (
+        <Alert type="info">{billingNotice}</Alert>
+      ) : null}
       {error ? <Alert type="error">{error}</Alert> : null}
       {!billingStatus.stripeConfigured ? (
         <Alert type="error">Stripe n'est pas encore configure sur le serveur. Ajoutez les cles Render avant d'activer les paiements.</Alert>
@@ -479,6 +494,33 @@ function PublicationPaymentGate({
         </Card>
       </div>
     </div>
+  );
+}
+
+function CreditPurchaseBanner({
+  billingStatus,
+  compact,
+}: {
+  billingStatus: EstablishmentBillingStatus;
+  compact?: boolean;
+}) {
+  return (
+    <Card className={`publication-credit-success ${compact ? 'compact' : ''}`}>
+      <div className="publication-credit-success-main">
+        <Badge tone="success">Credit confirme</Badge>
+        <h2>Votre credit mission est disponible</h2>
+        <p>Vous pouvez preparer ou publier votre annonce. Le credit sera debite uniquement quand un candidat acceptera la mission.</p>
+      </div>
+      <div className="publication-credit-success-stats">
+        <div><span>Disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
+        <div><span>Reserves</span><strong>{billingStatus.reservedCredits}</strong></div>
+        <div><span>Utilises</span><strong>{billingStatus.consumedCredits}</strong></div>
+      </div>
+      <div className="actions">
+        <LinkButton href="/establishment/onboarding" variant="light">Voir mon etablissement</LinkButton>
+        <LinkButton href="/establishment/missions/new" variant="secondary">Creer une mission</LinkButton>
+      </div>
+    </Card>
   );
 }
 

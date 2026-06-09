@@ -1,8 +1,8 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import type { Establishment, EstablishmentType } from '@/lib/types';
+import type { Establishment, EstablishmentBillingStatus, EstablishmentType } from '@/lib/types';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
@@ -34,6 +34,8 @@ function booleanLabel(value?: boolean | null) {
 export default function EstablishmentOnboardingPage() {
   const { establishments, loading, reload } = useEstablishments();
   const [form, setForm] = useState<any>({ type: 'HOSPITAL', country: 'France' });
+  const [billingByEstablishment, setBillingByEstablishment] = useState<Record<string, EstablishmentBillingStatus>>({});
+  const [billingLoadingIds, setBillingLoadingIds] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -42,6 +44,27 @@ export default function EstablishmentOnboardingPage() {
   function set(name: string, value: unknown) {
     setForm((p: any) => ({ ...p, [name]: value }));
   }
+
+  useEffect(() => {
+    let cancelled = false;
+
+    establishments.forEach((establishment) => {
+      setBillingLoadingIds((current) => ({ ...current, [establishment.id]: true }));
+      api.get<EstablishmentBillingStatus>(`/billing/establishments/${establishment.id}/status`)
+        .then((status) => {
+          if (cancelled) return;
+          setBillingByEstablishment((current) => ({ ...current, [establishment.id]: status }));
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          if (!cancelled) setBillingLoadingIds((current) => ({ ...current, [establishment.id]: false }));
+        });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [establishments]);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -125,6 +148,10 @@ export default function EstablishmentOnboardingPage() {
                   <strong>{establishment.completionScore}%</strong>
                   <ProgressBar value={establishment.completionScore} />
                 </div>
+                <EstablishmentCreditSummary
+                  status={billingByEstablishment[establishment.id]}
+                  loading={billingLoadingIds[establishment.id]}
+                />
                 <div className="divider" />
                 <div style={{ marginTop: 8 }}>
                   <LinkButton href={`/establishment/edit/${establishment.id}`} variant="secondary">
@@ -211,6 +238,66 @@ export default function EstablishmentOnboardingPage() {
         </Card>
       </div>
     </>
+  );
+}
+
+function EstablishmentCreditSummary({
+  status,
+  loading,
+}: {
+  status?: EstablishmentBillingStatus;
+  loading?: boolean;
+}) {
+  if (loading && !status) {
+    return (
+      <div className="establishment-credit-card is-loading">
+        <span>Acces publication</span>
+        <strong>Verification...</strong>
+      </div>
+    );
+  }
+
+  if (!status) return null;
+
+  const available = status.availableCredits;
+  const reserved = status.reservedCredits;
+  const consumed = status.consumedCredits;
+  const tone = status.hasActiveSubscription || available > 0 ? 'is-ready' : reserved > 0 ? 'is-reserved' : 'is-empty';
+
+  return (
+    <div className={`establishment-credit-card ${tone}`}>
+      <div>
+        <span>Credits mission</span>
+        <strong>
+          {status.hasActiveSubscription
+            ? 'Abonnement actif'
+            : available > 0
+              ? `${available} disponible${available > 1 ? 's' : ''}`
+              : reserved > 0
+                ? `${reserved} reserve${reserved > 1 ? 's' : ''}`
+                : 'Aucun credit'}
+        </strong>
+        <p>
+          {status.hasActiveSubscription
+            ? 'Les annonces peuvent etre publiees sans paiement unitaire.'
+            : available > 0
+              ? "Debit uniquement quand un candidat accepte une mission."
+              : reserved > 0
+                ? "Reserve a une annonce publiee, debite a l'acceptation candidat."
+                : 'Ajoutez un credit pour publier une annonce unique.'}
+        </p>
+      </div>
+      <div className="establishment-credit-counts">
+        <div><span>Disponibles</span><strong>{available}</strong></div>
+        <div><span>Reserves</span><strong>{reserved}</strong></div>
+        <div><span>Utilises</span><strong>{consumed}</strong></div>
+      </div>
+      <div className="actions">
+        <LinkButton href="/establishment/missions/new" variant={available > 0 || status.hasActiveSubscription ? 'secondary' : 'light'}>
+          {available > 0 || status.hasActiveSubscription ? 'Creer une mission' : 'Acheter un credit'}
+        </LinkButton>
+      </div>
+    </div>
   );
 }
 
