@@ -3781,11 +3781,57 @@ tbody tr:hover { background: #FAFBFD; }
   margin: 0;
 }
 
+.publication-credit-success-side {
+  display: grid;
+  gap: 8px;
+}
+
+.publication-credit-remaining {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid rgba(14, 138, 122, .18);
+  border-radius: 10px;
+  background: rgba(255,255,255,.9);
+}
+
+.publication-credit-remaining span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.publication-credit-remaining strong {
+  color: var(--heading);
+  font-family: var(--serif);
+  font-size: 38px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.publication-credit-remaining small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.publication-credit-success .actions {
+  grid-column: 1 / -1;
+}
+
 .publication-credit-success-stats,
 .establishment-credit-counts {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.publication-credit-success-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.establishment-credit-counts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .publication-credit-success-stats > div,

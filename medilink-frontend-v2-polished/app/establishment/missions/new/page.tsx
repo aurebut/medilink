@@ -604,21 +604,33 @@ function CreditPurchaseBanner({
   billingStatus: EstablishmentBillingStatus;
   compact?: boolean;
 }) {
+  const remainingCredits = billingStatus.availableCredits;
+
   return (
     <Card className={`publication-credit-success ${compact ? 'compact' : ''}`}>
       <div className="publication-credit-success-main">
         <Badge tone="success">Crédit confirmé</Badge>
         <h2>Votre crédit mission est disponible</h2>
-        <p>Vous pouvez préparer ou publier votre annonce. Le crédit sera débité uniquement quand un candidat acceptera la mission.</p>
+        <p>
+          Vous pouvez créer une nouvelle mission avec ce crédit ou reprendre un brouillon existant.
+          Dans les deux cas, le crédit sera utilisé pour la mission publiée.
+        </p>
       </div>
-      <div className="publication-credit-success-stats">
-        <div><span>Disponibles</span><strong>{billingStatus.availableCredits}</strong></div>
-        <div><span>Réservés</span><strong>{billingStatus.reservedCredits}</strong></div>
-        <div><span>Utilisés</span><strong>{billingStatus.consumedCredits}</strong></div>
+      <div className="publication-credit-success-side">
+        <div className="publication-credit-remaining">
+          <span>Crédits restants</span>
+          <strong>{remainingCredits}</strong>
+          <small>{remainingCredits > 1 ? 'missions publiables' : 'mission publiable'}</small>
+        </div>
+        <div className="publication-credit-success-stats">
+          <div><span>Réservés</span><strong>{billingStatus.reservedCredits}</strong></div>
+          <div><span>Utilisés</span><strong>{billingStatus.consumedCredits}</strong></div>
+        </div>
       </div>
       <div className="actions">
         <LinkButton href="/establishment/onboarding" variant="light">Voir mon etablissement</LinkButton>
         <LinkButton href="/establishment/missions/new" variant="secondary">Creer une mission</LinkButton>
+        <LinkButton href="/establishment/missions?tab=drafts" variant="light">Reprendre un brouillon</LinkButton>
       </div>
     </Card>
   );
