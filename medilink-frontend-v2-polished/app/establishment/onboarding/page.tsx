@@ -536,7 +536,7 @@ function BillingStatusPanel({
             <div className="plan-action">
               {isSubscribed ? (
                 <Button type="button" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
-                  {openingPortal ? 'Ouverture...' : 'Gérer mon abonnement'}
+                  {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
                 </Button>
               ) : (
                 <Button type="button" disabled={!status.stripeConfigured || subscribing} onClick={onSubscribe}>
@@ -585,12 +585,7 @@ function BillingStatusPanel({
         </div>
       </div>
 
-      {/* 4. Bottom Main Actions */}
-      <div className="premium-billing-actions">
-        <Button type="button" variant="light" disabled={!status.stripeConfigured || openingPortal} onClick={onOpenPortal}>
-          {openingPortal ? 'Ouverture...' : 'Gérer / résilier'}
-        </Button>
-      </div>
+
     </div>
   );
 }
