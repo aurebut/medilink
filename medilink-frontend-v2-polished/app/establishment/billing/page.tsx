@@ -702,39 +702,6 @@ export default function RecruiterBillingPage() {
           </div>
         </div>
 
-        {/* Detailed System Functioning */}
-        <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
-            Fonctionnement du système de facturation
-          </h3>
-          <p className="small" style={{ color: 'var(--muted)', marginBottom: '16px' }}>
-            Comprendre la différence entre la formule d'abonnement et le paiement à l'unité.
-          </p>
-          
-          <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-            <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
-              <div className="plan-header">
-                <span className="plan-badge">Abonnement Mensuel</span>
-              </div>
-              <p style={{ color: 'var(--text)', marginTop: '10px' }}>
-                L'abonnement vous offre un accès illimité et sans restriction pour publier vos missions de remplacement ou de vacation. 
-                Il s'agit d'une formule mensuelle sans engagement de durée. Les frais de publication sont fixes, quel que soit le nombre d'annonces que vous mettez en ligne.
-              </p>
-            </div>
-
-            <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
-              <div className="plan-header">
-                <span className="plan-badge badge-neutral">Mode Crédits (À l'unité)</span>
-              </div>
-              <p style={{ color: 'var(--text)', marginTop: '10px' }}>
-                Si vous n'avez pas d'abonnement actif, vous pouvez utiliser les crédits unitaires de publication. 
-                Un crédit correspond à la publication d'une annonce. De manière transparente, un crédit n'est consommé que lorsqu'un candidat accepte votre proposition de mission. 
-                Vos crédits n'expirent jamais.
-              </p>
-            </div>
-          </div>
-        </div>
-
         {/* Purchase History */}
         <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
