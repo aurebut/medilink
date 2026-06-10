@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {
   useState,
   type ButtonHTMLAttributes,
+  type ComponentProps,
   type InputHTMLAttributes,
   type ReactNode,
   type SelectHTMLAttributes,
@@ -32,14 +33,15 @@ export function LinkButton({
   children,
   variant = 'primary',
   className = '',
-}: {
+  ...props
+}: Omit<ComponentProps<typeof Link>, 'href'> & {
   href: string;
   children: ReactNode;
   variant?: 'primary' | 'secondary' | 'light' | 'danger' | 'success';
   className?: string;
 }) {
   return (
-    <Link className={`btn btn-${variant} ${className}`} href={href}>
+    <Link className={`btn btn-${variant} ${className}`} href={href} {...props}>
       {children}
     </Link>
   );

@@ -7,6 +7,17 @@ import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
+import {
+  clearNotificationsCache,
+  confirmNotificationDelete,
+  confirmNotificationRead,
+  confirmNotificationsClear,
+  normalizeNotifications,
+  primeNotificationsCache,
+  removeNotificationFromCache,
+  restoreNotificationInCache,
+  restoreNotificationsCache,
+} from '@/lib/notification-cache';
 import type { CandidateDashboardData, Conversation, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
@@ -79,7 +90,7 @@ function primeCandidateDashboard(data: CandidateDashboardData) {
   primeApiCache('/me/documents', data.documents);
   primeApiCache('/me/applications', data.applications);
   primeApiCache('/conversations', data.conversations);
-  primeApiCache('/notifications', data.notifications);
+  primeNotificationsCache(data.notifications);
 }
 
 function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
@@ -287,9 +298,9 @@ export function AppShell({
     if (!options.silent) setNotificationsLoading(true);
     setNotificationsError(null);
     try {
-      setNotifications(options.reload
+      setNotifications(normalizeNotifications(options.reload
         ? await api.reload<Notification[]>('/notifications')
-        : await api.get<Notification[]>('/notifications'));
+        : await api.get<Notification[]>('/notifications')));
     } catch (e: any) {
       setNotificationsError(e.message);
     } finally {
@@ -301,19 +312,14 @@ export function AppShell({
     const deletedNotification = notifications.find((notification) => notification.id === id);
     const deletedIndex = notifications.findIndex((notification) => notification.id === id);
 
-    setNotifications((items) => items.filter((notification) => notification.id !== id));
+    removeNotificationFromCache(id);
     setNotificationsError(null);
 
     try {
-      await api.delete(`/notifications/${id}`);
+      await confirmNotificationDelete(id);
     } catch (e: any) {
       if (deletedNotification) {
-        setNotifications((items) => {
-          if (items.some((notification) => notification.id === id)) return items;
-          const restored = [...items];
-          restored.splice(Math.max(deletedIndex, 0), 0, deletedNotification);
-          return restored;
-        });
+        restoreNotificationInCache(deletedNotification, deletedIndex);
       }
       setNotificationsError(e.message);
     }
@@ -321,15 +327,20 @@ export function AppShell({
 
   async function deleteAllNotifications() {
     const backupNotifications = [...notifications];
-    setNotifications([]);
+    clearNotificationsCache(backupNotifications);
     setNotificationsError(null);
 
     try {
-      await api.delete('/notifications');
+      await confirmNotificationsClear();
     } catch (e: any) {
-      setNotifications(backupNotifications);
+      restoreNotificationsCache(backupNotifications);
       setNotificationsError(e.message);
     }
+  }
+
+  function openNotification(notification: Notification) {
+    setNotificationsOpen(false);
+    if (!notification.readAt) void confirmNotificationRead(notification.id);
   }
 
   function warmRoute(href: string) {
@@ -390,14 +401,16 @@ export function AppShell({
       api.reload<Notification[]>('/notifications'),
       api.reload<Conversation[]>('/conversations'),
     ]);
-    setNotifications(nextNotifications);
+    primeNotificationsCache(nextNotifications);
     setConversations(nextConversations);
   }, { enabled: Boolean(user) && area !== 'admin' });
 
   useEffect(() => {
     if (area === 'admin') return;
 
-    const unsubscribeNotifications = subscribeApiCache<Notification[]>('/notifications', setNotifications);
+    const unsubscribeNotifications = subscribeApiCache<Notification[]>('/notifications', (items) => {
+      setNotifications(normalizeNotifications(items));
+    });
     const unsubscribeConversations = subscribeApiCache<Conversation[]>('/conversations', setConversations);
 
     return () => {
@@ -601,7 +614,7 @@ export function AppShell({
                             <Link
                               href={notificationLink}
                               className="notification-action-link"
-                              onClick={() => setNotificationsOpen(false)}
+                              onClick={() => openNotification(notification)}
                             >
                               {getNotificationLinkLabel(notification, area)} &rarr;
                             </Link>

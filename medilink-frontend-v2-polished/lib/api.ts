@@ -30,6 +30,7 @@ const SESSION_CACHE_PREFIX = 'medilink_api_cache:';
 const getCache = new Map<string, CacheEntry>();
 const revalidatedAt = new Map<string, number>();
 const cacheListeners = new Map<string, Set<(value: unknown) => void>>();
+const cacheVersions = new Map<string, number>();
 
 function cacheKey(path: string) {
   return path;
@@ -74,6 +75,16 @@ function emitApiCacheUpdate<T>(path: string, value: T) {
   listeners.forEach((listener) => listener(value));
 }
 
+function versionFor(path: string) {
+  return cacheVersions.get(cacheKey(path)) || 0;
+}
+
+function bumpCacheVersion(path?: string) {
+  if (!path) return;
+  const key = cacheKey(path);
+  cacheVersions.set(key, versionFor(path) + 1);
+}
+
 function revalidateApiCache(path: string) {
   const key = cacheKey(path);
   const now = Date.now();
@@ -96,6 +107,7 @@ export function clearApiCache(path?: string) {
     return;
   }
 
+  bumpCacheVersion(path);
   getCache.delete(cacheKey(path));
   revalidatedAt.delete(cacheKey(path));
   if (typeof window !== 'undefined') {
@@ -128,6 +140,7 @@ export function getApiCacheValue<T>(path: string) {
 }
 
 export function primeApiCache<T>(path: string, value: T) {
+  bumpCacheVersion(path);
   const expiresAt = Date.now() + GET_CACHE_TTL_MS;
   getCache.set(cacheKey(path), {
     expiresAt,
@@ -136,6 +149,12 @@ export function primeApiCache<T>(path: string, value: T) {
   });
   writeSessionCache(path, value, expiresAt);
   emitApiCacheUpdate(path, value);
+}
+
+export function updateApiCache<T>(path: string, updater: (current: T | null) => T) {
+  const next = updater(getApiCacheSync<T>(path));
+  primeApiCache(path, next);
+  return next;
 }
 
 export function getAuthToken() {
@@ -180,6 +199,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   const shouldReadCache = canUseCache && options.cacheMode !== 'reload';
   const key = cacheKey(path);
   const now = Date.now();
+  const requestCacheVersion = versionFor(path);
 
   if (shouldReadCache) {
     const cached = getCache.get(key);
@@ -225,13 +245,16 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     }
 
     if (canUseCache) {
-      writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
-      getCache.set(key, {
-        expiresAt: now + GET_CACHE_TTL_MS,
-        promise: Promise.resolve(payload as T),
-        value: payload,
-      });
-      emitApiCacheUpdate(path, payload as T);
+      const cacheWasMutated = versionFor(path) !== requestCacheVersion;
+      if (!cacheWasMutated) {
+        writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
+        getCache.set(key, {
+          expiresAt: now + GET_CACHE_TTL_MS,
+          promise: Promise.resolve(payload as T),
+          value: payload,
+        });
+        emitApiCacheUpdate(path, payload as T);
+      }
     }
 
     return payload as T;
@@ -271,6 +294,7 @@ export const api = {
   patch: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body }),
   patchSilent: <T>(path: string, body?: unknown) => apiFetch<T>(path, { method: 'PATCH', body, invalidateCache: false }),
   delete: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE' }),
+  deleteSilent: <T>(path: string) => apiFetch<T>(path, { method: 'DELETE', invalidateCache: false }),
 };
 
 export function isMockStorageUrl(url?: string) {

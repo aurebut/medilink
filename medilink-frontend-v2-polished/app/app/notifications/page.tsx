@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, subscribeApiCache } from '@/lib/api';
+import { confirmNotificationRead, normalizeNotifications } from '@/lib/notification-cache';
 import type { Notification } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatDateTime } from '@/lib/format';
@@ -34,15 +35,15 @@ function getNotificationLinkLabel(notification: Notification) {
 
 export default function NotificationsPage() {
   const cachedNotifications = api.getSync<Notification[]>('/notifications');
-  const [items, setItems] = useState<Notification[]>(cachedNotifications || []);
+  const [items, setItems] = useState<Notification[]>(cachedNotifications ? normalizeNotifications(cachedNotifications) : []);
   const [loading, setLoading] = useState(!cachedNotifications);
   const [error, setError] = useState<string | null>(null);
 
   async function load(options: { silent?: boolean; reload?: boolean } = {}) {
     try {
-      setItems(options.reload
+      setItems(normalizeNotifications(options.reload
         ? await api.reload<Notification[]>('/notifications')
-        : await api.get<Notification[]>('/notifications'));
+        : await api.get<Notification[]>('/notifications')));
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -50,18 +51,25 @@ export default function NotificationsPage() {
     }
   }
 
-  useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    const unsubscribe = subscribeApiCache<Notification[]>('/notifications', (notifications) => {
+      setItems(normalizeNotifications(notifications));
+    });
+    void load();
+    return unsubscribe;
+  }, []);
   useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   if (loading) return <LoadingCard label="Chargement des notifications..." />;
 
   async function read(id: string) {
-    try {
-      await api.patch(`/notifications/${id}/read`, {});
-      await load();
-    } catch (e: any) {
-      setError(e.message);
-    }
+    const readAt = new Date().toISOString();
+    setItems((current) => current.map((item) => item.id === id ? { ...item, readAt: item.readAt || readAt } : item));
+    await confirmNotificationRead(id);
+  }
+
+  function openNotification(notification: Notification) {
+    if (!notification.readAt) void read(notification.id);
   }
 
   return (
@@ -82,7 +90,7 @@ export default function NotificationsPage() {
               <p>{n.body}</p>
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                 {getNotificationLink(n) ? (
-                  <LinkButton href={getNotificationLink(n)!} variant="secondary">
+                  <LinkButton href={getNotificationLink(n)!} variant="secondary" onClick={() => openNotification(n)}>
                     {getNotificationLinkLabel(n)}
                   </LinkButton>
                 ) : null}

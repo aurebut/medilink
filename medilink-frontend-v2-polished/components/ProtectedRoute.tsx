@@ -7,6 +7,7 @@ import { LoadingCard, PlatformSplash } from './ui';
 import type { CandidateDashboardData, Conversation, CurrentUser, EstablishmentDashboardData, UserRole } from '@/lib/types';
 import { defaultRouteForUser } from '@/lib/routes';
 import { api, primeApiCache } from '@/lib/api';
+import { primeNotificationsCache } from '@/lib/notification-cache';
 import { splashSeenKey } from '@/lib/startup-splash';
 
 const PLATFORM_SPLASH_MIN_MS = 900;
@@ -31,7 +32,7 @@ function primeCandidateDashboard(data: CandidateDashboardData) {
   primeApiCache('/me/documents', data.documents);
   primeApiCache('/me/applications', data.applications);
   primeApiCache('/conversations', data.conversations);
-  primeApiCache('/notifications', data.notifications);
+  primeNotificationsCache(data.notifications);
 }
 
 function primeEstablishmentDashboard(data: EstablishmentDashboardData) {

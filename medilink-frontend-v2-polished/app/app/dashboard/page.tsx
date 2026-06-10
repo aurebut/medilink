@@ -8,6 +8,7 @@ import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
+import { confirmNotificationRead, normalizeNotifications, primeNotificationsCache } from '@/lib/notification-cache';
 import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -91,7 +92,9 @@ export default function CandidateDashboardPage() {
   const [documents, setDocuments] = useState<Document[]>(cachedDashboard?.documents || []);
   const [applications, setApplications] = useState<Application[]>(cachedDashboard?.applications || []);
   const [conversations, setConversations] = useState<Conversation[]>(cachedDashboard?.conversations || []);
-  const [notifications, setNotifications] = useState<Notification[]>(cachedDashboard?.notifications || []);
+  const [notifications, setNotifications] = useState<Notification[]>(
+    cachedDashboard?.notifications ? normalizeNotifications(cachedDashboard.notifications) : [],
+  );
   const [loading, setLoading] = useState(!cachedDashboard);
 
   function applyDashboardData(data: CandidateDashboardData) {
@@ -99,12 +102,12 @@ export default function CandidateDashboardPage() {
     primeApiCache('/me/documents', data.documents);
     primeApiCache('/me/applications', data.applications);
     primeApiCache('/conversations', data.conversations);
-    primeApiCache('/notifications', data.notifications);
+    primeNotificationsCache(data.notifications);
     setProfile(data.profile);
     setDocuments(data.documents);
     setApplications(data.applications);
     setConversations(data.conversations);
-    setNotifications(data.notifications);
+    setNotifications(normalizeNotifications(data.notifications));
   }
 
   useEffect(() => {
@@ -235,6 +238,10 @@ export default function CandidateDashboardPage() {
 
   if (loading) return <LoadingCard />;
 
+  function openNotification(notification: Notification) {
+    if (!notification.readAt) void confirmNotificationRead(notification.id);
+  }
+
   const firstName = profile?.firstName || 'Bienvenue';
   const completionScore = profile?.completionScore || 0;
   const profileReady = completionScore >= 80;
@@ -360,6 +367,7 @@ export default function CandidateDashboardPage() {
                         <Link
                           href={notificationLink}
                           className="notification-action-link"
+                          onClick={() => openNotification(notification)}
                         >
                           {getNotificationLinkLabel(notification)} &rarr;
                         </Link>
