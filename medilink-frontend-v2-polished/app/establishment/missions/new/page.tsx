@@ -228,6 +228,7 @@ export default function NewMissionPage() {
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [loadingDraft, setLoadingDraft] = useState(false);
+  const [showCreditAlert, setShowCreditAlert] = useState(false);
   const draftMissionIdRef = useRef<string | null>(null);
   const draftDirtyRef = useRef(false);
   const autosaveInFlightRef = useRef(false);
@@ -245,6 +246,18 @@ export default function NewMissionPage() {
     if (!primary || selectedEstablishmentId) return;
     setSelectedEstablishmentId(primary.id);
   }, [primary, selectedEstablishmentId]);
+
+  useEffect(() => {
+    if (billingStatus && billingStatus.availableCredits > 0) {
+      setShowCreditAlert(true);
+      const timer = setTimeout(() => {
+        setShowCreditAlert(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowCreditAlert(false);
+    }
+  }, [billingStatus?.availableCredits]);
 
   useEffect(() => {
     if (loading) return;
@@ -677,7 +690,7 @@ export default function NewMissionPage() {
         ) : null}
         {billingStatus.hasActiveSubscription ? (
           <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
-        ) : billingStatus.availableCredits > 0 ? (
+        ) : (billingStatus.availableCredits > 0 && showCreditAlert) ? (
           <Alert type="success">
             {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand la mission sera confirmée avec le candidat.
           </Alert>
