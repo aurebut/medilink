@@ -306,12 +306,31 @@ export default function RecruiterBillingPage() {
       classified: classifiedIds.includes(row.id),
     }));
 
-    return [...medilinkRows, ...manualAccountingRows].sort((a, b) => {
+    const purchaseAccountingRows = (billingStatus?.purchases || []).map((purchase) => {
+      const rowId = `purchase-${purchase.id}`;
+      return {
+        id: rowId,
+        source: 'MEDILINK' as const,
+        date: purchase.date,
+        remplacant: 'MediLink (Plateforme)',
+        mission: purchase.description,
+        amount: purchase.amount,
+        currency: 'EUR',
+        status: 'AVAILABLE' as const,
+        paymentMethod: 'Carte bancaire',
+        notes: `Réf: ${purchase.reference}`,
+        hasReceipt: true,
+        classified: classifiedIds.includes(rowId),
+        agreement: null,
+      };
+    });
+
+    return [...medilinkRows, ...manualAccountingRows, ...purchaseAccountingRows].sort((a, b) => {
       const aTime = a.date ? new Date(a.date).getTime() : 0;
       const bTime = b.date ? new Date(b.date).getTime() : 0;
       return bTime - aTime;
     });
-  }, [classifiedIds, conversations, manualRows]);
+  }, [classifiedIds, conversations, manualRows, billingStatus]);
 
   const availableYears = useMemo(() => {
     const years = new Set([getCurrentYear()]);
@@ -597,54 +616,7 @@ export default function RecruiterBillingPage() {
   }) {
     const renewsAt = billingStatus?.subscription?.currentPeriodEnd;
 
-    const mockPurchases = useMemo(() => {
-      if (!billingStatus) return [];
-      const list = [];
-      const now = new Date();
-      
-      if (billingStatus.hasActiveSubscription) {
-        list.push({
-          id: 'inv_1',
-          date: new Date(now.getFullYear(), now.getMonth(), 5).toISOString(),
-          description: 'Abonnement Mensuel (Accès Illimité)',
-          reference: 'INV-2026-003',
-          amount: 59.99,
-          status: 'PAID',
-        });
-        list.push({
-          id: 'inv_2',
-          date: new Date(now.getFullYear(), now.getMonth() - 1, 5).toISOString(),
-          description: 'Abonnement Mensuel (Accès Illimité)',
-          reference: 'INV-2026-002',
-          amount: 59.99,
-          status: 'PAID',
-        });
-      }
-      
-      if (billingStatus.consumedCredits > 0 || billingStatus.availableCredits > 0) {
-        list.push({
-          id: 'inv_3',
-          date: new Date(now.getFullYear(), now.getMonth() - 2, 12).toISOString(),
-          description: '1 Crédit de Publication d’annonce',
-          reference: 'REC-2026-015',
-          amount: 39.99,
-          status: 'PAID',
-        });
-      }
-
-      if (list.length === 0) {
-        list.push({
-          id: 'inv_empty',
-          date: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
-          description: 'Création du compte établissement',
-          reference: '-',
-          amount: 0,
-          status: 'COMPLETED',
-        });
-      }
-
-      return list;
-    }, [billingStatus]);
+    const purchases = billingStatus?.purchases || [];
 
     if (!billingStatus) return <LoadingCard label="Chargement de l'abonnement..." />;
 
@@ -723,7 +695,7 @@ export default function RecruiterBillingPage() {
                 </tr>
               </thead>
               <tbody>
-                {mockPurchases.map((purchase) => (
+                {purchases.map((purchase) => (
                   <tr key={purchase.id} style={{ borderBottom: '1px solid var(--line)' }}>
                     <td style={{ padding: '14px 16px', fontSize: '13.5px', color: 'var(--text)' }}>
                       {formatDate(purchase.date)}
@@ -738,8 +710,8 @@ export default function RecruiterBillingPage() {
                       {purchase.amount > 0 ? `${purchase.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Gratuit'}
                     </td>
                     <td style={{ padding: '14px 16px', textAlign: 'center' }}>
-                      <Badge tone={purchase.status === 'PAID' || purchase.status === 'COMPLETED' ? 'success' : 'neutral'}>
-                        {purchase.status === 'PAID' || purchase.status === 'COMPLETED' ? 'Payé' : purchase.status}
+                      <Badge tone={purchase.status === 'PAID' ? 'success' : 'neutral'}>
+                        {purchase.status === 'PAID' ? 'Payé' : purchase.status}
                       </Badge>
                     </td>
                   </tr>
@@ -901,7 +873,7 @@ function MissionsTab({
   onDownload: (conversationId: string) => Promise<void>;
   onClassify: (id: string) => void;
 }) {
-  const missionRows = rows.filter((row) => row.source === 'MEDILINK');
+  const missionRows = rows.filter((row) => row.source === 'MEDILINK' && row.agreement);
 
   if (missionRows.length === 0) {
     return <EmptyState title="Aucune mission comptable" description="Les accords MediLink apparaîtront ici dès qu'un recrutement sera validé." action={<LinkButton href="/establishment/messages">Ouvrir la messagerie</LinkButton>} />;
@@ -1131,7 +1103,7 @@ function DocumentsTab({
   onDownload: (conversationId: string) => Promise<void>;
   onClassify: (id: string) => void;
 }) {
-  const documentRows = rows.filter((row) => row.hasReceipt || row.source === 'MANUAL');
+  const documentRows = rows.filter((row) => (row.hasReceipt && (row.source !== 'MEDILINK' || row.agreement)) || row.source === 'MANUAL');
   return (
     <Card className="dashboard-panel">
       <div className="toolbar">

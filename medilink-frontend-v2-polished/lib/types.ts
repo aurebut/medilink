@@ -195,6 +195,14 @@ export type EstablishmentBillingStatus = {
     monthlySubscription: { amount: number; currency: string };
     publicationCredit: { amount: number; currency: string };
   };
+  purchases?: Array<{
+    id: string;
+    date: string;
+    description: string;
+    reference: string;
+    amount: number;
+    status: 'PAID' | 'PENDING';
+  }>;
   drafts?: Array<{
     id: string;
     title: string;
