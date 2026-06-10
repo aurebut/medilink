@@ -321,9 +321,16 @@ export default function NewMissionPage() {
     let cancelled = false;
     const path = `/billing/establishments/${selectedEstablishment.id}/status`;
 
-    setBillingLoading(true);
-    setBillingStatus(null);
+    const cachedStatusSync = api.getSync<EstablishmentBillingStatus>(path);
+    if (cachedStatusSync) {
+      setBillingStatus(cachedStatusSync);
+      setBillingLoading(false);
+    } else {
+      setBillingStatus(null);
+      setBillingLoading(true);
+    }
     setError(null);
+
     api.reload<EstablishmentBillingStatus>(path)
       .then((status) => {
         if (cancelled) return;
@@ -351,7 +358,19 @@ export default function NewMissionPage() {
     let cancelled = false;
     const path = `/missions/mine?establishmentId=${selectedEstablishment.id}`;
 
-    setDraftsLoading(true);
+    const cachedMissionsSync = api.getSync<Mission[]>(path);
+    if (cachedMissionsSync) {
+      setExistingDrafts(
+        cachedMissionsSync
+          .filter((mission) => mission.status === 'DRAFT')
+          .map(missionToDraftSummary),
+      );
+      setDraftsLoading(false);
+    } else {
+      setExistingDrafts([]);
+      setDraftsLoading(true);
+    }
+
     api.reload<Mission[]>(path)
       .then((missions) => {
         if (cancelled) return;
