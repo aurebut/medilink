@@ -83,7 +83,7 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [showInitialSplash, setShowInitialSplash] = useState(true);
+  const [showInitialSplash, setShowInitialSplash] = useState(() => shouldShowInitialSplash(user));
 
   useEffect(() => {
     if (loading) return;
