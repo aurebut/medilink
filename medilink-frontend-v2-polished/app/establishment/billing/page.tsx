@@ -563,85 +563,59 @@ function SubscriptionTab({
 }) {
   if (!billingStatus) return <LoadingCard label="Chargement de l'abonnement..." />;
 
-  const status = billingStatus.subscription?.status;
   const renewsAt = billingStatus.subscription?.currentPeriodEnd;
 
   return (
-    <div className="premium-billing-panel">
-      {/* Hero Section */}
-      <div className="premium-billing-hero">
-        <div className="hero-status-glow" />
-        <div className="hero-content">
-          <span className="hero-pretitle">Statut de publication</span>
-          <div className="hero-title-row">
-            <h2>
-              {billingStatus.hasActiveSubscription
-                ? 'Abonnement Illimité Actif'
-                : billingStatus.availableCredits > 0
-                ? 'Crédit disponible'
-                : 'Paiement requis'}
-            </h2>
-          </div>
-          <p className="hero-desc">
-            {billingStatus.hasActiveSubscription
-              ? 'Votre abonnement est actif. Vous pouvez créer et publier des annonces en illimité.'
-              : billingStatus.availableCredits > 0
-              ? "Un crédit prépayé est disponible sur votre compte. Il sera débité automatiquement lorsqu'un candidat acceptera l'une de vos missions."
-              : 'Aucun abonnement actif ni crédit disponible. Veuillez souscrire à un abonnement ou acheter un crédit unitaire pour publier vos missions.'}
-          </p>
-          <p className="hero-desc" style={{ marginTop: '12px', fontSize: '13px', opacity: 0.85 }}>
-            Pour gérer vos modes de paiement, télécharger l'historique complet de vos factures, modifier ou résilier votre abonnement actuel, accédez à votre espace de gestion Stripe sécurisé en cliquant sur le bouton ci-dessous.
-          </p>
-
-          <div className="premium-billing-actions">
-            <Button
-              type="button"
-              variant="light"
-              disabled={!billingStatus.stripeConfigured || busy}
-              onClick={onOpenPortal}
-            >
-              {busy ? 'Ouverture...' : 'Gérer mon abonnement sur Stripe'}
-            </Button>
-          </div>
-        </div>
+    <div className="premium-billing-panel" style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div className="premium-pricing-section" style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <h3>État de votre compte</h3>
       </div>
 
-      {/* KPI Grid */}
-      <div className="premium-kpi-grid">
-        <div className="premium-kpi-card highlight-kpi">
-          <div className="kpi-info">
-            <span>Crédits disponibles</span>
-            <strong>{billingStatus.availableCredits}</strong>
-            <small>Prêts à l'usage</small>
+      <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+        {/* Card 1: Available Credits */}
+        <div className="premium-plan-card active-plan" style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}>
+          <div className="plan-header">
+            <span className="plan-badge">Publications</span>
+            <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Crédits disponibles</h4>
           </div>
+          <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0' }}>
+            <strong style={{ fontSize: '36px' }}>{billingStatus.availableCredits}</strong>
+            <span style={{ fontSize: '16px', marginLeft: '6px' }}>crédits</span>
+          </div>
+          <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+            {billingStatus.consumedCredits} publications utilisées au total.
+          </p>
         </div>
 
-        <div className="premium-kpi-card">
-          <div className="kpi-info">
-            <span>Publications utilisées</span>
-            <strong>{billingStatus.consumedCredits}</strong>
-            <small>Total sur l'établissement</small>
-          </div>
-        </div>
-
-        <div
-          className={`premium-kpi-card status-card ${
-            billingStatus.hasActiveSubscription ? 'subscribed' : 'unsubscribed'
-          }`}
+        {/* Card 2: Subscription Status */}
+        <div 
+          className={`premium-plan-card ${billingStatus.hasActiveSubscription ? 'active-plan' : ''}`} 
+          style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}
         >
-          <div className="kpi-info">
-            <span>Abonnement</span>
-            <strong>{status || 'Inactif'}</strong>
-            <small>{billingStatus.hasActiveSubscription ? 'Accès illimité' : 'Mode à la carte'}</small>
+          <div className="plan-header">
+            <span className="plan-badge badge-neutral">Abonnement</span>
+            <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Statut de l'abonnement</h4>
           </div>
-        </div>
-
-        <div className="premium-kpi-card">
-          <div className="kpi-info">
-            <span>Renouvellement</span>
-            <strong>{renewsAt ? formatDate(renewsAt) : '-'}</strong>
-            <small>{renewsAt ? 'Reconduction automatique' : 'Aucun engagement'}</small>
-          </div>
+          
+          {billingStatus.hasActiveSubscription ? (
+            <>
+              <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--teal)' }}>
+                <strong style={{ fontSize: '28px' }}>Abonnement Actif</strong>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+                Prochain renouvellement : {renewsAt ? formatDate(renewsAt) : '-'}
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--muted)' }}>
+                <strong style={{ fontSize: '24px' }}>Pas d'abonnement actif</strong>
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+                Vous utilisez actuellement le mode de paiement à l'unité (crédits).
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>
