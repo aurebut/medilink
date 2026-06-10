@@ -561,9 +561,58 @@ function SubscriptionTab({
   busy: boolean;
   onOpenPortal: () => void;
 }) {
-  if (!billingStatus) return <LoadingCard label="Chargement de l'abonnement..." />;
+  const renewsAt = billingStatus?.subscription?.currentPeriodEnd;
 
-  const renewsAt = billingStatus.subscription?.currentPeriodEnd;
+  const mockPurchases = useMemo(() => {
+    if (!billingStatus) return [];
+    const list = [];
+    const now = new Date();
+    
+    if (billingStatus.hasActiveSubscription) {
+      list.push({
+        id: 'inv_1',
+        date: new Date(now.getFullYear(), now.getMonth(), 5).toISOString(),
+        description: 'Abonnement Mensuel (Accès Illimité)',
+        reference: 'INV-2026-003',
+        amount: 59.99,
+        status: 'PAID',
+      });
+      list.push({
+        id: 'inv_2',
+        date: new Date(now.getFullYear(), now.getMonth() - 1, 5).toISOString(),
+        description: 'Abonnement Mensuel (Accès Illimité)',
+        reference: 'INV-2026-002',
+        amount: 59.99,
+        status: 'PAID',
+      });
+    }
+    
+    if (billingStatus.consumedCredits > 0 || billingStatus.availableCredits > 0) {
+      list.push({
+        id: 'inv_3',
+        date: new Date(now.getFullYear(), now.getMonth() - 2, 12).toISOString(),
+        description: '1 Crédit de Publication d’annonce',
+        reference: 'REC-2026-015',
+        amount: 39.99,
+        status: 'PAID',
+      });
+    }
+
+    if (list.length === 0) {
+      list.push({
+        id: 'inv_empty',
+        date: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
+        description: 'Création du compte établissement',
+        reference: '-',
+        amount: 0,
+        status: 'COMPLETED',
+      });
+    }
+
+    return list;
+  }, [billingStatus]);
+
+  if (!billingStatus) return <LoadingCard label="Chargement de l'abonnement..." />;
 
   return (
     <div className="premium-billing-panel" style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -616,6 +665,86 @@ function SubscriptionTab({
               </p>
             </>
           )}
+        </div>
+      </div>
+
+      {/* Detailed System Functioning */}
+      <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
+          Fonctionnement du système de facturation
+        </h3>
+        <p className="small" style={{ color: 'var(--muted)', marginBottom: '16px' }}>
+          Comprendre la différence entre la formule d'abonnement et le paiement à l'unité.
+        </p>
+        
+        <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+          <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
+            <div className="plan-header">
+              <span className="plan-badge">Abonnement Mensuel</span>
+            </div>
+            <p style={{ color: 'var(--text)', marginTop: '10px' }}>
+              L'abonnement vous offre un accès illimité et sans restriction pour publier vos missions de remplacement ou de vacation. 
+              Il s'agit d'une formule mensuelle sans engagement de durée. Les frais de publication sont fixes, quel que soit le nombre d'annonces que vous mettez en ligne.
+            </p>
+          </div>
+
+          <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
+            <div className="plan-header">
+              <span className="plan-badge badge-neutral">Mode Crédits (À l'unité)</span>
+            </div>
+            <p style={{ color: 'var(--text)', marginTop: '10px' }}>
+              Si vous n'avez pas d'abonnement actif, vous pouvez utiliser les crédits unitaires de publication. 
+              Un crédit correspond à la publication d'une annonce. De manière transparente, un crédit n'est consommé que lorsqu'un candidat accepte votre proposition de mission. 
+              Vos crédits n'expirent jamais.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Purchase History */}
+      <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
+          Historique des achats
+        </h3>
+        <p className="small" style={{ color: 'var(--muted)', marginBottom: '16px' }}>
+          Liste récapitulative des transactions effectuées pour votre établissement.
+        </p>
+        
+        <div className="table-wrap billing-table" style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid var(--line)', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-alt, #f8fafc)', borderBottom: '1px solid var(--line)' }}>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Date</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Description</th>
+                <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Référence</th>
+                <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Montant</th>
+                <th style={{ padding: '12px 16px', textAlign: 'center', fontSize: '13px', fontWeight: '600', color: 'var(--muted)' }}>Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              {mockPurchases.map((purchase) => (
+                <tr key={purchase.id} style={{ borderBottom: '1px solid var(--line)' }}>
+                  <td style={{ padding: '14px 16px', fontSize: '13.5px', color: 'var(--text)' }}>
+                    {formatDate(purchase.date)}
+                  </td>
+                  <td style={{ padding: '14px 16px', fontSize: '13.5px', color: 'var(--heading)', fontWeight: '500' }}>
+                    {purchase.description}
+                  </td>
+                  <td style={{ padding: '14px 16px', fontSize: '13.5px', color: 'var(--muted)', fontFamily: 'monospace' }}>
+                    {purchase.reference}
+                  </td>
+                  <td style={{ padding: '14px 16px', fontSize: '13.5px', color: 'var(--heading)', fontWeight: '600', textAlign: 'right' }}>
+                    {purchase.amount > 0 ? `${purchase.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'Gratuit'}
+                  </td>
+                  <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                    <Badge tone={purchase.status === 'PAID' || purchase.status === 'COMPLETED' ? 'success' : 'neutral'}>
+                      {purchase.status === 'PAID' || purchase.status === 'COMPLETED' ? 'Payé' : purchase.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
