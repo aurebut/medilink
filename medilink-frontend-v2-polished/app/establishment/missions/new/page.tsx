@@ -660,7 +660,7 @@ export default function NewMissionPage() {
           <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
         ) : billingStatus.availableCredits > 0 ? (
           <Alert type="success">
-            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Il sera débité quand un candidat acceptera la mission.
+            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand un candidat acceptera la mission.
           </Alert>
         ) : null}
         <Card className="wizard-panel">
