@@ -660,7 +660,7 @@ export default function NewMissionPage() {
           <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
         ) : billingStatus.availableCredits > 0 ? (
           <Alert type="success">
-            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand un candidat acceptera la mission.
+            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand la mission sera confirmée avec le candidat.
           </Alert>
         ) : null}
         <Card className="wizard-panel">
@@ -908,7 +908,7 @@ function PublicationAccessGate({
           <div className="toolbar" style={{ marginBottom: 12 }}>
             <div>
               <h2>Votre annonce reste acquise</h2>
-              <p>Si vous payez une publication unique, le crédit reste disponible tant qu'aucun candidat n'a accepté une mission.</p>
+              <p>Si vous payez une publication unique, le crédit reste disponible tant que la mission n'a pas été confirmée avec un candidat.</p>
             </div>
             <Badge tone="neutral">Établissement</Badge>
           </div>
@@ -951,7 +951,7 @@ function PublicationAccessGate({
           <div>
             <Badge tone="neutral">A l'unite</Badge>
             <h2>Credit de publication</h2>
-            <p>Pour publier une annonce unique, avec un crédit débité seulement après acceptation candidat.</p>
+            <p>Pour publier une annonce unique, avec un crédit débité seulement après la confirmation de la mission avec le candidat.</p>
           </div>
           <div className="publication-price">
             <strong>{creditAmount}</strong>
@@ -959,7 +959,7 @@ function PublicationAccessGate({
           </div>
           <ul className="publication-plan-list">
             <li>Valable pour une annonce</li>
-            <li>Réservé à la publication, débité à l'acceptation candidat</li>
+            <li>Réservé à la publication, débité à la confirmation de la mission avec le candidat</li>
             <li>Permet aussi de preparer un brouillon</li>
           </ul>
           <Button type="button" variant="secondary" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onBuyCredit}>
