@@ -49,8 +49,10 @@ const agendaSections: Array<{ id: AgendaSection; label: string }> = [
 ];
 
 export default function CandidateAgendaPage() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const cachedApplications = api.getSync<Application[]>('/me/applications');
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
+  const [applications, setApplications] = useState<Application[]>(cachedApplications || []);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
   const [activeSection, setActiveSection] = useState<AgendaSection>('calendar');
   const [calendarMonth, setCalendarMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [calendarAnimation, setCalendarAnimation] = useState<'next' | 'prev' | 'jump'>('jump');
@@ -60,7 +62,7 @@ export default function CandidateAgendaPage() {
   const [draftNote, setDraftNote] = useState('');
   const [noteEditing, setNoteEditing] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!(cachedApplications && cachedConversations));
 
   useEffect(() => {
     try {

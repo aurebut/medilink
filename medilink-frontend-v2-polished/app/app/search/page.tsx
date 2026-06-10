@@ -55,14 +55,16 @@ const secondaryFilterKeys = [
 ];
 
 export default function SearchMissionsPage() {
+  const cachedMissions = api.getSync<Paginated<Mission>>('/missions?limit=50');
+  const cachedApplications = api.getSync<Application[]>('/me/applications');
   const [activeTab, setActiveTab] = useState<SearchTab>('missions');
-  const [items, setItems] = useState<Mission[]>([]);
-  const [total, setTotal] = useState(0);
+  const [items, setItems] = useState<Mission[]>(cachedMissions?.items || []);
+  const [total, setTotal] = useState(cachedMissions?.total || 0);
   const [filters, setFilters] = useState(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [extraFiltersOpen, setExtraFiltersOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedMissions);
 
   const activeFilters = Object.values(filters).filter(Boolean).length;
   const activeSecondaryFilters = secondaryFilterKeys.filter(
@@ -70,8 +72,8 @@ export default function SearchMissionsPage() {
   ).length;
 
   // Applications state
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [applicationsLoading, setApplicationsLoading] = useState(true);
+  const [applications, setApplications] = useState<Application[]>(cachedApplications || []);
+  const [applicationsLoading, setApplicationsLoading] = useState(!cachedApplications);
 
   async function loadMissions(currentFilters = filters, options: { silent?: boolean; reload?: boolean } = {}) {
     if (!options.silent) setLoading(true);

@@ -125,10 +125,11 @@ function remainingActions(row: AccountingRow) {
 export default function BillingMissionDetailPage() {
   const params = useParams<{ rowId: string }>();
   const rowId = decodeURIComponent(params.rowId);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
+  const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
   const [storageReady, setStorageReady] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 

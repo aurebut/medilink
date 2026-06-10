@@ -6,8 +6,9 @@ import type { Establishment } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 export function useEstablishments() {
-  const [establishments, setEstablishments] = useState<Establishment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedEstablishments = api.getSync<Establishment[]>('/establishments/me');
+  const [establishments, setEstablishments] = useState<Establishment[]>(cachedEstablishments || []);
+  const [loading, setLoading] = useState(!cachedEstablishments);
   const [error, setError] = useState<string | null>(null);
 
   async function load(options: { silent?: boolean; reload?: boolean } = {}) {

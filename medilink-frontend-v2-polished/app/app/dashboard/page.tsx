@@ -86,12 +86,13 @@ function getNotificationLinkLabel(notification: Notification) {
 }
 
 export default function CandidateDashboardPage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedDashboard = api.getSync<CandidateDashboardData>('/me/dashboard');
+  const [profile, setProfile] = useState<Profile | null>(cachedDashboard?.profile || null);
+  const [documents, setDocuments] = useState<Document[]>(cachedDashboard?.documents || []);
+  const [applications, setApplications] = useState<Application[]>(cachedDashboard?.applications || []);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedDashboard?.conversations || []);
+  const [notifications, setNotifications] = useState<Notification[]>(cachedDashboard?.notifications || []);
+  const [loading, setLoading] = useState(!cachedDashboard);
 
   function applyDashboardData(data: CandidateDashboardData) {
     primeApiCache('/me/profile', data.profile);

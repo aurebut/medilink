@@ -32,8 +32,9 @@ function getNotificationLinkLabel(notification: Notification) {
 }
 
 export default function RecruiterNotificationsPage() {
-  const [items, setItems] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedNotifications = api.getSync<Notification[]>('/notifications');
+  const [items, setItems] = useState<Notification[]>(cachedNotifications || []);
+  const [loading, setLoading] = useState(!cachedNotifications);
   const [error, setError] = useState<string | null>(null);
 
   async function load(options: { silent?: boolean; reload?: boolean } = {}) {

@@ -9,9 +9,11 @@ import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 export default function CandidateMissionHistoryPage() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedApplications = api.getSync<Application[]>('/me/applications');
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
+  const [applications, setApplications] = useState<Application[]>(cachedApplications || []);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
+  const [loading, setLoading] = useState(!(cachedApplications && cachedConversations));
 
   async function load(options: { reload?: boolean } = {}) {
     const read = options.reload ? api.reload : api.get;

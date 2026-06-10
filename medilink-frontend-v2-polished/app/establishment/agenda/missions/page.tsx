@@ -27,13 +27,27 @@ export default function EstablishmentMissionHistoryPage() {
       return;
     }
 
-    if (!options.silent) setLoading(true);
+    const missionsPath = `/missions/mine?establishmentId=${primary.id}`;
+    const applicationsPath = `/establishment/applications?establishmentId=${primary.id}`;
+    if (!options.silent) {
+      const cachedMissions = options.reload ? null : api.getSync<Mission[]>(missionsPath);
+      const cachedApplications = options.reload ? null : api.getSync<Application[]>(applicationsPath);
+      const cachedConversations = options.reload ? null : api.getSync<Conversation[]>('/conversations');
+      if (cachedMissions && cachedApplications && cachedConversations) {
+        setMissions(cachedMissions);
+        setApplications(cachedApplications);
+        setConversations(cachedConversations);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    }
     setError(null);
     try {
       const read = options.reload ? api.reload : api.get;
       const [m, a, c] = await Promise.all([
-        read<Mission[]>(`/missions/mine?establishmentId=${primary.id}`),
-        read<Application[]>(`/establishment/applications?establishmentId=${primary.id}`),
+        read<Mission[]>(missionsPath),
+        read<Application[]>(applicationsPath),
         read<Conversation[]>('/conversations'),
       ]);
       setMissions(m);

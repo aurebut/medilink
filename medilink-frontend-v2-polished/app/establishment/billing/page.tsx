@@ -210,14 +210,17 @@ function timelineSteps(row: AccountingRow) {
 
 export default function RecruiterBillingPage() {
   const { primary, loading: establishmentLoading } = useEstablishments();
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
   const [activeTab, setActiveTab] = useState<BillingTab>('overview');
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>(
+    cachedConversations && primary ? cachedConversations.filter((c) => c.establishmentId === primary.id) : [],
+  );
   const [manualRows, setManualRows] = useState<ManualExpense[]>([]);
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
   const [budgetLimit, setBudgetLimit] = useState(DEFAULT_BUDGET_LIMIT);
   const [selectedYear, setSelectedYear] = useState(getCurrentYear());
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'AVAILABLE' | 'PENDING' | 'COMPLETED' | 'MANUAL' | 'PROPOSED'>('ALL');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [billingStatus, setBillingStatus] = useState<EstablishmentBillingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -202,9 +202,17 @@ export default function EstablishmentCurrentMissionsPage() {
       return;
     }
 
-    setMissionsLoading(true);
-    setError(null);
     const applicationsPath = `/establishment/applications?establishmentId=${primary.id}`;
+    const cachedApplications = api.getSync<Application[]>(applicationsPath);
+    const cachedConversations = api.getSync<Conversation[]>('/conversations');
+    if (cachedApplications && cachedConversations) {
+      setApplications(cachedApplications);
+      setConversations(cachedConversations);
+      setMissionsLoading(false);
+    } else {
+      setMissionsLoading(true);
+    }
+    setError(null);
     const unsubscribeApplications = subscribeApiCache<Application[]>(applicationsPath, setApplications);
     const unsubscribeConversations = subscribeApiCache<Conversation[]>('/conversations', setConversations);
     Promise.all([

@@ -59,10 +59,18 @@ export default function EstablishmentMissionsPage() {
   async function loadMissions(options: { silent?: boolean; reload?: boolean } = {}) {
     if (!primary) return;
 
-    if (!options.silent) setMissionsLoading(true);
+    const path = `/missions/mine?establishmentId=${primary.id}`;
+    if (!options.silent) {
+      const cachedMissions = options.reload ? null : api.getSync<Mission[]>(path);
+      if (cachedMissions) {
+        setMissions(cachedMissions);
+        setMissionsLoading(false);
+      } else {
+        setMissionsLoading(true);
+      }
+    }
     try {
       setError(null);
-      const path = `/missions/mine?establishmentId=${primary.id}`;
       setMissions(options.reload
         ? await api.reload<Mission[]>(path)
         : await api.get<Mission[]>(path));
@@ -76,10 +84,18 @@ export default function EstablishmentMissionsPage() {
   async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
     if (!primary) return;
 
-    if (!options.silent) setApplicationsLoading(true);
+    const path = `/establishment/applications?establishmentId=${primary.id}`;
+    if (!options.silent) {
+      const cachedApplications = options.reload ? null : api.getSync<Application[]>(path);
+      if (cachedApplications) {
+        setApplications(cachedApplications);
+        setApplicationsLoading(false);
+      } else {
+        setApplicationsLoading(true);
+      }
+    }
     try {
       setError(null);
-      const path = `/establishment/applications?establishmentId=${primary.id}`;
       const data = options.reload
         ? await api.reload<Application[]>(path)
         : await api.get<Application[]>(path);

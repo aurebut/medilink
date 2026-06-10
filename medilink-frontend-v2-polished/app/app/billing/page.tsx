@@ -165,14 +165,15 @@ function timelineSteps(row: AccountingRow) {
 }
 
 export default function CandidateBillingPage() {
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
   const [activeTab, setActiveTab] = useState<BillingTab>('overview');
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
   const [manualRows, setManualRows] = useState<ManualRevenue[]>([]);
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
   const [provisionRate, setProvisionRate] = useState(DEFAULT_PROVISION_RATE);
   const [selectedYear, setSelectedYear] = useState(getCurrentYear());
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'AVAILABLE' | 'PENDING' | 'COMPLETED' | 'MANUAL' | 'PROPOSED'>('ALL');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 

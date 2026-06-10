@@ -44,15 +44,37 @@ function missionSchedule(mission: Mission) {
 export default function EstablishmentMissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [mission, setMission] = useState<Mission | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedMission = api.getSync<Mission>(`/missions/mine/${id}`);
+  const cachedApplications = cachedMission
+    ? api.getSync<Application[]>(`/establishment/applications?establishmentId=${cachedMission.establishmentId}`)
+    : null;
+  const [mission, setMission] = useState<Mission | null>(cachedMission || null);
+  const [applications, setApplications] = useState<Application[]>(
+    cachedApplications && cachedMission
+      ? cachedApplications.filter((application) => application.missionId === cachedMission.id)
+      : [],
+  );
+  const [loading, setLoading] = useState(!cachedMission);
   const [statusBusy, setStatusBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   async function load(options: { silent?: boolean; reload?: boolean } = {}) {
-    if (!options.silent) setLoading(true);
+    if (!options.silent) {
+      const nextCachedMission = options.reload ? null : api.getSync<Mission>(`/missions/mine/${id}`);
+      const nextCachedApplications = nextCachedMission && !options.reload
+        ? api.getSync<Application[]>(`/establishment/applications?establishmentId=${nextCachedMission.establishmentId}`)
+        : null;
+      if (nextCachedMission) {
+        setMission(nextCachedMission);
+        setApplications(nextCachedApplications
+          ? nextCachedApplications.filter((application) => application.missionId === nextCachedMission.id)
+          : []);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    }
     setError(null);
 
     try {

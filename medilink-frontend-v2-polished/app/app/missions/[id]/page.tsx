@@ -153,14 +153,29 @@ function MissionAnnouncementView({
 
 export default function CandidateMissionDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [publicMission, setPublicMission] = useState<Mission | null>(null);
-  const [loading, setLoading] = useState(true);
+  const cachedApplications = api.getSync<Application[]>('/me/applications');
+  const cachedConversations = api.getSync<Conversation[]>('/conversations');
+  const cachedMission = api.getSync<Mission>(`/missions/${id}`);
+  const [applications, setApplications] = useState<Application[]>(cachedApplications || []);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
+  const [publicMission, setPublicMission] = useState<Mission | null>(cachedMission || null);
+  const [loading, setLoading] = useState(!(cachedApplications && cachedConversations));
   const [error, setError] = useState<string | null>(null);
 
   async function load(options: { silent?: boolean; reload?: boolean } = {}) {
-    if (!options.silent) setLoading(true);
+    if (!options.silent) {
+      const nextCachedApplications = options.reload ? null : api.getSync<Application[]>('/me/applications');
+      const nextCachedConversations = options.reload ? null : api.getSync<Conversation[]>('/conversations');
+      const nextCachedMission = options.reload ? null : api.getSync<Mission>(`/missions/${id}`);
+      if (nextCachedApplications && nextCachedConversations) {
+        setApplications(nextCachedApplications);
+        setConversations(nextCachedConversations);
+        setPublicMission(nextCachedMission || null);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    }
     try {
       const read = options.reload ? api.reload : api.get;
       const [nextApplications, nextConversations, nextMission] = await Promise.all([

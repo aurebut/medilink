@@ -29,14 +29,23 @@ export default function MissionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
-  const [mission, setMission] = useState<Mission | null>(null);
+  const cachedMission = api.getSync<Mission>(`/missions/${id}`);
+  const [mission, setMission] = useState<Mission | null>(cachedMission || null);
   const [canManageMission, setCanManageMission] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedMission);
 
   async function loadMission(options: { silent?: boolean; reload?: boolean } = {}) {
     if (authLoading) return;
-    if (!options.silent) setLoading(true);
+    if (!options.silent) {
+      const nextCachedMission = options.reload ? null : api.getSync<Mission>(`/missions/${id}`);
+      if (nextCachedMission) {
+        setMission(nextCachedMission);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+    }
     setError(null);
     setCanManageMission(false);
 

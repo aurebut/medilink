@@ -49,11 +49,12 @@ function messagePreview(body?: string | null) {
 }
 
 export default function EstablishmentDashboardPage() {
-  const [primary, setPrimary] = useState<Establishment | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [missions, setMissions] = useState<Mission[]>([]);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [dashboardLoading, setDashboardLoading] = useState(true);
+  const cachedDashboard = api.getSync<EstablishmentDashboardData>('/establishment/dashboard');
+  const [primary, setPrimary] = useState<Establishment | null>(cachedDashboard?.establishment || null);
+  const [applications, setApplications] = useState<Application[]>(cachedDashboard?.applications || []);
+  const [missions, setMissions] = useState<Mission[]>(cachedDashboard?.missions || []);
+  const [conversations, setConversations] = useState<Conversation[]>(cachedDashboard?.conversations || []);
+  const [dashboardLoading, setDashboardLoading] = useState(!cachedDashboard);
 
   function applyDashboardData(data: EstablishmentDashboardData) {
     setPrimary(data.establishment);

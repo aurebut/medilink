@@ -74,11 +74,12 @@ function checklistStatusTone(doc?: Document) {
 }
 
 export function DocumentSection() {
-  const [documents, setDocuments] = useState<Document[]>([]);
+  const cachedDocuments = api.getSync<Document[]>('/me/documents');
+  const [documents, setDocuments] = useState<Document[]>(cachedDocuments || []);
   const [documentType, setDocumentType] = useState<DocumentType>('CV');
   const [file, setFile] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedDocuments);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

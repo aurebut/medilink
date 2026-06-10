@@ -46,12 +46,13 @@ const profileTabs: Array<{ id: ProfileTab; label: string }> = [
 ];
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [form, setForm] = useState<any>({});
+  const cachedProfile = api.getSync<Profile>('/me/profile');
+  const [profile, setProfile] = useState<Profile | null>(cachedProfile || null);
+  const [form, setForm] = useState<any>(cachedProfile ? { ...cachedProfile, actsPerformedText: (cachedProfile.actsPerformed || []).join(', ') } : {});
   const [activeTab, setActiveTab] = useState<ProfileTab>('identity');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarInputKey, setAvatarInputKey] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedProfile);
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [verifyingHealth, setVerifyingHealth] = useState(false);
