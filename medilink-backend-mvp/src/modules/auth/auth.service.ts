@@ -291,6 +291,51 @@ export class AuthService {
     return { message: 'Mot de passe réinitialisé.' };
   }
 
+  async deleteAccount(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new BadRequestException('Utilisateur introuvable.');
+    }
+
+    const anonymizedEmail = `deleted_${userId}_${Date.now()}@deleted.medilink.fr`;
+
+    await this.prisma.$transaction(async (tx) => {
+      // 1. Delete associated profile (which cascades to UserSkill)
+      await tx.profile.deleteMany({ where: { userId } });
+
+      // 2. Delete establishment memberships
+      await tx.establishmentMember.deleteMany({ where: { userId } });
+
+      // 3. Anonymize user record, soft-delete, and nullify phone/password
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          status: UserStatus.DELETED,
+          deletedAt: new Date(),
+          email: anonymizedEmail,
+          phone: null,
+          passwordHash: '',
+          emailVerified: false,
+        },
+      });
+
+      // 4. Revoke all active sessions
+      await tx.session.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: new Date() },
+      });
+    });
+
+    await this.audit.log({
+      actorUserId: userId,
+      action: 'user.deleted',
+      entityType: 'user',
+      entityId: userId,
+    });
+
+    return { message: 'Compte supprimé avec succès.' };
+  }
+
   private toSafeUser(user: any) {
     return {
       id: user.id,

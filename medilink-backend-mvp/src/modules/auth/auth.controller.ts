@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response, Request } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -49,6 +49,17 @@ export class AuthController {
   @UseGuards(AuthGuard)
   me(@CurrentUser() user: RequestUser) {
     return user;
+  }
+
+  @Delete('me')
+  @UseGuards(AuthGuard)
+  async deleteAccount(
+    @CurrentUser() user: RequestUser,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.auth.deleteAccount(user.id);
+    res.clearCookie(this.cookieName(), this.cookieOptions());
+    return result;
   }
 
   @Post('verify-email')
