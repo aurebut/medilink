@@ -228,7 +228,8 @@ export default function NewMissionPage() {
   const [draftMissionId, setDraftMissionId] = useState<string | null>(null);
   const [draftStatus, setDraftStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [loadingDraft, setLoadingDraft] = useState(false);
-  const [showCreditAlert, setShowCreditAlert] = useState(false);
+  const [creditAlertVisible, setCreditAlertVisible] = useState(false);
+  const [creditAlertFading, setCreditAlertFading] = useState(false);
   const draftMissionIdRef = useRef<string | null>(null);
   const draftDirtyRef = useRef(false);
   const autosaveInFlightRef = useRef(false);
@@ -263,15 +264,26 @@ export default function NewMissionPage() {
 
   useEffect(() => {
     if (showWizard && billingStatus && billingStatus.availableCredits > 0) {
-      setShowCreditAlert(true);
+      setCreditAlertVisible(true);
+      setCreditAlertFading(false);
       const timer = setTimeout(() => {
-        setShowCreditAlert(false);
+        setCreditAlertFading(true);
       }, 3000);
       return () => clearTimeout(timer);
     } else {
-      setShowCreditAlert(false);
+      setCreditAlertVisible(false);
+      setCreditAlertFading(false);
     }
   }, [showWizard, billingStatus?.availableCredits]);
+
+  useEffect(() => {
+    if (creditAlertFading) {
+      const timer = setTimeout(() => {
+        setCreditAlertVisible(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [creditAlertFading]);
 
   useEffect(() => {
     if (loading) return;
@@ -701,10 +713,19 @@ export default function NewMissionPage() {
         ) : null}
         {billingStatus.hasActiveSubscription ? (
           <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
-        ) : (billingStatus.availableCredits > 0 && showCreditAlert) ? (
-          <Alert type="success">
-            {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand la mission sera confirmée avec le candidat.
-          </Alert>
+        ) : creditAlertVisible ? (
+          <div
+            style={{
+              opacity: creditAlertFading ? 0 : 1,
+              maxHeight: creditAlertFading ? 0 : '120px',
+              overflow: 'hidden',
+              transition: 'all 500ms cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            <Alert type="success">
+              {billingStatus.availableCredits} crédit{billingStatus.availableCredits > 1 ? 's' : ''} de publication disponible{billingStatus.availableCredits > 1 ? 's' : ''}. Un crédit sera consommé quand la mission sera confirmée avec le candidat.
+            </Alert>
+          </div>
         ) : null}
         <Card className="wizard-panel">
           <div className="wizard-progress">
