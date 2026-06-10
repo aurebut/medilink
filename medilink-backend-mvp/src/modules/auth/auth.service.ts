@@ -264,6 +264,11 @@ export class AuthService {
       throw new BadRequestException('Lien de réinitialisation invalide ou expiré.');
     }
 
+    const validOldPassword = await bcrypt.compare(dto.oldPassword, record.user.passwordHash);
+    if (!validOldPassword) {
+      throw new BadRequestException("L'ancien mot de passe est incorrect.");
+    }
+
     const passwordHash = await bcrypt.hash(dto.newPassword, 12);
 
     await this.prisma.$transaction([
