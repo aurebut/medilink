@@ -293,6 +293,8 @@ export class AuthService {
       entityId: record.userId,
     });
 
+    await this.emailService.sendPasswordChangedSuccessEmail(record.userId, record.user.email);
+
     return { message: 'Mot de passe réinitialisé.' };
   }
 
