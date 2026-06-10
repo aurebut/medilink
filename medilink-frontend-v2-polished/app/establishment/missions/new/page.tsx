@@ -242,13 +242,27 @@ export default function NewMissionPage() {
     [establishments, primary, selectedEstablishmentId],
   );
 
+  const drafts = useMemo(() => {
+    return billingStatus ? mergeDraftSummaries(existingDrafts, billingStatus.drafts) : [];
+  }, [existingDrafts, billingStatus]);
+
+  const hasAccessToCreate = useMemo(() => {
+    if (!billingStatus) return false;
+    return billingStatus.hasActiveSubscription || (billingStatus.availableCredits - drafts.length > 0);
+  }, [billingStatus, drafts]);
+
+  const showWizard = useMemo(() => {
+    if (!billingStatus) return false;
+    return Boolean(draftMissionId) || (hasAccessToCreate && forceNewMission) || (billingStatus.hasActiveSubscription && !forceShowPaymentGate && drafts.length === 0);
+  }, [draftMissionId, hasAccessToCreate, forceNewMission, billingStatus, forceShowPaymentGate, drafts]);
+
   useEffect(() => {
     if (!primary || selectedEstablishmentId) return;
     setSelectedEstablishmentId(primary.id);
   }, [primary, selectedEstablishmentId]);
 
   useEffect(() => {
-    if (billingStatus && billingStatus.availableCredits > 0) {
+    if (showWizard && billingStatus && billingStatus.availableCredits > 0) {
       setShowCreditAlert(true);
       const timer = setTimeout(() => {
         setShowCreditAlert(false);
@@ -257,7 +271,7 @@ export default function NewMissionPage() {
     } else {
       setShowCreditAlert(false);
     }
-  }, [billingStatus?.availableCredits]);
+  }, [showWizard, billingStatus?.availableCredits]);
 
   useEffect(() => {
     if (loading) return;
@@ -651,9 +665,6 @@ export default function NewMissionPage() {
 
   if (billingLoading || draftsLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
 
-  const drafts = mergeDraftSummaries(existingDrafts, billingStatus.drafts);
-  const hasAccessToCreate = billingStatus.hasActiveSubscription || (billingStatus.availableCredits - drafts.length > 0);
-  const showWizard = Boolean(draftMissionId) || (hasAccessToCreate && forceNewMission) || (billingStatus.hasActiveSubscription && !forceShowPaymentGate && drafts.length === 0);
 
   if (!showWizard) {
     return (
