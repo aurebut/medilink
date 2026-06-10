@@ -557,6 +557,8 @@ export default function NewMissionPage() {
     draftMissionIdRef.current = null;
     draftDirtyRef.current = false;
     hasSubmittedRef.current = false;
+    setForceNewMission(false);
+    setForceShowPaymentGate(false);
   }
 
   async function startBillingCheckout(kind: 'subscription' | 'credit') {
@@ -618,31 +620,12 @@ export default function NewMissionPage() {
   if (billingLoading || draftsLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
 
   const drafts = mergeDraftSummaries(existingDrafts, billingStatus.drafts);
-  const localCanCreateMission = billingStatus.hasActiveSubscription || (billingStatus.availableCredits - drafts.length) > 0;
-  const hasBlockingDrafts = !billingStatus.hasActiveSubscription && drafts.length > 0 && !localCanCreateMission;
-  const showDraftIntermediary = hasBlockingDrafts && !draftMissionId && !forceNewMission && !forceShowPaymentGate;
+  const hasAccessToCreate = billingStatus.hasActiveSubscription || (billingStatus.availableCredits - drafts.length > 0);
+  const showWizard = Boolean(draftMissionId) || (hasAccessToCreate && forceNewMission) || (billingStatus.hasActiveSubscription && !forceShowPaymentGate && drafts.length === 0);
 
-  if (showDraftIntermediary) {
+  if (!showWizard) {
     return (
-      <DraftIntermediaryPage
-        drafts={drafts}
-        establishments={establishments}
-        selectedEstablishmentId={selectedEstablishmentId}
-        setSelectedEstablishmentId={setSelectedEstablishmentId}
-        onShowPayment={() => setForceShowPaymentGate(true)}
-        onDeleted={(draftId) => {
-          setExistingDrafts((current) => current.filter((draft) => draft.id !== draftId));
-          setBillingTrigger((t) => t + 1);
-        }}
-        canCreateNew={localCanCreateMission}
-        onCreateNew={() => setForceNewMission(true)}
-      />
-    );
-  }
-
-  if (forceShowPaymentGate || !localCanCreateMission) {
-    return (
-      <PublicationPaymentGate
+      <PublicationAccessGate
         establishments={establishments}
         selectedEstablishmentId={selectedEstablishmentId}
         setSelectedEstablishmentId={setSelectedEstablishmentId}
@@ -653,6 +636,12 @@ export default function NewMissionPage() {
         busy={billingBusy}
         onSubscribe={() => void startBillingCheckout('subscription')}
         onBuyCredit={() => void startBillingCheckout('credit')}
+        onCreateNew={() => setForceNewMission(true)}
+        drafts={drafts}
+        onDeleted={(draftId) => {
+          setExistingDrafts((current) => current.filter((draft) => draft.id !== draftId));
+          setBillingTrigger((t) => t + 1);
+        }}
       />
     );
   }
@@ -738,7 +727,7 @@ export default function NewMissionPage() {
   );
 }
 
-function PublicationPaymentGate({
+function PublicationAccessGate({
   establishments,
   selectedEstablishmentId,
   setSelectedEstablishmentId,
@@ -749,6 +738,9 @@ function PublicationPaymentGate({
   busy,
   onSubscribe,
   onBuyCredit,
+  onCreateNew,
+  drafts,
+  onDeleted,
 }: {
   establishments: Establishment[];
   selectedEstablishmentId: string;
@@ -760,15 +752,41 @@ function PublicationPaymentGate({
   busy: 'subscription' | 'credit' | null;
   onSubscribe: () => void;
   onBuyCredit: () => void;
+  onCreateNew: () => void;
+  drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
+  onDeleted: (draftId: string) => void;
 }) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleDelete(draftId: string) {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer définitivement ce brouillon ? Cette action libèrera votre crédit de publication.")) {
+      return;
+    }
+
+    setDeletingId(draftId);
+    setDeleteError(null);
+    try {
+      await api.delete(`/missions/${draftId}`);
+      clearApiCache('/establishment/dashboard');
+      onDeleted(draftId);
+    } catch (err: any) {
+      setDeleteError(err.message || "Impossible de supprimer le brouillon.");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const subscriptionAmount = formatCents(billingStatus.prices.monthlySubscription.amount, billingStatus.prices.monthlySubscription.currency);
   const creditAmount = formatCents(billingStatus.prices.publicationCredit.amount, billingStatus.prices.publicationCredit.currency);
+
+  const freeCredits = billingStatus.hasActiveSubscription ? 0 : Math.max(0, billingStatus.availableCredits - drafts.length);
 
   return (
     <div className="new-mission-page">
       <PageHeader
         title="Publier une annonce"
-        description="Choisissez votre mode d'accès avant de remplir le formulaire. Aucun formulaire long ne vous est demandé avant paiement."
+        description="Choisissez votre mode d'accès ou gérez vos brouillons avant de remplir le formulaire."
       />
 
       {billingReturnStatus === 'credit-success' ? (
@@ -776,31 +794,138 @@ function PublicationPaymentGate({
       ) : billingNotice ? (
         <Alert type="info">{billingNotice}</Alert>
       ) : null}
-      {error ? <Alert type="error">{error}</Alert> : null}
+      {error || deleteError ? <Alert type="error">{error || deleteError}</Alert> : null}
       {!billingStatus.stripeConfigured ? (
         <Alert type="error">Stripe n'est pas encore configure sur le serveur. Ajoutez les cles Render avant d'activer les paiements.</Alert>
       ) : null}
 
-      <Card className="card-highlight publication-access-card">
-        <div className="toolbar">
-          <div>
-            <h2>Votre annonce reste acquise</h2>
-            <p>Si vous payez une publication unique, le crédit reste disponible tant qu'aucun candidat n'a accepté une mission.</p>
-          </div>
-          <Badge tone="warning">Paiement avant formulaire</Badge>
+      {/* 1. Bandeau de Crédit Disponible */}
+      {!billingStatus.hasActiveSubscription && freeCredits > 0 ? (
+        <div style={{ marginBottom: 24, border: '1px solid var(--success, #10b981)', borderRadius: 10, overflow: 'hidden' }}>
+          <Card className="card-highlight">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <Badge tone="success">Crédit disponible</Badge>
+                <h2 style={{ marginTop: 8, fontSize: 18 }}>Vous disposez de {freeCredits} crédit{freeCredits > 1 ? 's' : ''} de publication libre{freeCredits > 1 ? 's' : ''}</h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: 14, color: 'var(--muted)' }}>
+                  Vous pouvez créer une toute nouvelle mission immédiatement en utilisant l'un de vos crédits.
+                </p>
+              </div>
+              <Button type="button" onClick={onCreateNew}>
+                Créer une nouvelle mission
+              </Button>
+            </div>
+          </Card>
         </div>
+      ) : billingStatus.hasActiveSubscription ? (
+        <div style={{ marginBottom: 24, border: '1px solid var(--success, #10b981)', borderRadius: 10, overflow: 'hidden' }}>
+          <Card className="card-highlight">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <Badge tone="success">Abonnement actif</Badge>
+                <h2 style={{ marginTop: 8, fontSize: 18 }}>Création de missions illimitée</h2>
+                <p style={{ margin: '4px 0 0 0', fontSize: 14, color: 'var(--muted)' }}>
+                  Votre abonnement vous permet de publier autant d'annonces que vous le souhaitez sans frais supplémentaires.
+                </p>
+              </div>
+              <Button type="button" onClick={onCreateNew}>
+                Créer une nouvelle mission
+              </Button>
+            </div>
+          </Card>
+        </div>
+      ) : null}
 
-        <Field label="Etablissement">
-          <Select value={selectedEstablishmentId} onChange={(event) => setSelectedEstablishmentId(event.target.value)}>
-            {establishments.map((establishment) => (
-              <option key={establishment.id} value={establishment.id}>
-                {establishment.name}{establishment.city ? ` - ${establishment.city}` : ''}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </Card>
+      {/* 2. Liste des brouillons existants */}
+      {drafts.length > 0 ? (
+        <div style={{ marginBottom: 24 }}>
+          <Card className="card-highlight publication-access-card">
+            <div className="toolbar" style={{ marginBottom: 12 }}>
+              <div>
+                <h2>Brouillon{drafts.length > 1 ? 's' : ''} en cours trouvé{drafts.length > 1 ? 's' : ''}</h2>
+                <p>
+                  Vous pouvez reprendre l'un de vos brouillons existants ou le supprimer pour récupérer le crédit associé.
+                </p>
+              </div>
+              <Badge tone="warning">Action requise</Badge>
+            </div>
 
+            <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
+              {drafts.map((draft) => (
+                <div
+                  key={draft.id}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '16px 20px',
+                    background: 'rgba(20, 39, 74, 0.02)',
+                    border: '1px solid var(--line)',
+                    borderRadius: 10,
+                  }}
+                >
+                  <div>
+                    <strong style={{ fontSize: 16, color: 'var(--heading)' }}>{draft.title || 'Mission sans titre'}</strong>
+                    <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+                      <span>Spécialité : {draft.specialty || 'Non précisée'}</span>
+                      {draft.startDate ? (
+                        <>
+                          <span style={{ margin: '0 8px' }}>•</span>
+                          <span>Début le {formatDate(draft.startDate)}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button
+                      type="button"
+                      disabled={deletingId !== null}
+                      onClick={() => {
+                        window.location.href = `/establishment/missions/new?draftId=${draft.id}`;
+                      }}
+                    >
+                      Reprendre
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      disabled={deletingId !== null}
+                      onClick={() => void handleDelete(draft.id)}
+                    >
+                      {deletingId === draft.id ? 'Suppression...' : 'Supprimer & libérer'}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      ) : null}
+
+      {/* Sélecteur d'établissement */}
+      <div style={{ marginBottom: 24 }}>
+        <Card className="card-highlight publication-access-card">
+          <div className="toolbar" style={{ marginBottom: 12 }}>
+            <div>
+              <h2>Votre annonce reste acquise</h2>
+              <p>Si vous payez une publication unique, le crédit reste disponible tant qu'aucun candidat n'a accepté une mission.</p>
+            </div>
+            <Badge tone="neutral">Établissement</Badge>
+          </div>
+
+          <Field label="Etablissement rattaché">
+            <Select value={selectedEstablishmentId} onChange={(event) => setSelectedEstablishmentId(event.target.value)}>
+              {establishments.map((establishment) => (
+                <option key={establishment.id} value={establishment.id}>
+                  {establishment.name}{establishment.city ? ` - ${establishment.city}` : ''}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </Card>
+      </div>
+
+      {/* 3. Tarifs et abonnement (Stripe) */}
       <div className="publication-plan-grid">
         <Card className="publication-plan-card">
           <div>
@@ -1363,146 +1488,4 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
   );
 }
 
-function DraftIntermediaryPage({
-  drafts,
-  establishments,
-  selectedEstablishmentId,
-  setSelectedEstablishmentId,
-  onShowPayment,
-  onDeleted,
-  canCreateNew,
-  onCreateNew,
-}: {
-  drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
-  establishments: Establishment[];
-  selectedEstablishmentId: string;
-  setSelectedEstablishmentId: (id: string) => void;
-  onShowPayment: () => void;
-  onDeleted: (draftId: string) => void;
-  canCreateNew: boolean;
-  onCreateNew: () => void;
-}) {
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  async function handleDelete(draftId: string) {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer définitivement ce brouillon ? Cette action libèrera votre crédit de publication.")) {
-      return;
-    }
-
-    setDeletingId(draftId);
-    setDeleteError(null);
-    try {
-      await api.delete(`/missions/${draftId}`);
-      clearApiCache('/establishment/dashboard');
-      onDeleted(draftId);
-    } catch (err: any) {
-      setDeleteError(err.message || "Impossible de supprimer le brouillon.");
-      setDeletingId(null);
-    }
-  }
-
-  return (
-    <div className="new-mission-page">
-      <PageHeader
-        title="Brouillon en cours"
-        description="Vous avez déjà un brouillon de mission en attente de publication."
-      />
-
-      {deleteError ? <Alert type="error">{deleteError}</Alert> : null}
-
-      <div style={{ marginBottom: 20 }}>
-        <Card className="card-highlight publication-access-card">
-          <div className="toolbar" style={{ marginBottom: 12 }}>
-            <div>
-              <h2>Brouillon{drafts.length > 1 ? 's' : ''} en cours trouvé{drafts.length > 1 ? 's' : ''}</h2>
-              <p>
-                Pour créer une nouvelle mission, vous pouvez soit reprendre votre brouillon existant, soit le supprimer pour récupérer votre crédit de publication et recommencer à zéro.
-              </p>
-            </div>
-            <Badge tone="warning">Action requise</Badge>
-          </div>
-
-          <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
-            {drafts.map((draft) => (
-              <div
-                key={draft.id}
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '16px 20px',
-                  background: 'rgba(20, 39, 74, 0.02)',
-                  border: '1px solid var(--line)',
-                  borderRadius: 10,
-                }}
-              >
-                <div>
-                  <strong style={{ fontSize: 16, color: 'var(--heading)' }}>{draft.title || 'Mission sans titre'}</strong>
-                  <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
-                    <span>Spécialité : {draft.specialty || 'Non précisée'}</span>
-                    {draft.startDate ? (
-                      <>
-                        <span style={{ margin: '0 8px' }}>•</span>
-                        <span>Début le {formatDate(draft.startDate)}</span>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <Button
-                    type="button"
-                    disabled={deletingId !== null}
-                    onClick={() => {
-                      window.location.href = `/establishment/missions/new?draftId=${draft.id}`;
-                    }}
-                  >
-                    Reprendre
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    disabled={deletingId !== null}
-                    onClick={() => void handleDelete(draft.id)}
-                  >
-                    {deletingId === draft.id ? 'Suppression...' : 'Supprimer & libérer le crédit'}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <div style={{ marginBottom: 20 }}>
-        <Alert type="info">
-          <strong>Comment ça marche ?</strong>
-          <p style={{ margin: '4px 0 0 0', fontSize: 13 }}>
-            Comme vous n'avez pas d'abonnement actif, vos brouillons sont limités par vos crédits de publication achetés (1 crédit = 1 annonce active ou en cours de saisie). 
-            <strong> Supprimer un brouillon libère immédiatement son crédit</strong>, vous permettant de créer une toute nouvelle mission à partir de zéro sans payer de frais supplémentaires.
-          </p>
-        </Alert>
-      </div>
-
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 12 }}>
-          Vous souhaitez conserver ce brouillon et créer une autre annonce en parallèle ?
-        </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-          {canCreateNew ? (
-            <Button type="button" onClick={onCreateNew}>
-              Créer une nouvelle mission
-            </Button>
-          ) : (
-            <Button type="button" variant="light" onClick={onShowPayment}>
-              Acheter un crédit supplémentaire
-            </Button>
-          )}
-          <LinkButton href="/establishment/missions" variant="light">
-            Retourner au tableau de bord
-          </LinkButton>
-        </div>
-      </div>
-    </div>
-  );
-}

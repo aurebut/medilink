@@ -115,7 +115,10 @@ function warmEstablishmentWorkspace() {
     .catch(() => undefined);
   void api.get<Array<{ id: string }>>('/establishments/me')
     .then((items) => {
-      items.slice(0, 3).forEach((item) => warmApi([`/billing/establishments/${item.id}/status`]));
+      items.slice(0, 3).forEach((item) => warmApi([
+        `/billing/establishments/${item.id}/status`,
+        `/missions/mine?establishmentId=${item.id}`,
+      ]));
     })
     .catch(() => undefined);
   void api.get<Conversation[]>('/conversations')

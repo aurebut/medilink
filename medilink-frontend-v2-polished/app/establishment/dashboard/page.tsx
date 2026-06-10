@@ -64,6 +64,7 @@ export default function EstablishmentDashboardPage() {
       primeApiCache('/establishments/me', [data.establishment]);
       primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
       primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
+      api.preload(`/billing/establishments/${data.establishment.id}/status`);
     }
     primeApiCache('/conversations', data.conversations);
   }
