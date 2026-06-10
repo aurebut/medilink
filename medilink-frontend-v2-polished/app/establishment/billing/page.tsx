@@ -584,21 +584,23 @@ function SubscriptionTab({
           </div>
           <p className="hero-desc">
             {billingStatus.hasActiveSubscription
-              ? 'Votre abonnement est actif. Vous pouvez créer et publier des annonces sans frais unitaires supplémentaires.'
+              ? 'Votre abonnement est actif. Vous pouvez créer et publier des annonces en illimité.'
               : billingStatus.availableCredits > 0
               ? "Un crédit prépayé est disponible sur votre compte. Il sera débité automatiquement lorsqu'un candidat acceptera l'une de vos missions."
               : 'Aucun abonnement actif ni crédit disponible. Veuillez souscrire à un abonnement ou acheter un crédit unitaire pour publier vos missions.'}
           </p>
+          <p className="hero-desc" style={{ marginTop: '12px', fontSize: '13px', opacity: 0.85 }}>
+            Pour gérer vos modes de paiement, télécharger l'historique complet de vos factures, modifier ou résilier votre abonnement actuel, accédez à votre espace de gestion Stripe sécurisé en cliquant sur le bouton ci-dessous.
+          </p>
 
           <div className="premium-billing-actions">
-            <LinkButton href="/establishment/missions/new">Créer une annonce</LinkButton>
             <Button
               type="button"
               variant="light"
               disabled={!billingStatus.stripeConfigured || busy}
               onClick={onOpenPortal}
             >
-              {busy ? 'Ouverture...' : 'Gérer sur Stripe'}
+              {busy ? 'Ouverture...' : 'Gérer mon abonnement sur Stripe'}
             </Button>
           </div>
         </div>
@@ -607,7 +609,6 @@ function SubscriptionTab({
       {/* KPI Grid */}
       <div className="premium-kpi-grid">
         <div className="premium-kpi-card highlight-kpi">
-          <div className="kpi-icon" aria-hidden="true">🎫</div>
           <div className="kpi-info">
             <span>Crédits disponibles</span>
             <strong>{billingStatus.availableCredits}</strong>
@@ -616,7 +617,6 @@ function SubscriptionTab({
         </div>
 
         <div className="premium-kpi-card">
-          <div className="kpi-icon" aria-hidden="true">📢</div>
           <div className="kpi-info">
             <span>Publications utilisées</span>
             <strong>{billingStatus.consumedCredits}</strong>
@@ -629,7 +629,6 @@ function SubscriptionTab({
             billingStatus.hasActiveSubscription ? 'subscribed' : 'unsubscribed'
           }`}
         >
-          <div className="kpi-icon" aria-hidden="true">💳</div>
           <div className="kpi-info">
             <span>Abonnement</span>
             <strong>{status || 'Inactif'}</strong>
@@ -638,112 +637,10 @@ function SubscriptionTab({
         </div>
 
         <div className="premium-kpi-card">
-          <div className="kpi-icon" aria-hidden="true">📅</div>
           <div className="kpi-info">
             <span>Renouvellement</span>
             <strong>{renewsAt ? formatDate(renewsAt) : '-'}</strong>
             <small>{renewsAt ? 'Reconduction automatique' : 'Aucun engagement'}</small>
-          </div>
-        </div>
-      </div>
-
-      {/* Pricing / Comparison Section */}
-      <div className="premium-pricing-section">
-        <h3>Formules et tarifs de publication</h3>
-        
-        {!billingStatus.stripeConfigured ? (
-          <Alert type="error">Stripe n'est pas encore configuré sur le serveur Render.</Alert>
-        ) : null}
-
-        <div className="premium-plans-grid">
-          {/* Card 1: Monthly Subscription */}
-          <div className={`premium-plan-card ${billingStatus.hasActiveSubscription ? 'active-plan' : ''}`}>
-            {billingStatus.hasActiveSubscription ? (
-              <span className="plan-ribbon">Formule active</span>
-            ) : null}
-            <div className="plan-header">
-              <span className="plan-badge">Mensuel</span>
-              <h4>Abonnement Illimité</h4>
-              <p>Idéal pour les établissements ayant des besoins réguliers en recrutement.</p>
-            </div>
-            <div className="plan-price">
-              <strong>{formatCents(billingStatus.prices.monthlySubscription.amount, billingStatus.prices.monthlySubscription.currency)}</strong>
-              <span>/ mois</span>
-            </div>
-            <ul className="plan-features">
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Publication d'annonces en illimité
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Zéro frais supplémentaire par annonce
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Accès prioritaire aux candidatures
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Messagerie & profils de candidats vérifiés
-              </li>
-            </ul>
-            <div className="plan-action">
-              <Button
-                type="button"
-                variant={billingStatus.hasActiveSubscription ? 'secondary' : 'primary'}
-                block
-                disabled={!billingStatus.stripeConfigured || busy}
-                onClick={onOpenPortal}
-              >
-                {billingStatus.hasActiveSubscription ? 'Gérer l\'abonnement' : 'Souscrire à l\'abonnement'}
-              </Button>
-            </div>
-          </div>
-
-          {/* Card 2: Single Publication */}
-          <div className={`premium-plan-card ${!billingStatus.hasActiveSubscription && billingStatus.availableCredits > 0 ? 'active-plan' : ''}`}>
-            {!billingStatus.hasActiveSubscription && billingStatus.availableCredits > 0 ? (
-              <span className="plan-ribbon">Crédit disponible</span>
-            ) : null}
-            <div className="plan-header">
-              <span className="plan-badge badge-neutral">À l'unité</span>
-              <h4>Annonce Unique</h4>
-              <p>Parfait pour des besoins ponctuels, sans engagement de durée.</p>
-            </div>
-            <div className="plan-price">
-              <strong>{formatCents(billingStatus.prices.publicationCredit.amount, billingStatus.prices.publicationCredit.currency)}</strong>
-              <span>/ annonce</span>
-            </div>
-            <ul className="plan-features">
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Achat simple de crédit unitaire
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Débité uniquement si la mission est validée
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Crédit valable sans limite de temps
-              </li>
-              <li>
-                <span className="feature-check" aria-hidden="true">✓</span>
-                Accès identique aux profils vérifiés
-              </li>
-            </ul>
-            <div className="plan-action">
-              <Button
-                type="button"
-                variant="light"
-                block
-                disabled={!billingStatus.stripeConfigured || busy}
-                onClick={onOpenPortal}
-              >
-                Acheter un crédit
-              </Button>
-            </div>
           </div>
         </div>
       </div>
