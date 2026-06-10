@@ -255,6 +255,24 @@ export function AppShell({
   const userHomeHref = homeHref(area);
   const unreadNotifications = notifications.filter((notification) => !notification.readAt).length;
 
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
+  const [verificationError, setVerificationError] = useState<string | null>(null);
+
+  async function handleResendVerification() {
+    setResendingEmail(true);
+    setVerificationMessage(null);
+    setVerificationError(null);
+    try {
+      const result = await api.post<{ message: string }>('/auth/resend-verification', {});
+      setVerificationMessage(result.message);
+    } catch (err: any) {
+      setVerificationError(err.message || 'Impossible de renvoyer le mail.');
+    } finally {
+      setResendingEmail(false);
+    }
+  }
+
   async function onLogout() {
     setMobileNavOpen(false);
     setAccountMenuOpen(false);
@@ -719,7 +737,31 @@ export function AppShell({
             <div className="small">Plateforme MediLink</div>
           </div>
         </header>
-        <div className="content">{children}</div>
+        <div className="content">
+          {user && !user.emailVerified && area !== 'admin' ? (
+            <div className="verification-banner">
+              <span className="banner-icon">⚠️</span>
+              <span className="banner-text">
+                Votre adresse email n&apos;est pas encore vérifiée.
+              </span>
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={resendingEmail}
+                className="banner-button"
+              >
+                {resendingEmail ? 'Envoi...' : "Renvoyer l'email de validation"}
+              </button>
+              {verificationMessage && (
+                <span className="banner-status success">✓ {verificationMessage}</span>
+              )}
+              {verificationError && (
+                <span className="banner-status error">✗ {verificationError}</span>
+              )}
+            </div>
+          ) : null}
+          {children}
+        </div>
       </main>
     </div>
   );

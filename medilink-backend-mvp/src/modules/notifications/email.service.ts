@@ -48,7 +48,13 @@ export class EmailService {
         });
         providerMessageId = result.data?.id;
       } else {
-        this.logger.log(`[EMAIL MOCK] ${params.to} | ${params.subject}`);
+        this.logger.log(`[EMAIL MOCK] To: ${params.to} | Subject: ${params.subject}`);
+        const linkMatch = params.html.match(/href="([^"]+)"/);
+        if (linkMatch && linkMatch[1]) {
+          this.logger.log(`[EMAIL MOCK] Link: ${linkMatch[1]}`);
+        } else {
+          this.logger.log(`[EMAIL MOCK] Content: ${params.html}`);
+        }
       }
 
       await this.prisma.emailEvent.update({

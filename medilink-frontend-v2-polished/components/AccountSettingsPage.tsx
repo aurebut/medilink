@@ -15,6 +15,21 @@ export function AccountSettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [sendingReset, setSendingReset] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+
+  async function handleResendVerification() {
+    setMessage(null);
+    setError(null);
+    setResendingEmail(true);
+    try {
+      const result = await api.post<{ message: string }>('/auth/resend-verification', {});
+      setMessage(result.message);
+    } catch (err: any) {
+      setError(err.message || 'Impossible de renvoyer le mail.');
+    } finally {
+      setResendingEmail(false);
+    }
+  }
 
   async function requestPasswordReset(e: FormEvent) {
     e.preventDefault();
@@ -63,7 +78,20 @@ export function AccountSettingsPage() {
             </div>
             <div>
               <span>Vérification email</span>
-              <strong>{user?.emailVerified ? 'Vérifié' : 'En attente'}</strong>
+              <strong style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {user?.emailVerified ? 'Vérifié' : 'En attente'}
+                {!user?.emailVerified && (
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendingEmail}
+                    className="banner-button"
+                    style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px', background: '#f59e0b', color: '#fff', border: 'none', cursor: 'pointer' }}
+                  >
+                    {resendingEmail ? 'Envoi...' : 'Renvoyer'}
+                  </button>
+                )}
+              </strong>
             </div>
             <div>
               <span>Téléphone</span>

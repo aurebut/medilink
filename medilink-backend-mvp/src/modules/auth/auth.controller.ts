@@ -56,6 +56,12 @@ export class AuthController {
     return this.auth.verifyEmail(dto.token);
   }
 
+  @Post('resend-verification')
+  @UseGuards(AuthGuard)
+  resendVerification(@CurrentUser() user: RequestUser) {
+    return this.auth.resendVerificationEmail(user.id);
+  }
+
   @Post('forgot-password')
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.auth.forgotPassword(dto);

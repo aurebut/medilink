@@ -9356,4 +9356,102 @@ td {
   flex-shrink: 0;
 }
 
+/* Verification Banner */
+.verification-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(254, 243, 199, 0.55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  color: #92400e;
+  font-size: 14px;
+  font-weight: 500;
+  animation: fadeInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verification-banner .banner-icon {
+  font-size: 18px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.verification-banner .banner-text {
+  flex-grow: 1;
+}
+
+.verification-banner .banner-button {
+  background: #f59e0b;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+}
+
+.verification-banner .banner-button:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.verification-banner .banner-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.verification-banner .banner-button:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.verification-banner .banner-status {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  animation: fadeIn 0.3s ease;
+}
+
+.verification-banner .banner-status.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #065f46;
+}
+
+.verification-banner .banner-status.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #991b1b;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 

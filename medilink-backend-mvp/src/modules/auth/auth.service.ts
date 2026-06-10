@@ -43,15 +43,15 @@ export class AuthService {
         ? UserRole.CANDIDATE
         : UserRole.ESTABLISHMENT_OWNER;
 
-    const user = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       const createdUser = await tx.user.create({
         data: {
           email,
           passwordHash,
           role,
           phone: dto.phone,
-          status: UserStatus.ACTIVE,
-          emailVerified: true,
+          status: UserStatus.PENDING_EMAIL_VERIFICATION,
+          emailVerified: false,
           profile:
             role === UserRole.CANDIDATE
               ? {
@@ -66,8 +66,19 @@ export class AuthService {
         },
       });
 
-      return createdUser;
+      const rawToken = createRawToken();
+      await tx.emailVerificationToken.create({
+        data: {
+          userId: createdUser.id,
+          tokenHash: hashToken(rawToken),
+          expiresAt: addDays(new Date(), 3),
+        },
+      });
+
+      return { user: createdUser, rawToken };
     });
+
+    const { user, rawToken } = result;
 
     await this.audit.log({
       actorUserId: user.id,
@@ -92,10 +103,12 @@ export class AuthService {
         .catch(() => undefined);
     }
 
+    await this.emailService.sendVerificationEmail(user.id, user.email, rawToken);
+
     const session = await this.createSession(user.id);
 
     return {
-      message: 'Compte cree.',
+      message: 'Compte créé. Veuillez vérifier votre email.',
       userId: user.id,
       token: session.token,
       expiresAt: session.expiresAt,
@@ -184,6 +197,35 @@ export class AuthService {
     });
 
     return { message: 'Email vérifié.' };
+  }
+
+  async resendVerificationEmail(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur introuvable.');
+    }
+
+    if (user.emailVerified) {
+      throw new BadRequestException('Votre adresse email est déjà vérifiée.');
+    }
+
+    await this.prisma.emailVerificationToken.updateMany({
+      where: { userId, usedAt: null },
+      data: { expiresAt: new Date() },
+    });
+
+    const rawToken = createRawToken();
+    await this.prisma.emailVerificationToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(rawToken),
+        expiresAt: addDays(new Date(), 3),
+      },
+    });
+
+    await this.emailService.sendVerificationEmail(user.id, user.email, rawToken);
+
+    return { message: 'Un nouvel email de validation a été envoyé.' };
   }
 
   async forgotPassword(dto: ForgotPasswordDto) {
