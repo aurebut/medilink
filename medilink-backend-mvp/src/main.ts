@@ -12,7 +12,7 @@ async function bootstrap() {
     config.get<string>('FRONTEND_URL') || 'http://localhost:3000'
   )
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => origin.trim().replace(/\/$/, ''))
     .filter(Boolean);
   const allowedVercelSuffix = '.vercel.app';
 
