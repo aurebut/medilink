@@ -650,58 +650,8 @@ export default function RecruiterBillingPage() {
 
     return (
       <div className="premium-billing-panel" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <div className="premium-pricing-section" style={{ textAlign: 'center', marginBottom: '10px' }}>
-          <h3>État de votre compte</h3>
-        </div>
-
-        <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-          <div className="premium-plan-card active-plan" style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}>
-            <div className="plan-header">
-              <span className="plan-badge">Publications</span>
-              <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Crédits disponibles</h4>
-            </div>
-            <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0' }}>
-              <strong style={{ fontSize: '36px' }}>{billingStatus.availableCredits}</strong>
-              <span style={{ fontSize: '16px', marginLeft: '6px' }}>crédits</span>
-            </div>
-            <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
-              {billingStatus.consumedCredits} publications utilisées au total.
-            </p>
-          </div>
-
-          <div 
-            className={`premium-plan-card ${billingStatus.hasActiveSubscription ? 'active-plan' : ''}`} 
-            style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}
-          >
-            <div className="plan-header">
-              <span className="plan-badge badge-neutral">Abonnement</span>
-              <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Statut de l'abonnement</h4>
-            </div>
-            
-            {billingStatus.hasActiveSubscription ? (
-              <>
-                <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--teal)' }}>
-                  <strong style={{ fontSize: '28px' }}>Abonnement Actif</strong>
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
-                  Prochain renouvellement : {renewsAt ? formatDate(renewsAt) : '-'}
-                </p>
-              </>
-            ) : (
-              <>
-                <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--muted)' }}>
-                  <strong style={{ fontSize: '24px' }}>Pas d'abonnement actif</strong>
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
-                  Vous utilisez actuellement le mode de paiement à l'unité (crédits).
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
         {/* Detailed System Functioning & Checkout Cards */}
-        <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
+        <div className="premium-pricing-section">
           <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
             Formules et tarifs de publication
           </h3>
