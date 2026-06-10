@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { api } from '@/lib/api';
+import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, PasswordInput, LinkButton } from '@/components/ui';
 
 function ResetPasswordForm() {
@@ -13,6 +14,7 @@ function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -24,6 +26,7 @@ function ResetPasswordForm() {
       return;
     }
 
+    setLoading(true);
     try {
       const res = await api.post<{ message: string }>('/auth/reset-password', {
         token,
@@ -33,49 +36,74 @@ function ResetPasswordForm() {
       setMessage(res.message);
     } catch (e: any) {
       setError(e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <main className="auth-page">
-      <form className="auth-card form" onSubmit={submit}>
-        <Link className="brand" href="/">
-          <span>Médilink</span>
+    <AuthPage
+      eyebrow="Sécurité"
+      title="Nouveau mot de passe"
+      description="Définissez un mot de passe robuste pour protéger l'accès à votre espace Médilink."
+      onSubmit={submit}
+      footer={(
+        <Link href="/login" className="small">
+          Retour à la connexion
         </Link>
-        <h1>Nouveau mot de passe</h1>
-        {message ? <Alert type="success">{message}</Alert> : null}
-        {error ? <Alert type="error">{error}</Alert> : null}
-        
-        <Field label="Ancien mot de passe">
-          <PasswordInput
-            required
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-          />
-        </Field>
+      )}
+    >
+      {message ? <Alert type="success">{message}</Alert> : null}
+      {error ? <Alert type="error">{error}</Alert> : null}
+      
+      {!message && (
+        <>
+          <Field label="Ancien mot de passe">
+            <PasswordInput
+              required
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              disabled={loading}
+              placeholder="Votre ancien mot de passe"
+            />
+          </Field>
 
-        <Field label="Nouveau mot de passe">
-          <PasswordInput
-            required
-            minLength={8}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-        </Field>
+          <Field label="Nouveau mot de passe">
+            <PasswordInput
+              required
+              minLength={8}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={loading}
+              placeholder="Minimum 8 caractères"
+            />
+          </Field>
 
-        <Field label="Confirmer le nouveau mot de passe">
-          <PasswordInput
-            required
-            minLength={8}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </Field>
+          <Field label="Confirmer le nouveau mot de passe">
+            <PasswordInput
+              required
+              minLength={8}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={loading}
+              placeholder="Confirmez le mot de passe"
+            />
+          </Field>
 
-        <Button>Réinitialiser</Button>
-        {message ? <LinkButton href="/login">Se connecter</LinkButton> : null}
-      </form>
-    </main>
+          <Button block disabled={loading}>
+            {loading ? 'Réinitialisation...' : 'Réinitialiser'}
+          </Button>
+        </>
+      )}
+
+      {message ? (
+        <div style={{ marginTop: '16px' }}>
+          <LinkButton href="/login" className="btn-block">
+            Se connecter
+          </LinkButton>
+        </div>
+      ) : null}
+    </AuthPage>
   );
 }
 
@@ -86,3 +114,4 @@ export default function ResetPasswordPage() {
     </Suspense>
   );
 }
+
