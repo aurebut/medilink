@@ -650,116 +650,87 @@ export default function RecruiterBillingPage() {
 
     return (
       <div className="premium-billing-panel" style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Detailed System Functioning & Checkout Cards */}
-        <div className="premium-pricing-section">
+        <div className="premium-pricing-section" style={{ textAlign: 'center', marginBottom: '10px' }}>
+          <h3>État de votre compte</h3>
+        </div>
+
+        <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+          {/* Card 1: Available Credits */}
+          <div className="premium-plan-card active-plan" style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}>
+            <div className="plan-header">
+              <span className="plan-badge">Publications</span>
+              <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Crédits disponibles</h4>
+            </div>
+            <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0' }}>
+              <strong style={{ fontSize: '36px' }}>{billingStatus.availableCredits}</strong>
+              <span style={{ fontSize: '16px', marginLeft: '6px' }}>crédits</span>
+            </div>
+            <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+              {billingStatus.consumedCredits} publications utilisées au total.
+            </p>
+          </div>
+
+          {/* Card 2: Subscription Status */}
+          <div 
+            className={`premium-plan-card ${billingStatus.hasActiveSubscription ? 'active-plan' : ''}`} 
+            style={{ textAlign: 'center', justifyContent: 'center', padding: '30px 20px' }}
+          >
+            <div className="plan-header">
+              <span className="plan-badge badge-neutral">Abonnement</span>
+              <h4 style={{ marginTop: '10px', fontSize: '18px' }}>Statut de l'abonnement</h4>
+            </div>
+            
+            {billingStatus.hasActiveSubscription ? (
+              <>
+                <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--teal)' }}>
+                  <strong style={{ fontSize: '28px' }}>Abonnement Actif</strong>
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+                  Prochain renouvellement : {renewsAt ? formatDate(renewsAt) : '-'}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="plan-price" style={{ justifyContent: 'center', borderBottom: 'none', marginBottom: '0', paddingBottom: '0', color: 'var(--muted)' }}>
+                  <strong style={{ fontSize: '24px' }}>Pas d'abonnement actif</strong>
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', marginTop: '15px' }}>
+                  Vous utilisez actuellement le mode de paiement à l'unité (crédits).
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Detailed System Functioning */}
+        <div className="premium-pricing-section" style={{ marginTop: '40px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--heading)', marginBottom: '4px' }}>
-            Formules et tarifs de publication
+            Fonctionnement du système de facturation
           </h3>
           <p className="small" style={{ color: 'var(--muted)', marginBottom: '16px' }}>
-            Choisissez la formule adaptée à vos besoins de recrutement ou gérez vos options.
+            Comprendre la différence entre la formule d'abonnement et le paiement à l'unité.
           </p>
-
-          {!billingStatus.stripeConfigured ? (
-            <Alert type="error">Stripe n'est pas encore configuré sur le serveur Render.</Alert>
-          ) : null}
           
           <div className="premium-plans-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-            {/* Card 1: Subscription */}
-            <div className={`premium-plan-card ${billingStatus.hasActiveSubscription ? 'active-plan' : ''}`} style={{ padding: '22px' }}>
-              {billingStatus.hasActiveSubscription ? (
-                <span className="plan-ribbon">Formule active</span>
-              ) : null}
+            <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
               <div className="plan-header">
-                <span className="plan-badge">Recommandé</span>
-                <h4 style={{ marginTop: '6px', fontSize: '17px', fontWeight: '700' }}>Abonnement établissement</h4>
-                <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginTop: '6px' }}>
-                  Pour publier plusieurs annonces sans repasser par un paiement unitaire.
-                </p>
+                <span className="plan-badge">Abonnement Mensuel</span>
               </div>
-              <div className="plan-price" style={{ alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--line)' }}>
-                <strong style={{ fontSize: '26px' }}>59,99 €</strong>
-                <span style={{ fontSize: '13px', color: 'var(--muted)', marginLeft: '3px' }}>/ mois</span>
-              </div>
-              <ul className="plan-features" style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Publications incluses tant que l'abonnement est actif
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Gestion de l'abonnement et des factures via Stripe
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Création en brouillon ou publication immédiate
-                </li>
-              </ul>
-              <div className="plan-action">
-                {billingStatus.hasActiveSubscription ? (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    block
-                    disabled={!billingStatus.stripeConfigured || busy}
-                    onClick={onOpenPortal}
-                  >
-                    Gérer l'abonnement sur Stripe
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    variant="primary"
-                    block
-                    disabled={!billingStatus.stripeConfigured || busy}
-                    onClick={onSubscribe}
-                  >
-                    {busy ? 'Redirection...' : "S'abonner"}
-                  </Button>
-                )}
-              </div>
+              <p style={{ color: 'var(--text)', marginTop: '10px' }}>
+                L'abonnement vous offre un accès illimité et sans restriction pour publier vos missions de remplacement ou de vacation. 
+                Il s'agit d'une formule mensuelle sans engagement de durée. Les frais de publication sont fixes, quel que soit le nombre d'annonces que vous mettez en ligne.
+              </p>
             </div>
 
-            {/* Card 2: Single Publication Credits */}
-            <div className={`premium-plan-card ${!billingStatus.hasActiveSubscription && billingStatus.availableCredits > 0 ? 'active-plan' : ''}`} style={{ padding: '22px' }}>
-              {!billingStatus.hasActiveSubscription && billingStatus.availableCredits > 0 ? (
-                <span className="plan-ribbon">Crédit actif</span>
-              ) : null}
+            <div className="premium-plan-card" style={{ padding: '20px', fontSize: '13.5px', lineHeight: '1.6' }}>
               <div className="plan-header">
-                <span className="plan-badge badge-neutral">A l'unité</span>
-                <h4 style={{ marginTop: '6px', fontSize: '17px', fontWeight: '700' }}>Crédit de publication</h4>
-                <p style={{ fontSize: '12.5px', color: 'var(--muted)', marginTop: '6px' }}>
-                  Pour publier une annonce unique, avec un crédit débité seulement après la confirmation de la mission avec le candidat.
-                </p>
+                <span className="plan-badge badge-neutral">Mode Crédits (À l'unité)</span>
               </div>
-              <div className="plan-price" style={{ alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--line)' }}>
-                <strong style={{ fontSize: '26px' }}>39,99 €</strong>
-                <span style={{ fontSize: '13px', color: 'var(--muted)', marginLeft: '3px' }}>une fois</span>
-              </div>
-              <ul className="plan-features" style={{ listStyle: 'none', padding: 0, margin: '0 0 20px', display: 'flex', flexDirection: 'column', gap: '8px', flexGrow: 1 }}>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Valable pour une annonce
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Réservé à la publication, débité à la confirmation de la mission avec le candidat
-                </li>
-                <li style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '12.5px' }}>
-                  <span className="feature-check">✓</span>
-                  Permet aussi de préparer un brouillon
-                </li>
-              </ul>
-              <div className="plan-action">
-                <Button
-                  type="button"
-                  variant="light"
-                  block
-                  disabled={!billingStatus.stripeConfigured || busy}
-                  onClick={onBuyCredit}
-                >
-                  {busy ? 'Redirection...' : 'Payer une annonce'}
-                </Button>
-              </div>
+              <p style={{ color: 'var(--text)', marginTop: '10px' }}>
+                Si vous n'avez pas d'abonnement actif, vous pouvez utiliser les crédits unitaires de publication. 
+                Un crédit correspond à la publication d'une annonce. De manière transparente, un crédit n'est consommé que lorsqu'un candidat accepte votre proposition de mission. 
+                Vos crédits n'expirent jamais.
+              </p>
             </div>
           </div>
         </div>
