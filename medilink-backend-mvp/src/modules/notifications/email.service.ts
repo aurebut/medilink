@@ -78,8 +78,13 @@ export class EmailService {
     }
   }
 
+  private getFrontendUrl(): string {
+    const raw = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    return raw.split(',')[0].trim();
+  }
+
   sendVerificationEmail(userId: string, to: string, token: string) {
-    const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const frontendUrl = this.getFrontendUrl();
     const link = `${frontendUrl}/verify-email?token=${token}`;
 
     return this.sendEmail({
@@ -92,7 +97,7 @@ export class EmailService {
   }
 
   sendPasswordResetEmail(userId: string, to: string, token: string) {
-    const frontendUrl = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
+    const frontendUrl = this.getFrontendUrl();
     const link = `${frontendUrl}/reset-password?token=${token}`;
 
     return this.sendEmail({
