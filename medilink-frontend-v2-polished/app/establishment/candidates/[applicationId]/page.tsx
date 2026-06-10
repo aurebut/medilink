@@ -8,6 +8,7 @@ import { documentTypeLabel, medicalStatusLabel as formatMedicalStatusLabel, miss
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateIs, candidateNoun } from '@/lib/grammar';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
 
 function applicationTone(status: string) {
@@ -36,14 +37,21 @@ export default function EstablishmentCandidateProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  async function loadData(options: { reload?: boolean } = {}) {
     if (!applicationId) return;
 
-    api.get<CandidateProfileForApplication>(`/establishment/applications/${applicationId}/candidate-profile`)
-      .then(setData)
+    setData(options.reload
+      ? await api.reload<CandidateProfileForApplication>(`/establishment/applications/${applicationId}/candidate-profile`)
+      : await api.get<CandidateProfileForApplication>(`/establishment/applications/${applicationId}/candidate-profile`));
+  }
+
+  useEffect(() => {
+    loadData()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, [applicationId]);
+
+  useAutoRefresh(() => loadData({ reload: true }), { enabled: !loading });
 
   async function openDocument(document: Document) {
     const previewWindow = openDocumentPreviewWindow();

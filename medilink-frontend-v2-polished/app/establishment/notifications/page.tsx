@@ -49,7 +49,7 @@ export default function RecruiterNotificationsPage() {
   }
 
   useEffect(() => { void load(); }, []);
-  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading, intervalMs: 30_000 });
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   if (loading) return <LoadingCard label="Chargement des notifications..." />;
 

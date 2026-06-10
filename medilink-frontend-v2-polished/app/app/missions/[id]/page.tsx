@@ -14,6 +14,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type MissionContext = {
@@ -158,13 +159,14 @@ export default function CandidateMissionDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
-    setLoading(true);
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     try {
+      const read = options.reload ? api.reload : api.get;
       const [nextApplications, nextConversations, nextMission] = await Promise.all([
-        api.get<Application[]>('/me/applications'),
-        api.get<Conversation[]>('/conversations'),
-        api.get<Mission>(`/missions/${id}`).catch(() => null),
+        read<Application[]>('/me/applications'),
+        read<Conversation[]>('/conversations'),
+        read<Mission>(`/missions/${id}`).catch(() => null),
       ]);
       setApplications(nextApplications);
       setConversations(nextConversations);
@@ -172,13 +174,15 @@ export default function CandidateMissionDetailPage() {
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => {
     void load();
   }, [id]);
+
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   const context = useMemo<MissionContext | null>(() => {
     const application = applications.find((item) => item.missionId === id) || null;

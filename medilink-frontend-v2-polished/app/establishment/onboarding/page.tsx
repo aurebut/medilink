@@ -21,6 +21,7 @@ import {
   secretaryTypeOptions,
   softwareOptions,
 } from '@/lib/profile-options';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 type EstablishmentInfoTab = 'establishments' | 'create' | 'billing';
 
@@ -52,6 +53,21 @@ export default function EstablishmentOnboardingPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [billingBusyId, setBillingBusyId] = useState<string | null>(null);
 
+  async function loadBillingStatuses(options: { reload?: boolean } = {}) {
+    await Promise.allSettled(establishments.map(async (establishment) => {
+      setBillingLoadingIds((current) => ({ ...current, [establishment.id]: true }));
+      try {
+        const path = `/billing/establishments/${establishment.id}/status`;
+        const status = options.reload
+          ? await api.reload<EstablishmentBillingStatus>(path)
+          : await api.get<EstablishmentBillingStatus>(path);
+        setBillingByEstablishment((current) => ({ ...current, [establishment.id]: status }));
+      } finally {
+        setBillingLoadingIds((current) => ({ ...current, [establishment.id]: false }));
+      }
+    }));
+  }
+
   function set(name: string, value: unknown) {
     setForm((p: any) => ({ ...p, [name]: value }));
   }
@@ -65,23 +81,14 @@ export default function EstablishmentOnboardingPage() {
   useEffect(() => {
     let cancelled = false;
 
-    establishments.forEach((establishment) => {
-      setBillingLoadingIds((current) => ({ ...current, [establishment.id]: true }));
-      api.get<EstablishmentBillingStatus>(`/billing/establishments/${establishment.id}/status`)
-        .then((status) => {
-          if (cancelled) return;
-          setBillingByEstablishment((current) => ({ ...current, [establishment.id]: status }));
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          if (!cancelled) setBillingLoadingIds((current) => ({ ...current, [establishment.id]: false }));
-        });
-    });
+    void loadBillingStatuses().catch(() => undefined);
 
     return () => {
       cancelled = true;
     };
   }, [establishments]);
+
+  useAutoRefresh(() => loadBillingStatuses({ reload: true }), { enabled: !loading && establishments.length > 0 && !saving && !deletingId && !billingBusyId });
 
   function selectTab(tab: EstablishmentInfoTab) {
     setActiveTab(tab);

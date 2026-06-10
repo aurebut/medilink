@@ -3,22 +3,29 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Document, Establishment, Mission, CurrentUser } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { LinkButton, LoadingCard, PageHeader, StatCard } from '@/components/ui';
 
 export default function AdminDashboardPage() {
   const [counts, setCounts] = useState({ users: 0, documents: 0, establishments: 0, missions: 0 });
   const [loading, setLoading] = useState(true);
 
+  async function load(options: { reload?: boolean } = {}) {
+    const read = options.reload ? api.reload : api.get;
+    const [u, d, e, m] = await Promise.all([
+      read<CurrentUser[]>('/admin/users'),
+      read<Document[]>('/admin/documents?status=PENDING_VERIFICATION'),
+      read<Establishment[]>('/admin/establishments'),
+      read<Mission[]>('/admin/missions'),
+    ]);
+    setCounts({ users: u.length, documents: d.length, establishments: e.length, missions: m.length });
+  }
+
   useEffect(() => {
-    Promise.all([
-      api.get<CurrentUser[]>('/admin/users'),
-      api.get<Document[]>('/admin/documents?status=PENDING_VERIFICATION'),
-      api.get<Establishment[]>('/admin/establishments'),
-      api.get<Mission[]>('/admin/missions'),
-    ]).then(([u, d, e, m]) => {
-      setCounts({ users: u.length, documents: d.length, establishments: e.length, missions: m.length });
-    }).finally(() => setLoading(false));
+    load().finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => load({ reload: true }), { enabled: !loading });
 
   if (loading) return <LoadingCard />;
 

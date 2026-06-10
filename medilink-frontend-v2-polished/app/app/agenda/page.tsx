@@ -8,6 +8,7 @@ import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
 import { Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
@@ -76,15 +77,21 @@ export default function CandidateAgendaPage() {
     setNoteEditing(!savedNote);
   }, [notes, selectedDay]);
 
+  async function load(options: { reload?: boolean } = {}) {
+    const read = options.reload ? api.reload : api.get;
+    const [a, c] = await Promise.all([
+      read<Application[]>('/me/applications'),
+      read<Conversation[]>('/conversations'),
+    ]);
+    setApplications(a);
+    setConversations(c);
+  }
+
   useEffect(() => {
-    Promise.all([
-      api.get<Application[]>('/me/applications'),
-      api.get<Conversation[]>('/conversations'),
-    ]).then(([a, c]) => {
-      setApplications(a);
-      setConversations(c);
-    }).finally(() => setLoading(false));
+    load().finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => load({ reload: true }), { enabled: !loading });
 
   const events = useMemo(() => {
     const now = new Date();

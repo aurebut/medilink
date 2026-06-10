@@ -6,6 +6,7 @@ import { agreementLabel, agreementNextStep, agreementTone, latestAgreement } fro
 import { formatDate, formatMoney } from '@/lib/format';
 import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Conversation, MissionAgreement } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
 
 type ManualRevenue = {
@@ -175,17 +176,24 @@ export default function CandidateBillingPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadConversations(options: { reload?: boolean } = {}) {
+    setConversations(options.reload
+      ? await api.reload<Conversation[]>('/conversations')
+      : await api.get<Conversation[]>('/conversations'));
+  }
+
   useEffect(() => {
     const stored = readStoredState();
     setManualRows(stored.manualRows);
     setProvisionRate(stored.provisionRate);
     setClassifiedIds(stored.classifiedIds);
 
-    api.get<Conversation[]>('/conversations')
-      .then(setConversations)
+    loadConversations()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !loading });
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ manualRows, provisionRate, classifiedIds }));

@@ -10,6 +10,7 @@ import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, Loadi
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 type ManualExpense = {
   id: string;
@@ -221,6 +222,25 @@ export default function RecruiterBillingPage() {
   const [billingStatus, setBillingStatus] = useState<EstablishmentBillingStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadConversations(options: { reload?: boolean } = {}) {
+    const data = options.reload
+      ? await api.reload<Conversation[]>('/conversations')
+      : await api.get<Conversation[]>('/conversations');
+    setConversations(primary ? data.filter((c) => c.establishmentId === primary.id) : []);
+  }
+
+  async function loadBillingStatus(options: { reload?: boolean } = {}) {
+    if (!primary) {
+      setBillingStatus(null);
+      return;
+    }
+
+    const path = `/billing/establishments/${primary.id}/status`;
+    setBillingStatus(options.reload
+      ? await api.reload<EstablishmentBillingStatus>(path)
+      : await api.get<EstablishmentBillingStatus>(path));
+  }
+
   useEffect(() => {
     const queryTab = new URLSearchParams(window.location.search).get('tab');
     if (queryTab === 'subscription') setActiveTab('subscription');
@@ -230,28 +250,22 @@ export default function RecruiterBillingPage() {
     setBudgetLimit(stored.budgetLimit);
     setClassifiedIds(stored.classifiedIds);
 
-    api.get<Conversation[]>('/conversations')
-      .then((data) => {
-        if (primary) {
-          setConversations(data.filter((c) => c.establishmentId === primary.id));
-        } else {
-          setConversations([]);
-        }
-      })
+    loadConversations()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, [primary]);
 
   useEffect(() => {
-    if (!primary) {
-      setBillingStatus(null);
-      return;
-    }
-
-    api.reload<EstablishmentBillingStatus>(`/billing/establishments/${primary.id}/status`)
-      .then(setBillingStatus)
+    loadBillingStatus({ reload: true })
       .catch((e: any) => setError(e.message));
   }, [primary]);
+
+  useAutoRefresh(async () => {
+    await Promise.all([
+      loadConversations({ reload: true }),
+      loadBillingStatus({ reload: true }),
+    ]);
+  }, { enabled: !establishmentLoading && !loading });
 
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ manualRows, budgetLimit, classifiedIds }));

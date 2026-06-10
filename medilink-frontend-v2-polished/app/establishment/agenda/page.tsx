@@ -15,6 +15,7 @@ import {
 import { formatDate } from '@/lib/format';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -90,31 +91,40 @@ export default function EstablishmentAgendaPage() {
     setNoteEditing(!savedNote);
   }, [notes, selectedDay]);
 
-  useEffect(() => {
+  async function loadData(options: { silent?: boolean; reload?: boolean } = {}) {
     if (establishmentsLoading) return;
     if (!primary) {
       setMissions([]);
       setApplications([]);
       setConversations([]);
-      setLoading(false);
+      if (!options.silent) setLoading(false);
       return;
     }
 
-    setLoading(true);
+    if (!options.silent) setLoading(true);
     setError(null);
-    Promise.all([
-      api.get<Mission[]>(`/missions/mine?establishmentId=${primary.id}`),
-      api.get<Application[]>(`/establishment/applications?establishmentId=${primary.id}`),
-      api.get<Conversation[]>('/conversations'),
-    ])
-      .then(([m, a, c]) => {
-        setMissions(m);
-        setApplications(a);
-        setConversations(c);
-      })
-      .catch((e: any) => setError(e.message))
-      .finally(() => setLoading(false));
+    try {
+      const read = options.reload ? api.reload : api.get;
+      const [m, a, c] = await Promise.all([
+        read<Mission[]>(`/missions/mine?establishmentId=${primary.id}`),
+        read<Application[]>(`/establishment/applications?establishmentId=${primary.id}`),
+        read<Conversation[]>('/conversations'),
+      ]);
+      setMissions(m);
+      setApplications(a);
+      setConversations(c);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      if (!options.silent) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadData();
   }, [establishmentsLoading, primary]);
+
+  useAutoRefresh(() => loadData({ silent: true, reload: true }), { enabled: !establishmentsLoading && !loading });
 
   const rows = useMemo(
     () => buildEstablishmentAgendaRows(missions, applications, conversations),

@@ -221,7 +221,7 @@ export default function CandidateCurrentMissionsPage() {
     ]);
     setApplications(nextApplications);
     setConversations(nextConversations);
-  }, { enabled: !loading, intervalMs: 10_000 });
+  }, { enabled: !loading });
 
   const rows = useMemo(() => {
     return applications

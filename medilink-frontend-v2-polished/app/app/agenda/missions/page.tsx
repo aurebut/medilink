@@ -5,6 +5,7 @@ import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistor
 import { api } from '@/lib/api';
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
 import type { Application, Conversation } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 export default function CandidateMissionHistoryPage() {
@@ -12,15 +13,21 @@ export default function CandidateMissionHistoryPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
 
+  async function load(options: { reload?: boolean } = {}) {
+    const read = options.reload ? api.reload : api.get;
+    const [a, c] = await Promise.all([
+      read<Application[]>('/me/applications'),
+      read<Conversation[]>('/conversations'),
+    ]);
+    setApplications(a);
+    setConversations(c);
+  }
+
   useEffect(() => {
-    Promise.all([
-      api.get<Application[]>('/me/applications'),
-      api.get<Conversation[]>('/conversations'),
-    ]).then(([a, c]) => {
-      setApplications(a);
-      setConversations(c);
-    }).finally(() => setLoading(false));
+    load().finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => load({ reload: true }), { enabled: !loading });
 
   const rows = useMemo(() => buildCandidateMissionHistoryRows(applications, conversations), [applications, conversations]);
 

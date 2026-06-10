@@ -5,6 +5,7 @@ import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview
 import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, LoadingInline, ProgressBar } from './ui';
 
 type UploadResponse = {
@@ -83,18 +84,21 @@ export function DocumentSection() {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  async function load() {
-    setLoading(true);
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     try {
-      setDocuments(await api.get<Document[]>('/me/documents'));
+      setDocuments(options.reload
+        ? await api.reload<Document[]>('/me/documents')
+        : await api.get<Document[]>('/me/documents'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading && !submitting });
 
   const visibleDocuments = useMemo(
     () => documents.filter((doc) => doc.documentType !== 'AVATAR' && doc.verificationStatus !== 'DELETED'),

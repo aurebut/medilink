@@ -13,6 +13,7 @@ import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels
 import { getMissionApplyPath } from '@/lib/mission-links';
 import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
 
 function sectorLabel(value?: string | null) {
@@ -33,37 +34,39 @@ export default function MissionPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  async function loadMission(options: { silent?: boolean; reload?: boolean } = {}) {
     if (authLoading) return;
+    if (!options.silent) setLoading(true);
+    setError(null);
+    setCanManageMission(false);
 
-    async function loadMission() {
-      setLoading(true);
-      setError(null);
-      setCanManageMission(false);
-
-      try {
-        if (isEstablishmentRole(user?.role)) {
-          try {
-            const managedMission = await api.get<Mission>(`/missions/mine/${id}`);
-            setMission(managedMission);
-            setCanManageMission(true);
-            return;
-          } catch {
-            // If this establishment does not manage the mission, fall through to the public view.
-          }
+    try {
+      const read = options.reload ? api.reload : api.get;
+      if (isEstablishmentRole(user?.role)) {
+        try {
+          const managedMission = await read<Mission>(`/missions/mine/${id}`);
+          setMission(managedMission);
+          setCanManageMission(true);
+          return;
+        } catch {
+          // If this establishment does not manage the mission, fall through to the public view.
         }
-
-        setMission(await api.get<Mission>(`/missions/${id}`));
-      } catch (e: any) {
-        setMission(null);
-        setError(e.message);
-      } finally {
-        setLoading(false);
       }
-    }
 
+      setMission(await read<Mission>(`/missions/${id}`));
+    } catch (e: any) {
+      setMission(null);
+      setError(e.message);
+    } finally {
+      if (!options.silent) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     void loadMission();
   }, [authLoading, id, user?.role]);
+
+  useAutoRefresh(() => loadMission({ silent: true, reload: true }), { enabled: !authLoading && !loading });
 
   const applyPath = useMemo(() => getMissionApplyPath(id), [id]);
   const homeHref = !authLoading && user ? defaultRouteForUser(user) : '/';

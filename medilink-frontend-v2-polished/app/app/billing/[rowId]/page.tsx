@@ -6,6 +6,7 @@ import { api, getApiUrl, getAuthToken } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, latestAgreement } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
 import type { Conversation, MissionAgreement } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type AccountingRow = {
@@ -131,14 +132,21 @@ export default function BillingMissionDetailPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadConversations(options: { reload?: boolean } = {}) {
+    setConversations(options.reload
+      ? await api.reload<Conversation[]>('/conversations')
+      : await api.get<Conversation[]>('/conversations'));
+  }
+
   useEffect(() => {
     setClassifiedIds(readClassifiedIds());
     setStorageReady(true);
-    api.get<Conversation[]>('/conversations')
-      .then(setConversations)
+    loadConversations()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !loading });
 
   useEffect(() => {
     if (storageReady) writeClassifiedIds(classifiedIds);

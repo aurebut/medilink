@@ -233,7 +233,7 @@ export default function EstablishmentCurrentMissionsPage() {
     ]);
     setApplications(nextApplications);
     setConversations(nextConversations);
-  }, { enabled: Boolean(primary) && !missionsLoading, intervalMs: 10_000 });
+  }, { enabled: Boolean(primary) && !missionsLoading });
 
   useEffect(() => {
     if (!primary || typeof window === 'undefined') return;

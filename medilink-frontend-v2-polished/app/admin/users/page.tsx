@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import type { CurrentUser, Profile } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
 import { roleLabel, statusLabel } from '@/lib/labels';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
 
 type AdminUser = CurrentUser & { profile?: Profile | null };
@@ -14,17 +15,20 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
     try {
-      setUsers(await api.get<AdminUser[]>('/admin/users'));
+      setUsers(options.reload
+        ? await api.reload<AdminUser[]>('/admin/users')
+        : await api.get<AdminUser[]>('/admin/users'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   async function suspend(id: string) {
     if (!confirm('Suspendre cet utilisateur ?')) return;

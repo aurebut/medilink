@@ -22,6 +22,7 @@ import {
   specialtyOptions,
 } from '@/lib/profile-options';
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 function safeArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
@@ -139,22 +140,39 @@ export default function EditMissionPage() {
   const [form, setForm] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [formDirty, setFormDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLoading(true);
+  function applyMission(nextMission: Mission) {
+    setMission(nextMission);
+    setForm(missionToForm(nextMission));
+    setFormDirty(false);
+  }
+
+  async function loadMission(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     setError(null);
-    api.get<Mission>(`/missions/mine/${id}`)
-      .then((nextMission) => {
-        setMission(nextMission);
-        setForm(missionToForm(nextMission));
-      })
-      .catch((e: any) => setError(e.message))
-      .finally(() => setLoading(false));
+    try {
+      const nextMission = options.reload
+        ? await api.reload<Mission>(`/missions/mine/${id}`)
+        : await api.get<Mission>(`/missions/mine/${id}`);
+      applyMission(nextMission);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      if (!options.silent) setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadMission();
   }, [id]);
 
+  useAutoRefresh(() => loadMission({ silent: true, reload: true }), { enabled: !loading && !formDirty && !saving });
+
   function set(name: string, value: unknown) {
+    setFormDirty(true);
     setForm((current: any) => ({ ...current, [name]: value }));
   }
 
@@ -182,8 +200,7 @@ export default function EditMissionPage() {
 
     try {
       const updated = await api.patch<Mission>(`/missions/${id}`, buildPayload(form));
-      setMission(updated);
-      setForm(missionToForm(updated));
+      applyMission(updated);
       setSuccess('Annonce mise à jour.');
     } catch (e: any) {
       setError(e.message);

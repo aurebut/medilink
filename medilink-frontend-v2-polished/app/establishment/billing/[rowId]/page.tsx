@@ -10,6 +10,7 @@ import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHe
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 type AccountingRow = {
   id: string;
@@ -176,21 +177,23 @@ export default function RecruiterBillingMissionDetailPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  async function loadConversations(options: { reload?: boolean } = {}) {
+    const data = options.reload
+      ? await api.reload<Conversation[]>('/conversations')
+      : await api.get<Conversation[]>('/conversations');
+    setConversations(primary ? data.filter((c) => c.establishmentId === primary.id) : []);
+  }
+
   useEffect(() => {
     setClassifiedIds(readClassifiedIds());
     setStorageReady(true);
 
-    api.get<Conversation[]>('/conversations')
-      .then((data) => {
-        if (primary) {
-          setConversations(data.filter((c) => c.establishmentId === primary.id));
-        } else {
-          setConversations([]);
-        }
-      })
+    loadConversations()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, [primary]);
+
+  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !establishmentLoading && !loading });
 
   useEffect(() => {
     if (storageReady) writeClassifiedIds(classifiedIds);

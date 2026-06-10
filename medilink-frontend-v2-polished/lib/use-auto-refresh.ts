@@ -4,11 +4,14 @@ import { useEffect, useRef } from 'react';
 
 type AutoRefreshOptions = {
   enabled?: boolean;
-  intervalMs: number;
+  intervalMs?: number;
+  refreshOnMount?: boolean;
 };
 
+export const AUTO_REFRESH_INTERVAL_MS = 15_000;
+
 export function useAutoRefresh(refresh: () => void | Promise<void>, options: AutoRefreshOptions) {
-  const { enabled = true, intervalMs } = options;
+  const { enabled = true, intervalMs = AUTO_REFRESH_INTERVAL_MS, refreshOnMount = true } = options;
   const refreshRef = useRef(refresh);
   const runningRef = useRef(false);
 
@@ -42,10 +45,12 @@ export function useAutoRefresh(refresh: () => void | Promise<void>, options: Aut
     document.addEventListener('visibilitychange', refreshWhenVisible);
     window.addEventListener('focus', refreshWhenVisible);
 
+    if (refreshOnMount) void tick();
+
     return () => {
       if (intervalId) window.clearInterval(intervalId);
       document.removeEventListener('visibilitychange', refreshWhenVisible);
       window.removeEventListener('focus', refreshWhenVisible);
     };
-  }, [enabled, intervalMs]);
+  }, [enabled, intervalMs, refreshOnMount]);
 }

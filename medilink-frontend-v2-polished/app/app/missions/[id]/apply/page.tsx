@@ -7,6 +7,7 @@ import type { Application, Conversation, Mission } from '@/lib/types';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 type ApplyResult = {
@@ -24,12 +25,19 @@ export default function ApplyMissionPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
+  async function loadMission(options: { reload?: boolean } = {}) {
+    setMission(options.reload
+      ? await api.reload<Mission>(`/missions/${id}`)
+      : await api.get<Mission>(`/missions/${id}`));
+  }
+
   useEffect(() => {
-    api.get<Mission>(`/missions/${id}`)
-      .then(setMission)
+    loadMission()
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useAutoRefresh(() => loadMission({ reload: true }), { enabled: !loading && !success && !submitting });
 
   async function submit(e: FormEvent) {
     e.preventDefault();

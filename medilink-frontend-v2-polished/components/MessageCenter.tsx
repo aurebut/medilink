@@ -310,7 +310,7 @@ export function MessageCenter() {
     });
   }, [activeId]);
 
-  useAutoRefresh(() => refresh({ reload: true }), { enabled: !loading, intervalMs: 10_000 });
+  useAutoRefresh(() => refresh({ reload: true }), { enabled: !loading });
   useEffect(() => {
     if (!activeId) return;
     return subscribeApiCache<Message[]>(`/conversations/${activeId}/messages`, (data) => {

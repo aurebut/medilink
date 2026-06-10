@@ -11,6 +11,7 @@ import { candidateNoun } from '@/lib/grammar';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getMissionPublicPath } from '@/lib/mission-links';
 import type { Application, ApplicationStatus, Mission } from '@/lib/types';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 function applicationTone(status: ApplicationStatus) {
   if (status === 'ACCEPTED') return 'success';
@@ -50,16 +51,17 @@ export default function EstablishmentMissionDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  async function load() {
-    setLoading(true);
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     setError(null);
 
     try {
-      const nextMission = await api.get<Mission>(`/missions/mine/${id}`);
+      const read = options.reload ? api.reload : api.get;
+      const nextMission = await read<Mission>(`/missions/mine/${id}`);
       setMission(nextMission);
 
       try {
-        const allApplications = await api.get<Application[]>(`/establishment/applications?establishmentId=${nextMission.establishmentId}`);
+        const allApplications = await read<Application[]>(`/establishment/applications?establishmentId=${nextMission.establishmentId}`);
         setApplications(allApplications.filter((application) => application.missionId === nextMission.id));
       } catch {
         setApplications([]);
@@ -68,13 +70,15 @@ export default function EstablishmentMissionDetailPage() {
       setError(e.message);
       setMission(null);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => {
     void load();
   }, [id]);
+
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading && !statusBusy });
 
   const stats = useMemo(() => {
     return {

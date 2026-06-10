@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import type { Mission } from '@/lib/types';
 import { formatDate } from '@/lib/format';
 import { missionTypeLabel, statusLabel } from '@/lib/labels';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
 
 function tone(status: string) {
@@ -18,17 +19,20 @@ export default function AdminMissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
     try {
-      setItems(await api.get<Mission[]>('/admin/missions'));
+      setItems(options.reload
+        ? await api.reload<Mission[]>('/admin/missions')
+        : await api.get<Mission[]>('/admin/missions'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   async function unpublish(id: string) {
     if (!confirm('Dépublier cette mission ?')) return;

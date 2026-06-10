@@ -172,7 +172,7 @@ export default function SearchMissionsPage() {
       return loadMissions(filters, { silent: true, reload: true });
     }
     return loadApplications({ silent: true, reload: true });
-  }, { enabled: activeTab === 'missions' ? !loading : !applicationsLoading, intervalMs: 15_000 });
+  }, { enabled: activeTab === 'missions' ? !loading : !applicationsLoading });
 
   function set(name: string, value: string) {
     setFilters((prev) => ({ ...prev, [name]: value }));

@@ -108,7 +108,7 @@ export default function EstablishmentMissionsPage() {
       return;
     }
     await loadApplications({ silent: true, reload: true });
-  }, { enabled: Boolean(primary) && !missionsLoading && !applicationsLoading, intervalMs: 15_000 });
+  }, { enabled: Boolean(primary) && !missionsLoading && !applicationsLoading });
 
   async function updateApplication(id: string, status: ApplicationStatus) {
     try {

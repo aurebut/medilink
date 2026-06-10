@@ -117,7 +117,7 @@ export default function CandidateDashboardPage() {
 
   useAutoRefresh(async () => {
     applyDashboardData(await api.reload<CandidateDashboardData>('/me/dashboard'));
-  }, { enabled: !loading, intervalMs: 60_000 });
+  }, { enabled: !loading });
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {

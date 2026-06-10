@@ -84,7 +84,7 @@ export default function EstablishmentDashboardPage() {
 
   useAutoRefresh(async () => {
     applyDashboardData(await api.reload<EstablishmentDashboardData>('/establishment/dashboard'));
-  }, { enabled: !dashboardLoading, intervalMs: 60_000 });
+  }, { enabled: !dashboardLoading });
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {

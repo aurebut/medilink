@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Establishment } from '@/lib/types';
 import { establishmentTypeLabel, statusLabel } from '@/lib/labels';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
 
 export default function AdminEstablishmentsPage() {
@@ -11,17 +12,20 @@ export default function AdminEstablishmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
     try {
-      setItems(await api.get<Establishment[]>('/admin/establishments'));
+      setItems(options.reload
+        ? await api.reload<Establishment[]>('/admin/establishments')
+        : await api.get<Establishment[]>('/admin/establishments'));
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, []);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   async function verify(id: string) {
     try {

@@ -5,6 +5,7 @@ import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview
 import type { Document, DocumentVerificationStatus } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, LoadingCard, PageHeader, Select } from '@/components/ui';
 
 function tone(status: string) {
@@ -20,21 +21,24 @@ export default function AdminDocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load() {
-    setLoading(true);
+  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+    if (!options.silent) setLoading(true);
     setError(null);
     try {
       const query = status ? `?status=${status}` : '';
-      const data = await api.get<Document[]>(`/admin/documents${query}`);
+      const data = options.reload
+        ? await api.reload<Document[]>(`/admin/documents${query}`)
+        : await api.get<Document[]>(`/admin/documents${query}`);
       setDocs(data);
     } catch (e: any) {
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (!options.silent) setLoading(false);
     }
   }
 
   useEffect(() => { void load(); }, [status]);
+  useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   async function approve(id: string) {
     try {

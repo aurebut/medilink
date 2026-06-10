@@ -374,7 +374,7 @@ export function AppShell({
     ]);
     setNotifications(nextNotifications);
     setConversations(nextConversations);
-  }, { enabled: Boolean(user) && area !== 'admin', intervalMs: 30_000 });
+  }, { enabled: Boolean(user) && area !== 'admin' });
 
   useEffect(() => {
     if (area === 'admin') return;

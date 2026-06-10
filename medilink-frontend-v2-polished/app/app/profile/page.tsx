@@ -24,6 +24,7 @@ import {
   specialtyOptions,
   universityDiplomaOptions,
 } from '@/lib/profile-options';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
 type UploadResponse = {
   documentId: string;
@@ -54,21 +55,33 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [verifyingHealth, setVerifyingHealth] = useState(false);
+  const [formDirty, setFormDirty] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  function applyProfile(p: Profile) {
+    setProfile(p);
+    setForm({ ...p, actsPerformedText: (p.actsPerformed || []).join(', ') });
+    setFormDirty(false);
+  }
+
+  async function loadProfile(options: { reload?: boolean } = {}) {
+    const p = options.reload
+      ? await api.reload<Profile>('/me/profile')
+      : await api.get<Profile>('/me/profile');
+    applyProfile(p);
+  }
+
   useEffect(() => {
-    api.get<Profile>('/me/profile')
-      .then((p) => {
-        setProfile(p);
-        setForm({ ...p, actsPerformedText: (p.actsPerformed || []).join(', ') });
-      })
-      .finally(() => setLoading(false));
+    loadProfile().finally(() => setLoading(false));
   }, []);
+
+  useAutoRefresh(() => loadProfile({ reload: true }), { enabled: !loading && !formDirty && !saving && !uploadingAvatar && !verifyingHealth });
 
   if (loading || !profile) return <LoadingCard />;
 
   function set(name: string, value: unknown) {
+    setFormDirty(true);
     setForm((prev: any) => ({ ...prev, [name]: value }));
   }
 
@@ -110,8 +123,7 @@ export default function ProfilePage() {
 
     try {
       const updated = await api.patch<Profile>('/me/profile', payload);
-      setProfile(updated);
-      setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
+      applyProfile(updated);
       setMessage(`Profil ${gendered(updated, 'mis a jour', 'mise a jour')}.`);
     } catch (e: any) {
       setError(e.message);
@@ -147,8 +159,7 @@ export default function ProfilePage() {
 
       await api.post(`/documents/${upload.documentId}/confirm-upload`, {});
       const updated = await api.get<Profile>('/me/profile');
-      setProfile(updated);
-      setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
+      applyProfile(updated);
       setAvatarFile(null);
       setAvatarInputKey((key) => key + 1);
       setMessage('Photo de profil mise a jour.');
@@ -168,15 +179,13 @@ export default function ProfilePage() {
       const updated = await api.post<Profile>('/me/profile/verify-health-professional', {
         rpps: form.rpps,
       });
-      setProfile(updated);
-      setForm({ ...updated, actsPerformedText: (updated.actsPerformed || []).join(', ') });
+      applyProfile(updated);
       setMessage(healthVerificationMessage(updated.healthVerificationStatus));
     } catch (e: any) {
       setError(e.message || 'Verification RPPS impossible.');
       try {
         const refreshed = await api.get<Profile>('/me/profile');
-        setProfile(refreshed);
-        setForm({ ...refreshed, actsPerformedText: (refreshed.actsPerformed || []).join(', ') });
+        applyProfile(refreshed);
       } catch {
         // Keep current form state if refresh fails.
       }
