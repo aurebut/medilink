@@ -1,8 +1,29 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EmailEventStatus } from '@prisma/client';
+import { EmailEventStatus, UserRole } from '@prisma/client';
 import { Resend } from 'resend';
 import { PrismaService } from '../prisma/prisma.service';
+
+export type MissionEmailContext = {
+  missionTitle?: string | null;
+  establishmentName?: string | null;
+  candidateName?: string | null;
+  senderName?: string | null;
+  city?: string | null;
+  startDate?: Date | string | null;
+  endDate?: Date | string | null;
+  startTime?: string | null;
+  endTime?: string | null;
+  conversationId?: string | null;
+  recipientRole?: UserRole | string | null;
+  messagePreview?: string | null;
+  workflowAction?: string | null;
+};
+
+export type DocumentEmailContext = {
+  documentType?: string | null;
+  fileName?: string | null;
+};
 
 @Injectable()
 export class EmailService {
@@ -81,6 +102,108 @@ export class EmailService {
   private getFrontendUrl(): string {
     const raw = this.config.get<string>('FRONTEND_URL') || 'http://localhost:3000';
     return raw.split(',')[0].trim();
+  }
+
+  private escapeHtml(value?: string | number | null): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  private subjectText(value: string): string {
+    return value.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  private formatDate(value?: Date | string | null): string | null {
+    if (!value) return null;
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return null;
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+    });
+  }
+
+  private formatMissionDate(context: MissionEmailContext): string | null {
+    const startDate = this.formatDate(context.startDate);
+    const endDate = this.formatDate(context.endDate);
+    const timeRange = [context.startTime, context.endTime].filter(Boolean).join(' - ');
+    const dateRange = startDate && endDate && startDate !== endDate
+      ? `${startDate} - ${endDate}`
+      : startDate;
+    return [dateRange, timeRange].filter(Boolean).join(' | ') || null;
+  }
+
+  private messageLink(context: MissionEmailContext): string {
+    const basePath = context.recipientRole === UserRole.CANDIDATE ? '/app/messages' : '/establishment/messages';
+    const query = context.conversationId ? `?id=${encodeURIComponent(context.conversationId)}` : '';
+    return `${this.getFrontendUrl()}${basePath}${query}`;
+  }
+
+  private missionDetails(context: MissionEmailContext): string {
+    const rows = [
+      ['Mission', context.missionTitle],
+      ['Etablissement', context.establishmentName],
+      ['Candidat', context.candidateName],
+      ['Ville', context.city],
+      ['Date', this.formatMissionDate(context)],
+    ].filter(([, value]) => value);
+
+    if (!rows.length) return '';
+
+    return `
+      <div style="background-color: #F8F7F3; border: 1px solid #E4E9F2; border-radius: 10px; padding: 16px; margin-bottom: 24px; font-size: 14px; line-height: 1.6; color: #0F1E32;">
+        ${rows.map(([label, value]) => `
+          <p style="margin: 0 0 8px 0;"><strong>${this.escapeHtml(label)} :</strong> ${this.escapeHtml(value)}</p>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  private cta(label: string, href: string): string {
+    return `
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
+        <tr>
+          <td align="center">
+            <a href="${this.escapeHtml(href)}" style="display: inline-block; background-color: #0E8A7A; color: #ffffff; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; box-shadow: 0 4px 12px rgba(14, 138, 122, 0.15); transition: background-color 0.2s;">
+              ${this.escapeHtml(label)}
+            </a>
+          </td>
+        </tr>
+      </table>
+    `;
+  }
+
+  private applicationStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      SUBMITTED: 'envoyee',
+      VIEWED: 'consultee',
+      ACCEPTED: 'acceptee',
+      REJECTED: 'refusee',
+      WITHDRAWN: 'retiree',
+      CANCELLED: 'annulee',
+    };
+    return labels[status] || status;
+  }
+
+  private documentTypeLabel(type?: string | null): string | null {
+    if (!type) return null;
+    const labels: Record<string, string> = {
+      CV: 'CV',
+      ATTESTATION: 'attestation',
+      CONVENTION: 'convention',
+      DIPLOMA: 'diplome',
+      IDENTITY_DOCUMENT: "piece d'identite",
+      INSURANCE: 'assurance',
+      AVATAR: 'photo de profil',
+      MESSAGE_ATTACHMENT: 'piece jointe',
+      OTHER: 'document',
+    };
+    return labels[type] || type;
   }
 
   private wrapInLayout(title: string, bodyHtml: string): string {
@@ -232,116 +355,116 @@ export class EmailService {
     });
   }
 
-  sendNewMessageEmail(userId: string, to: string) {
+  sendNewMessageEmail(userId: string, to: string, context: MissionEmailContext = {}) {
+    const senderName = context.senderName || context.establishmentName || 'un interlocuteur';
+    const action = context.workflowAction || `Nouveau message de ${senderName}`;
+    const preview = context.messagePreview
+      ? `
+        <div style="background-color: #FFFFFF; border-left: 3px solid #0E8A7A; padding: 12px 14px; margin: 0 0 24px 0; color: #0F1E32; font-size: 14px; line-height: 1.6;">
+          ${this.escapeHtml(context.messagePreview)}
+        </div>
+      `
+      : '';
+
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Nouveau message reçu</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">${this.escapeHtml(action)}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Vous avez reçu un nouveau message sur la plateforme Médilink. Cliquez sur le bouton ci-dessous pour y répondre.
+        ${context.workflowAction
+          ? `Une action vient d'etre effectuee dans votre conversation avec ${this.escapeHtml(senderName)}.`
+          : `Vous avez recu un nouveau message de <strong>${this.escapeHtml(senderName)}</strong>.`}
       </p>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-        <tr>
-          <td align="center">
-            <a href="${this.getFrontendUrl()}/app/messages" style="display: inline-block; background-color: #0E8A7A; color: #ffffff; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; box-shadow: 0 4px 12px rgba(14, 138, 122, 0.15); transition: background-color 0.2s;">
-              Accéder à la messagerie
-            </a>
-          </td>
-        </tr>
-      </table>
+      ${this.missionDetails(context)}
+      ${preview}
+      ${this.cta('Acceder a la conversation', this.messageLink(context))}
     `;
 
     return this.sendEmail({
       userId,
       to,
       type: 'message.new',
-      subject: 'Nouveau message sur Médilink',
-      html: this.wrapInLayout('Nouveau message sur Médilink', bodyHtml),
+      subject: this.subjectText(context.workflowAction
+        ? `${context.workflowAction} - Medilink`
+        : `Nouveau message de ${senderName} - Medilink`),
+      html: this.wrapInLayout('Nouveau message sur Medilink', bodyHtml),
     });
   }
 
-  sendApplicationReceivedEmail(userId: string, to: string) {
+  sendApplicationReceivedEmail(userId: string, to: string, context: MissionEmailContext = {}) {
+    const candidateName = context.candidateName || 'Un candidat';
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Nouvelle candidature reçue</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Nouvelle candidature recue</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Bonne nouvelle ! Un candidat vient de postuler à l'une de vos annonces de mission sur Médilink. 
-        Vous pouvez consulter sa candidature et son profil en cliquant ci-dessous.
+        <strong>${this.escapeHtml(candidateName)}</strong> vient de postuler a votre mission${context.missionTitle ? ` <strong>${this.escapeHtml(context.missionTitle)}</strong>` : ''}.
+        Vous pouvez consulter son profil, son message et poursuivre l'echange depuis votre espace etablissement.
       </p>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-        <tr>
-          <td align="center">
-            <a href="${this.getFrontendUrl()}/establishment/dashboard" style="display: inline-block; background-color: #0E8A7A; color: #ffffff; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; box-shadow: 0 4px 12px rgba(14, 138, 122, 0.15); transition: background-color 0.2s;">
-              Consulter les candidatures
-            </a>
-          </td>
-        </tr>
-      </table>
+      ${this.missionDetails(context)}
+      ${this.cta('Consulter la candidature', `${this.getFrontendUrl()}/establishment/dashboard`)}
     `;
 
     return this.sendEmail({
       userId,
       to,
       type: 'application.received',
-      subject: 'Nouvelle candidature reçue',
-      html: this.wrapInLayout('Nouvelle candidature reçue', bodyHtml),
+      subject: this.subjectText(`${candidateName} a postule${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
+      html: this.wrapInLayout('Nouvelle candidature recue', bodyHtml),
     });
   }
 
-  sendApplicationStatusEmail(userId: string, to: string, status: string) {
+  sendApplicationStatusEmail(userId: string, to: string, status: string, context: MissionEmailContext = {}) {
+    const statusLabel = this.applicationStatusLabel(status);
+    const isAccepted = status === 'ACCEPTED';
+    const isRejected = status === 'REJECTED';
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Statut de votre candidature</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Votre candidature est ${this.escapeHtml(statusLabel)}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Le statut de votre candidature sur Médilink a été mis à jour par l'établissement.
-        Il est désormais : <strong style="color: #0E8A7A;">${status}</strong>.
+        ${isAccepted
+          ? `Votre candidature est acceptee pour cette mission. Vous pouvez maintenant finaliser les prochaines etapes dans la conversation.`
+          : isRejected
+            ? `L'etablissement ${context.establishmentName ? `<strong>${this.escapeHtml(context.establishmentName)}</strong>` : ''} n'a pas retenu votre candidature pour cette mission.`
+            : `Le statut de votre candidature a ete mis a jour : <strong style="color: #0E8A7A;">${this.escapeHtml(statusLabel)}</strong>.`}
       </p>
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-        <tr>
-          <td align="center">
-            <a href="${this.getFrontendUrl()}/app/dashboard" style="display: inline-block; background-color: #0E8A7A; color: #ffffff; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; box-shadow: 0 4px 12px rgba(14, 138, 122, 0.15); transition: background-color 0.2s;">
-              Suivre mes candidatures
-            </a>
-          </td>
-        </tr>
-      </table>
+      ${this.missionDetails(context)}
+      ${this.cta(context.conversationId ? 'Ouvrir la conversation' : 'Suivre mes candidatures', context.conversationId ? this.messageLink({ ...context, recipientRole: UserRole.CANDIDATE }) : `${this.getFrontendUrl()}/app/dashboard`)}
     `;
 
     return this.sendEmail({
       userId,
       to,
       type: 'application.status_changed',
-      subject: 'Statut de votre candidature mis à jour',
-      html: this.wrapInLayout('Statut de votre candidature mis à jour', bodyHtml),
+      subject: this.subjectText(`Candidature ${statusLabel}${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
+      html: this.wrapInLayout('Statut de votre candidature mis a jour', bodyHtml),
     });
   }
 
-  sendDocumentStatusEmail(userId: string, to: string, status: string, reason?: string) {
+  sendDocumentStatusEmail(
+    userId: string,
+    to: string,
+    status: string,
+    reason?: string,
+    context: DocumentEmailContext = {},
+  ) {
+    const documentType = this.documentTypeLabel(context.documentType) || 'document';
+    const approved = status === 'APPROVED';
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Statut de votre document</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">${approved ? 'Document valide' : 'Document refuse'}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Le statut de validation de l'un de vos justificatifs d'identité ou diplômes a été mis à jour par notre équipe.
-        Il est maintenant : <strong style="color: ${status === 'APPROVED' ? '#0E8A7A' : '#B42318'};">${status === 'APPROVED' ? 'Approuvé' : 'Refusé'}</strong>.
+        Notre equipe a ${approved ? 'valide' : 'refuse'} votre ${this.escapeHtml(documentType)}${context.fileName ? ` <strong>${this.escapeHtml(context.fileName)}</strong>` : ''}.
+        ${approved ? 'Votre dossier gagne en fiabilite pour vos prochaines missions.' : 'Vous pouvez le corriger puis le renvoyer depuis votre profil.'}
       </p>
       ${reason ? `
         <div style="background-color: #FEF2F2; border: 1px solid rgba(180, 35, 24, 0.15); border-radius: 8px; padding: 16px; margin-bottom: 24px; color: #991B1B; font-size: 14px; font-family: 'DM Sans', sans-serif;">
-          <strong>Motif du refus :</strong><br>${reason}
+          <strong>Motif du refus :</strong><br>${this.escapeHtml(reason)}
         </div>
       ` : ''}
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-        <tr>
-          <td align="center">
-            <a href="${this.getFrontendUrl()}/app/profile" style="display: inline-block; background-color: #0E8A7A; color: #ffffff; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; text-decoration: none; padding: 14px 28px; border-radius: 8px; box-shadow: 0 4px 12px rgba(14, 138, 122, 0.15); transition: background-color 0.2s;">
-              Accéder à mes documents
-            </a>
-          </td>
-        </tr>
-      </table>
+      ${this.cta('Acceder a mes documents', `${this.getFrontendUrl()}/app/profile`)}
     `;
 
     return this.sendEmail({
       userId,
       to,
       type: 'document.status_changed',
-      subject: 'Statut de votre document mis à jour',
-      html: this.wrapInLayout('Statut de votre document mis à jour', bodyHtml),
+      subject: `${approved ? 'Document valide' : 'Document refuse'} - Medilink`,
+      html: this.wrapInLayout('Statut de votre document mis a jour', bodyHtml),
     });
   }
 }
-

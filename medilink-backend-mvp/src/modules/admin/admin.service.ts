@@ -81,7 +81,7 @@ export class AdminService {
       },
     });
 
-    await this.notifications.notifyDocumentStatus(document.userId, 'APPROVED');
+    await this.notifications.notifyDocumentStatus(document.userId, 'APPROVED', undefined, document.id);
 
     await this.audit.log({
       actorUserId: admin.id,
@@ -111,7 +111,7 @@ export class AdminService {
       },
     });
 
-    await this.notifications.notifyDocumentStatus(document.userId, 'REJECTED', reason);
+    await this.notifications.notifyDocumentStatus(document.userId, 'REJECTED', reason, document.id);
 
     await this.audit.log({
       actorUserId: admin.id,
