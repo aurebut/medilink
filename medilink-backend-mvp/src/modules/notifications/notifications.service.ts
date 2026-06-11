@@ -98,16 +98,20 @@ export class NotificationsService {
       data: { applicationId, missionId: application.missionId },
     });
 
-    await this.email.sendApplicationReceivedEmail(recipient.id, recipient.email, {
-      candidateName,
-      missionTitle: application.mission.title,
-      establishmentName: application.mission.establishment.name,
-      city: application.mission.city,
-      startDate: application.mission.startDate,
-      endDate: application.mission.endDate,
-      startTime: application.mission.startTime,
-      endTime: application.mission.endTime,
-    });
+    try {
+      await this.email.sendApplicationReceivedEmail(recipient.id, recipient.email, {
+        candidateName,
+        missionTitle: application.mission.title,
+        establishmentName: application.mission.establishment.name,
+        city: application.mission.city,
+        startDate: application.mission.startDate,
+        endDate: application.mission.endDate,
+        startTime: application.mission.startTime,
+        endTime: application.mission.endTime,
+      });
+    } catch (error) {
+      console.error('Failed to send application received email:', error);
+    }
   }
 
   async notifyApplicationStatusChanged(applicationId: string, status: string) {
@@ -132,21 +136,25 @@ export class NotificationsService {
       data: { applicationId, missionId: application.missionId, status },
     });
 
-    await this.email.sendApplicationStatusEmail(
-      application.candidate.id,
-      application.candidate.email,
-      status,
-      {
-        missionTitle: application.mission.title,
-        establishmentName: application.mission.establishment.name,
-        city: application.mission.city,
-        startDate: application.mission.startDate,
-        endDate: application.mission.endDate,
-        startTime: application.mission.startTime,
-        endTime: application.mission.endTime,
-        conversationId: application.conversation?.id,
-      },
-    );
+    try {
+      await this.email.sendApplicationStatusEmail(
+        application.candidate.id,
+        application.candidate.email,
+        status,
+        {
+          missionTitle: application.mission.title,
+          establishmentName: application.mission.establishment.name,
+          city: application.mission.city,
+          startDate: application.mission.startDate,
+          endDate: application.mission.endDate,
+          startTime: application.mission.startTime,
+          endTime: application.mission.endTime,
+          conversationId: application.conversation?.id,
+        },
+      );
+    } catch (error) {
+      console.error('Failed to send application status email:', error);
+    }
   }
 
   async notifyNewMessage(conversationId: string, senderUserId: string) {
@@ -209,21 +217,25 @@ export class NotificationsService {
         data: { conversationId, missionId: conversation.missionId },
       });
 
-      await this.email.sendNewMessageEmail(user.id, user.email, {
-        senderName,
-        missionTitle: conversation.mission.title,
-        establishmentName: conversation.establishment.name,
-        candidateName,
-        city: conversation.mission.city,
-        startDate: conversation.mission.startDate,
-        endDate: conversation.mission.endDate,
-        startTime: conversation.mission.startTime,
-        endTime: conversation.mission.endTime,
-        conversationId,
-        recipientRole: user.role,
-        messagePreview,
-        workflowAction,
-      });
+      try {
+        await this.email.sendNewMessageEmail(user.id, user.email, {
+          senderName,
+          missionTitle: conversation.mission.title,
+          establishmentName: conversation.establishment.name,
+          candidateName,
+          city: conversation.mission.city,
+          startDate: conversation.mission.startDate,
+          endDate: conversation.mission.endDate,
+          startTime: conversation.mission.startTime,
+          endTime: conversation.mission.endTime,
+          conversationId,
+          recipientRole: user.role,
+          messagePreview,
+          workflowAction,
+        });
+      } catch (error) {
+        console.error('Failed to send new message email:', error);
+      }
     }
   }
 
@@ -255,10 +267,14 @@ export class NotificationsService {
           : `Votre ${documentLabel} a ete refuse.${reason ? ` Motif : ${reason}` : ''}`,
     });
 
-    await this.email.sendDocumentStatusEmail(user.id, user.email, status, reason, {
-      documentType: document?.documentType,
-      fileName: document?.fileName,
-    });
+    try {
+      await this.email.sendDocumentStatusEmail(user.id, user.email, status, reason, {
+        documentType: document?.documentType,
+        fileName: document?.fileName,
+      });
+    } catch (error) {
+      console.error('Failed to send document status email:', error);
+    }
   }
 
   private userDisplayName(user: { email: string; profile?: { firstName?: string | null; lastName?: string | null } | null }) {
