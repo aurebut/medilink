@@ -174,7 +174,7 @@ export function MessageCenter() {
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const activeIdRef = useRef<string | null>(null);
-  const sendingMessageRef = useRef(false);
+  const sendingMessageRef = useRef(0);
   activeIdRef.current = activeId;
 
   const active = useMemo(() => conversations.find((c) => c.id === activeId) || null, [conversations, activeId]);
@@ -372,7 +372,7 @@ export function MessageCenter() {
   async function send(e?: FormEvent) {
     e?.preventDefault();
     const messageBody = body.trim();
-    if (!activeId || !messageBody || sendingMessageRef.current) return;
+    if (!activeId || !messageBody) return;
 
     const conversationId = activeId;
     const clientRequestId = createClientRequestId();
@@ -387,7 +387,7 @@ export function MessageCenter() {
       localStatus: 'pending',
     };
 
-    sendingMessageRef.current = true;
+    sendingMessageRef.current += 1;
     setSendingMessage(true);
     setError(null);
     setBody('');
@@ -403,8 +403,8 @@ export function MessageCenter() {
       if (activeIdRef.current === conversationId) setBody(messageBody);
       setError(e.message);
     } finally {
-      sendingMessageRef.current = false;
-      setSendingMessage(false);
+      sendingMessageRef.current = Math.max(0, sendingMessageRef.current - 1);
+      setSendingMessage(sendingMessageRef.current > 0);
     }
   }
 
@@ -871,8 +871,8 @@ export function MessageCenter() {
         </div>
 
         <form className="message-form" onSubmit={send}>
-          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." disabled={sendingMessage} />
-          <Button disabled={sendingMessage || !body.trim()}>{sendingMessage ? 'Envoi...' : 'Envoyer'}</Button>
+          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." />
+          <Button disabled={!body.trim()}>Envoyer</Button>
         </form>
       </Card> : null}
     </div>
