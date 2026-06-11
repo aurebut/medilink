@@ -29,6 +29,15 @@ type ScoredCandidate = {
   candidateUserId: string;
   email: string;
   displayName: string;
+  profile: {
+    firstName?: string | null;
+    lastName?: string | null;
+    city?: string | null;
+    medicalStatus?: MedicalStatus | null;
+    specialty?: string | null;
+    verifiedSpecialty?: string | null;
+    completionScore: number;
+  };
   eligible: boolean;
   score: number;
   tier: string;
@@ -253,6 +262,7 @@ export class MatchingService {
         candidateUserId: candidate.id,
         email: candidate.email,
         displayName: this.userDisplayName(candidate),
+        profile: this.candidateProfileSummary(profile),
         eligible: false,
         score: 0,
         tier: 'excluded',
@@ -340,6 +350,7 @@ export class MatchingService {
       candidateUserId: candidate.id,
       email: candidate.email,
       displayName: this.userDisplayName(candidate),
+      profile: this.candidateProfileSummary(profile),
       eligible: true,
       score,
       tier: this.tierForScore(score),
@@ -689,6 +700,18 @@ export class MatchingService {
 
   private userDisplayName(user: { email: string; profile?: { firstName?: string | null; lastName?: string | null } | null }) {
     return [user.profile?.firstName, user.profile?.lastName].filter(Boolean).join(' ') || user.email;
+  }
+
+  private candidateProfileSummary(profile: any) {
+    return {
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      city: profile.city,
+      medicalStatus: profile.medicalStatus,
+      specialty: profile.specialty,
+      verifiedSpecialty: profile.verifiedSpecialty,
+      completionScore: profile.completionScore || 0,
+    };
   }
 
   private missionSummary(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>) {
