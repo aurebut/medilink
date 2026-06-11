@@ -258,6 +258,9 @@ export class ConversationsService {
         agreementId: agreement.id,
         proposal: this.agreementPayload(updatedAgreement),
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyApplicationStatusChanged(conversation.applicationId, ApplicationStatus.ACCEPTED);
@@ -303,6 +306,9 @@ export class ConversationsService {
       return this.createWorkflowMessageTx(tx, user, conversationId, 'PROPOSAL_REJECTED', {
         agreementId: agreement.id,
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyApplicationStatusChanged(conversation.applicationId, ApplicationStatus.REJECTED);
@@ -341,6 +347,9 @@ export class ConversationsService {
         agreementId: agreement.id,
         proposal: this.agreementPayload(updatedAgreement),
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
@@ -372,6 +381,9 @@ export class ConversationsService {
         agreementId: agreement.id,
         proposal: this.agreementPayload(updatedAgreement),
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
@@ -408,6 +420,9 @@ export class ConversationsService {
         agreementId: agreement.id,
         proposal: this.agreementPayload(updatedAgreement),
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
@@ -443,6 +458,9 @@ export class ConversationsService {
           issuedAt: invoice.issuedAt,
         })),
       });
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     await this.notifications.notifyNewMessage(conversationId, user.id);
@@ -458,6 +476,9 @@ export class ConversationsService {
     const invoice = await this.prisma.$transaction(async (tx) => {
       const invoices = await this.ensureInvoicesTx(tx, agreement);
       return invoices.find((item) => item.type === invoiceType);
+    }, {
+      maxWait: 5000,
+      timeout: 15000,
     });
 
     if (!invoice) throw new NotFoundException('Facture introuvable.');
