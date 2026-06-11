@@ -5542,7 +5542,9 @@ tbody tr:hover { background: #FAFBFD; }
     background: var(--bg);
   }
   .shell > .sidebar {
-    display: block !important;
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 50;
@@ -5556,6 +5558,8 @@ tbody tr:hover { background: #FAFBFD; }
     border-bottom: 1px solid rgba(255,255,255,.08);
   }
   .shell > .sidebar .sidebar-head {
+    flex: 1 1 auto;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -5564,6 +5568,7 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .shell > .sidebar .brand { padding: 0; }
   .shell > .sidebar .mobile-menu-button {
+    order: 3;
     width: 42px;
     height: 42px;
     flex: 0 0 42px;
@@ -5676,6 +5681,13 @@ tbody tr:hover { background: #FAFBFD; }
     width: 100%;
   }
   .shell > .sidebar .sidebar-footer { display: none; }
+  .shell > .sidebar .sidebar-quick-actions {
+    order: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
   .main {
     min-width: 0;
     overflow: hidden;
