@@ -18,6 +18,9 @@ export type MissionEmailContext = {
   recipientRole?: UserRole | string | null;
   messagePreview?: string | null;
   workflowAction?: string | null;
+  score?: number | null;
+  reasons?: string[] | null;
+  missionId?: string | null;
 };
 
 export type DocumentEmailContext = {
@@ -142,6 +145,10 @@ export class EmailService {
     const basePath = context.recipientRole === UserRole.CANDIDATE ? '/app/messages' : '/establishment/messages';
     const query = context.conversationId ? `?id=${encodeURIComponent(context.conversationId)}` : '';
     return `${this.getFrontendUrl()}${basePath}${query}`;
+  }
+
+  private missionLink(context: MissionEmailContext): string {
+    return `${this.getFrontendUrl()}/app/missions/${encodeURIComponent(context.missionId || '')}`;
   }
 
   private missionDetails(context: MissionEmailContext): string {
@@ -407,6 +414,37 @@ export class EmailService {
       type: 'application.received',
       subject: this.subjectText(`${candidateName} a postule${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
       html: this.wrapInLayout('Nouvelle candidature recue', bodyHtml),
+    });
+  }
+
+  sendMissionRecommendationEmail(userId: string, to: string, context: MissionEmailContext = {}) {
+    const reasons = context.reasons?.length
+      ? `
+        <div style="background-color: #F8F7F3; border: 1px solid #E4E9F2; border-radius: 10px; padding: 16px; margin-bottom: 24px; font-size: 14px; line-height: 1.6; color: #0F1E32;">
+          <p style="margin: 0 0 8px 0;"><strong>Pourquoi cette mission peut vous correspondre :</strong></p>
+          <ul style="margin: 0; padding-left: 18px;">
+            ${context.reasons.slice(0, 5).map((reason) => `<li>${this.escapeHtml(reason)}</li>`).join('')}
+          </ul>
+        </div>
+      `
+      : '';
+
+    const bodyHtml = `
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Mission recommandee pour vous</h1>
+      <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
+        Nous avons identifie une mission qui correspond fortement a votre profil${context.score ? `, avec un score de pertinence de <strong>${this.escapeHtml(context.score)}/100</strong>` : ''}.
+      </p>
+      ${this.missionDetails(context)}
+      ${reasons}
+      ${this.cta('Voir la mission', this.missionLink(context))}
+    `;
+
+    return this.sendEmail({
+      userId,
+      to,
+      type: 'matching.mission_recommendation',
+      subject: this.subjectText(`Mission recommandee${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
+      html: this.wrapInLayout('Mission recommandee', bodyHtml),
     });
   }
 

@@ -9,6 +9,7 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { EstablishmentsModule } from './modules/establishments/establishments.module';
+import { MatchingModule } from './modules/matching/matching.module';
 import { MissionsModule } from './modules/missions/missions.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
@@ -30,6 +31,7 @@ import { UsersModule } from './modules/users/users.module';
     DocumentsModule,
     EstablishmentsModule,
     MissionsModule,
+    MatchingModule,
     ApplicationsModule,
     ConversationsModule,
     DashboardModule,

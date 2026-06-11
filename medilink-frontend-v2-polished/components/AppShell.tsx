@@ -7,6 +7,7 @@ import { api, getApiCacheSync, primeApiCache, subscribeApiCache } from '@/lib/ap
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
+import { getCandidateMissionPath } from '@/lib/mission-links';
 import {
   clearNotificationsCache,
   confirmNotificationDelete,
@@ -48,6 +49,7 @@ const adminNav: NavItem[] = [
   { href: '/admin/documents', label: 'Documents', icon: 'F' },
   { href: '/admin/establishments', label: 'Établissements', icon: 'E' },
   { href: '/admin/missions', label: 'Missions', icon: 'M' },
+  { href: '/admin/matching', label: 'Matching', icon: 'S' },
 ];
 
 const WARMED_PATH_TTL_MS = 60_000;
@@ -210,7 +212,7 @@ function getNotificationLink(notification: Notification, area: 'candidate' | 'es
     if (area === 'establishment') return `/establishment/messages?id=${data.conversationId}`;
   }
   if (data.missionId) {
-    if (area === 'candidate') return '/app/missions';
+    if (area === 'candidate') return getCandidateMissionPath(String(data.missionId));
     if (area === 'establishment') return '/establishment/missions?tab=applications';
   }
   return null;

@@ -142,11 +142,19 @@ enum NotificationType {
   DOCUMENT_APPROVED
   DOCUMENT_REJECTED
   PROFILE_INCOMPLETE
+  MISSION_RECOMMENDATION
 }
 
 enum EmailEventStatus {
   PENDING
   SENT
+  FAILED
+}
+
+enum MissionMatchNotificationStatus {
+  PENDING
+  SENT
+  SKIPPED
   FAILED
 }
 
@@ -239,6 +247,7 @@ model User {
   memberships     EstablishmentMember[]
   missionsCreated Mission[] @relation("MissionCreator")
   applications    Application[] @relation("CandidateApplications")
+  candidateMatches MissionCandidateMatch[]
   messages        Message[]
   notifications   Notification[]
   emailEvents     EmailEvent[]
@@ -507,6 +516,7 @@ model Mission {
   conversations Conversation[]
   agreements    MissionAgreement[]
   publicationCredit PublicationCredit?
+  candidateMatches MissionCandidateMatch[]
 
   @@index([status])
   @@index([missionType])
@@ -516,6 +526,29 @@ model Mission {
   @@index([patientType])
   @@index([softwareUsed])
   @@index([startDate])
+}
+
+model MissionCandidateMatch {
+  id                 String                         @id @default(uuid())
+  missionId          String
+  candidateUserId    String
+  score              Int
+  tier               String
+  reasons            Json?
+  breakdown          Json?
+  notificationStatus MissionMatchNotificationStatus @default(PENDING)
+  notifiedAt         DateTime?
+  lastScoredAt       DateTime                       @default(now())
+  createdAt          DateTime                       @default(now())
+  updatedAt          DateTime                       @updatedAt
+
+  mission   Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  candidate User    @relation(fields: [candidateUserId], references: [id], onDelete: Cascade)
+
+  @@unique([missionId, candidateUserId])
+  @@index([missionId, score])
+  @@index([candidateUserId])
+  @@index([notificationStatus])
 }
 
 model BillingCustomer {
