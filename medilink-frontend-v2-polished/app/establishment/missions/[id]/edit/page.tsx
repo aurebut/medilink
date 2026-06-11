@@ -13,8 +13,10 @@ import {
   durationOptions,
   equipmentOptions,
   establishmentDepartmentOptions,
+  missionActOptions,
   mobilityOptions,
   patientTypeOptions,
+  practiceSettingOptions,
   refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
@@ -55,6 +57,8 @@ function missionToForm(mission: Mission) {
     specialty: mission.specialty || '',
     requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel || 'INTERN',
     requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean),
+    practiceSetting: mission.practiceSetting || '',
+    requiredActs: mission.requiredActs || [],
     city: mission.city || '',
     location: mission.location || '',
     sector: mission.sector || '',
@@ -97,6 +101,8 @@ function buildPayload(form: any) {
     specialty: form.specialty,
     requiredLevel: form.requiredLevels?.[0] || form.requiredLevel,
     requiredLevels: form.requiredLevels?.length ? form.requiredLevels : [form.requiredLevel],
+    practiceSetting: form.practiceSetting || null,
+    requiredActs: cleanArray(form.requiredActs),
     city: form.city.trim(),
     location: optionalText(form.location),
     sector: form.sector || null,
@@ -286,9 +292,11 @@ export default function EditMissionPage() {
               </div>
             </div>
             <div className="form">
+              <SingleChoiceField label="Cadre d'exercice" value={form.practiceSetting || ''} options={practiceSettingOptions} onChange={(value) => set('practiceSetting', value)} />
               <MultiChoiceTextField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
               <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
               <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
+              <MultiChoiceField label="Actes attendus" values={safeArray(form.requiredActs)} options={missionActOptions} onChange={(values) => set('requiredActs', values)} />
               <div className="form-row">
                 <Field label="Présence de secrétaire">
                   <Select value={booleanSelectValue(form.hasSecretary)} onChange={(event) => set('hasSecretary', event.target.value === '' ? undefined : event.target.value === 'true')}>
@@ -418,6 +426,7 @@ export default function EditMissionPage() {
             </div>
             <div className="info-list">
               <div><span>Spécialité</span><strong>{form.specialty || '-'}</strong></div>
+              <div><span>Cadre</span><strong>{form.practiceSetting || '-'}</strong></div>
               <div><span>Ville</span><strong>{form.city || '-'}</strong></div>
               <div><span>Date</span><strong>{form.startDate ? formatDate(form.startDate) : '-'}</strong></div>
               <div><span>Horaire</span><strong>{form.startTime || '-'} {form.endTime ? `- ${form.endTime}` : ''}</strong></div>

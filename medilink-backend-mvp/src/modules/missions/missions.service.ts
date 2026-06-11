@@ -61,6 +61,8 @@ export class MissionsService {
         specialty: dto.specialty,
         requiredLevel: requiredLevels[0],
         requiredLevels,
+        practiceSetting: dto.practiceSetting,
+        requiredActs: dto.requiredActs || [],
         location: dto.location,
         city: dto.city,
         sector: dto.sector || establishment.sector,

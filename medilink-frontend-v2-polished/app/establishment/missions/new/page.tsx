@@ -15,8 +15,10 @@ import {
   durationOptions,
   equipmentOptions,
   establishmentDepartmentOptions,
+  missionActOptions,
   mobilityOptions,
   patientTypeOptions,
+  practiceSettingOptions,
   refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
@@ -176,6 +178,8 @@ function missionToWizardForm(mission: any) {
     title: mission.title === 'Mission sans titre' ? '' : mission.title || '',
     specialty: mission.specialty === 'Specialite a preciser' ? '' : mission.specialty || '',
     description: mission.description || '',
+    practiceSetting: mission.practiceSetting || '',
+    requiredActs: mission.requiredActs || [],
     departmentInfo: mission.departmentInfo || '',
     softwareUsed: mission.softwareUsed || '',
     hasSecretary: mission.hasSecretary,
@@ -503,6 +507,8 @@ export default function NewMissionPage() {
       establishmentId: selectedEstablishment?.id,
       requiredLevel: form.requiredLevels?.[0] || form.requiredLevel,
       requiredLevels: form.requiredLevels?.length ? form.requiredLevels : [form.requiredLevel],
+      practiceSetting: form.practiceSetting || undefined,
+      requiredActs: cleanArray(form.requiredActs),
       compensationMode: 'RETROCESSION',
       durationHours: form.durationHours ? Number(form.durationHours) : undefined,
       retrocessionPercentage: form.retrocessionPercentage ? Number(form.retrocessionPercentage) : 70,
@@ -1159,8 +1165,10 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <h2>Service et outils</h2>
           <p>Indiquez le cadre de travail et les logiciels utilisés au quotidien.</p>
         </div>
+        <SingleChoiceField label="Cadre d'exercice" value={form.practiceSetting || ''} options={practiceSettingOptions} onChange={(value) => set('practiceSetting', value)} />
         <MultiChoiceTextField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
         <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
+        <MultiChoiceField label="Actes attendus" values={safeArray(form.requiredActs)} options={missionActOptions} onChange={(values) => set('requiredActs', values)} />
       </div>
     );
   }
@@ -1530,12 +1538,14 @@ function MissionDraftSummary({ form, compact = false }: { form: any; compact?: b
       </div>
       <div className="info-list">
         <div><span>Spécialité</span><strong>{form.specialty || '-'}</strong></div>
+        <div><span>Cadre</span><strong>{form.practiceSetting || '-'}</strong></div>
         <div><span>Ville</span><strong>{form.city || '-'}</strong></div>
         <div><span>Secteur conventionné</span><strong>{sectorLabel(form.sector)}</strong></div>
         <div><span>Patientèle</span><strong>{form.patientType || '-'}</strong></div>
         <div><span>Logiciel</span><strong>{form.softwareUsed || '-'}</strong></div>
         <div><span>Secrétaire</span><strong>{form.hasSecretary === undefined || form.hasSecretary === null ? '-' : form.hasSecretary ? 'Oui' : 'Non'}</strong></div>
         <div><span>Service</span><strong>{form.departmentInfo || '-'}</strong></div>
+        <div><span>Actes attendus</span><strong>{safeArray(form.requiredActs).join(', ') || '-'}</strong></div>
         <div><span>Date</span><strong>{form.startDate ? formatDate(form.startDate) : '-'}</strong></div>
         <div><span>Horaire</span><strong>{form.startTime || '-'} {form.endTime ? `- ${form.endTime}` : ''}</strong></div>
         <div><span>Durée</span><strong>{form.durationHours ? `${form.durationHours} h` : '-'}</strong></div>

@@ -16,9 +16,11 @@ type MatchCandidate = {
   candidateUserId: string;
   email: string;
   displayName: string;
+  eligible: boolean;
   score: number;
   tier: string;
   reasons: string[];
+  exclusionReasons: string[];
   breakdown: Record<string, number>;
   alreadyNotified: boolean;
 };
@@ -35,7 +37,9 @@ type MatchPreview = {
   };
   thresholds: MatchTier[];
   total: number;
+  excludedTotal: number;
   items: MatchCandidate[];
+  excluded: MatchCandidate[];
 };
 
 type DispatchResult = {
@@ -145,6 +149,7 @@ export default function AdminMatchingPage() {
   const selectedMission = missions.find((mission) => mission.id === selectedMissionId);
   const pendingCandidates = preview?.items.filter((candidate) => !candidate.alreadyNotified) || [];
   const topCandidate = preview?.items[0];
+  const notifiedCandidates = preview?.items.filter((candidate) => candidate.alreadyNotified) || [];
 
   return (
     <>
@@ -262,10 +267,17 @@ export default function AdminMatchingPage() {
             </div>
             <div className="card stat-card">
               <div className="stat">
-                <span>Paliers actifs</span>
-                <strong>{preview.thresholds.length}</strong>
-                <div className="small">{preview.thresholds.map((tier) => `${tier.minimumScore}+`).join(' / ')}</div>
+                <span>Exclus</span>
+                <strong>{preview.excludedTotal}</strong>
+                <div className="small">{notifiedCandidates.length} deja notifie(s)</div>
               </div>
+            </div>
+          </div>
+
+          <div className="toolbar">
+            <div>
+              <h2>Retenus</h2>
+              <p className="small">Candidats eligibles, tries par score mission/profil.</p>
             </div>
           </div>
 
@@ -314,6 +326,44 @@ export default function AdminMatchingPage() {
                 {preview.items.length === 0 ? (
                   <tr>
                     <td colSpan={6}>Aucun candidat au-dessus du seuil de matching actuel.</td>
+                  </tr>
+                ) : null}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="toolbar">
+            <div>
+              <h2>Exclus</h2>
+              <p className="small">Candidats sortis du matching avant scoring pour incompatibilite claire.</p>
+            </div>
+          </div>
+
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Candidat</th>
+                  <th>Raisons d'exclusion</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                {preview.excluded.map((candidate) => (
+                  <tr key={candidate.candidateUserId}>
+                    <td>
+                      <strong>{candidate.displayName}</strong>
+                      <div className="small">{candidate.email}</div>
+                    </td>
+                    <td>
+                      <div className="small">{candidate.exclusionReasons.join(' | ') || 'Exclusion non detaillee'}</div>
+                    </td>
+                    <td><Badge tone="danger">Exclu</Badge></td>
+                  </tr>
+                ))}
+                {preview.excluded.length === 0 ? (
+                  <tr>
+                    <td colSpan={3}>Aucun candidat exclu dans la previsualisation actuelle.</td>
                   </tr>
                 ) : null}
               </tbody>

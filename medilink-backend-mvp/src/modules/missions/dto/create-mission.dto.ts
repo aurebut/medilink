@@ -41,6 +41,15 @@ export class CreateMissionDto {
 
   @IsOptional()
   @IsString()
+  practiceSetting?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  requiredActs?: string[];
+
+  @IsOptional()
+  @IsString()
   location?: string;
 
   @IsString()

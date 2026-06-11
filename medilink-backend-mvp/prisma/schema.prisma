@@ -311,12 +311,23 @@ model Profile {
   preferredCities     String[]       @default([])
   maxTravelRadiusKm   Int?
   mobilityOptions     String[]       @default([])
+  acceptedWeekdays    String[]       @default([])
+  acceptedTimeSlots   String[]       @default([])
+  minimumNoticeHours  Int?
+  mobilityRangeType   String?
+  housingRequiredBeyondKm Int?
+  acceptedPracticeSettings String[]  @default([])
   acceptedMissionTypes String[]      @default([])
   minimumCompensation Int?
   preferredDurations  String[]       @default([])
   refusedSchedules    String[]       @default([])
   knownSoftware       String[]       @default([])
   acceptedPatientTypes String[]      @default([])
+  refusedPatientTypes String[]       @default([])
+  maxPatientsPerDay   Int?
+  parkingRequired     Boolean?
+  acceptedActs        String[]       @default([])
+  refusedActs         String[]       @default([])
   secretaryRequired   Boolean?
   accommodationRequired Boolean?
   fastPaymentImportant Boolean?
@@ -471,6 +482,8 @@ model Mission {
   specialty           String
   requiredLevel       RequiredLevel
   requiredLevels      RequiredLevel[] @default([])
+  practiceSetting     String?
+  requiredActs        String[]       @default([])
   location            String?
   city                String
   sector              String?
@@ -532,9 +545,11 @@ model MissionCandidateMatch {
   id                 String                         @id @default(uuid())
   missionId          String
   candidateUserId    String
+  eligible           Boolean                        @default(true)
   score              Int
   tier               String
   reasons            Json?
+  exclusionReasons   Json?
   breakdown          Json?
   notificationStatus MissionMatchNotificationStatus @default(PENDING)
   notifiedAt         DateTime?

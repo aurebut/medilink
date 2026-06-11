@@ -90,6 +90,37 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  acceptedWeekdays?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedTimeSlots?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(720)
+  minimumNoticeHours?: number;
+
+  @IsOptional()
+  @IsString()
+  mobilityRangeType?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(1000)
+  housingRequiredBeyondKm?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedPracticeSettings?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   acceptedMissionTypes?: string[];
 
   @IsOptional()
@@ -116,6 +147,31 @@ export class UpdateProfileDto {
   @IsArray()
   @IsString({ each: true })
   acceptedPatientTypes?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  refusedPatientTypes?: string[];
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(300)
+  maxPatientsPerDay?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  parkingRequired?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  acceptedActs?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  refusedActs?: string[];
 
   @IsOptional()
   @IsBoolean()
