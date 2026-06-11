@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
+import { api, getApiCacheSync, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
@@ -18,7 +18,7 @@ import {
   restoreNotificationInCache,
   restoreNotificationsCache,
 } from '@/lib/notification-cache';
-import type { CandidateDashboardData, Conversation, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
+import type { CandidateDashboardData, Conversation, Establishment, EstablishmentBillingStatus, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
 
@@ -240,6 +240,11 @@ function getNotificationLinkLabel(notification: Notification, area: 'candidate' 
   return '';
 }
 
+type PublicationCreditSummary = {
+  available: number;
+  establishments: Array<{ id: string; name: string; availableCredits: number }>;
+};
+
 export function AppShell({
   children,
   area,
@@ -258,8 +263,11 @@ export function AppShell({
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [creditsOpen, setCreditsOpen] = useState(false);
+  const [publicationCredits, setPublicationCredits] = useState<PublicationCreditSummary>({ available: 0, establishments: [] });
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const notificationsRef = useRef<HTMLDivElement | null>(null);
+  const creditsRef = useRef<HTMLDivElement | null>(null);
   const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
   const userProfileHref = profileHref(area);
   const userAccountHref = accountHref(area);
@@ -288,6 +296,7 @@ export function AppShell({
     setMobileNavOpen(false);
     setAccountMenuOpen(false);
     setNotificationsOpen(false);
+    setCreditsOpen(false);
     await logout();
     router.push('/login');
   }
@@ -350,6 +359,43 @@ export function AppShell({
     if (area === 'establishment') warmEstablishmentWorkspace();
   }
 
+  async function loadPublicationCredits(options: { reload?: boolean } = {}) {
+    if (area !== 'establishment') {
+      setPublicationCredits({ available: 0, establishments: [] });
+      return;
+    }
+
+    try {
+      const establishments = options.reload
+        ? await api.reload<Establishment[]>('/establishments/me')
+        : await api.get<Establishment[]>('/establishments/me');
+
+      const statuses = await Promise.all(
+        establishments.map(async (establishment) => {
+          const path = `/billing/establishments/${establishment.id}/status`;
+          const cached = getApiCacheSync<EstablishmentBillingStatus>(path);
+          const status = cached || (options.reload
+            ? await api.reload<EstablishmentBillingStatus>(path)
+            : await api.get<EstablishmentBillingStatus>(path));
+
+          return {
+            id: establishment.id,
+            name: establishment.name,
+            availableCredits: status.availableCredits,
+          };
+        }),
+      );
+
+      const visibleCredits = statuses.filter((status) => status.availableCredits > 0);
+      setPublicationCredits({
+        available: visibleCredits.reduce((sum, status) => sum + status.availableCredits, 0),
+        establishments: visibleCredits,
+      });
+    } catch {
+      setPublicationCredits({ available: 0, establishments: [] });
+    }
+  }
+
   useEffect(() => {
     function onDocumentClick(event: MouseEvent) {
       if (!accountMenuRef.current?.contains(event.target as Node)) {
@@ -358,12 +404,16 @@ export function AppShell({
       if (!notificationsRef.current?.contains(event.target as Node)) {
         setNotificationsOpen(false);
       }
+      if (!creditsRef.current?.contains(event.target as Node)) {
+        setCreditsOpen(false);
+      }
     }
 
     function onEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setAccountMenuOpen(false);
         setNotificationsOpen(false);
+        setCreditsOpen(false);
       }
     }
 
@@ -379,6 +429,7 @@ export function AppShell({
     setMobileNavOpen(false);
     setNotificationsOpen(false);
     setAccountMenuOpen(false);
+    setCreditsOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -386,6 +437,8 @@ export function AppShell({
       setNotifications([]);
       setConversations([]);
       setNotificationsOpen(false);
+      setCreditsOpen(false);
+      setPublicationCredits({ available: 0, establishments: [] });
       return;
     }
 
@@ -395,6 +448,16 @@ export function AppShell({
       .catch(() => {});
   }, [area]);
 
+  useEffect(() => {
+    if (area !== 'establishment' || !user) {
+      setCreditsOpen(false);
+      setPublicationCredits({ available: 0, establishments: [] });
+      return;
+    }
+
+    void loadPublicationCredits();
+  }, [area, user]);
+
   useAutoRefresh(async () => {
     if (area === 'admin') return;
     const [nextNotifications, nextConversations] = await Promise.all([
@@ -403,6 +466,7 @@ export function AppShell({
     ]);
     primeNotificationsCache(nextNotifications);
     setConversations(nextConversations);
+    if (area === 'establishment') void loadPublicationCredits({ reload: true });
   }, { enabled: Boolean(user) && area !== 'admin' });
 
   useEffect(() => {
@@ -418,6 +482,20 @@ export function AppShell({
       unsubscribeConversations();
     };
   }, [area]);
+
+  useEffect(() => {
+    if (area !== 'establishment' || publicationCredits.establishments.length === 0) return;
+
+    const unsubscribeStatus = publicationCredits.establishments.map((establishment) =>
+      subscribeApiCache<EstablishmentBillingStatus>(`/billing/establishments/${establishment.id}/status`, () => {
+        void loadPublicationCredits();
+      }),
+    );
+
+    return () => {
+      unsubscribeStatus.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [area, publicationCredits.establishments]);
 
   useEffect(() => {
     if (area !== 'candidate' || user?.role !== 'CANDIDATE') {
@@ -547,6 +625,69 @@ export function AppShell({
         </nav>
 
         {area !== 'admin' ? (
+          <div className="sidebar-quick-actions">
+          {area === 'establishment' && publicationCredits.available > 0 ? (
+            <div className="publication-credit-menu-wrap" ref={creditsRef}>
+              {creditsOpen ? (
+                <div className="notification-menu publication-credit-menu" role="dialog" aria-label="Credits de publication disponibles">
+                  <div className="notification-menu-head publication-credit-menu-head">
+                    <div>
+                      <strong>Credits publication</strong>
+                      <span>{publicationCredits.available} credit{publicationCredits.available > 1 ? 's' : ''} disponible{publicationCredits.available > 1 ? 's' : ''}</span>
+                    </div>
+                    <Link
+                      href="/establishment/missions/new"
+                      className="notification-menu-link"
+                      onFocus={() => warmRoute('/establishment/missions/new')}
+                      onMouseEnter={() => warmRoute('/establishment/missions/new')}
+                      onClick={() => setCreditsOpen(false)}
+                    >
+                      Publier
+                    </Link>
+                  </div>
+                  <div className="publication-credit-menu-list">
+                    {publicationCredits.establishments.map((establishment) => (
+                      <div key={establishment.id} className="publication-credit-menu-item">
+                        <span>{establishment.name}</span>
+                        <strong>{establishment.availableCredits}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="publication-credit-menu-footer">
+                    <Link
+                      href="/establishment/billing?tab=subscription"
+                      className="notification-action-link"
+                      onClick={() => setCreditsOpen(false)}
+                    >
+                      Gerer les credits &rarr;
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+
+              <button
+                type="button"
+                className={`notification-bell publication-credit-button ${creditsOpen ? 'open' : ''}`}
+                aria-label={`${publicationCredits.available} credit${publicationCredits.available > 1 ? 's' : ''} de publication disponible${publicationCredits.available > 1 ? 's' : ''}`}
+                aria-haspopup="dialog"
+                aria-expanded={creditsOpen}
+                onMouseDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setAccountMenuOpen(false);
+                  setNotificationsOpen(false);
+                  setCreditsOpen((open) => !open);
+                }}
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 2v20" />
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H14.5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                <span className="notification-dot publication-credit-dot">{publicationCredits.available > 9 ? '9+' : publicationCredits.available}</span>
+              </button>
+            </div>
+          ) : null}
+
           <div className="notification-menu-wrap" ref={notificationsRef}>
             {notificationsOpen ? (
               <div className="notification-menu" role="dialog" aria-label="Notifications recentes">
@@ -637,6 +778,7 @@ export function AppShell({
               onClick={(event) => {
                 event.stopPropagation();
                 setAccountMenuOpen(false);
+                setCreditsOpen(false);
                 setNotificationsOpen((open) => !open);
                 if (!notificationsOpen) void loadNotifications();
               }}
@@ -648,6 +790,7 @@ export function AppShell({
               {unreadNotifications > 0 ? <span className="notification-dot">{unreadNotifications > 9 ? '9+' : unreadNotifications}</span> : null}
             </button>
           </div>
+          </div>
         ) : null}
 
         <button
@@ -658,6 +801,7 @@ export function AppShell({
           aria-controls="sidebar-nav"
           onClick={() => {
             setNotificationsOpen(false);
+            setCreditsOpen(false);
             setMobileNavOpen((open) => !open);
           }}
         >
@@ -729,6 +873,7 @@ export function AppShell({
             onClick={(event) => {
               event.stopPropagation();
               setNotificationsOpen(false);
+              setCreditsOpen(false);
               setAccountMenuOpen((open) => !open);
             }}
           >
