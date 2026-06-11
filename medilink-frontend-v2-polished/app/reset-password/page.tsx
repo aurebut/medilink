@@ -9,7 +9,6 @@ import { Alert, Button, Field, PasswordInput, LinkButton } from '@/components/ui
 
 function ResetPasswordForm() {
   const token = useSearchParams().get('token') || '';
-  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -30,7 +29,6 @@ function ResetPasswordForm() {
     try {
       const res = await api.post<{ message: string }>('/auth/reset-password', {
         token,
-        oldPassword,
         newPassword,
       });
       setMessage(res.message);
@@ -58,16 +56,6 @@ function ResetPasswordForm() {
       
       {!message && (
         <>
-          <Field label="Ancien mot de passe">
-            <PasswordInput
-              required
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              disabled={loading}
-              placeholder="Votre ancien mot de passe"
-            />
-          </Field>
-
           <Field label="Nouveau mot de passe">
             <PasswordInput
               required
