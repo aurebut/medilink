@@ -12,8 +12,16 @@ import { splashSeenKey } from '@/lib/startup-splash';
 
 const PLATFORM_SPLASH_MIN_MS = 900;
 
+function hasAnySplashBeenSeen() {
+  if (typeof window === 'undefined') return false;
+  return Object.keys(window.sessionStorage).some(
+    (key) => key.startsWith('medilink_platform_splash_seen:') && window.sessionStorage.getItem(key) === 'true'
+  );
+}
+
 function shouldShowInitialSplash(user?: CurrentUser | null) {
   if (typeof window === 'undefined') return true;
+  if (hasAnySplashBeenSeen()) return false;
   if (!user) return true;
   return window.sessionStorage.getItem(splashSeenKey(user)) !== 'true';
 }
@@ -89,7 +97,7 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
   useEffect(() => {
     if (loading) return;
     setShowInitialSplash(shouldShowInitialSplash(user));
-  }, [loading, user?.id]);
+  }, [loading, user]);
 
   useEffect(() => {
     if (loading) return;
@@ -106,10 +114,11 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
     if (loading || !user || !showInitialSplash) return;
 
     let cancelled = false;
-    void Promise.allSettled([
-      warmStartupData(user),
-      sleep(PLATFORM_SPLASH_MIN_MS),
-    ]).then(() => {
+    
+    // Warm startup data in the background without blocking the splash screen dismissal
+    void warmStartupData(user);
+
+    sleep(PLATFORM_SPLASH_MIN_MS).then(() => {
       if (cancelled) return;
       markInitialSplashSeen(user);
       setShowInitialSplash(false);
