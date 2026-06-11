@@ -227,7 +227,9 @@ export function MessageCenter() {
         setActiveId(initialActiveId);
       }
       data.slice(0, 3).forEach((conversation) => {
-        api.preload(`/conversations/${conversation.id}/messages`);
+        if (conversation.id !== activeIdRef.current) {
+          api.preload(`/conversations/${conversation.id}/messages`);
+        }
       });
     } catch (e: any) {
       setError(e.message);
@@ -271,7 +273,9 @@ export function MessageCenter() {
       const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
       if (!activeIdRef.current && initialActiveId) setActiveId(initialActiveId);
       data.slice(0, 3).forEach((conversation) => {
-        api.preload(`/conversations/${conversation.id}/messages`);
+        if (conversation.id !== activeIdRef.current) {
+          api.preload(`/conversations/${conversation.id}/messages`);
+        }
       });
     });
 

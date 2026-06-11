@@ -523,18 +523,16 @@ export class BillingService {
 
   private async getPublicationAccess(establishmentId: string, tx?: Prisma.TransactionClient) {
     const client = tx || this.prisma;
-    const [subscription, availableCredits, reservedCredits, consumedCredits] = await Promise.all([
-      client.establishmentSubscription.findUnique({ where: { establishmentId } }),
-      client.publicationCredit.count({
-        where: { establishmentId, status: PublicationCreditStatus.AVAILABLE },
-      }),
-      client.publicationCredit.count({
-        where: { establishmentId, status: PublicationCreditStatus.RESERVED },
-      }),
-      client.publicationCredit.count({
-        where: { establishmentId, status: PublicationCreditStatus.CONSUMED },
-      }),
-    ]);
+    const subscription = await client.establishmentSubscription.findUnique({ where: { establishmentId } });
+    const availableCredits = await client.publicationCredit.count({
+      where: { establishmentId, status: PublicationCreditStatus.AVAILABLE },
+    });
+    const reservedCredits = await client.publicationCredit.count({
+      where: { establishmentId, status: PublicationCreditStatus.RESERVED },
+    });
+    const consumedCredits = await client.publicationCredit.count({
+      where: { establishmentId, status: PublicationCreditStatus.CONSUMED },
+    });
 
     const hasActiveSubscription = Boolean(
       subscription &&
