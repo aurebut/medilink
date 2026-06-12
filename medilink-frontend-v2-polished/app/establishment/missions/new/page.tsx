@@ -1016,23 +1016,13 @@ function PublicationAccessGate({
       {/* Profil de facturation */}
       <div style={{ marginBottom: 24 }}>
         <Card className="card-highlight publication-access-card">
-          <div className="toolbar" style={{ marginBottom: 12 }}>
+          <div className="toolbar">
             <div>
               <h2>Votre annonce reste acquise</h2>
               <p>Si vous payez une publication unique, le crédit rejoint vos crédits de publication et reste disponible tant qu'il n'a pas été réservé à une mission.</p>
             </div>
             <Badge tone="neutral">Facturation</Badge>
           </div>
-
-          <Field label="Profil de facturation">
-            <Select value={selectedEstablishmentId} onChange={(event) => setSelectedEstablishmentId(event.target.value)}>
-              {establishments.map((establishment) => (
-                <option key={establishment.id} value={establishment.id}>
-                  {establishment.name}{establishment.city ? ` - ${establishment.city}` : ''}
-                </option>
-              ))}
-            </Select>
-          </Field>
         </Card>
       </div>
 
