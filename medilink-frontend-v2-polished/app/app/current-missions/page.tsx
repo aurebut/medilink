@@ -183,11 +183,15 @@ function rowPriority(row: MissionRow) {
   return 3;
 }
 
-function mapsHref(address: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-}
-
-export default function CandidateCurrentMissionsPage() {
+function mapsHref(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+
+function mapsEmbedHref(address: string) {
+  return `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+}
+
+export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
@@ -311,10 +315,26 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <strong>{dates.primary}</strong>
         <small>{dates.secondary}</small>
       </div>
-      <div className="candidate-command-stat">
-        <span>Statut</span>
-        <strong>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</strong>
-        <small>{agreementNextStep(row.agreement?.status)}</small>
+      <div className="candidate-command-stat">
+        <span>Statut</span>
+        <strong>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</strong>
+        <small>{agreementNextStep(row.agreement?.status)}</small>
+      </div>
+      <div className="candidate-command-map">
+        {hasAddress ? (
+          <iframe
+            title={`Carte de ${mission?.title || 'la mission'}`}
+            src={mapsEmbedHref(address)}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        ) : (
+          <div className="candidate-command-map-empty">Adresse à confirmer</div>
+        )}
+        <div className="candidate-command-map-label">
+          <span>Adresse mission</span>
+          <strong>{address}</strong>
+        </div>
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? (

@@ -986,7 +986,9 @@ button { touch-action: manipulation; }
 }
 
 .candidate-current-unified .candidate-command-actions {
+  grid-column: 1 / -1;
   align-content: end;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -1016,6 +1018,66 @@ button { touch-action: manipulation; }
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.candidate-command-map {
+  position: relative;
+  grid-column: 1 / -1;
+  min-height: 178px;
+  overflow: hidden;
+  border: 1px solid rgba(14,138,122,.18);
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(14,138,122,.08), rgba(26,82,160,.05)),
+    #F8FAFC;
+}
+
+.candidate-command-map iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 178px;
+  display: block;
+  border: 0;
+  filter: saturate(.92) contrast(.96);
+}
+
+.candidate-command-map-empty {
+  min-height: 178px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.candidate-command-map-label {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  gap: 2px;
+  width: fit-content;
+  max-width: calc(100% - 20px);
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.74);
+  border-radius: 10px;
+  background: rgba(255,255,255,.92);
+  box-shadow: 0 12px 30px rgba(11,25,41,.14);
+}
+
+.candidate-command-map-label span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.candidate-command-map-label strong {
+  color: var(--heading);
+  font-size: 13px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .candidate-current-detail {
@@ -4914,6 +4976,17 @@ tbody tr:hover { background: #FAFBFD; }
     flex: 1 1 88px;
     min-width: 0;
     justify-content: center;
+  }
+  .candidate-command-map,
+  .candidate-command-map iframe,
+  .candidate-command-map-empty {
+    min-height: 154px;
+  }
+  .candidate-command-map-label {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-width: calc(100% - 16px);
   }
   .candidate-current-route-head,
   .candidate-current-route-title,
