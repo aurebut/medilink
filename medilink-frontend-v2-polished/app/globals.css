@@ -3940,7 +3940,6 @@ tbody tr:hover { background: #FAFBFD; }
 
 .mission-card { display: grid; gap: 14px; position: relative; overflow: hidden; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
 .mission-card:hover { border-color: rgba(26,82,160,.24); box-shadow: 0 10px 34px rgba(11,25,41,.08); transform: translateY(-1px); }
-.mission-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; width: auto; background: var(--teal); }
 .mission-card-image { display: block; width: 100%; aspect-ratio: 16 / 7; overflow: hidden; border-radius: 10px; background: #E4E9F2; }
 .search-results .mission-card-image { height: 150px; }
 .mission-list .mission-card-image { height: 96px; }
@@ -8400,9 +8399,6 @@ td {
     linear-gradient(#fff,#fff) padding-box,
     linear-gradient(135deg, rgba(45,108,200,.28), rgba(26,82,160,.08)) border-box;
   border-color: transparent;
-}
-.mission-card::before {
-  background: linear-gradient(90deg, #112238 0%, #1A52A0 52%, #0E8A7A 100%);
 }
 .mission-pay {
   background:
