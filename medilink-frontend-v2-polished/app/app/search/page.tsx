@@ -312,13 +312,6 @@ export default function SearchMissionsPage() {
                   applyHref={getMissionApplyPath(mission.id)}
                 />
               ))}
-              {recommendedMissions.length === 0 ? (
-                <EmptyState
-                  title="Aucune mission adaptée pour le moment"
-                  description="Complétez votre profil ou lancez une recherche libre pour voir toutes les annonces publiées."
-                  action={<Button onClick={() => setActiveTab('search')}>Ouvrir la recherche</Button>}
-                />
-              ) : null}
             </>
           )}
         </div>
