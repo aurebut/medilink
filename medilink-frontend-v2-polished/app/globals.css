@@ -1380,6 +1380,14 @@ button { touch-action: manipulation; }
   box-shadow: none;
 }
 
+.candidate-current-unified .candidate-current-panel > *,
+.candidate-current-unified .candidate-current-info > div > *,
+.candidate-current-unified .candidate-current-detail-grid > div > *,
+.candidate-current-unified .candidate-current-doc-summary > div > *,
+.candidate-current-unified .candidate-current-day-document > * {
+  min-width: 0;
+}
+
 .candidate-current-unified .candidate-current-grid > .candidate-current-panel:nth-child(n + 3),
 .candidate-current-unified .candidate-current-info > div:nth-child(n + 3),
 .candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 3),
@@ -1624,6 +1632,7 @@ button { touch-action: manipulation; }
   .candidate-current-unified .candidate-current-doc-summary > div,
   .candidate-current-unified .candidate-current-day-document {
     padding: 14px 0;
+    padding-left: 0 !important;
     border-left: 0 !important;
   }
 
@@ -5091,6 +5100,7 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-current-unified .candidate-current-doc-summary > div,
   .candidate-current-unified .candidate-current-day-document {
     padding: 14px 0;
+    padding-left: 0 !important;
     border-left: 0 !important;
     border-radius: 0;
     background: transparent;
