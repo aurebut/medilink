@@ -1005,8 +1005,8 @@ button { touch-action: manipulation; }
 }
 
 .candidate-current-unified {
-  gap: 16px;
-  padding: 14px;
+  gap: 0;
+  padding: 18px;
   border: 1px solid rgba(14,138,122,.18);
   border-radius: 8px;
   background:
@@ -1017,6 +1017,9 @@ button { touch-action: manipulation; }
 
 .candidate-current-unified .candidate-command-strip {
   margin-bottom: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   box-shadow: none;
 }
 
@@ -1033,7 +1036,7 @@ button { touch-action: manipulation; }
 .candidate-current-pilotage-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 12px;
+  gap: 0;
   align-items: start;
 }
 
@@ -1041,12 +1044,11 @@ button { touch-action: manipulation; }
   display: grid;
   gap: 14px;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    linear-gradient(180deg, rgba(248,250,252,.72), rgba(255,255,255,.96)),
-    #fff;
+  margin-top: 18px;
+  padding: 18px 0 0;
+  border-top: 1px solid rgba(14,138,122,.16);
+  border-radius: 0;
+  background: transparent;
 }
 
 .candidate-current-route-head {
@@ -4841,6 +4843,9 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-command-strip {
     gap: 10px;
     padding: 12px;
+  }
+  .candidate-current-unified .candidate-command-strip {
+    padding: 0;
   }
   .candidate-command-main h2 {
     font-size: 20px;
