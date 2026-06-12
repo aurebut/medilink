@@ -187,12 +187,12 @@ export class EmailService {
 
   private applicationStatusLabel(status: string): string {
     const labels: Record<string, string> = {
-      SUBMITTED: 'envoyee',
-      VIEWED: 'consultee',
-      ACCEPTED: 'acceptee',
-      REJECTED: 'refusee',
-      WITHDRAWN: 'retiree',
-      CANCELLED: 'annulee',
+      SUBMITTED: 'envoyée',
+      VIEWED: 'consultée',
+      ACCEPTED: 'acceptée',
+      REJECTED: 'refusée',
+      WITHDRAWN: 'retirée',
+      CANCELLED: 'annulée',
     };
     return labels[status] || status;
   }
@@ -203,11 +203,11 @@ export class EmailService {
       CV: 'CV',
       ATTESTATION: 'attestation',
       CONVENTION: 'convention',
-      DIPLOMA: 'diplome',
-      IDENTITY_DOCUMENT: "piece d'identite",
+      DIPLOMA: 'diplôme',
+      IDENTITY_DOCUMENT: "pièce d'identité",
       INSURANCE: 'assurance',
       AVATAR: 'photo de profil',
-      MESSAGE_ATTACHMENT: 'piece jointe',
+      MESSAGE_ATTACHMENT: 'pièce jointe',
       OTHER: 'document',
     };
     return labels[type] || type;
@@ -377,12 +377,12 @@ export class EmailService {
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">${this.escapeHtml(action)}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
         ${context.workflowAction
-          ? `Une action vient d'etre effectuee dans votre conversation avec ${this.escapeHtml(senderName)}.`
-          : `Vous avez recu un nouveau message de <strong>${this.escapeHtml(senderName)}</strong>.`}
+          ? `Une action vient d'être effectuée dans votre conversation avec ${this.escapeHtml(senderName)}.`
+          : `Vous avez reçu un nouveau message de <strong>${this.escapeHtml(senderName)}</strong>.`}
       </p>
       ${this.missionDetails(context)}
       ${preview}
-      ${this.cta('Acceder a la conversation', this.messageLink(context))}
+      ${this.cta('Accéder à la conversation', this.messageLink(context))}
     `;
 
     return this.sendEmail({
@@ -390,19 +390,19 @@ export class EmailService {
       to,
       type: 'message.new',
       subject: this.subjectText(context.workflowAction
-        ? `${context.workflowAction} - Medilink`
-        : `Nouveau message de ${senderName} - Medilink`),
-      html: this.wrapInLayout('Nouveau message sur Medilink', bodyHtml),
+        ? `${context.workflowAction} - Médilink`
+        : `Nouveau message de ${senderName} - Médilink`),
+      html: this.wrapInLayout('Nouveau message sur Médilink', bodyHtml),
     });
   }
 
   sendApplicationReceivedEmail(userId: string, to: string, context: MissionEmailContext = {}) {
     const candidateName = context.candidateName || 'Un candidat';
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Nouvelle candidature recue</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Nouvelle candidature reçue</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        <strong>${this.escapeHtml(candidateName)}</strong> vient de postuler a votre mission${context.missionTitle ? ` <strong>${this.escapeHtml(context.missionTitle)}</strong>` : ''}.
-        Vous pouvez consulter son profil, son message et poursuivre l'echange depuis votre espace etablissement.
+        <strong>${this.escapeHtml(candidateName)}</strong> vient de postuler à votre mission${context.missionTitle ? ` <strong>${this.escapeHtml(context.missionTitle)}</strong>` : ''}.
+        Vous pouvez consulter son profil, son message et poursuivre l'échange depuis votre espace établissement.
       </p>
       ${this.missionDetails(context)}
       ${this.cta('Consulter la candidature', `${this.getFrontendUrl()}/establishment/dashboard`)}
@@ -412,8 +412,8 @@ export class EmailService {
       userId,
       to,
       type: 'application.received',
-      subject: this.subjectText(`${candidateName} a postule${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
-      html: this.wrapInLayout('Nouvelle candidature recue', bodyHtml),
+      subject: this.subjectText(`${candidateName} a postulé${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
+      html: this.wrapInLayout('Nouvelle candidature reçue', bodyHtml),
     });
   }
 
@@ -430,9 +430,9 @@ export class EmailService {
       : '';
 
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Mission recommandee pour vous</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Mission recommandée pour vous</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Nous avons identifie une mission qui correspond fortement a votre profil${context.score ? `, avec un score de pertinence de <strong>${this.escapeHtml(context.score)}/100</strong>` : ''}.
+        Nous avons identifié une mission qui correspond fortement à votre profil${context.score ? `, avec un score de pertinence de <strong>${this.escapeHtml(context.score)}/100</strong>` : ''}.
       </p>
       ${this.missionDetails(context)}
       ${reasons}
@@ -443,8 +443,8 @@ export class EmailService {
       userId,
       to,
       type: 'matching.mission_recommendation',
-      subject: this.subjectText(`Mission recommandee${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
-      html: this.wrapInLayout('Mission recommandee', bodyHtml),
+      subject: this.subjectText(`Mission recommandée${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
+      html: this.wrapInLayout('Mission recommandée', bodyHtml),
     });
   }
 
@@ -456,10 +456,10 @@ export class EmailService {
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Votre candidature est ${this.escapeHtml(statusLabel)}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
         ${isAccepted
-          ? `Votre candidature est acceptee pour cette mission. Vous pouvez maintenant finaliser les prochaines etapes dans la conversation.`
+          ? `Votre candidature est acceptée pour cette mission. Vous pouvez maintenant finaliser les prochaines étapes dans la conversation.`
           : isRejected
-            ? `L'etablissement ${context.establishmentName ? `<strong>${this.escapeHtml(context.establishmentName)}</strong>` : ''} n'a pas retenu votre candidature pour cette mission.`
-            : `Le statut de votre candidature a ete mis a jour : <strong style="color: #0E8A7A;">${this.escapeHtml(statusLabel)}</strong>.`}
+            ? `L'établissement ${context.establishmentName ? `<strong>${this.escapeHtml(context.establishmentName)}</strong>` : ''} n'a pas retenu votre candidature pour cette mission.`
+            : `Le statut de votre candidature a été mis à jour : <strong style="color: #0E8A7A;">${this.escapeHtml(statusLabel)}</strong>.`}
       </p>
       ${this.missionDetails(context)}
       ${this.cta(context.conversationId ? 'Ouvrir la conversation' : 'Suivre mes candidatures', context.conversationId ? this.messageLink({ ...context, recipientRole: UserRole.CANDIDATE }) : `${this.getFrontendUrl()}/app/dashboard`)}
@@ -470,7 +470,7 @@ export class EmailService {
       to,
       type: 'application.status_changed',
       subject: this.subjectText(`Candidature ${statusLabel}${context.missionTitle ? ` - ${context.missionTitle}` : ''}`),
-      html: this.wrapInLayout('Statut de votre candidature mis a jour', bodyHtml),
+      html: this.wrapInLayout('Statut de votre candidature mis à jour', bodyHtml),
     });
   }
 
@@ -484,25 +484,25 @@ export class EmailService {
     const documentType = this.documentTypeLabel(context.documentType) || 'document';
     const approved = status === 'APPROVED';
     const bodyHtml = `
-      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">${approved ? 'Document valide' : 'Document refuse'}</h1>
+      <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">${approved ? 'Document validé' : 'Document refusé'}</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Notre equipe a ${approved ? 'valide' : 'refuse'} votre ${this.escapeHtml(documentType)}${context.fileName ? ` <strong>${this.escapeHtml(context.fileName)}</strong>` : ''}.
-        ${approved ? 'Votre dossier gagne en fiabilite pour vos prochaines missions.' : 'Vous pouvez le corriger puis le renvoyer depuis votre profil.'}
+        Notre équipe a ${approved ? 'validé' : 'refusé'} votre ${this.escapeHtml(documentType)}${context.fileName ? ` <strong>${this.escapeHtml(context.fileName)}</strong>` : ''}.
+        ${approved ? 'Votre dossier gagne en fiabilité pour vos prochaines missions.' : 'Vous pouvez le corriger puis le renvoyer depuis votre profil.'}
       </p>
       ${reason ? `
         <div style="background-color: #FEF2F2; border: 1px solid rgba(180, 35, 24, 0.15); border-radius: 8px; padding: 16px; margin-bottom: 24px; color: #991B1B; font-size: 14px; font-family: 'DM Sans', sans-serif;">
           <strong>Motif du refus :</strong><br>${this.escapeHtml(reason)}
         </div>
       ` : ''}
-      ${this.cta('Acceder a mes documents', `${this.getFrontendUrl()}/app/profile`)}
+      ${this.cta('Accéder à mes documents', `${this.getFrontendUrl()}/app/profile`)}
     `;
 
     return this.sendEmail({
       userId,
       to,
       type: 'document.status_changed',
-      subject: `${approved ? 'Document valide' : 'Document refuse'} - Medilink`,
-      html: this.wrapInLayout('Statut de votre document mis a jour', bodyHtml),
+      subject: `${approved ? 'Document validé' : 'Document refusé'} - Médilink`,
+      html: this.wrapInLayout('Statut de votre document mis à jour', bodyHtml),
     });
   }
 }
