@@ -19,6 +19,7 @@ type MissionStep = {
   label: string;
   helper: string;
   status: string;
+  dateLabel?: string;
   active: boolean;
   done: boolean;
 };
@@ -170,12 +171,16 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
   const paymentReleased = Boolean(status === 'PAYMENT_RELEASED' || agreement?.payment?.releasedAt);
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
+  const startDate = missionStart(application, agreement);
+  const endDate = missionEnd(application, agreement);
+  const startLabel = startDate ? formatDate(startDate) : 'Date � confirmer';
+  const endLabel = endDate ? formatDate(endDate) : 'Date � confirmer';
 
   return [
     { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec le candidat.', status: confirmed ? 'Validée' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
-    { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', active: confirmed && !scheduleStarted, done: scheduleStarted },
+    { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', dateLabel: startLabel, active: confirmed && !scheduleStarted, done: scheduleStarted },
     { key: 'documents', label: 'Documents de mission', helper: 'Le candidat doit déposer les fichiers générés pendant toute la durée de la mission.', status: scheduleStarted ? 'À déposer' : 'À venir', active: active || (scheduleStarted && !completed), done: false },
-    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a été validée.' : scheduleEnded ? 'La date de fin est passée, en attente de validation.' : 'Cette étape se validera après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
+    { key: 'completed', label: 'Fin de mission', helper: completed ? 'La fin de mission a été validée.' : scheduleEnded ? 'La date de fin est passée, en attente de validation.' : 'Cette étape se validera après la fin de mission.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', dateLabel: endLabel, active: scheduleEnded && !completed, done: completed },
     { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement du candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
@@ -752,6 +757,7 @@ function MissionControlPanel({
                         <strong>{step.label}</strong>
                         <small>{step.status}</small>
                       </div>
+                      {step.dateLabel ? <span className="candidate-current-route-date">{step.dateLabel}</span> : null}
                       <p>{step.helper}</p>
                     </div>
                   </div>

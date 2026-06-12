@@ -1271,6 +1271,22 @@ button { touch-action: manipulation; }
   line-height: 1;
 }
 
+.candidate-current-route-date {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border: 1px solid rgba(26,82,160,.16);
+  border-radius: 999px;
+  background: rgba(26,82,160,.06);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1;
+}
+
 .candidate-current-route-list > div.active .candidate-current-route-title small,
 .candidate-current-route-list > div.done .candidate-current-route-title small {
   border-color: rgba(14,138,122,.22);
