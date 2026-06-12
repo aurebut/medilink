@@ -157,7 +157,7 @@ export function MessageCenter() {
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
   const [mobileOptionsOpen, setMobileOptionsOpen] = useState(false);
-  const [desktopTimelineOpen, setDesktopTimelineOpen] = useState(true);
+  const [desktopTimelineOpen, setDesktopTimelineOpen] = useState(false);
   const [proposal, setProposal] = useState<ProposalForm>({
     compensationMode: 'RETROCESSION',
     amount: '',
@@ -758,6 +758,7 @@ export function MessageCenter() {
   const mobileNextStep = workflowTimelineSteps.find((step) => (
     step.key !== mobileCurrentStep?.key && (step.status === 'current' || step.status === 'waiting' || step.status === 'locked')
   )) || null;
+  const desktopHeaderStep = !isMobile && !desktopTimelineOpen ? mobileCurrentStep : null;
 
   return (
     <div ref={messageLayoutRef} className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -847,6 +848,9 @@ export function MessageCenter() {
                 {currentStatus}
               </Badge>
             </div>
+            {desktopHeaderStep ? (
+              <DesktopWorkflowHeaderStep step={desktopHeaderStep} />
+            ) : null}
           </div>
 
           <div className="conversation-header-actions">
@@ -874,7 +878,7 @@ export function MessageCenter() {
                 aria-expanded={desktopTimelineOpen}
                 onClick={() => setDesktopTimelineOpen(true)}
               >
-                Timeline
+                Plus de détails
               </Button>
             ) : null}
           </div>
@@ -1222,9 +1226,10 @@ function DesktopWorkflowTimeline({
           <button
             type="button"
             className="desktop-workflow-collapse-button"
+            aria-label="Replier le suivi"
             onClick={onCollapse}
           >
-            Replier
+            <span aria-hidden="true">×</span>
           </button>
         </div>
       </div>
@@ -1248,6 +1253,21 @@ function DesktopWorkflowTimeline({
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function DesktopWorkflowHeaderStep({ step }: { step: MobileTimelineStep }) {
+  return (
+    <div className={`desktop-workflow-header-step is-${step.status}`} aria-label={`Etape de suivi: ${step.title}`}>
+      <div className="desktop-workflow-marker" aria-hidden="true" />
+      <div className="desktop-workflow-copy">
+        <div className="desktop-workflow-title">
+          <strong>{step.title}</strong>
+          <span>{timelineStatusLabel(step.status)}</span>
+        </div>
+        <p>{step.description}</p>
       </div>
     </div>
   );

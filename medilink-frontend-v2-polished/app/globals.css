@@ -4322,15 +4322,23 @@ tbody tr:hover { background: #FAFBFD; }
 }
 .desktop-workflow-collapse-button {
   flex: 0 0 auto;
-  min-height: 34px;
-  padding: 0 12px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 10px;
   background: #F8FAFC;
   color: var(--text);
-  font-size: 12px;
+  font-size: 22px;
   font-weight: 800;
+  line-height: 1;
   cursor: pointer;
+}
+.desktop-workflow-collapse-button span {
+  display: block;
+  transform: translateY(-1px);
 }
 .desktop-workflow-steps {
   min-width: 0;
@@ -4405,6 +4413,46 @@ tbody tr:hover { background: #FAFBFD; }
   box-shadow: none;
 }
 .desktop-workflow-step.is-locked .desktop-workflow-marker::after { background: #D4DAE4; }
+.desktop-workflow-header-step {
+  --step-color: #9AA7B8;
+  --step-bg: #F2F4F8;
+  flex: 1 1 270px;
+  max-width: 360px;
+  min-width: 230px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-left: auto;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #FAFBFD;
+}
+.desktop-workflow-header-step.is-done {
+  --step-color: #0B6F62;
+  --step-bg: rgba(14,138,122,.12);
+  border-color: rgba(14,138,122,.22);
+  background: #F8FCFB;
+}
+.desktop-workflow-header-step.is-current {
+  --step-color: var(--blue);
+  --step-bg: rgba(26,82,160,.12);
+  border-color: rgba(26,82,160,.24);
+  background: linear-gradient(180deg, rgba(26,82,160,.07), #fff 76%);
+}
+.desktop-workflow-header-step.is-rejected {
+  --step-color: #B42318;
+  --step-bg: #FEF3F2;
+  border-color: #FECACA;
+  background: #FFF8F8;
+}
+.desktop-workflow-header-step.is-locked .desktop-workflow-marker {
+  border-color: #D4DAE4;
+  box-shadow: none;
+}
+.desktop-workflow-header-step.is-locked .desktop-workflow-marker::after {
+  background: #D4DAE4;
+}
 .desktop-workflow-copy {
   flex: 1 1 auto;
   display: grid;
