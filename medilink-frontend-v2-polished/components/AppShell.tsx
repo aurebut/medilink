@@ -648,12 +648,10 @@ export function AppShell({
                     </Link>
                   </div>
                   <div className="publication-credit-menu-list">
-                    {publicationCredits.establishments.map((establishment) => (
-                      <div key={establishment.id} className="publication-credit-menu-item">
-                        <span>{establishment.name}</span>
-                        <strong>{establishment.availableCredits}</strong>
-                      </div>
-                    ))}
+                    <div className="publication-credit-menu-item">
+                      <span>Compte etablissement</span>
+                      <strong>{publicationCredits.available}</strong>
+                    </div>
                   </div>
                   <div className="publication-credit-menu-footer">
                     <Link

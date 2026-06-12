@@ -49,7 +49,7 @@ export class MissionsService {
     }
 
     const establishment = await this.resolveEstablishment(user, dto);
-    await this.billing.assertCanCreateMission(establishment.id);
+    await this.billing.assertCanCreateMission(establishment.id, user.id);
 
     const mission = await this.prisma.mission.create({
       data: {
@@ -108,7 +108,7 @@ export class MissionsService {
 
     if (dto.publishNow) {
       try {
-        await this.billing.attachPublicationAccessToMission(establishment.id, mission.id);
+        await this.billing.attachPublicationAccessToMission(establishment.id, mission.id, user.id);
       } catch (error) {
         await this.prisma.mission.delete({ where: { id: mission.id } });
         throw error;
@@ -311,7 +311,7 @@ export class MissionsService {
   async setStatus(user: RequestUser, missionId: string, status: MissionStatus) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
     if (status === MissionStatus.PUBLISHED) {
-      await this.billing.attachPublicationAccessToMission(mission.establishmentId, missionId);
+      await this.billing.attachPublicationAccessToMission(mission.establishmentId, missionId, user.id);
     }
 
     if (status === MissionStatus.ARCHIVED) {

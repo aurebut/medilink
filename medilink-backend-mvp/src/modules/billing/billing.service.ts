@@ -236,18 +236,27 @@ export class BillingService {
     return { url: session.url };
   }
 
-  async assertCanCreateMission(establishmentId: string) {
+  async assertCanCreateMission(establishmentId: string, userId?: string) {
     const access = await this.getPublicationAccess(establishmentId);
     if (access.hasActiveSubscription) return;
 
+    const creditEstablishmentIds = userId
+      ? await this.getPublicationCreditScopeEstablishmentIds(userId, establishmentId)
+      : [establishmentId];
+    const availableCredits = await this.prisma.publicationCredit.count({
+      where: {
+        establishmentId: { in: creditEstablishmentIds },
+        status: PublicationCreditStatus.AVAILABLE,
+      },
+    });
     const draftMissionsCount = await this.prisma.mission.count({
       where: {
-        establishmentId,
+        establishmentId: { in: creditEstablishmentIds },
         status: MissionStatus.DRAFT,
       },
     });
 
-    if (access.availableCredits - draftMissionsCount > 0) return;
+    if (availableCredits - draftMissionsCount > 0) return;
 
     throw new BadRequestException({
       code: 'PUBLICATION_PAYMENT_REQUIRED',
@@ -256,13 +265,17 @@ export class BillingService {
     });
   }
 
-  async attachPublicationAccessToMission(establishmentId: string, missionId: string) {
+  async attachPublicationAccessToMission(establishmentId: string, missionId: string, userId?: string) {
     const access = await this.getPublicationAccess(establishmentId);
     if (access.hasActiveSubscription) return { source: 'SUBSCRIPTION' };
 
+    const creditEstablishmentIds = userId
+      ? await this.getPublicationCreditScopeEstablishmentIds(userId, establishmentId)
+      : [establishmentId];
+
     const existing = await this.prisma.publicationCredit.findFirst({
       where: {
-        establishmentId,
+        establishmentId: { in: creditEstablishmentIds },
         missionId,
         status: { in: [PublicationCreditStatus.RESERVED, PublicationCreditStatus.CONSUMED] },
       },
@@ -272,7 +285,7 @@ export class BillingService {
 
     const credit = await this.prisma.publicationCredit.findFirst({
       where: {
-        establishmentId,
+        establishmentId: { in: creditEstablishmentIds },
         status: PublicationCreditStatus.AVAILABLE,
       },
       orderBy: { paidAt: 'asc' },
@@ -289,6 +302,7 @@ export class BillingService {
     const claimed = await this.prisma.publicationCredit.updateMany({
       where: { id: credit.id, status: PublicationCreditStatus.AVAILABLE },
       data: {
+        establishmentId,
         missionId,
         status: PublicationCreditStatus.RESERVED,
         reservedAt: new Date(),
@@ -296,7 +310,7 @@ export class BillingService {
     });
 
     if (claimed.count === 0) {
-      return this.attachPublicationAccessToMission(establishmentId, missionId);
+      return this.attachPublicationAccessToMission(establishmentId, missionId, userId);
     }
 
     const updated = await this.prisma.publicationCredit.findUnique({ where: { id: credit.id } });
@@ -547,6 +561,29 @@ export class BillingService {
       consumedCredits,
       subscription,
     };
+  }
+
+  private async getPublicationCreditScopeEstablishmentIds(userId: string, establishmentId: string) {
+    await this.permissions.ensureEstablishmentMember(userId, establishmentId);
+
+    const memberships = await this.prisma.establishmentMember.findMany({
+      where: {
+        userId,
+        role: {
+          in: [
+            EstablishmentMemberRole.OWNER,
+            EstablishmentMemberRole.ADMIN,
+            EstablishmentMemberRole.RECRUITER,
+          ],
+        },
+      },
+      select: { establishmentId: true },
+    });
+
+    return Array.from(new Set([
+      establishmentId,
+      ...memberships.map((membership) => membership.establishmentId),
+    ]));
   }
 
   private async ensureBillingManager(userId: string, establishmentId: string) {

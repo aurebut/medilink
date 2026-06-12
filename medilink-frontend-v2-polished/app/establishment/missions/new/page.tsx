@@ -98,6 +98,28 @@ function mergeDraftSummaries(...groups: Array<DraftSummary[] | undefined>) {
   return Array.from(byId.values());
 }
 
+function mergeAccountCreditStatus(
+  selectedStatus: EstablishmentBillingStatus,
+  accountStatuses: EstablishmentBillingStatus[],
+) {
+  const totals = accountStatuses.reduce(
+    (sum, status) => ({
+      availableCredits: sum.availableCredits + status.availableCredits,
+      reservedCredits: sum.reservedCredits + status.reservedCredits,
+      consumedCredits: sum.consumedCredits + status.consumedCredits,
+    }),
+    { availableCredits: 0, reservedCredits: 0, consumedCredits: 0 },
+  );
+  const accountDrafts = mergeDraftSummaries(...accountStatuses.map((status) => status.drafts));
+
+  return {
+    ...selectedStatus,
+    ...totals,
+    canCreateMission: selectedStatus.hasActiveSubscription || (totals.availableCredits - accountDrafts.length) > 0,
+    drafts: accountDrafts,
+  };
+}
+
 function findStoppedStep(form: any, establishment?: any) {
   const tomorrow = tomorrowDateInput();
 
@@ -246,6 +268,10 @@ export default function NewMissionPage() {
     () => establishments.find((item) => item.id === selectedEstablishmentId) || primary,
     [establishments, primary, selectedEstablishmentId],
   );
+  const establishmentIdsKey = useMemo(
+    () => establishments.map((establishment) => establishment.id).join('|'),
+    [establishments],
+  );
 
   const drafts = useMemo(() => {
     return billingStatus ? mergeDraftSummaries(existingDrafts, billingStatus.drafts) : [];
@@ -362,11 +388,14 @@ export default function NewMissionPage() {
     }
 
     let cancelled = false;
-    const path = `/billing/establishments/${selectedEstablishment.id}/status`;
+    const statusPath = (establishmentId: string) => `/billing/establishments/${establishmentId}/status`;
+    const cachedStatuses = establishments
+      .map((establishment) => api.getSync<EstablishmentBillingStatus>(statusPath(establishment.id)))
+      .filter((status): status is EstablishmentBillingStatus => Boolean(status));
+    const cachedSelectedStatus = cachedStatuses.find((status) => status.establishmentId === selectedEstablishment.id);
 
-    const cachedStatusSync = api.getSync<EstablishmentBillingStatus>(path);
-    if (cachedStatusSync) {
-      setBillingStatus(cachedStatusSync);
+    if (cachedSelectedStatus) {
+      setBillingStatus(mergeAccountCreditStatus(cachedSelectedStatus, cachedStatuses));
       setBillingLoading(false);
     } else {
       setBillingStatus(null);
@@ -374,10 +403,22 @@ export default function NewMissionPage() {
     }
     setError(null);
 
-    api.reload<EstablishmentBillingStatus>(path)
-      .then((status) => {
+    Promise.all(
+      establishments.map(async (establishment) => {
+        try {
+          return await api.reload<EstablishmentBillingStatus>(statusPath(establishment.id));
+        } catch (e) {
+          if (establishment.id === selectedEstablishment.id) throw e;
+          return null;
+        }
+      }),
+    )
+      .then((statuses) => {
         if (cancelled) return;
-        setBillingStatus(status);
+        const accountStatuses = statuses.filter((status): status is EstablishmentBillingStatus => Boolean(status));
+        const selectedStatus = accountStatuses.find((status) => status.establishmentId === selectedEstablishment.id);
+        if (!selectedStatus) throw new Error("Impossible de charger le statut de facturation de l'etablissement selectionne.");
+        setBillingStatus(mergeAccountCreditStatus(selectedStatus, accountStatuses));
         setBillingLoading(false);
       })
       .catch((e: any) => {
@@ -389,7 +430,7 @@ export default function NewMissionPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedEstablishment?.id, billingTrigger]);
+  }, [selectedEstablishment?.id, billingTrigger, establishmentIdsKey]);
 
   useEffect(() => {
     if (!selectedEstablishment?.id) {
@@ -972,18 +1013,18 @@ function PublicationAccessGate({
         </div>
       ) : null}
 
-      {/* Sélecteur d'établissement */}
+      {/* Profil de facturation */}
       <div style={{ marginBottom: 24 }}>
         <Card className="card-highlight publication-access-card">
           <div className="toolbar" style={{ marginBottom: 12 }}>
             <div>
               <h2>Votre annonce reste acquise</h2>
-              <p>Si vous payez une publication unique, le crédit reste disponible tant que la mission n'a pas été confirmée avec un candidat.</p>
+              <p>Si vous payez une publication unique, le crédit rejoint vos crédits de publication et reste disponible tant qu'il n'a pas été réservé à une mission.</p>
             </div>
-            <Badge tone="neutral">Établissement</Badge>
+            <Badge tone="neutral">Facturation</Badge>
           </div>
 
-          <Field label="Etablissement rattaché">
+          <Field label="Profil de facturation">
             <Select value={selectedEstablishmentId} onChange={(event) => setSelectedEstablishmentId(event.target.value)}>
               {establishments.map((establishment) => (
                 <option key={establishment.id} value={establishment.id}>
