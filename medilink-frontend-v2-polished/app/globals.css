@@ -9097,54 +9097,100 @@ td {
 .billing-timeline {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
+  gap: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 6px 4px 8px;
 }
 
 .billing-timeline > div {
   position: relative;
   display: grid;
-  gap: 7px;
+  grid-template-rows: 34px auto;
+  gap: 8px;
   min-width: 0;
-  padding: 10px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #FBFCFD;
+  padding: 0 10px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.billing-timeline > div::before,
+.billing-timeline > div::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  height: 2px;
+  background: rgba(148,163,184,.28);
+}
+
+.billing-timeline > div::before {
+  left: 0;
+  right: 50%;
+}
+
+.billing-timeline > div::after {
+  left: 50%;
+  right: 0;
+}
+
+.billing-timeline > div:first-child::before,
+.billing-timeline > div:last-child::after {
+  display: none;
+}
+
+.billing-timeline > div.done::before,
+.billing-timeline > div.done::after,
+.billing-timeline > div.done + div::before {
+  background: rgba(14,138,122,.42);
 }
 
 .billing-timeline > div span {
-  width: 12px;
-  height: 12px;
-  border: 2px solid rgba(108,122,137,.3);
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  justify-self: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(148,163,184,.34);
   border-radius: 999px;
   background: #fff;
+  color: rgba(77,91,108,.72);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(11,25,41,.06);
 }
 
 .billing-timeline > div strong {
-  overflow: hidden;
-  color: var(--muted);
+  display: block;
+  min-height: 32px;
+  color: inherit;
   font-size: 12px;
+  font-weight: 850;
   line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .billing-timeline > div.done {
-  border-color: rgba(14,138,122,.18);
-  background: rgba(14,138,122,.06);
+  color: var(--teal-700);
 }
 
 .billing-timeline > div.done span {
   border-color: var(--teal);
   background: var(--teal);
+  color: #fff;
 }
 
 .billing-timeline > div.active {
-  border-color: rgba(204,139,35,.26);
-  background: rgba(204,139,35,.08);
+  color: #A15F00;
 }
 
 .billing-timeline > div.active span {
   border-color: #CC8B23;
+  background: #FFF8EA;
+  color: #A15F00;
+  box-shadow: 0 0 0 4px rgba(204,139,35,.12);
 }
 
 .billing-mission-meta {
@@ -9430,7 +9476,7 @@ td {
   }
 
   .billing-timeline {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(116px, 1fr));
   }
 
   .billing-mission-detail {
@@ -9492,7 +9538,8 @@ td {
   }
 
   .billing-timeline {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(104px, 1fr));
+    margin: 0 -4px;
   }
 
   .billing-filters,

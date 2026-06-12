@@ -614,9 +614,9 @@ function MissionsTab({
             </div>
 
             <div className="billing-timeline">
-              {timelineSteps(row).map((step) => (
+              {timelineSteps(row).map((step, index) => (
                 <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
-                  <span aria-hidden="true" />
+                  <span aria-hidden="true">{index + 1}</span>
                   <strong>{step.label}</strong>
                 </div>
               ))}
