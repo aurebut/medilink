@@ -5,7 +5,7 @@ import { api, clearApiCache, isMockStorageUrl, subscribeApiCache } from '@/lib/a
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getCandidateBillingMissionPath, getCandidateConversationPath, getCandidateMissionPath } from '@/lib/mission-links';
+import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -285,7 +285,7 @@ export default function CandidateCurrentMissionsPage() {
 
           <div className="candidate-current-layout">
             {selectedRow ? (
-              <MissionControlPanel row={selectedRow} activeSection={activeSection} />
+              <MissionControlPanel row={selectedRow} activeSection={activeSection} />
             ) : null}
           </div>
         </>
@@ -294,7 +294,7 @@ export default function CandidateCurrentMissionsPage() {
   );
 }
 
-function MissionCommandStrip({ row }: { row: MissionRow }) {
+function MissionCommandStrip({ row }: { row: MissionRow }) {
   const mission = row.application.mission;
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse à confirmer';
@@ -327,19 +327,6 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
             Message
           </LinkButton>
         ) : null}
-        {mission?.id ? (
-          <LinkButton href={getCandidateMissionPath(mission.id)} variant="light">
-            <span className="command-action-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M7 3.8h7.2L18 7.6v12.6H7V3.8Z" />
-                <path d="M14 4v4h4" />
-                <path d="M9.5 12h5" />
-                <path d="M9.5 15h5" />
-              </svg>
-            </span>
-            Mission
-          </LinkButton>
-        ) : null}
         {hasAddress ? (
           <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">
             <span className="command-action-icon" aria-hidden="true">
@@ -356,7 +343,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
   );
 }
 
-function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSection: MissionSection }) {
+function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSection: MissionSection }) {
   const mission = row.application.mission;
   const establishment = mission?.establishment;
   const progress = missionProgress(row.application, row.agreement);
@@ -375,7 +362,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
   return (
     <section className="candidate-current-detail candidate-current-unified">
-      {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
+      {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
 
       {activeSection === 'pilotage' ? (
         <>
