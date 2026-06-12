@@ -390,8 +390,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
 
-  const detailFillers = Array.from({ length: (4 - (detailItems.length % 4)) % 4 });
-
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
   return (
     <section className="candidate-current-detail candidate-current-unified">
@@ -465,14 +463,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
                   <strong>{item.value}</strong>
                 </div>
               ))}
-              {detailFillers.map((_, index) => (
-                <div
-                  key={`detail-filler-${index}`}
-                  className="candidate-current-detail-filler"
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
+            </div>
           ) : null}
         </div>
       ) : null}
