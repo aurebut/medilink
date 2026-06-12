@@ -8692,14 +8692,6 @@ td {
   background: linear-gradient(135deg, #fff 0%, #f8fbfb 100%);
 }
 
-.billing-hero-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(90deg, var(--navy), var(--teal));
-}
-
 .billing-hero-copy {
   display: grid;
   align-content: center;
