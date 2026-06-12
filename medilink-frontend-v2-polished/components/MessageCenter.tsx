@@ -173,6 +173,7 @@ export function MessageCenter() {
   const [loading, setLoading] = useState(true);
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const messageLayoutRef = useRef<HTMLDivElement | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const activeIdRef = useRef<string | null>(null);
   const sendingMessageRef = useRef(0);
@@ -340,6 +341,41 @@ export function MessageCenter() {
   }, [activeId]);
   useEffect(() => {
     if (!isMobile) setMobileOptionsOpen(false);
+  }, [isMobile]);
+  useEffect(() => {
+    const layout = messageLayoutRef.current;
+    if (!layout || isMobile) {
+      layout?.style.removeProperty('--message-layout-height');
+      return;
+    }
+
+    let frame = 0;
+    const updateLayoutHeight = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const rect = layout.getBoundingClientRect();
+        const bottomGap = 16;
+        const availableHeight = Math.floor(window.innerHeight - rect.top - bottomGap);
+        layout.style.setProperty('--message-layout-height', `${Math.max(360, availableHeight)}px`);
+      });
+    };
+
+    updateLayoutHeight();
+    window.addEventListener('resize', updateLayoutHeight);
+    window.addEventListener('orientationchange', updateLayoutHeight);
+
+    const resizeObserver = new ResizeObserver(updateLayoutHeight);
+    if (layout.parentElement) resizeObserver.observe(layout.parentElement);
+    if (layout.previousElementSibling) resizeObserver.observe(layout.previousElementSibling);
+    void document.fonts?.ready.then(updateLayoutHeight);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('resize', updateLayoutHeight);
+      window.removeEventListener('orientationchange', updateLayoutHeight);
+      resizeObserver.disconnect();
+      layout.style.removeProperty('--message-layout-height');
+    };
   }, [isMobile]);
   useEffect(() => {
     if (!activeId) return;
@@ -724,7 +760,7 @@ export function MessageCenter() {
   )) || null;
 
   return (
-    <div className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
+    <div ref={messageLayoutRef} className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
       {showConversationList ? <Card className="conversation-list">
         <div className="toolbar">
           <div>
@@ -735,9 +771,11 @@ export function MessageCenter() {
         {isMobile ? (
           <div className="conversation-mobile-search">
             <label className="sr-only" htmlFor="conversation-search">Rechercher une conversation</label>
-            <span aria-hidden="true">Search</span>
+            <span aria-hidden="true" />
             <input
               id="conversation-search"
+              type="search"
+              autoComplete="off"
               value={conversationQuery}
               onChange={(event) => setConversationQuery(event.target.value)}
               placeholder="Rechercher une discussion"

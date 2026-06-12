@@ -4000,7 +4000,7 @@ tbody tr:hover { background: #FAFBFD; }
 .establishment-photo-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .establishment-photo-actions .btn { min-height: 32px; padding: 7px 9px; font-size: 12px; }
 
-.message-layout { display: grid; grid-template-columns: 355px minmax(0, 1fr); gap: 16px; height: calc(100vh - 138px); min-height: 520px; }
+.message-layout { display: grid; grid-template-columns: 355px minmax(0, 1fr); gap: 16px; height: var(--message-layout-height, calc(100vh - 138px)); min-height: min(520px, var(--message-layout-height, 520px)); }
 .conversation-list, .message-pane { overflow: hidden; display: flex; flex-direction: column; }
 .conversation-items { overflow: auto; display: grid; gap: 10px; padding-right: 4px; }
 .conversation-button { text-align: left; width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 14px; cursor: pointer; transition: .15s ease; }
@@ -4029,8 +4029,8 @@ tbody tr:hover { background: #FAFBFD; }
 
 @media (min-width: 981px) {
   .messages-page .message-layout {
-    height: calc(100dvh - 228px);
-    min-height: 460px;
+    height: var(--message-layout-height, calc(100dvh - 228px));
+    min-height: min(460px, var(--message-layout-height, 460px));
   }
 }
 
@@ -5893,6 +5893,8 @@ tbody tr:hover { background: #FAFBFD; }
     display: flex;
     align-items: center;
     gap: 9px;
+    width: 100%;
+    box-sizing: border-box;
     min-height: 46px;
     margin-bottom: 12px;
     padding: 0 12px;
@@ -5910,6 +5912,9 @@ tbody tr:hover { background: #FAFBFD; }
     background: rgba(26,82,160,.08);
     color: var(--blue);
     flex: 0 0 auto;
+    overflow: hidden;
+    font-size: 0;
+    line-height: 0;
   }
   .message-layout-mobile:not(.message-layout-mobile-active) .conversation-mobile-search > span::before {
     content: '';
@@ -5934,12 +5939,16 @@ tbody tr:hover { background: #FAFBFD; }
     transform-origin: left center;
   }
   .message-layout-mobile:not(.message-layout-mobile-active) .conversation-mobile-search input {
-    width: 100%;
+    flex: 1 1 auto;
+    width: 1%;
     min-width: 0;
+    height: 44px;
     border: 0;
     outline: 0;
     background: transparent;
     color: var(--heading);
+    appearance: none;
+    -webkit-appearance: none;
     font: inherit;
     font-size: 14px;
     font-weight: 750;
