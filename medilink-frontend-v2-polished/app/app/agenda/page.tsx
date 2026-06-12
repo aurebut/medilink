@@ -260,6 +260,7 @@ export default function CandidateAgendaPage() {
                     <div key={calendarEventWeeks[weekIndex].key} className="agenda-week-row">
                       {week.map((day) => {
                         const hasNote = Boolean(notes[day.key]);
+                        const dayEvents = eventsByDay.get(day.key) || [];
                         if (!day.inMonth) {
                           return <div key={day.key} className="agenda-day agenda-day-outside" aria-hidden="true" />;
                         }
@@ -275,6 +276,14 @@ export default function CandidateAgendaPage() {
                           >
                             <div className="agenda-day-number">{day.date.getDate()}</div>
                             <div className="agenda-day-events">
+                              {dayEvents.slice(0, 3).map((event) => (
+                                <span
+                                  key={event.application.id}
+                                  className={`agenda-event-dot is-${agreementTone(event.agreement?.status)}`}
+                                  aria-hidden="true"
+                                />
+                              ))}
+                              {dayEvents.length > 3 ? <span className="agenda-day-more">+{dayEvents.length - 3}</span> : null}
                               {hasNote ? <span className="agenda-note-dot">Note</span> : null}
                             </div>
                           </button>

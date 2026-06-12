@@ -309,6 +309,7 @@ export default function EstablishmentAgendaPage() {
                         <div key={calendarEventWeeks[weekIndex].key} className="agenda-week-row">
                           {week.map((day) => {
                             const hasNote = Boolean(notes[day.key]);
+                            const dayRows = rowsByDay.get(day.key) || [];
                             if (!day.inMonth) {
                               return <div key={day.key} className="agenda-day agenda-day-outside" aria-hidden="true" />;
                             }
@@ -324,6 +325,14 @@ export default function EstablishmentAgendaPage() {
                               >
                                 <div className="agenda-day-number">{day.date.getDate()}</div>
                                 <div className="agenda-day-events">
+                                  {dayRows.slice(0, 3).map((row) => (
+                                    <span
+                                      key={row.mission.id}
+                                      className={`agenda-event-dot is-${establishmentMissionTone(row)}`}
+                                      aria-hidden="true"
+                                    />
+                                  ))}
+                                  {dayRows.length > 3 ? <span className="agenda-day-more">+{dayRows.length - 3}</span> : null}
                                   {hasNote ? <span className="agenda-note-dot">Note</span> : null}
                                 </div>
                               </button>
