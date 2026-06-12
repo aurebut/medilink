@@ -173,8 +173,8 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
   const startDate = missionStart(application, agreement);
   const endDate = missionEnd(application, agreement);
-  const startLabel = startDate ? formatDate(startDate) : 'Date � confirmer';
-  const endLabel = endDate ? formatDate(endDate) : 'Date � confirmer';
+  const startLabel = startDate ? formatDate(startDate) : 'Date à confirmer';
+  const endLabel = endDate ? formatDate(endDate) : 'Date à confirmer';
 
   return [
     { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec le candidat.', status: confirmed ? 'Validée' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },

@@ -106,9 +106,9 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
 
   const endDate = missionEnd(application, agreement);
 
-  const startLabel = startDate ? formatDate(startDate) : 'Date � confirmer';
+  const startLabel = startDate ? formatDate(startDate) : 'Date à confirmer';
 
-  const endLabel = endDate ? formatDate(endDate) : 'Date � confirmer';
+  const endLabel = endDate ? formatDate(endDate) : 'Date à confirmer';
 
   return [
     { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec l’établissement.', status: confirmed ? 'Validé' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
@@ -365,7 +365,7 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
                 <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" />
               </svg>
             </span>
-            Itin�raire
+            Itinéraire
           </a>
         ) : null}
       </div>
