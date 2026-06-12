@@ -39,7 +39,7 @@ export function MissionCard({
   const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
 
   return (
-    <Card className="mission-card">
+    <Card className={`mission-card${establishmentPhoto ? ' mission-card--with-image' : ''}`}>
       {establishmentPhoto ? (
         <Link className="mission-card-image" href={missionDetailHref} aria-label={`Voir ${mission.title}`}>
           <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />

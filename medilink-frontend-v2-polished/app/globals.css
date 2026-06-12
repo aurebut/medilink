@@ -3955,11 +3955,11 @@ tbody tr:hover { background: #FAFBFD; }
 .mission-share .input { min-width: min(100%, 360px); flex: 1 1 320px; }
 .mission-share > .actions { flex: 0 0 auto; }
 @media (min-width: 621px) {
-  .search-results .mission-card {
+  .search-results .mission-card--with-image {
     grid-template-columns: 220px minmax(0, 1fr);
     align-items: start;
   }
-  .mission-list .mission-card {
+  .mission-list .mission-card--with-image {
     grid-template-columns: 128px minmax(0, 1fr);
     align-items: start;
   }
@@ -3973,8 +3973,8 @@ tbody tr:hover { background: #FAFBFD; }
     width: 128px;
     height: 92px;
   }
-  .search-results .mission-card > :not(.mission-card-image),
-  .mission-list .mission-card > :not(.mission-card-image) {
+  .search-results .mission-card--with-image > :not(.mission-card-image),
+  .mission-list .mission-card--with-image > :not(.mission-card-image) {
     grid-column: 2;
   }
 }
