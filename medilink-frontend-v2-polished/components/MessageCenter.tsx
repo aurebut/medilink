@@ -152,6 +152,7 @@ export function MessageCenter() {
   ));
   const [conversations, setConversations] = useState<ConversationWithLast[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [conversationQuery, setConversationQuery] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [body, setBody] = useState('');
   const [proposalOpen, setProposalOpen] = useState(false);
@@ -178,6 +179,20 @@ export function MessageCenter() {
   activeIdRef.current = activeId;
 
   const active = useMemo(() => conversations.find((c) => c.id === activeId) || null, [conversations, activeId]);
+  const visibleConversations = useMemo(() => {
+    const query = conversationQuery.trim().toLowerCase();
+    if (!query) return conversations;
+
+    return conversations.filter((conversation) => {
+      const last = conversation.messages?.[0];
+      return [
+        conversation.establishment?.name,
+        conversation.mission?.title,
+        conversation.mission?.city,
+        last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise à jour du suivi' : last?.body,
+      ].some((value) => value?.toLowerCase().includes(query));
+    });
+  }, [conversationQuery, conversations]);
   const workflows = useMemo(() => messages.map((m) => ({ message: m, workflow: parseWorkflow(m) })).filter((x) => x.workflow), [messages]);
   const lastProposal = useMemo(
     () => [...workflows].reverse().find((x) => x.workflow?.kind === 'FINAL_PROPOSAL') || null,
@@ -717,22 +732,52 @@ export function MessageCenter() {
             <div className="small">{conversations.length} échange(s)</div>
           </div>
         </div>
+        {isMobile ? (
+          <div className="conversation-mobile-search">
+            <label className="sr-only" htmlFor="conversation-search">Rechercher une conversation</label>
+            <span aria-hidden="true">Search</span>
+            <input
+              id="conversation-search"
+              value={conversationQuery}
+              onChange={(event) => setConversationQuery(event.target.value)}
+              placeholder="Rechercher une discussion"
+            />
+          </div>
+        ) : null}
         {error ? <Alert type="error">{error}</Alert> : null}
         <div className="conversation-items">
-          {conversations.map((conv) => {
+          {visibleConversations.map((conv) => {
             const last = conv.messages?.[0];
+            const title = conv.establishment?.name || conv.mission?.title || 'Conversation';
+            const preview = last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise a jour du suivi' : last?.body || 'Aucun message';
+            const initial = title.trim().charAt(0).toUpperCase() || 'M';
             return (
               <button
                 key={conv.id}
                 className={`conversation-button ${conv.id === activeId ? 'active' : ''}`}
                 onClick={() => setActiveId(conv.id)}
               >
-                <strong>{conv.establishment?.name || conv.mission?.title || 'Conversation'}</strong>
+                <span className="conversation-mobile-avatar" aria-hidden="true">{initial}</span>
+                <span className="conversation-mobile-content">
+                  <span className="conversation-mobile-head">
+                    <strong>{title}</strong>
+                    <span>{formatDateTime(conv.lastMessageAt)}</span>
+                  </span>
+                  <span className="conversation-mobile-mission">{conv.mission?.title || conv.mission?.city || 'Mission'}</span>
+                  <span className="conversation-mobile-preview">{preview}</span>
+                </span>
+                <strong>{title}</strong>
                 <div className="small">{conv.mission?.title}</div>
                 <div className="small">{last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise à jour du suivi' : last?.body || 'Aucun message'} - {formatDateTime(conv.lastMessageAt)}</div>
               </button>
             );
           })}
+          {visibleConversations.length === 0 ? (
+            <div className="conversation-mobile-empty">
+              <strong>Aucune conversation trouvee</strong>
+              <span>Essayez un nom, une ville ou une mission.</span>
+            </div>
+          ) : null}
         </div>
       </Card> : null}
 

@@ -1,9 +1,9 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import type { Application, Mission, MissionType, Paginated, RequiredLevel } from '@/lib/types';
+import type { Application, Mission, MissionType, Paginated, Profile, RequiredLevel } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { missionTypeOptions, requiredLevelOptions, statusLabel } from '@/lib/labels';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
@@ -28,10 +28,11 @@ const emptyFilters = {
   retrocessionMax: '',
 };
 
-type SearchTab = 'missions' | 'applications';
+type SearchTab = 'recommended' | 'search' | 'applications';
 
 const tabs: Array<{ id: SearchTab; label: string }> = [
-  { id: 'missions', label: 'Missions' },
+  { id: 'recommended', label: 'Missions pour vous' },
+  { id: 'search', label: 'Recherche' },
   { id: 'applications', label: 'Candidatures' },
 ];
 
@@ -54,12 +55,41 @@ const secondaryFilterKeys = [
   'retrocessionMax',
 ];
 
+function normalize(value?: string | null) {
+  return (value || '').trim().toLowerCase();
+}
+
+function includesMatch(source?: string | null, target?: string | null) {
+  const a = normalize(source);
+  const b = normalize(target);
+  return !!a && !!b && (a.includes(b) || b.includes(a));
+}
+
+function scoreMissionForProfile(mission: Mission, profile: Profile | null, appliedMissionIds: Set<string>) {
+  let score = 0;
+
+  if (appliedMissionIds.has(mission.id)) score -= 100;
+  if (mission.status === 'PUBLISHED') score += 8;
+  if (profile?.preferredCities?.some((city) => includesMatch(mission.city, city))) score += 12;
+  if (includesMatch(mission.city, profile?.city)) score += 8;
+  if (includesMatch(mission.specialty, profile?.specialty)) score += 10;
+  if (profile?.medicalStatus && (mission.requiredLevels || [mission.requiredLevel]).includes(profile.medicalStatus as RequiredLevel)) score += 6;
+  if (mission.patientType && profile?.acceptedPatientTypes?.some((patientType) => includesMatch(mission.patientType, patientType))) score += 5;
+  if (mission.softwareUsed && profile?.knownSoftware?.some((software) => includesMatch(mission.softwareUsed, software))) score += 4;
+  if (mission.missionType && profile?.acceptedMissionTypes?.includes(mission.missionType)) score += 5;
+  if (profile?.minimumCompensation && mission.retrocessionPercentage && mission.retrocessionPercentage >= profile.minimumCompensation) score += 3;
+
+  return score;
+}
+
 export default function SearchMissionsPage() {
   const cachedMissions = api.getSync<Paginated<Mission>>('/missions?limit=50');
   const cachedApplications = api.getSync<Application[]>('/me/applications');
-  const [activeTab, setActiveTab] = useState<SearchTab>('missions');
+  const cachedProfile = api.getSync<Profile>('/me/profile');
+  const [activeTab, setActiveTab] = useState<SearchTab>('recommended');
   const [items, setItems] = useState<Mission[]>(cachedMissions?.items || []);
   const [total, setTotal] = useState(cachedMissions?.total || 0);
+  const [profile, setProfile] = useState<Profile | null>(cachedProfile || null);
   const [filters, setFilters] = useState(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [extraFiltersOpen, setExtraFiltersOpen] = useState(false);
@@ -74,6 +104,22 @@ export default function SearchMissionsPage() {
   // Applications state
   const [applications, setApplications] = useState<Application[]>(cachedApplications || []);
   const [applicationsLoading, setApplicationsLoading] = useState(!cachedApplications);
+
+  const appliedMissionIds = useMemo(
+    () => new Set(applications.map((application) => application.missionId)),
+    [applications]
+  );
+
+  const recommendedMissions = useMemo(() => {
+    return [...items]
+      .filter((mission) => mission.status === 'PUBLISHED' && !appliedMissionIds.has(mission.id))
+      .sort((a, b) => {
+        const scoreDelta = scoreMissionForProfile(b, profile, appliedMissionIds) - scoreMissionForProfile(a, profile, appliedMissionIds);
+        if (scoreDelta !== 0) return scoreDelta;
+        return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+      })
+      .slice(0, 8);
+  }, [appliedMissionIds, items, profile]);
 
   async function loadMissions(currentFilters = filters, options: { silent?: boolean; reload?: boolean } = {}) {
     if (!options.silent) setLoading(true);
@@ -153,16 +199,26 @@ export default function SearchMissionsPage() {
     }
   }
 
+  async function loadProfile() {
+    try {
+      setProfile(await api.get<Profile>('/me/profile'));
+    } catch {
+      setProfile(null);
+    }
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const queryTab = new URLSearchParams(window.location.search).get('tab');
-    if (queryTab === 'applications') {
-      setActiveTab('applications');
-    }
+    if (queryTab === 'applications' || queryTab === 'search') setActiveTab(queryTab);
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'missions') {
+    if (activeTab === 'recommended') {
+      void loadMissions(emptyFilters);
+      void loadApplications({ silent: true });
+      void loadProfile();
+    } else if (activeTab === 'search') {
       void loadMissions();
     } else {
       void loadApplications();
@@ -170,11 +226,14 @@ export default function SearchMissionsPage() {
   }, [activeTab]);
 
   useAutoRefresh(() => {
-    if (activeTab === 'missions') {
+    if (activeTab === 'recommended') {
+      return loadMissions(emptyFilters, { silent: true, reload: true });
+    }
+    if (activeTab === 'search') {
       return loadMissions(filters, { silent: true, reload: true });
     }
     return loadApplications({ silent: true, reload: true });
-  }, { enabled: activeTab === 'missions' ? !loading : !applicationsLoading });
+  }, { enabled: activeTab === 'applications' ? !applicationsLoading : !loading });
 
   function set(name: string, value: string) {
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -200,7 +259,7 @@ export default function SearchMissionsPage() {
     <>
       <PageHeader
         title="Annonce et candidature"
-        description="Recherchez des missions et suivez vos candidatures depuis le même espace."
+        description="Consultez les missions adaptées à votre profil, recherchez librement et suivez vos candidatures."
       />
 
       <div className="billing-tabs" role="tablist" aria-label="Sections des annonces" style={{ marginBottom: 18 }}>
@@ -213,8 +272,8 @@ export default function SearchMissionsPage() {
               setActiveTab(tab.id);
               if (typeof window !== 'undefined') {
                 const url = new URL(window.location.href);
-                if (tab.id === 'applications') {
-                  url.searchParams.set('tab', 'applications');
+                if (tab.id === 'applications' || tab.id === 'search') {
+                  url.searchParams.set('tab', tab.id);
                 } else {
                   url.searchParams.delete('tab');
                 }
@@ -229,7 +288,41 @@ export default function SearchMissionsPage() {
         ))}
       </div>
 
-      {activeTab === 'missions' ? (
+      {activeTab === 'recommended' ? (
+        <div className="grid recommended-missions">
+          {error ? <Alert type="error">{error}</Alert> : null}
+          {loading ? (
+            <LoadingCard label="Chargement des missions pour vous..." />
+          ) : (
+            <>
+              <div className="toolbar">
+                <div>
+                  <strong>Missions pour vous</strong>
+                  <div className="small">
+                    {recommendedMissions.length} mission(s) publiée(s) priorisée(s) selon votre profil.
+                  </div>
+                </div>
+                <Button type="button" variant="light" onClick={() => setActiveTab('search')}>Recherche avancée</Button>
+              </div>
+              {recommendedMissions.map((mission) => (
+                <MissionCard
+                  key={mission.id}
+                  mission={mission}
+                  detailHref={getCandidateMissionPath(mission.id)}
+                  applyHref={getMissionApplyPath(mission.id)}
+                />
+              ))}
+              {recommendedMissions.length === 0 ? (
+                <EmptyState
+                  title="Aucune mission adaptée pour le moment"
+                  description="Complétez votre profil ou lancez une recherche libre pour voir toutes les annonces publiées."
+                  action={<Button onClick={() => setActiveTab('search')}>Ouvrir la recherche</Button>}
+                />
+              ) : null}
+            </>
+          )}
+        </div>
+      ) : activeTab === 'search' ? (
         <div className="grid-main">
           <Card className={`search-filters ${filtersOpen ? 'search-filters-open' : ''}`}>
             <div className="search-filters-head">
@@ -420,7 +513,7 @@ export default function SearchMissionsPage() {
               title="Aucune candidature"
               description="Commence par chercher une mission."
               action={
-                <Button onClick={() => setActiveTab('missions')}>
+                <Button onClick={() => setActiveTab('search')}>
                   Chercher une mission
                 </Button>
               }
