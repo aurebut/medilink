@@ -12,6 +12,7 @@ import {
   clearNotificationsCache,
   confirmNotificationDelete,
   confirmNotificationRead,
+  confirmNotificationsRead,
   confirmNotificationsClear,
   normalizeNotifications,
   primeNotificationsCache,
@@ -352,6 +353,11 @@ export function AppShell({
   function openNotification(notification: Notification) {
     setNotificationsOpen(false);
     if (!notification.readAt) void confirmNotificationRead(notification.id);
+  }
+
+  async function openNotificationsMenu() {
+    await loadNotifications();
+    await confirmNotificationsRead();
   }
 
   function warmRoute(href: string) {
@@ -780,7 +786,7 @@ export function AppShell({
                 setAccountMenuOpen(false);
                 setCreditsOpen(false);
                 setNotificationsOpen((open) => !open);
-                if (!notificationsOpen) void loadNotifications();
+                if (!notificationsOpen) openNotificationsMenu();
               }}
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">

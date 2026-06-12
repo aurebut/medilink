@@ -55,10 +55,28 @@ export function markNotificationReadInCache(id: string, readAt = new Date().toIS
   );
 }
 
+export function markNotificationsReadInCache(readAt = new Date().toISOString()) {
+  updateApiCache<Notification[]>(NOTIFICATIONS_PATH, (items) =>
+    normalizeNotifications(items || []).map((notification) => {
+      if (!notification.readAt) readNotificationIds.set(notification.id, readAt);
+      return notification.readAt ? notification : { ...notification, readAt };
+    }),
+  );
+}
+
 export async function confirmNotificationRead(id: string) {
   markNotificationReadInCache(id);
   try {
     await api.patchSilent(`/notifications/${id}/read`, {});
+  } catch {
+    // The next automatic refresh reconciles the badge if the server rejects the read.
+  }
+}
+
+export async function confirmNotificationsRead() {
+  markNotificationsReadInCache();
+  try {
+    await api.patchSilent('/notifications/read', {});
   } catch {
     // The next automatic refresh reconciles the badge if the server rejects the read.
   }
