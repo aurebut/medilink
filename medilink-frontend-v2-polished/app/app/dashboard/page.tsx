@@ -466,8 +466,8 @@ export default function CandidateDashboardPage() {
             <LinkButton variant="light" href="/app/missions">Tout voir</LinkButton>
           </div>
           {dashboard.missionRows.length > 0 ? (
-            <div className="dashboard-list">
-              {dashboard.missionRows.slice(0, 5).map(({ application, agreement }) => (
+            <div className="dashboard-list dashboard-mission-list">
+              {dashboard.missionRows.map(({ application, agreement }) => (
                 <div key={application.id} className="dashboard-list-item">
                   <div>
                     <strong>{application.mission?.title || 'Mission'}</strong>

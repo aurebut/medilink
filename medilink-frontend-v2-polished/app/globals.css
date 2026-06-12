@@ -2612,7 +2612,34 @@ button { touch-action: manipulation; }
   align-items: start;
 }
 .dashboard-missions-panel {
-  min-height: 520px;
+  display: grid;
+  gap: 14px;
+}
+.dashboard-missions-panel .toolbar {
+  margin-bottom: 0;
+}
+.dashboard-mission-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(26, 82, 160, 0.2) transparent;
+}
+.dashboard-mission-list::-webkit-scrollbar {
+  width: 6px;
+}
+.dashboard-mission-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dashboard-mission-list::-webkit-scrollbar-thumb {
+  background-color: rgba(26, 82, 160, 0.2);
+  border-radius: 10px;
+}
+.dashboard-mission-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(26, 82, 160, 0.4);
+}
+.dashboard-mission-list .dashboard-list-item {
+  flex-shrink: 0;
 }
 .dashboard-admin-column {
   display: grid;
