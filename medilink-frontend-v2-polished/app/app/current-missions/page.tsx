@@ -116,7 +116,7 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
     { key: 'ended', label: 'Fin de mission', helper: scheduleEnded ? 'La date de fin de mission est passée.' : 'Cette étape se validera à la date de fin de mission.', status: scheduleEnded ? 'Terminée' : 'À venir', dateLabel: endLabel, active: active, done: scheduleEnded },
     { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant la mission.', status: scheduleEnded ? 'À finaliser' : scheduleStarted ? 'À préparer' : 'À venir', active: scheduleEnded && !completed, done: completed },
     { key: 'completed', label: 'Validation de mission', helper: completed ? 'La mission a été validée.' : scheduleEnded ? 'La mission est terminée, en attente de validation.' : 'Cette étape suivra la fin de mission et les documents.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Situation de paiement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    { key: 'payment', label: 'Règlement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
   ];
 }
 
