@@ -1373,6 +1373,7 @@ button { touch-action: manipulation; }
 .candidate-current-unified .candidate-current-detail-grid > div,
 .candidate-current-unified .candidate-current-doc-summary > div,
 .candidate-current-unified .candidate-current-day-document {
+  position: relative;
   align-content: start;
   gap: 10px;
   min-height: 96px;
@@ -1416,12 +1417,33 @@ button { touch-action: manipulation; }
 .candidate-current-unified .candidate-current-doc-summary > div:nth-child(2n),
 .candidate-current-unified .candidate-current-day-document:nth-child(2n) {
   padding-left: 18px;
-  border-left: 1px solid rgba(148,163,184,.16);
+}
+
+.candidate-current-unified .candidate-current-grid > .candidate-current-panel:nth-child(2n)::before,
+.candidate-current-unified .candidate-current-info > div:nth-child(2n)::before,
+.candidate-current-unified .candidate-current-doc-summary > div:nth-child(2n)::before,
+.candidate-current-unified .candidate-current-day-document:nth-child(2n)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 1px;
+  background: rgba(148,163,184,.16);
 }
 
 .candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1)) {
   padding-left: 14px;
-  border-left: 1px solid rgba(148,163,184,.14);
+}
+
+.candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1))::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 1px;
+  background: rgba(148,163,184,.14);
 }
 
 .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 5) {
@@ -1606,7 +1628,15 @@ button { touch-action: manipulation; }
 
   .candidate-current-unified .candidate-current-detail-grid > div:nth-child(2n) {
     padding-left: 14px;
-    border-left: 1px solid rgba(148,163,184,.14);
+    border-left: 0;
+  }
+
+  .candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1))::before {
+    display: none;
+  }
+
+  .candidate-current-unified .candidate-current-detail-grid > div:nth-child(2n)::before {
+    display: block;
   }
 
   .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 3) {
@@ -5130,6 +5160,14 @@ tbody tr:hover { background: #FAFBFD; }
     border-left: 0 !important;
     border-radius: 0;
     background: transparent;
+  }
+
+  .candidate-current-unified .candidate-current-panel::before,
+  .candidate-current-unified .candidate-current-info > div::before,
+  .candidate-current-unified .candidate-current-detail-grid > div::before,
+  .candidate-current-unified .candidate-current-doc-summary > div::before,
+  .candidate-current-unified .candidate-current-day-document::before {
+    display: none !important;
   }
   .candidate-current-unified .candidate-current-info > div {
     min-height: 118px;
