@@ -18,7 +18,13 @@ export function formatDateTime(value?: string | null) {
 
 export function formatMoney(amount?: number | null, currency = 'EUR') {
   if (amount === undefined || amount === null) return 'Rémunération non précisée';
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+  const hasDecimals = amount % 1 !== 0;
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: hasDecimals ? 2 : 0,
+  }).format(amount);
 }
 
 export function formatCompensation({

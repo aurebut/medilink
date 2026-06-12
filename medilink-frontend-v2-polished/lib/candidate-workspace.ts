@@ -1,4 +1,5 @@
 import type { Application, Conversation, MissionAgreement, MissionAgreementStatus } from './types';
+import { formatMoney } from './format';
 
 export const weekDayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
@@ -63,11 +64,7 @@ export function candidateAmountLabel(agreement?: MissionAgreement | null) {
       ? `${agreement.retrocessionPercentage}% de rétrocession`
       : 'Rétrocession';
   }
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: agreement.currency || 'EUR',
-    maximumFractionDigits: 0,
-  }).format(agreement.candidateAmount || agreement.amount || 0);
+  return formatMoney(agreement.candidateAmount || agreement.amount || 0, agreement.currency || 'EUR');
 }
 
 export function missionDateValue(application: Application, agreement?: MissionAgreement | null) {
