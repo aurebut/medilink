@@ -891,12 +891,14 @@ export function AppShell({
       </aside>
 
       <main className="main">
-        <header className="topbar">
-          <div className="topbar-title">
-            <strong>{areaLabel(area, candidateProfile)}</strong>
-            <div className="small">Plateforme MediLink</div>
-          </div>
-        </header>
+        {area === 'admin' ? (
+          <header className="topbar">
+            <div className="topbar-title">
+              <strong>{areaLabel(area, candidateProfile)}</strong>
+              <div className="small">Plateforme MediLink</div>
+            </div>
+          </header>
+        ) : null}
         <div className="content">
           {user && !user.emailVerified && area !== 'admin' ? (
             <div className="verification-banner">
