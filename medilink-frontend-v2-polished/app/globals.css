@@ -1100,6 +1100,7 @@ button { touch-action: manipulation; }
 }
 
 .candidate-current-unified {
+  --current-mission-divider-inset: 18px;
   gap: 0;
   padding: 18px;
   border: 1px solid rgba(14,138,122,.18);
@@ -1386,7 +1387,7 @@ button { touch-action: manipulation; }
 
 .candidate-current-unified .candidate-current-detail-grid > div,
 .candidate-current-unified .candidate-current-doc-summary > div {
-  min-height: 76px;
+  min-height: 96px;
 }
 
 .candidate-current-unified .candidate-current-info > div {
@@ -1426,22 +1427,22 @@ button { touch-action: manipulation; }
   content: '';
   position: absolute;
   left: 0;
-  top: 18px;
-  bottom: 18px;
+  top: var(--current-mission-divider-inset);
+  bottom: var(--current-mission-divider-inset);
   width: 1px;
   background: rgba(148,163,184,.16);
 }
 
 .candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1)) {
-  padding-left: 14px;
+  padding-left: 18px;
 }
 
 .candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1))::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 18px;
-  bottom: 18px;
+  top: var(--current-mission-divider-inset);
+  bottom: var(--current-mission-divider-inset);
   width: 1px;
   background: rgba(148,163,184,.14);
 }
