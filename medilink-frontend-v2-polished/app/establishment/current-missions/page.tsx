@@ -551,10 +551,23 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
       </div>
       <div className="candidate-command-actions">
         {row.application.conversation ? (
-          <LinkButton href={getEstablishmentConversationPath(row.application.conversation.id)} variant="secondary">Messagerie</LinkButton>
+          <LinkButton href={getEstablishmentConversationPath(row.application.conversation.id)} variant="secondary">
+            <span className="command-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 6.8C4 5.8 4.8 5 5.8 5h12.4c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H9l-4.2 3v-3.2c-.5-.3-.8-.9-.8-1.6V6.8Z" />
+              </svg>
+            </span>
+            Message
+          </LinkButton>
         ) : null}
         <LinkButton href={`/establishment/candidates/${row.application.id}`} variant="light">
-          Profil candidat
+          <span className="command-action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+              <path d="M5 20a7 7 0 0 1 14 0" />
+            </svg>
+          </span>
+          Profil
         </LinkButton>
       </div>
     </section>

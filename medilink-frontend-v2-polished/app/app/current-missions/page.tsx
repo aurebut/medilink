@@ -315,15 +315,46 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <span>Statut</span>
         <strong>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</strong>
         <small>{agreementNextStep(row.agreement?.status)}</small>
-      </div>
-      <div className="candidate-command-actions">
-        {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)} variant="secondary">Messagerie</LinkButton> : null}
-        {mission?.id ? <LinkButton href={getCandidateMissionPath(mission.id)} variant="light">Voir la mission</LinkButton> : null}
-        {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itinéraire</a> : null}
-      </div>
-    </section>
-  );
-}
+      </div>
+      <div className="candidate-command-actions">
+        {row.conversation ? (
+          <LinkButton href={getCandidateConversationPath(row.conversation.id)} variant="secondary">
+            <span className="command-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 6.8C4 5.8 4.8 5 5.8 5h12.4c1 0 1.8.8 1.8 1.8v7.4c0 1-.8 1.8-1.8 1.8H9l-4.2 3v-3.2c-.5-.3-.8-.9-.8-1.6V6.8Z" />
+              </svg>
+            </span>
+            Message
+          </LinkButton>
+        ) : null}
+        {mission?.id ? (
+          <LinkButton href={getCandidateMissionPath(mission.id)} variant="light">
+            <span className="command-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7 3.8h7.2L18 7.6v12.6H7V3.8Z" />
+                <path d="M14 4v4h4" />
+                <path d="M9.5 12h5" />
+                <path d="M9.5 15h5" />
+              </svg>
+            </span>
+            Mission
+          </LinkButton>
+        ) : null}
+        {hasAddress ? (
+          <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">
+            <span className="command-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 21s6-5.3 6-11a6 6 0 0 0-12 0c0 5.7 6 11 6 11Z" />
+                <path d="M12 12.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" />
+              </svg>
+            </span>
+            Trajet
+          </a>
+        ) : null}
+      </div>
+    </section>
+  );
+}
 
 function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSection: MissionSection }) {
   const mission = row.application.mission;

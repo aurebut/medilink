@@ -985,6 +985,39 @@ button { touch-action: manipulation; }
   flex-wrap: wrap;
 }
 
+.candidate-current-unified .candidate-command-actions {
+  align-content: end;
+  gap: 8px;
+}
+
+.candidate-current-unified .candidate-command-actions .btn {
+  min-height: 38px;
+  padding: 8px 11px;
+  border-radius: 999px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.command-action-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.command-action-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .candidate-current-detail {
   display: grid;
   gap: 18px;
@@ -1441,6 +1474,15 @@ button { touch-action: manipulation; }
 
   .candidate-command-actions .btn {
     width: 100%;
+  }
+  .candidate-current-unified .candidate-command-actions {
+    flex-direction: row;
+    align-items: center !important;
+  }
+  .candidate-current-unified .candidate-command-actions .btn {
+    width: auto;
+    flex: 1 1 96px;
+    min-width: 0;
   }
 }
 .auth-page::before,
@@ -4861,6 +4903,17 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-current-tab-panel .btn {
     width: 100%;
     min-width: 0;
+  }
+  .candidate-current-unified .candidate-command-actions {
+    flex-direction: row;
+    align-items: center !important;
+  }
+  .candidate-current-unified .candidate-command-actions .btn,
+  .candidate-current-unified .candidate-command-actions a.btn {
+    width: auto;
+    flex: 1 1 88px;
+    min-width: 0;
+    justify-content: center;
   }
   .candidate-current-route-head,
   .candidate-current-route-title,
