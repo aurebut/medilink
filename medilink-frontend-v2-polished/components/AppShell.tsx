@@ -219,11 +219,18 @@ function getNotificationLink(notification: Notification, area: 'candidate' | 'es
   return null;
 }
 
-function getNotificationBody(notification: Notification, conversations: Conversation[]) {
+function getNotificationBody(notification: Notification, conversations: Conversation[], area?: 'candidate' | 'establishment' | 'admin') {
   if (notification.type === 'NEW_MESSAGE' && notification.data) {
     const data = notification.data as Record<string, any>;
     const conv = conversations.find(c => c.id === data.conversationId);
     if (conv) {
+      if (area === 'establishment') {
+        const candidateProfile = conv.application?.candidate?.profile;
+        const candidateName = candidateProfile
+          ? [candidateProfile.firstName, candidateProfile.lastName].filter(Boolean).join(' ')
+          : '';
+        return `Vous avez reçu un nouveau message de ${candidateName || 'votre candidat'}.`;
+      }
       return `Vous avez reçu un nouveau message de ${conv.establishment?.name || 'l\'établissement'}.`;
     }
   }
@@ -655,7 +662,7 @@ export function AppShell({
                   </div>
                   <div className="publication-credit-menu-list">
                     <div className="publication-credit-menu-item">
-                      <span>Compte etablissement</span>
+                      <span>{publicationCredits.available > 1 ? 'Crédits restants' : 'Crédit restant'}</span>
                       <strong>{publicationCredits.available}</strong>
                     </div>
                   </div>
@@ -756,7 +763,7 @@ export function AppShell({
                               </button>
                             </span>
                           </div>
-                          <p>{getNotificationBody(notification, conversations)}</p>
+                          <p>{getNotificationBody(notification, conversations, area)}</p>
                           {notificationLink ? (
                             <Link
                               href={notificationLink}
