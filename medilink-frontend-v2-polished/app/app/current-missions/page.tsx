@@ -388,8 +388,11 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
     { label: 'Secrétariat', value: mission?.hasSecretary ? mission.secretaryType || 'Disponible' : null },
     { label: 'Parking', value: mission?.parkingAvailable ? 'Disponible' : null },
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
-  ].filter((item) => item.value);
-  const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
+  ].filter((item) => item.value);
+
+  const detailFillers = Array.from({ length: (4 - (detailItems.length % 4)) % 4 });
+
+  const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
   return (
     <section className="candidate-current-detail candidate-current-unified">
       {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
@@ -459,8 +462,15 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
               {detailItems.map((item) => (
                 <div key={item.label}>
                   <span>{item.label}</span>
-                  <strong>{item.value}</strong>
+                  <strong>{item.value}</strong>
                 </div>
+              ))}
+              {detailFillers.map((_, index) => (
+                <div
+                  key={`detail-filler-${index}`}
+                  className="candidate-current-detail-filler"
+                  aria-hidden="true"
+                />
               ))}
             </div>
           ) : null}

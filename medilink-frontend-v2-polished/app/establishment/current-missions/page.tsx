@@ -688,6 +688,8 @@ function MissionControlPanel({
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
 
+  const detailFillers = Array.from({ length: (4 - (detailItems.length % 4)) % 4 });
+
   const profile = candidateProfile?.candidate?.profile;
   const candidateFullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || row.application.candidate?.email || 'Candidat';
 
@@ -903,6 +905,13 @@ function MissionControlPanel({
                       <span>{item.label}</span>
                       <strong>{item.value}</strong>
                     </div>
+                  ))}
+                  {detailFillers.map((_, index) => (
+                    <div
+                      key={`detail-filler-${index}`}
+                      className="candidate-current-detail-filler"
+                      aria-hidden="true"
+                    />
                   ))}
                 </div>
               ) : null}

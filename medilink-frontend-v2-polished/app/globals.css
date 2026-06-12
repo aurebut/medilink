@@ -1388,6 +1388,10 @@ button { touch-action: manipulation; }
   min-height: 76px;
 }
 
+.candidate-current-unified .candidate-current-detail-filler {
+  pointer-events: none;
+}
+
 .candidate-current-unified .candidate-current-info > div {
   min-height: 132px;
 }
@@ -1598,6 +1602,10 @@ button { touch-action: manipulation; }
 
   .candidate-current-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .candidate-current-unified .candidate-current-detail-filler {
+    display: none;
   }
 
   .candidate-current-unified .candidate-current-detail-grid > div {
