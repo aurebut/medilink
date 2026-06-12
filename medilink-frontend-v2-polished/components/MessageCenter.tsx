@@ -758,7 +758,7 @@ export function MessageCenter() {
   const mobileNextStep = workflowTimelineSteps.find((step) => (
     step.key !== mobileCurrentStep?.key && (step.status === 'current' || step.status === 'waiting' || step.status === 'locked')
   )) || null;
-  const desktopHeaderStep = !isMobile && !desktopTimelineOpen ? mobileCurrentStep : null;
+  const headerWorkflowStep = isMobile || !desktopTimelineOpen ? mobileCurrentStep : null;
 
   return (
     <div ref={messageLayoutRef} className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
@@ -848,8 +848,8 @@ export function MessageCenter() {
                 {currentStatus}
               </Badge>
             </div>
-            {desktopHeaderStep ? (
-              <DesktopWorkflowHeaderStep step={desktopHeaderStep} />
+            {headerWorkflowStep ? (
+              <DesktopWorkflowHeaderStep step={headerWorkflowStep} />
             ) : null}
           </div>
 
