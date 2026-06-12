@@ -1125,7 +1125,7 @@ button { touch-action: manipulation; }
 
 .candidate-current-tab-panel {
   display: grid;
-  gap: 14px;
+  gap: 18px;
 }
 
 .candidate-current-pilotage-grid {
@@ -1349,6 +1349,74 @@ button { touch-action: manipulation; }
   background: #F8FAFC;
 }
 
+.candidate-current-unified .candidate-current-tab-panel {
+  padding: 0;
+}
+
+.candidate-current-unified .candidate-current-grid,
+.candidate-current-unified .candidate-current-info,
+.candidate-current-unified .candidate-current-detail-grid,
+.candidate-current-unified .candidate-current-doc-summary,
+.candidate-current-unified .candidate-current-day-documents {
+  gap: 0;
+  border-top: 1px solid rgba(14,138,122,.14);
+}
+
+.candidate-current-unified .candidate-current-tab-panel > .candidate-current-grid:first-child,
+.candidate-current-unified .candidate-current-tab-panel > .candidate-current-info:first-child,
+.candidate-current-unified .candidate-current-tab-panel > .candidate-current-detail-grid:first-child {
+  border-top: 0;
+}
+
+.candidate-current-unified .candidate-current-panel,
+.candidate-current-unified .candidate-current-info > div,
+.candidate-current-unified .candidate-current-detail-grid > div,
+.candidate-current-unified .candidate-current-doc-summary > div,
+.candidate-current-unified .candidate-current-day-document {
+  padding: 15px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.candidate-current-unified .candidate-current-grid > .candidate-current-panel:nth-child(n + 3),
+.candidate-current-unified .candidate-current-info > div:nth-child(n + 3),
+.candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 3),
+.candidate-current-unified .candidate-current-day-document:nth-child(n + 3) {
+  border-top: 1px solid rgba(148,163,184,.18);
+}
+
+.candidate-current-unified .candidate-current-grid > .candidate-current-panel:nth-child(2n),
+.candidate-current-unified .candidate-current-info > div:nth-child(2n),
+.candidate-current-unified .candidate-current-doc-summary > div:nth-child(2n),
+.candidate-current-unified .candidate-current-day-document:nth-child(2n) {
+  padding-left: 18px;
+  border-left: 1px solid rgba(148,163,184,.16);
+}
+
+.candidate-current-unified .candidate-current-detail-grid > div:not(:nth-child(4n + 1)) {
+  padding-left: 14px;
+  border-left: 1px solid rgba(148,163,184,.14);
+}
+
+.candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 5) {
+  border-top: 1px solid rgba(148,163,184,.18);
+}
+
+.candidate-current-unified .candidate-current-documents {
+  gap: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.candidate-current-unified .candidate-current-documents > div:first-child {
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(14,138,122,.14);
+}
+
 .candidate-current-documents > div:first-child {
   display: grid;
   gap: 7px;
@@ -1441,6 +1509,11 @@ button { touch-action: manipulation; }
   cursor: pointer;
 }
 
+.candidate-current-unified .candidate-current-dropzone {
+  border-color: rgba(14,138,122,.26);
+  background: rgba(14,138,122,.045);
+}
+
 .candidate-current-dropzone input {
   padding: 10px;
   background: #fff;
@@ -1461,6 +1534,14 @@ button { touch-action: manipulation; }
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
+}
+
+.candidate-current-unified .candidate-current-file-list > div {
+  padding: 9px 0;
+  border: 0;
+  border-top: 1px solid rgba(148,163,184,.16);
+  border-radius: 0;
+  background: transparent;
 }
 
 .candidate-current-file-list strong {
@@ -1495,6 +1576,19 @@ button { touch-action: manipulation; }
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .candidate-current-unified .candidate-current-detail-grid > div {
+    border-left: 0;
+  }
+
+  .candidate-current-unified .candidate-current-detail-grid > div:nth-child(2n) {
+    padding-left: 14px;
+    border-left: 1px solid rgba(148,163,184,.14);
+  }
+
+  .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 3) {
+    border-top: 1px solid rgba(148,163,184,.18);
+  }
+
   .candidate-command-actions {
     justify-content: flex-start;
   }
@@ -1522,6 +1616,23 @@ button { touch-action: manipulation; }
   .candidate-current-doc-summary,
   .candidate-current-day-documents {
     grid-template-columns: 1fr;
+  }
+
+  .candidate-current-unified .candidate-current-panel,
+  .candidate-current-unified .candidate-current-info > div,
+  .candidate-current-unified .candidate-current-detail-grid > div,
+  .candidate-current-unified .candidate-current-doc-summary > div,
+  .candidate-current-unified .candidate-current-day-document {
+    padding: 14px 0;
+    border-left: 0 !important;
+  }
+
+  .candidate-current-unified .candidate-current-panel:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-info > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-day-document:nth-child(n + 2) {
+    border-top: 1px solid rgba(148,163,184,.18);
   }
 
   .candidate-current-route-head {
@@ -2982,6 +3093,7 @@ button { touch-action: manipulation; }
 .agenda-day.muted {
   background: #F8FAFC;
 }
+
 .agenda-day-outside {
   min-height: 104px;
   border-color: transparent;
@@ -4966,6 +5078,29 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .candidate-current-unified .candidate-command-strip {
     padding: 0;
+  }
+  .candidate-current-unified .candidate-current-route {
+    padding: 18px 0 0;
+  }
+  .candidate-current-unified .candidate-current-documents {
+    padding: 0;
+  }
+  .candidate-current-unified .candidate-current-panel,
+  .candidate-current-unified .candidate-current-info > div,
+  .candidate-current-unified .candidate-current-detail-grid > div,
+  .candidate-current-unified .candidate-current-doc-summary > div,
+  .candidate-current-unified .candidate-current-day-document {
+    padding: 14px 0;
+    border-left: 0 !important;
+    border-radius: 0;
+    background: transparent;
+  }
+  .candidate-current-unified .candidate-current-panel:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-info > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-day-document:nth-child(n + 2) {
+    border-top: 1px solid rgba(148,163,184,.18);
   }
   .candidate-command-main h2 {
     font-size: 20px;
