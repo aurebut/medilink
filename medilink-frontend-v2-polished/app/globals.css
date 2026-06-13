@@ -3952,14 +3952,18 @@ tr:last-child td { border-bottom: none; }
 tbody tr:hover { background: #FAFBFD; }
 .establishment-application-sections {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 .establishment-application-section {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+}
+.establishment-application-section + .establishment-application-section {
+  padding-top: 4px;
+  border-top: 1px solid rgba(11,25,41,.08);
 }
 .establishment-application-section-history tbody tr {
-  opacity: .86;
+  opacity: .92;
 }
 .establishment-application-section-history tbody tr:hover {
   opacity: 1;
@@ -3969,47 +3973,39 @@ tbody tr:hover { background: #FAFBFD; }
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 12px 14px;
-  border: 1px solid rgba(26,82,160,.12);
-  border-left: 3px solid rgba(26,82,160,.52);
-  border-radius: 10px;
-  background: rgba(26,82,160,.035);
-}
-.establishment-application-section-history .establishment-application-section-head {
-  border-color: rgba(97,111,126,.14);
-  border-left-color: rgba(97,111,126,.38);
-  background: #FAF9F6;
+  padding: 0 2px;
 }
 .establishment-application-section-head h2 {
   margin: 0;
   color: var(--heading);
-  font-family: var(--serif);
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 1.1;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 .establishment-application-section-head p {
-  margin: 6px 0 0;
+  margin: 2px 0 0;
   max-width: 680px;
   color: var(--muted);
-  line-height: 1.55;
+  font-size: 13px;
+  line-height: 1.45;
 }
 @media (max-width: 620px) {
   .establishment-application-sections {
-    gap: 22px;
+    gap: 20px;
   }
   .establishment-application-section {
-    gap: 12px;
+    gap: 8px;
   }
   .establishment-application-section-head {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px;
+    padding: 0 2px;
   }
   .establishment-application-section-head h2 {
-    font-size: 22px;
-    line-height: 1;
+    font-size: 15px;
+    line-height: 1.2;
   }
   .establishment-application-section-head p {
     display: none;
