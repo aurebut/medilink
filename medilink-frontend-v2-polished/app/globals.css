@@ -1671,6 +1671,8 @@ button { touch-action: manipulation; }
   .candidate-current-doc-summary,
   .candidate-current-day-documents {
     grid-template-columns: 1fr;
+    gap: 12px;
+    border-top: 0;
   }
 
   .candidate-current-unified .candidate-current-panel,
@@ -1678,18 +1680,20 @@ button { touch-action: manipulation; }
   .candidate-current-unified .candidate-current-detail-grid > div,
   .candidate-current-unified .candidate-current-doc-summary > div,
   .candidate-current-unified .candidate-current-day-document {
-    min-height: 88px;
-    padding: 14px 0;
-    padding-left: 0 !important;
+    min-height: 132px;
+    padding: 14px !important;
     border-left: 0 !important;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
   }
 
   .candidate-current-unified .candidate-current-info > div {
-    min-height: 118px;
+    min-height: 132px;
   }
 
   .candidate-current-unified .candidate-current-day-document {
-    min-height: 160px;
+    min-height: 220px;
   }
 
   .candidate-current-unified .candidate-current-panel:nth-child(n + 2),
@@ -1697,7 +1701,7 @@ button { touch-action: manipulation; }
   .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 2),
   .candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 2),
   .candidate-current-unified .candidate-current-day-document:nth-child(n + 2) {
-    border-top: 1px solid rgba(148,163,184,.18);
+    border-top: 1px solid var(--line);
   }
 
   .candidate-current-route-head {
@@ -5223,6 +5227,8 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-current-day-documents,
   .candidate-current-detail-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
+    border-top: 0;
   }
   .candidate-command-strip {
     gap: 10px;
@@ -5242,12 +5248,12 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-current-unified .candidate-current-detail-grid > div,
   .candidate-current-unified .candidate-current-doc-summary > div,
   .candidate-current-unified .candidate-current-day-document {
-    min-height: 88px;
-    padding: 14px 0;
-    padding-left: 0 !important;
+    min-height: 132px;
+    padding: 14px !important;
     border-left: 0 !important;
-    border-radius: 0;
-    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
   }
 
   .candidate-current-unified .candidate-current-panel::before,
@@ -5258,17 +5264,17 @@ tbody tr:hover { background: #FAFBFD; }
     display: none !important;
   }
   .candidate-current-unified .candidate-current-info > div {
-    min-height: 118px;
+    min-height: 132px;
   }
   .candidate-current-unified .candidate-current-day-document {
-    min-height: 160px;
+    min-height: 220px;
   }
   .candidate-current-unified .candidate-current-panel:nth-child(n + 2),
   .candidate-current-unified .candidate-current-info > div:nth-child(n + 2),
   .candidate-current-unified .candidate-current-detail-grid > div:nth-child(n + 2),
   .candidate-current-unified .candidate-current-doc-summary > div:nth-child(n + 2),
   .candidate-current-unified .candidate-current-day-document:nth-child(n + 2) {
-    border-top: 1px solid rgba(148,163,184,.18);
+    border-top: 1px solid var(--line);
   }
   .candidate-command-main h2 {
     font-size: 20px;
