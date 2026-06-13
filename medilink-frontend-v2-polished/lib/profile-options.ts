@@ -94,10 +94,13 @@ export const acceptedMissionTypeOptions: ChoiceOption[] = [
 ];
 
 export const weekdayOptions: ChoiceOption[] = [
-  { value: 'WEEKDAYS', label: 'Semaine' },
+  { value: 'MONDAY', label: 'Lundi' },
+  { value: 'TUESDAY', label: 'Mardi' },
+  { value: 'WEDNESDAY', label: 'Mercredi' },
+  { value: 'THURSDAY', label: 'Jeudi' },
+  { value: 'FRIDAY', label: 'Vendredi' },
   { value: 'SATURDAY', label: 'Samedi' },
   { value: 'SUNDAY', label: 'Dimanche' },
-  { value: 'HOLIDAYS', label: 'Jours fériés' },
 ];
 
 export const timeSlotOptions: ChoiceOption[] = [

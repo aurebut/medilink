@@ -614,10 +614,15 @@ function ChoiceCalendar({
               type="button"
               className={selected ? 'selected' : ''}
               aria-pressed={selected}
+              aria-label={`${option.label} ${selected ? 'accepté' : 'non sélectionné'}`}
               onClick={() => onChange(toggleChoice(values, option.value))}
             >
               <span className="availability-check" aria-hidden="true">{selected ? '✓' : ''}</span>
-              <strong>{option.label}</strong>
+              <strong>
+                <span className="availability-day-initial" aria-hidden="true">{shortWeekdayLabel(option.label, 'initial')}</span>
+                <span className="availability-day-short" aria-hidden="true">{shortWeekdayLabel(option.label, 'short')}</span>
+                <span className="availability-day-full">{option.label}</span>
+              </strong>
               <small>{selected ? 'Accepté' : 'Libre'}</small>
             </button>
           );
@@ -684,4 +689,18 @@ function RemovableChoiceChips({
 
 function toggleChoice(values: string[], value: string) {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+}
+
+function shortWeekdayLabel(label: string, format: 'initial' | 'short') {
+  const labels: Record<string, { initial: string; short: string }> = {
+    Lundi: { initial: 'L', short: 'Lun.' },
+    Mardi: { initial: 'Ma', short: 'Mar.' },
+    Mercredi: { initial: 'Me', short: 'Mer.' },
+    Jeudi: { initial: 'J', short: 'Jeu.' },
+    Vendredi: { initial: 'V', short: 'Ven.' },
+    Samedi: { initial: 'S', short: 'Sam.' },
+    Dimanche: { initial: 'D', short: 'Dim.' },
+  };
+
+  return labels[label]?.[format] || label.slice(0, format === 'initial' ? 1 : 4);
 }

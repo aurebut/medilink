@@ -2112,7 +2112,7 @@ button { touch-action: manipulation; }
   gap: 8px;
 }
 .availability-calendar-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 .availability-slot-grid {
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2120,23 +2120,26 @@ button { touch-action: manipulation; }
 .availability-calendar-grid button,
 .availability-slot-grid button {
   min-width: 0;
-  min-height: 72px;
+  min-height: 68px;
   display: grid;
   gap: 5px;
   align-content: center;
-  justify-items: start;
-  padding: 10px;
+  justify-items: center;
+  padding: 9px 7px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
   color: var(--text);
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
 }
 .availability-slot-grid button {
   min-height: 58px;
   align-content: start;
+  justify-items: start;
+  padding: 10px;
+  text-align: left;
   font-size: 13px;
   font-weight: 850;
 }
@@ -2149,8 +2152,17 @@ button { touch-action: manipulation; }
 .availability-calendar-grid strong {
   overflow-wrap: anywhere;
   color: var(--heading);
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.15;
+}
+.availability-day-initial {
+  display: none;
+}
+.availability-day-short {
+  display: inline;
+}
+.availability-day-full {
+  display: none;
 }
 .availability-calendar-grid small {
   color: var(--muted);
@@ -5071,7 +5083,31 @@ tbody tr:hover { background: #FAFBFD; }
     gap: 8px;
   }
   .availability-calendar-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .availability-calendar-grid button {
+    min-height: 54px;
+    padding: 7px 3px;
+    border-radius: 9px;
+  }
+  .availability-calendar-grid small {
+    display: none;
+  }
+  .availability-calendar-grid strong {
+    font-size: 11px;
+  }
+  .availability-day-initial {
+    display: inline;
+  }
+  .availability-day-short,
+  .availability-day-full {
+    display: none;
+  }
+  .availability-calendar-grid .availability-check {
+    width: 18px;
+    height: 18px;
+    font-size: 12px;
   }
   .availability-slot-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
