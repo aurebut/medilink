@@ -1335,6 +1335,18 @@ button { touch-action: manipulation; }
   margin-top: 4px;
 }
 
+.candidate-current-address-map {
+  grid-column: auto;
+  width: 100%;
+  min-height: 190px;
+  margin-top: 4px;
+}
+
+.candidate-current-address-map iframe,
+.candidate-current-address-map .candidate-command-map-empty {
+  min-height: 190px;
+}
+
 .candidate-current-info h3 {
   margin: 0;
   color: var(--heading);
@@ -5306,6 +5318,11 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-command-map iframe,
   .candidate-command-map-empty {
     min-height: 154px;
+  }
+  .candidate-current-address-map,
+  .candidate-current-address-map iframe,
+  .candidate-current-address-map .candidate-command-map-empty {
+    min-height: 190px;
   }
   .candidate-command-map-label {
     left: 8px;

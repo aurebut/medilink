@@ -478,6 +478,22 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
               <span>Adresse</span>
               <strong>{address}</strong>
               <p>{mission?.city || establishment?.city || 'Ville à confirmer'}</p>
+              <div className="candidate-command-map candidate-current-address-map">
+                {hasAddress ? (
+                  <iframe
+                    title={`Carte de ${mission?.title || 'la mission'}`}
+                    src={mapsEmbedHref(address)}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                ) : (
+                  <div className="candidate-command-map-empty">Adresse à confirmer</div>
+                )}
+                <div className="candidate-command-map-label">
+                  <span>Adresse mission</span>
+                  <strong>{address}</strong>
+                </div>
+              </div>
               {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Ouvrir l’itinéraire</a> : null}
             </div>
             <div className="candidate-current-panel">
