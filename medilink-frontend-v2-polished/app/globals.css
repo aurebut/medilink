@@ -1716,6 +1716,52 @@ button { touch-action: manipulation; }
     border-top: 1px solid var(--line);
   }
 
+  .candidate-current-unified .candidate-current-tab-panel-flat {
+    gap: 0;
+  }
+
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-grid,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-info,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-detail-grid,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-doc-summary,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-day-documents {
+    gap: 0;
+    border-top: 1px solid rgba(14,138,122,.14);
+  }
+
+  .candidate-current-unified .candidate-current-tab-panel-flat > .candidate-current-grid:first-child,
+  .candidate-current-unified .candidate-current-tab-panel-flat > .candidate-current-info:first-child,
+  .candidate-current-unified .candidate-current-tab-panel-flat > .candidate-current-detail-grid:first-child {
+    border-top: 0;
+  }
+
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-panel,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-info > div,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-detail-grid > div,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-doc-summary > div,
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-day-document {
+    min-height: auto;
+    padding: 15px 0 !important;
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-panel:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-info > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-detail-grid > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-doc-summary > div:nth-child(n + 2),
+  .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-day-document:nth-child(n + 2) {
+    border-top: 1px solid rgba(148,163,184,.18) !important;
+  }
+
+  .candidate-current-unified .candidate-current-tab-panel-flat .table-wrap {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
   .candidate-current-route-head {
     display: grid;
   }
