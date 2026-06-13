@@ -409,9 +409,14 @@ export default function ProfilePage() {
 
                     <div className="profile-preferences-section">
                       <h3>Disponibilités structurées</h3>
-                      <MultiChoiceField label="Jours acceptés" values={safeArray(form.acceptedWeekdays)} options={weekdayOptions} onChange={(values) => set('acceptedWeekdays', values)} />
-                      <MultiChoiceField label="Créneaux acceptés" values={safeArray(form.acceptedTimeSlots)} options={timeSlotOptions} onChange={(values) => set('acceptedTimeSlots', values)} />
-                      <SingleChoiceField label="Préavis minimum" value={form.minimumNoticeHours == null ? '' : String(form.minimumNoticeHours)} options={noticeOptions} onChange={(value) => set('minimumNoticeHours', value)} />
+                      <StructuredAvailabilityField
+                        weekdays={safeArray(form.acceptedWeekdays)}
+                        timeSlots={safeArray(form.acceptedTimeSlots)}
+                        notice={form.minimumNoticeHours == null ? '' : String(form.minimumNoticeHours)}
+                        onWeekdaysChange={(values) => set('acceptedWeekdays', values)}
+                        onTimeSlotsChange={(values) => set('acceptedTimeSlots', values)}
+                        onNoticeChange={(value) => set('minimumNoticeHours', value)}
+                      />
                     </div>
 
                     <MultiChoiceField label="Villes acceptées" values={safeArray(form.preferredCities)} options={cityOptions} onChange={(values) => set('preferredCities', values)} />
@@ -526,4 +531,157 @@ function BooleanPreference({ label, value, onChange }: { label: string; value?: 
       </div>
     </div>
   );
+}
+
+function StructuredAvailabilityField({
+  weekdays,
+  timeSlots,
+  notice,
+  onWeekdaysChange,
+  onTimeSlotsChange,
+  onNoticeChange,
+}: {
+  weekdays: string[];
+  timeSlots: string[];
+  notice: string;
+  onWeekdaysChange: (values: string[]) => void;
+  onTimeSlotsChange: (values: string[]) => void;
+  onNoticeChange: (value: string) => void;
+}) {
+  const customWeekdays = weekdays.filter((value) => !weekdayOptions.some((option) => option.value === value));
+  const customTimeSlots = timeSlots.filter((value) => !timeSlotOptions.some((option) => option.value === value));
+
+  return (
+    <div className="structured-availability">
+      <div className="structured-availability-head">
+        <div>
+          <span className="label">Calendrier de disponibilité</span>
+          <p className="small">Cochez les jours et les périodes que les établissements peuvent vous proposer.</p>
+        </div>
+        <div className="availability-counter">
+          <strong>{weekdays.length}</strong>
+          <span>jour(s)</span>
+        </div>
+      </div>
+
+      <ChoiceCalendar
+        label="Jours acceptés"
+        values={weekdays}
+        options={weekdayOptions}
+        onChange={onWeekdaysChange}
+      />
+
+      {customWeekdays.length ? (
+        <RemovableChoiceChips values={customWeekdays} allValues={weekdays} onChange={onWeekdaysChange} />
+      ) : null}
+
+      <ChoiceTileGrid
+        label="Créneaux acceptés"
+        values={timeSlots}
+        options={timeSlotOptions}
+        onChange={onTimeSlotsChange}
+      />
+
+      {customTimeSlots.length ? (
+        <RemovableChoiceChips values={customTimeSlots} allValues={timeSlots} onChange={onTimeSlotsChange} />
+      ) : null}
+
+      <SingleChoiceField label="Préavis minimum" value={notice} options={noticeOptions} onChange={onNoticeChange} />
+    </div>
+  );
+}
+
+function ChoiceCalendar({
+  label,
+  values,
+  options,
+  onChange,
+}: {
+  label: string;
+  values: string[];
+  options: Array<{ value: string; label: string }>;
+  onChange: (values: string[]) => void;
+}) {
+  return (
+    <div className="field">
+      <span className="label">{label}</span>
+      <div className="availability-calendar-grid">
+        {options.map((option) => {
+          const selected = values.includes(option.value);
+          return (
+            <button
+              key={option.value}
+              type="button"
+              className={selected ? 'selected' : ''}
+              aria-pressed={selected}
+              onClick={() => onChange(toggleChoice(values, option.value))}
+            >
+              <span className="availability-check" aria-hidden="true">{selected ? '✓' : ''}</span>
+              <strong>{option.label}</strong>
+              <small>{selected ? 'Accepté' : 'Libre'}</small>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ChoiceTileGrid({
+  label,
+  values,
+  options,
+  onChange,
+}: {
+  label: string;
+  values: string[];
+  options: Array<{ value: string; label: string }>;
+  onChange: (values: string[]) => void;
+}) {
+  return (
+    <div className="field">
+      <span className="label">{label}</span>
+      <div className="availability-slot-grid">
+        {options.map((option) => {
+          const selected = values.includes(option.value);
+          return (
+            <button
+              key={option.value}
+              type="button"
+              className={selected ? 'selected' : ''}
+              aria-pressed={selected}
+              onClick={() => onChange(toggleChoice(values, option.value))}
+            >
+              <span className="availability-check" aria-hidden="true">{selected ? '✓' : ''}</span>
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function RemovableChoiceChips({
+  values,
+  allValues,
+  onChange,
+}: {
+  values: string[];
+  allValues: string[];
+  onChange: (values: string[]) => void;
+}) {
+  return (
+    <div className="selected-custom-values">
+      {values.map((value) => (
+        <button key={value} type="button" onClick={() => onChange(allValues.filter((item) => item !== value))}>
+          {value} ×
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function toggleChoice(values: string[], value: string) {
+  return values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
 }
