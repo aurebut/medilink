@@ -3956,27 +3956,10 @@ tbody tr:hover { background: #FAFBFD; }
 }
 .establishment-application-section {
   display: grid;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid rgba(26,82,160,.14);
-  border-radius: 14px;
-  background: var(--surface);
-  box-shadow: 0 10px 30px rgba(11,25,41,.045);
-}
-.establishment-application-section-current {
-  border-left: 5px solid var(--primary);
-  background: linear-gradient(90deg, rgba(26,82,160,.075), rgba(255,255,255,.98) 34%);
-}
-.establishment-application-section-history {
-  border-color: rgba(97,111,126,.18);
-  border-left: 5px solid rgba(97,111,126,.42);
-  background: #FBFAF7;
-}
-.establishment-application-section-history .table-wrap {
-  box-shadow: none;
+  gap: 10px;
 }
 .establishment-application-section-history tbody tr {
-  opacity: .78;
+  opacity: .86;
 }
 .establishment-application-section-history tbody tr:hover {
   opacity: 1;
@@ -3986,13 +3969,22 @@ tbody tr:hover { background: #FAFBFD; }
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 0 2px 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(26,82,160,.12);
+  border-left: 3px solid rgba(26,82,160,.52);
+  border-radius: 10px;
+  background: rgba(26,82,160,.035);
+}
+.establishment-application-section-history .establishment-application-section-head {
+  border-color: rgba(97,111,126,.14);
+  border-left-color: rgba(97,111,126,.38);
+  background: #FAF9F6;
 }
 .establishment-application-section-head h2 {
   margin: 0;
   color: var(--heading);
   font-family: var(--serif);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 400;
   line-height: 1.1;
 }
@@ -4008,19 +4000,15 @@ tbody tr:hover { background: #FAFBFD; }
   }
   .establishment-application-section {
     gap: 12px;
-    padding: 14px;
-    border-radius: 14px;
-    box-shadow: 0 8px 26px rgba(11,25,41,.045);
   }
   .establishment-application-section-head {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 0 12px;
-    border-bottom: 1px solid rgba(26,82,160,.10);
+    padding: 12px;
   }
   .establishment-application-section-head h2 {
-    font-size: 26px;
+    font-size: 22px;
     line-height: 1;
   }
   .establishment-application-section-head p {
