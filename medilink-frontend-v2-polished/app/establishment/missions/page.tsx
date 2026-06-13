@@ -281,9 +281,74 @@ function ApplicationsTab({
   updateApplication: (id: string, status: ApplicationStatus) => Promise<void>;
   onMissionDeleted: (missionId: string) => void;
 }) {
+  const historicalApplications = applications.filter((application) => (
+    application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN'
+  ));
+  const currentApplications = applications.filter((application) => (
+    application.status !== 'ACCEPTED' && application.status !== 'REJECTED' && application.status !== 'WITHDRAWN'
+  ));
+
+  if (applications.length === 0) {
+    return (
+      <Card>
+        <h2>Aucune candidature</h2>
+        <p>Les candidatures reçues apparaîtront ici dès qu’un candidat postulera à l’une de vos missions.</p>
+      </Card>
+    );
+  }
+
   return (
-    <div className="table-wrap">
-      <table>
+    <div className="establishment-application-sections">
+      <ApplicationSection
+        title="Candidatures d’actualité"
+        description="Nouvelles candidatures et profils encore à qualifier."
+        applications={currentApplications}
+        emptyLabel="Aucune candidature d’actualité."
+        updatingId={updatingId}
+        updateApplication={updateApplication}
+        onMissionDeleted={onMissionDeleted}
+      />
+      <ApplicationSection
+        title="Historique des candidatures"
+        description="Candidatures acceptées, refusées ou retirées, conservées pour suivi."
+        applications={historicalApplications}
+        emptyLabel="Aucune candidature dans l’historique."
+        updatingId={updatingId}
+        updateApplication={updateApplication}
+        onMissionDeleted={onMissionDeleted}
+      />
+    </div>
+  );
+}
+
+function ApplicationSection({
+  title,
+  description,
+  applications,
+  emptyLabel,
+  updatingId,
+  updateApplication,
+  onMissionDeleted,
+}: {
+  title: string;
+  description: string;
+  applications: Application[];
+  emptyLabel: string;
+  updatingId: string | null;
+  updateApplication: (id: string, status: ApplicationStatus) => Promise<void>;
+  onMissionDeleted: (missionId: string) => void;
+}) {
+  return (
+    <section className="establishment-application-section">
+      <div className="establishment-application-section-head">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+        <Badge tone={applications.length ? 'neutral' : 'warning'}>{applications.length}</Badge>
+      </div>
+      <div className="table-wrap">
+        <table>
         <thead>
           <tr>
             <th>Candidat</th>
@@ -294,7 +359,7 @@ function ApplicationsTab({
           </tr>
         </thead>
         <tbody>
-          {applications.map((application) => {
+          {applications.length > 0 ? applications.map((application) => {
             const isFinal = application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN';
             const isUpdating = updatingId === application.id;
 
@@ -337,14 +402,14 @@ function ApplicationsTab({
                 </td>
               </tr>
             );
-          })}
-          {applications.length === 0 ? (
+          }) : (
             <tr>
-              <td colSpan={5}>Aucune candidature.</td>
+              <td colSpan={5}>{emptyLabel}</td>
             </tr>
-          ) : null}
+          )}
         </tbody>
-      </table>
-    </div>
+        </table>
+      </div>
+    </section>
   );
 }
