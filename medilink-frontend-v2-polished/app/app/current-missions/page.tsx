@@ -431,7 +431,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
       ) : null}
 
       {activeSection === 'brief' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-info">
             <div>
               <h3>Consignes de l’établissement</h3>
@@ -457,7 +457,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
       ) : null}
 
       {activeSection === 'lieu' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel candidate-current-map-panel">
               <span>Adresse</span>
