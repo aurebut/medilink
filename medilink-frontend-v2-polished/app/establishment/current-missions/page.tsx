@@ -9,6 +9,7 @@ import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } 
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
@@ -118,8 +119,9 @@ function notesStorageKey(establishmentId: string) {
   return `medilink_current_mission_notes_${establishmentId}`;
 }
 
-function readableList(values?: string[] | null) {
-  return values?.length ? values.join(', ') : null;
+function readableList(values?: string[] | null, mapper?: (val: string) => string) {
+  if (!values?.length) return null;
+  return mapper ? values.map(mapper).join(', ') : values.join(', ');
 }
 
 function missionStart(application: Application, agreement?: MissionAgreement | null) {
@@ -679,12 +681,12 @@ function MissionControlPanel({
   };
 
   const detailItems = [
-    { label: 'Service', value: mission?.departmentInfo || mission?.sector },
-    { label: 'Equipe', value: mission?.teamInfo },
-    { label: 'Matériel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable) },
-    { label: 'Logiciel', value: mission?.softwareUsed },
+    { label: 'Service', value: getDepartmentLabel(mission?.departmentInfo) || getSectorLabel(mission?.sector) },
+    { label: 'Équipe', value: mission?.teamInfo },
+    { label: 'Matériel', value: mission?.equipmentInfo || readableList(mission?.equipmentAvailable, getEquipmentLabel) },
+    { label: 'Logiciel', value: getSoftwareLabel(mission?.softwareUsed) },
     { label: 'Patients / jour', value: mission?.averagePatientsPerDay ? `${mission.averagePatientsPerDay}` : null },
-    { label: 'Secrétariat', value: mission?.hasSecretary ? mission.secretaryType || 'Disponible' : null },
+    { label: 'Secrétariat', value: mission?.hasSecretary ? getSecretaryTypeLabel(mission.secretaryType) || 'Disponible' : null },
     { label: 'Parking', value: mission?.parkingAvailable ? 'Disponible' : null },
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
@@ -869,9 +871,9 @@ function MissionControlPanel({
                 </div>
                 <div className="candidate-current-panel">
                   <span>Contexte</span>
-                  <strong>{mission?.departmentInfo || mission?.sector || 'Service à confirmer'}</strong>
-                  <p>{mission?.teamInfo || 'Equipe et organisation à confirmer dans la messagerie.'}</p>
-                  <small>{mission?.patientType || 'Patientèle à confirmer'}</small>
+                  <strong>{getDepartmentLabel(mission?.departmentInfo) || getSectorLabel(mission?.sector) || 'Service à confirmer'}</strong>
+                  <p>{mission?.teamInfo || 'Équipe et organisation à confirmer dans la messagerie.'}</p>
+                  <small>{getPatientTypeLabel(mission?.patientType) || 'Patientèle à confirmer'}</small>
                 </div>
               </div>
 
@@ -949,7 +951,7 @@ function MissionControlPanel({
                 ) : null}
                 <div>
                   <span style={{ fontSize: 12, color: 'var(--muted)', display: 'block', marginBottom: 4 }}>Logiciels maîtrisés :</span>
-                  <p>{readableList(profile?.knownSoftware) || 'Non précisé.'}</p>
+                  <p>{readableList(profile?.knownSoftware, getSoftwareLabel) || 'Non précisé.'}</p>
                 </div>
               </div>
             </div>

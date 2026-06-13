@@ -624,7 +624,7 @@ function EstablishmentCreditSummary({
     return (
       <div className="establishment-credit-card is-loading">
         <span>Accès publication</span>
-        <strong>Verification...</strong>
+        <strong>Vérification...</strong>
       </div>
     );
   }
@@ -639,34 +639,34 @@ function EstablishmentCreditSummary({
   return (
     <div className={`establishment-credit-card ${tone}`}>
       <div>
-        <span>Credits mission</span>
+        <span>Crédits mission</span>
         <strong>
           {status.hasActiveSubscription
             ? 'Abonnement actif'
             : available > 0
               ? `${available} disponible${available > 1 ? 's' : ''}`
               : reserved > 0
-                ? `${reserved} reserve${reserved > 1 ? 's' : ''}`
-                : 'Aucun credit'}
+                ? `${reserved} réservé${reserved > 1 ? 's' : ''}`
+                : 'Aucun crédit'}
         </strong>
         <p>
           {status.hasActiveSubscription
-            ? 'Les annonces peuvent etre publiees sans paiement unitaire.'
+            ? 'Les annonces peuvent être publiées sans paiement unitaire.'
             : available > 0
               ? "Débit uniquement quand un candidat accepte une mission."
               : reserved > 0
                 ? "Réservé à une annonce publiée, débité à l'acceptation candidat."
-                : 'Ajoutez un credit pour publier une annonce unique.'}
+                : 'Ajoutez un crédit pour publier une annonce unique.'}
         </p>
       </div>
       <div className="establishment-credit-counts">
         <div><span>Disponibles</span><strong>{available}</strong></div>
-        <div><span>Reserves</span><strong>{reserved}</strong></div>
-        <div><span>Utilises</span><strong>{consumed}</strong></div>
+        <div><span>Réservés</span><strong>{reserved}</strong></div>
+        <div><span>Utilisés</span><strong>{consumed}</strong></div>
       </div>
       <div className="actions">
         <LinkButton href="/establishment/missions/new" variant={available > 0 || status.hasActiveSubscription ? 'secondary' : 'light'}>
-          {available > 0 || status.hasActiveSubscription ? 'Creer une mission' : 'Acheter un credit'}
+          {available > 0 || status.hasActiveSubscription ? 'Créer une mission' : 'Acheter un crédit'}
         </LinkButton>
       </div>
     </div>

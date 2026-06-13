@@ -397,7 +397,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="form-row">
-                      <Field label="Annees d'experience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
+                      <Field label="Années d'expérience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
                       <MultiChoiceField label="Compétences" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
                     </div>
                   </>
@@ -405,45 +405,45 @@ export default function ProfilePage() {
 
                 {activeTab === 'missions' ? (
                   <>
-                    <Field label="Disponibilites"><Textarea value={form.availabilityNotes || ''} onChange={(e) => set('availabilityNotes', e.target.value)} placeholder="Ex : nuits, week-ends, gardes ponctuelles..." /></Field>
+                    <Field label="Disponibilités"><Textarea value={form.availabilityNotes || ''} onChange={(e) => set('availabilityNotes', e.target.value)} placeholder="Ex : nuits, week-ends, gardes ponctuelles..." /></Field>
 
                     <div className="profile-preferences-section">
-                      <h3>Disponibilites structurees</h3>
-                      <MultiChoiceField label="Jours acceptes" values={safeArray(form.acceptedWeekdays)} options={weekdayOptions} onChange={(values) => set('acceptedWeekdays', values)} />
-                      <MultiChoiceField label="Creneaux acceptes" values={safeArray(form.acceptedTimeSlots)} options={timeSlotOptions} onChange={(values) => set('acceptedTimeSlots', values)} />
-                      <SingleChoiceField label="Preavis minimum" value={form.minimumNoticeHours == null ? '' : String(form.minimumNoticeHours)} options={noticeOptions} onChange={(value) => set('minimumNoticeHours', value)} />
+                      <h3>Disponibilités structurées</h3>
+                      <MultiChoiceField label="Jours acceptés" values={safeArray(form.acceptedWeekdays)} options={weekdayOptions} onChange={(values) => set('acceptedWeekdays', values)} />
+                      <MultiChoiceField label="Créneaux acceptés" values={safeArray(form.acceptedTimeSlots)} options={timeSlotOptions} onChange={(values) => set('acceptedTimeSlots', values)} />
+                      <SingleChoiceField label="Préavis minimum" value={form.minimumNoticeHours == null ? '' : String(form.minimumNoticeHours)} options={noticeOptions} onChange={(value) => set('minimumNoticeHours', value)} />
                     </div>
 
-                    <MultiChoiceField label="Villes acceptees" values={safeArray(form.preferredCities)} options={cityOptions} onChange={(values) => set('preferredCities', values)} />
+                    <MultiChoiceField label="Villes acceptées" values={safeArray(form.preferredCities)} options={cityOptions} onChange={(values) => set('preferredCities', values)} />
 
                     <div className="form-row">
                       <Field label="Rayon maximum (km)">
                         <Input type="number" min={0} max={1000} value={form.maxTravelRadiusKm ?? ''} onChange={(e) => set('maxTravelRadiusKm', e.target.value)} placeholder="Ex : 50" />
                       </Field>
-                      <Field label="Remuneration minimale (EUR)">
+                      <Field label="Rémunération minimale (EUR)">
                         <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
                       </Field>
                     </div>
 
-                    <MultiChoiceField label="Mobilite" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
+                    <MultiChoiceField label="Mobilité" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
                     <div className="form-row">
-                      <SingleChoiceField label="Type de mobilite" value={form.mobilityRangeType || ''} options={mobilityRangeOptions} onChange={(value) => set('mobilityRangeType', value)} />
-                      <Field label="Logement requis au-dela de (km)">
+                      <SingleChoiceField label="Type de mobilité" value={form.mobilityRangeType || ''} options={mobilityRangeOptions} onChange={(value) => set('mobilityRangeType', value)} />
+                      <Field label="Logement requis au-delà de (km)">
                         <Input type="number" min={0} max={1000} value={form.housingRequiredBeyondKm ?? ''} onChange={(e) => set('housingRequiredBeyondKm', e.target.value)} placeholder="Ex : 50" />
                       </Field>
                     </div>
-                    <MultiChoiceField label="Types de missions acceptees" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-                    <MultiChoiceField label="Cadres d'exercice acceptes" values={safeArray(form.acceptedPracticeSettings)} options={practiceSettingOptions} onChange={(values) => set('acceptedPracticeSettings', values)} />
+                    <MultiChoiceField label="Types de missions acceptées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
+                    <MultiChoiceField label="Cadres d'exercice acceptés" values={safeArray(form.acceptedPracticeSettings)} options={practiceSettingOptions} onChange={(values) => set('acceptedPracticeSettings', values)} />
                     <MultiChoiceField label="Durée préférée" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-                    <MultiChoiceField label="Horaires refuses" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+                    <MultiChoiceField label="Horaires refusés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
                     <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-                    <MultiChoiceField label="Patientele acceptee" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
-                    <MultiChoiceField label="Patientele refusee" values={safeArray(form.refusedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('refusedPatientTypes', values)} />
+                    <MultiChoiceField label="Patientèle acceptée" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
+                    <MultiChoiceField label="Patientèle refusée" values={safeArray(form.refusedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('refusedPatientTypes', values)} />
 
                     <div className="profile-preferences-section">
-                      <h3>Actes et charge de travail</h3>
-                      <MultiChoiceField label="Actes acceptes" values={safeArray(form.acceptedActs)} options={missionActOptions} onChange={(values) => set('acceptedActs', values)} />
-                      <MultiChoiceField label="Actes refuses" values={safeArray(form.refusedActs)} options={missionActOptions} onChange={(values) => set('refusedActs', values)} />
+                       <h3>Actes et charge de travail</h3>
+                       <MultiChoiceField label="Actes acceptés" values={safeArray(form.acceptedActs)} options={missionActOptions} onChange={(values) => set('acceptedActs', values)} />
+                       <MultiChoiceField label="Actes refusés" values={safeArray(form.refusedActs)} options={missionActOptions} onChange={(values) => set('refusedActs', values)} />
                       <Field label="Patients par jour maximum">
                         <Input type="number" min={0} max={300} value={form.maxPatientsPerDay ?? ''} onChange={(e) => set('maxPatientsPerDay', e.target.value)} placeholder="Ex : 25" />
                       </Field>
@@ -460,7 +460,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="form-row">
-                      <SingleChoiceField label="Niveau de pression accepte" value={form.acceptedPressureLevel || ''} options={pressureLevelOptions} onChange={(value) => set('acceptedPressureLevel', value)} />
+                      <SingleChoiceField label="Niveau de pression accepté" value={form.acceptedPressureLevel || ''} options={pressureLevelOptions} onChange={(value) => set('acceptedPressureLevel', value)} />
                     </div>
                   </>
                 ) : null}
@@ -478,17 +478,17 @@ export default function ProfilePage() {
 function healthVerificationLabel(status?: HealthVerificationStatus | null) {
   switch (status) {
     case 'VERIFIED':
-      return 'Verifie';
+      return 'Vérifié';
     case 'PENDING':
-      return 'Verification...';
+      return 'Vérification...';
     case 'NOT_FOUND':
       return 'RPPS introuvable';
     case 'MISMATCH':
-      return 'Identite differente';
+      return 'Identité différente';
     case 'ERROR':
       return 'Erreur ANS';
     default:
-      return 'Non verifie';
+      return 'Non vérifié';
   }
 }
 
@@ -502,10 +502,10 @@ function healthVerificationTone(
 }
 
 function healthVerificationMessage(status?: HealthVerificationStatus | null) {
-  if (status === 'VERIFIED') return 'Compte professionnel verifie.';
-  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouve pour ce RPPS.';
-  if (status === 'MISMATCH') return 'RPPS trouve, mais le nom ou le prenom ne correspond pas au profil.';
-  return 'Verification RPPS terminee.';
+  if (status === 'VERIFIED') return 'Compte professionnel vérifié.';
+  if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouvé pour ce RPPS.';
+  if (status === 'MISMATCH') return 'RPPS trouvé, mais le nom ou le prénom ne correspond pas au profil.';
+  return 'Vérification RPPS terminée.';
 }
 
 function safeArray(value: unknown): string[] {

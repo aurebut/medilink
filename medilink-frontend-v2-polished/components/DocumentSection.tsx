@@ -53,16 +53,16 @@ function checklistCopy(type: DocumentType, doc?: Document) {
   if (!doc) {
     return type === 'CV'
       ? 'Document prioritaire pour rendre vos candidatures lisibles.'
-      : 'A ajouter pour renforcer votre dossier.';
+      : 'À ajouter pour renforcer votre dossier.';
   }
-  if (doc.verificationStatus === 'APPROVED') return 'Valide et consultable par les etablissements apres candidature.';
-  if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoye, en attente de validation Medilink.';
-  if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Upload a finaliser.';
+  if (doc.verificationStatus === 'APPROVED') return 'Validé et consultable par les établissements après candidature.';
+  if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoyé, en attente de validation MediLink.';
+  if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Upload à finaliser.';
   if (doc.verificationStatus === 'REJECTED') {
-    return doc.rejectionReason ? `Refuse : ${doc.rejectionReason}` : 'Refuse, vous pouvez envoyer une nouvelle version.';
+    return doc.rejectionReason ? `Refusé : ${doc.rejectionReason}` : 'Refusé, vous pouvez envoyer une nouvelle version.';
   }
-  if (doc.verificationStatus === 'EXPIRED') return 'Expire, une version recente est necessaire.';
-  return 'Document ajoute au dossier.';
+  if (doc.verificationStatus === 'EXPIRED') return 'Expiré, une version récente est nécessaire.';
+  return 'Document ajouté au dossier.';
 }
 
 function checklistStatusLabel(doc?: Document) {
@@ -192,23 +192,23 @@ export function DocumentSection() {
       <div className="documents-hero">
         <div>
           <h2>Dossier documents</h2>
-          <p>Centralisez les pieces utiles a vos candidatures. Elles restent privees et ne sont consultables par un etablissement que si vous candidatez a l'une de ses missions.</p>
+          <p>Centralisez les pièces utiles à vos candidatures. Elles restent privées et ne sont consultables par un établissement que si vous candidatez à l'une de ses missions.</p>
         </div>
         <div className="documents-score">
           <strong>{completionScore}%</strong>
-          <span>documents essentiels valides</span>
+          <span>documents essentiels validés</span>
         </div>
       </div>
 
       <div className="documents-summary">
         <div className="documents-summary-main">
           <ProgressBar value={completionScore} />
-          <span className="small">{approvedRequiredCount}/{requiredDocumentTypes.length} documents essentiels valides</span>
+          <span className="small">{approvedRequiredCount}/{requiredDocumentTypes.length} documents essentiels validés</span>
         </div>
         <div className="documents-summary-stats">
           <Badge tone={missingRequiredCount ? 'warning' : 'success'}>{missingRequiredCount} manquant(s)</Badge>
-          <Badge tone={pendingCount ? 'warning' : 'neutral'}>{pendingCount} en verification</Badge>
-          <Badge tone={rejectedCount ? 'danger' : 'neutral'}>{rejectedCount} a corriger</Badge>
+          <Badge tone={pendingCount ? 'warning' : 'neutral'}>{pendingCount} en vérification</Badge>
+          <Badge tone={rejectedCount ? 'danger' : 'neutral'}>{rejectedCount} à corriger</Badge>
         </div>
       </div>
 
@@ -219,7 +219,7 @@ export function DocumentSection() {
               <div className={`document-checklist-item ${document?.verificationStatus === 'APPROVED' ? 'is-approved' : ''}`} key={type}>
                 <div className="document-checklist-head">
                   <div>
-                    <span>{required ? 'Essentiel' : 'Recommande'}</span>
+                    <span>{required ? 'Essentiel' : 'Recommandé'}</span>
                     <strong>{documentTypeLabel(type)}</strong>
                   </div>
                   <Badge tone={checklistStatusTone(document) as any}>{checklistStatusLabel(document)}</Badge>
@@ -228,7 +228,7 @@ export function DocumentSection() {
                 {document ? (
                   <div className="document-file-meta">
                     <strong>{document.fileName}</strong>
-                    <span>Ajoute le {formatDateTime(document.createdAt)}</span>
+                    <span>Ajouté le {formatDateTime(document.createdAt)}</span>
                   </div>
                 ) : null}
                 <div className="actions">
@@ -244,8 +244,8 @@ export function DocumentSection() {
 
           {visibleDocuments.length === 0 ? (
             <div className="document-empty-state">
-              <h3>Votre dossier est pret a etre construit.</h3>
-              <p>Commencez par votre CV : c'est le premier document regarde par les recruteurs lorsqu'ils consultent une candidature.</p>
+              <h3>Votre dossier est prêt à être construit.</h3>
+              <p>Commencez par votre CV : c'est le premier document regardé par les recruteurs lorsqu'ils consultent une candidature.</p>
             </div>
           ) : null}
         </>
@@ -263,7 +263,7 @@ export function DocumentSection() {
       />
       {file ? (
         <div className="document-selected-file">
-          <span>Selection : <strong>{file.name}</strong></span>
+          <span>Sélection : <strong>{file.name}</strong></span>
           <Button onClick={upload} disabled={submitting}>{submitting ? 'Upload...' : 'Envoyer'}</Button>
         </div>
       ) : null}
@@ -275,7 +275,7 @@ export function DocumentSection() {
           <h3>Historique</h3>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajoute</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajouté</th><th>Actions</th></tr></thead>
               <tbody>
                 {visibleDocuments.map((doc) => <tr key={doc.id}>
                   <td>{documentTypeLabel(doc.documentType)}</td>

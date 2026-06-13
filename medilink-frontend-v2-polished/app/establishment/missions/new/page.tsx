@@ -417,7 +417,7 @@ export default function NewMissionPage() {
         if (cancelled) return;
         const accountStatuses = statuses.filter((status): status is EstablishmentBillingStatus => Boolean(status));
         const selectedStatus = accountStatuses.find((status) => status.establishmentId === selectedEstablishment.id);
-        if (!selectedStatus) throw new Error("Impossible de charger le statut de facturation de l'etablissement selectionne.");
+        if (!selectedStatus) throw new Error("Impossible de charger le statut de facturation de l'établissement sélectionné.");
         setBillingStatus(mergeAccountCreditStatus(selectedStatus, accountStatuses));
         setBillingLoading(false);
       })
@@ -722,7 +722,7 @@ export default function NewMissionPage() {
     );
   }
 
-  if (billingLoading || draftsLoading || !billingStatus) return <LoadingCard label="Verification de votre acces publication..." />;
+  if (billingLoading || draftsLoading || !billingStatus) return <LoadingCard label="Vérification de votre accès publication..." />;
 
 
   if (!showWizard) {
@@ -907,7 +907,7 @@ function PublicationAccessGate({
       ) : null}
       {error || deleteError ? <Alert type="error">{error || deleteError}</Alert> : null}
       {!billingStatus.stripeConfigured ? (
-        <Alert type="error">Stripe n'est pas encore configure sur le serveur. Ajoutez les cles Render avant d'activer les paiements.</Alert>
+        <Alert type="error">Stripe n'est pas encore configuré sur le serveur. Ajoutez les clés Render avant d'activer les paiements.</Alert>
       ) : null}
 
       {/* 1. Bandeau de Crédit Disponible */}
@@ -1030,8 +1030,8 @@ function PublicationAccessGate({
       <div className="publication-plan-grid">
         <Card className="publication-plan-card">
           <div>
-            <Badge tone="success">Recommande</Badge>
-            <h2>Abonnement etablissement</h2>
+            <Badge tone="success">Recommandé</Badge>
+            <h2>Abonnement établissement</h2>
             <p>Pour publier plusieurs annonces sans repasser par un paiement unitaire.</p>
           </div>
           <div className="publication-price">
@@ -1041,7 +1041,7 @@ function PublicationAccessGate({
           <ul className="publication-plan-list">
             <li>Publications incluses tant que l'abonnement est actif</li>
             <li>Gestion de l'abonnement et des factures via Stripe</li>
-            <li>Creation en brouillon ou publication immediate</li>
+            <li>Création en brouillon ou publication immédiate</li>
           </ul>
           <Button type="button" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onSubscribe}>
             {busy === 'subscription' ? 'Redirection...' : "S'abonner"}
@@ -1050,8 +1050,8 @@ function PublicationAccessGate({
 
         <Card className="publication-plan-card">
           <div>
-            <Badge tone="neutral">A l'unite</Badge>
-            <h2>Credit de publication</h2>
+            <Badge tone="neutral">À l'unité</Badge>
+            <h2>Crédit de publication</h2>
             <p>Pour publier une annonce unique, avec un crédit débité seulement après la confirmation de la mission avec le candidat.</p>
           </div>
           <div className="publication-price">
@@ -1061,7 +1061,7 @@ function PublicationAccessGate({
           <ul className="publication-plan-list">
             <li>Valable pour une annonce</li>
             <li>Réservé à la publication, débité à la confirmation de la mission avec le candidat</li>
-            <li>Permet aussi de preparer un brouillon</li>
+            <li>Permet aussi de préparer un brouillon</li>
           </ul>
           <Button type="button" variant="secondary" disabled={!billingStatus.stripeConfigured || Boolean(busy)} onClick={onBuyCredit}>
             {busy === 'credit' ? 'Redirection...' : 'Payer une annonce'}
@@ -1103,8 +1103,8 @@ function CreditPurchaseBanner({
         </div>
       </div>
       <div className="actions">
-        <LinkButton href="/establishment/onboarding" variant="light">Voir mon etablissement</LinkButton>
-        <LinkButton href="/establishment/missions/new" variant="secondary">Creer une mission</LinkButton>
+        <LinkButton href="/establishment/onboarding" variant="light">Voir mon établissement</LinkButton>
+        <LinkButton href="/establishment/missions/new" variant="secondary">Créer une mission</LinkButton>
         <LinkButton href="/establishment/missions?tab=drafts" variant="light">Reprendre un brouillon</LinkButton>
       </div>
     </Card>
