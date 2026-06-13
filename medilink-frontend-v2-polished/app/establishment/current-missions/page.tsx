@@ -772,7 +772,7 @@ function MissionControlPanel({
       ) : null}
 
       {activeSection === 'brief' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 style={{ fontSize: 18, margin: 0, color: 'var(--heading)' }}>
               {isEditingBrief ? 'Modification du brief' : 'Brief & notes'}
@@ -915,7 +915,7 @@ function MissionControlPanel({
       ) : null}
 
       {activeSection === 'candidat' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
               <span>Candidat</span>
@@ -968,7 +968,7 @@ function MissionControlPanel({
       ) : null}
 
       {activeSection === 'compta' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
               <span>Rémunération de mission</span>
@@ -1055,7 +1055,7 @@ function CandidateDocumentsPanel({
   const documents = candidateProfile.candidate.documents || [];
 
   return (
-    <div className="candidate-current-tab-panel">
+    <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
       <div className="candidate-current-documents">
         <div>
           <span>Documents validés</span>

@@ -5541,6 +5541,12 @@ tbody tr:hover { background: #FAFBFD; }
   .candidate-current-unified .candidate-current-tab-panel-flat .candidate-current-day-document:nth-child(n + 2) {
     border-top: 1px solid rgba(148,163,184,.18) !important;
   }
+  .candidate-current-unified .candidate-current-tab-panel-flat .table-wrap {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
   .wizard-panel {
     gap: 16px;
   }

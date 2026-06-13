@@ -507,7 +507,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
       ) : null}
 
       {activeSection === 'compta' ? (
-        <div className="candidate-current-tab-panel">
+        <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
               <span>Rémunération</span>
