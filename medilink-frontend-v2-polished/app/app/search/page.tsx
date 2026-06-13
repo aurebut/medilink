@@ -49,6 +49,32 @@ function isClosedApplication(status: ApplicationStatus) {
   return closedApplicationStatuses.includes(status);
 }
 
+function ApplicationActionIcon({ type }: { type: 'message' | 'mission' | 'withdraw' }) {
+  if (type === 'message') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21 12a8 8 0 0 1-8 8H6l-3 2 1.2-4A8 8 0 1 1 21 12Z" />
+        <path d="M8 11h8M8 14h5" />
+      </svg>
+    );
+  }
+
+  if (type === 'mission') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M8 4h8l3 3v13H5V4h3Z" />
+        <path d="M15 4v4h4M8 12h8M8 16h6" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M6 7h12M10 11v6M14 11v6M9 7l1-3h4l1 3M8 7l1 13h6l1-13" />
+    </svg>
+  );
+}
+
 const secondaryFilterKeys = [
   'missionType',
   'requiredLevel',
@@ -607,29 +633,39 @@ function ApplicationSection({
                   </Badge>
                 </td>
                 <td>{formatDateTime(a.createdAt)}</td>
-                <td className="actions">
+                <td className="actions application-icon-actions">
                   {a.conversation ? (
                     <Link
-                      className="btn btn-light"
+                      className="application-icon-action"
                       href={getCandidateConversationPath(a.conversation.id)}
+                      aria-label={`Ouvrir la messagerie pour ${a.mission?.title || 'cette candidature'}`}
+                      title="Messagerie"
                     >
-                      Messagerie
+                      <ApplicationActionIcon type="message" />
+                      <span className="sr-only">Messagerie</span>
                     </Link>
                   ) : null}
                   {a.missionId ? (
                     <Link
-                      className="btn btn-secondary"
+                      className="application-icon-action application-icon-action-primary"
                       href={getCandidateMissionPath(a.missionId)}
+                      aria-label={`Voir la mission ${a.mission?.title || ''}`.trim()}
+                      title="Voir mission"
                     >
-                      Voir mission
+                      <ApplicationActionIcon type="mission" />
+                      <span className="sr-only">Voir mission</span>
                     </Link>
                   ) : null}
                   <Button
                     variant="danger"
+                    className="application-icon-action application-icon-action-danger"
                     onClick={() => withdraw(a.id)}
                     disabled={isClosedApplication(a.status)}
+                    aria-label={`Retirer la candidature ${a.mission?.title || ''}`.trim()}
+                    title="Retirer"
                   >
-                    Retirer
+                    <ApplicationActionIcon type="withdraw" />
+                    <span className="sr-only">Retirer</span>
                   </Button>
                 </td>
               </tr>

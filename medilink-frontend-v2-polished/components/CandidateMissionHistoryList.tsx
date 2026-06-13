@@ -5,6 +5,33 @@ import { statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
 
+function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'billing' }) {
+  if (type === 'message') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M21 12a8 8 0 0 1-8 8H6l-3 2 1.2-4A8 8 0 1 1 21 12Z" />
+        <path d="M8 11h8M8 14h5" />
+      </svg>
+    );
+  }
+
+  if (type === 'mission') {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path d="M8 4h8l3 3v13H5V4h3Z" />
+        <path d="M15 4v4h4M8 12h8M8 16h6" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M4 7h16v12H4z" />
+      <path d="M7 7V5h10v2M8 12h8M8 16h5" />
+    </svg>
+  );
+}
+
 export function CandidateMissionHistoryList({
   rows,
   limit,
@@ -46,10 +73,41 @@ export function CandidateMissionHistoryList({
             <div><span>Prochaine étape</span><strong>{agreementNextStep(agreement?.status)}</strong></div>
           </div>
 
-          <div className="actions">
-            {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Ouvrir la discussion</LinkButton> : null}
-            {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Détail mission</LinkButton> : null}
-            <LinkButton href={getCandidateBillingMissionPath(conversation, agreement)} variant="light">Ma compta</LinkButton>
+          <div className="actions application-icon-actions">
+            {conversation ? (
+              <LinkButton
+                href={getCandidateConversationPath(conversation.id)}
+                variant="light"
+                className="application-icon-action"
+                aria-label={`Ouvrir la discussion pour ${application.mission?.title || 'cette mission'}`}
+                title="Discussion"
+              >
+                <MissionHistoryActionIcon type="message" />
+                <span className="sr-only">Ouvrir la discussion</span>
+              </LinkButton>
+            ) : null}
+            {application.missionId ? (
+              <LinkButton
+                href={`/app/missions/${application.missionId}`}
+                variant="secondary"
+                className="application-icon-action application-icon-action-primary"
+                aria-label={`Voir le détail de ${application.mission?.title || 'cette mission'}`}
+                title="Détail mission"
+              >
+                <MissionHistoryActionIcon type="mission" />
+                <span className="sr-only">Détail mission</span>
+              </LinkButton>
+            ) : null}
+            <LinkButton
+              href={getCandidateBillingMissionPath(conversation, agreement)}
+              variant="light"
+              className="application-icon-action"
+              aria-label={`Ouvrir la compta pour ${application.mission?.title || 'cette mission'}`}
+              title="Ma compta"
+            >
+              <MissionHistoryActionIcon type="billing" />
+              <span className="sr-only">Ma compta</span>
+            </LinkButton>
           </div>
         </Card>
       ))}

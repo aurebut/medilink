@@ -3990,6 +3990,70 @@ tbody tr:hover { background: #FAFBFD; }
   font-size: 13px;
   line-height: 1.45;
 }
+.application-icon-actions.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+.application-icon-action,
+.application-icon-actions.actions .application-icon-action.btn,
+.application-icon-actions.actions a.application-icon-action {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--heading);
+  box-shadow: 0 6px 18px rgba(11,25,41,.045);
+  transition: border-color .15s ease, color .15s ease, background .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.application-icon-action:hover {
+  border-color: rgba(26,82,160,.24);
+  background: #FAFBFD;
+  color: var(--primary);
+  box-shadow: 0 8px 22px rgba(11,25,41,.07);
+  transform: translateY(-1px);
+}
+.application-icon-action svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.application-icon-action-primary,
+.application-icon-actions.actions .application-icon-action-primary.btn,
+.application-icon-actions.actions a.application-icon-action-primary {
+  border-color: rgba(26,82,160,.20);
+  background: rgba(26,82,160,.045);
+  color: var(--primary);
+}
+.application-icon-action-danger,
+.application-icon-actions.actions .application-icon-action-danger.btn {
+  border-color: rgba(220,38,38,.18);
+  background: rgba(220,38,38,.045);
+  color: #B42318;
+}
+.application-icon-action-danger:hover {
+  border-color: rgba(220,38,38,.26);
+  background: rgba(220,38,38,.07);
+  color: #991B1B;
+}
+.application-icon-action:disabled,
+.application-icon-actions.actions .application-icon-action.btn:disabled {
+  cursor: not-allowed;
+  opacity: .42;
+  transform: none;
+  box-shadow: none;
+}
 @media (max-width: 620px) {
   .establishment-application-sections {
     gap: 20px;
@@ -4014,6 +4078,16 @@ tbody tr:hover { background: #FAFBFD; }
     width: fit-content;
     flex: 0 0 auto;
     margin-left: auto;
+  }
+  .application-icon-actions.actions {
+    width: auto;
+    grid-template-columns: none;
+    justify-content: flex-start;
+  }
+  .application-icon-actions.actions .application-icon-action.btn,
+  .application-icon-actions.actions a.application-icon-action {
+    width: 38px;
+    min-width: 38px;
   }
 }
 .small { font-size: 13px; color: var(--muted); line-height: 1.45; }
