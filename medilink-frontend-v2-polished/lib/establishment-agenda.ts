@@ -85,15 +85,15 @@ export function establishmentMissionTone(row: EstablishmentAgendaRow): 'neutral'
 
 export function establishmentMissionLabel(row: EstablishmentAgendaRow) {
   if (row.agreement) return agreementLabel(row.agreement.status);
-  if (row.selectedApplication?.status === 'ACCEPTED') return 'Candidat valide';
+  if (row.selectedApplication?.status === 'ACCEPTED') return 'Candidat validé';
   if (row.mission.status === 'FILLED') return 'Mission pourvue';
   if (row.applications.length > 0) return `${row.applications.length} candidature${row.applications.length > 1 ? 's' : ''}`;
-  return 'Mission publiee';
+  return 'Mission publiée';
 }
 
 export function establishmentMissionNextStep(row: EstablishmentAgendaRow) {
   if (row.agreement) return agreementNextStep(row.agreement.status);
-  if (row.selectedApplication?.status === 'ACCEPTED') return 'Preparer le brief mission';
+  if (row.selectedApplication?.status === 'ACCEPTED') return 'Préparer le brief mission';
   if (row.applications.length > 0) return 'Traiter les candidatures';
   return 'Mission visible aux candidats';
 }

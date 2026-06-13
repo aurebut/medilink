@@ -18,7 +18,7 @@ export function CandidateMissionHistoryList({
     return (
       <EmptyState
         title="Aucune mission dans l'historique"
-        description="Envoyez une candidature pour demarrer un suivi de mission."
+        description="Envoyez une candidature pour démarrer un suivi de mission."
         action={<LinkButton href="/app/search">Chercher une mission</LinkButton>}
       />
     );
@@ -31,7 +31,7 @@ export function CandidateMissionHistoryList({
           <div className="workspace-card-head">
             <div>
               <h3>{application.mission?.title || 'Mission'}</h3>
-              <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Etablissement a confirmer'}</p>
+              <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</p>
             </div>
             <div className="workspace-badges">
               <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
@@ -43,12 +43,12 @@ export function CandidateMissionHistoryList({
             <div><span>Date</span><strong>{formatDate(date)}</strong></div>
             <div><span>Ville</span><strong>{application.mission?.city || '-'}</strong></div>
             <div><span>Remuneration</span><strong>{candidateAmountLabel(agreement)}</strong></div>
-            <div><span>Prochaine etape</span><strong>{agreementNextStep(agreement?.status)}</strong></div>
+            <div><span>Prochaine étape</span><strong>{agreementNextStep(agreement?.status)}</strong></div>
           </div>
 
           <div className="actions">
             {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Ouvrir la discussion</LinkButton> : null}
-            {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Detail mission</LinkButton> : null}
+            {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Détail mission</LinkButton> : null}
             <LinkButton href={getCandidateBillingMissionPath(conversation, agreement)} variant="light">Ma compta</LinkButton>
           </div>
         </Card>

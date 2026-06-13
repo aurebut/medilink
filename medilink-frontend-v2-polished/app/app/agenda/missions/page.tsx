@@ -39,7 +39,7 @@ export default function CandidateMissionHistoryPage() {
     <>
       <PageHeader
         title="Historique des missions"
-        description="Toutes vos propositions, missions acceptees et fins de mission."
+        description="Toutes vos propositions, missions acceptées et fins de mission."
         actions={<LinkButton href="/app/agenda" variant="light">Retour agenda</LinkButton>}
       />
 

@@ -334,7 +334,7 @@ export default function CandidateAgendaPage() {
                         <div key={application.id} className="agenda-detail-event">
                           <div>
                             <strong>{application.mission?.title || 'Mission'}</strong>
-                            <span>{application.mission?.establishment?.name || application.mission?.city || 'Etablissement à confirmer'}</span>
+                            <span>{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
                           </div>
                           <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
                           <div className="actions">

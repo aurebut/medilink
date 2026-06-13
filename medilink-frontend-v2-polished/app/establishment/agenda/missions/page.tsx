@@ -77,7 +77,7 @@ export default function EstablishmentMissionHistoryPage() {
     <>
       <PageHeader
         title="Historique des missions"
-        description="Toutes les missions publiees, pourvues et confirmees de votre etablissement."
+        description="Toutes les missions publiées, pourvues et confirmées de votre établissement."
         actions={<LinkButton href="/establishment/agenda" variant="light">Retour agenda</LinkButton>}
       />
 
@@ -85,9 +85,9 @@ export default function EstablishmentMissionHistoryPage() {
 
       {!primary ? (
         <Card className="card-highlight">
-          <h2>Aucun etablissement rattache</h2>
-          <p>Creez votre fiche etablissement pour publier des missions puis les suivre ici.</p>
-          <LinkButton href="/establishment/onboarding">Creer mon etablissement</LinkButton>
+          <h2>Aucun établissement rattaché</h2>
+          <p>Créez votre fiche établissement pour publier des missions puis les suivre ici.</p>
+          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       ) : (
         <EstablishmentMissionHistoryList rows={rows} />

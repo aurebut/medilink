@@ -231,12 +231,12 @@ export default function EstablishmentAgendaPage() {
     <>
       <PageHeader
         title="Agenda"
-        description="Vue operationnelle des missions publiees, pourvues et confirmees de votre etablissement."
+        description="Vue opérationnelle des missions publiées, pourvues et confirmées de votre établissement."
         actions={
           primary ? (
-            <LinkButton href="/establishment/missions/new" variant="light">Creer une mission</LinkButton>
+            <LinkButton href="/establishment/missions/new" variant="light">Créer une mission</LinkButton>
           ) : (
-            <LinkButton href="/establishment/onboarding" variant="light">Creer mon etablissement</LinkButton>
+            <LinkButton href="/establishment/onboarding" variant="light">Créer mon établissement</LinkButton>
           )
         }
       />
@@ -245,9 +245,9 @@ export default function EstablishmentAgendaPage() {
 
       {!primary ? (
         <Card className="card-highlight">
-          <h2>Aucun etablissement rattache</h2>
-          <p>Creez votre fiche etablissement pour publier des missions puis les retrouver dans l'agenda.</p>
-          <LinkButton href="/establishment/onboarding">Creer mon etablissement</LinkButton>
+          <h2>Aucun établissement rattaché</h2>
+          <p>Créez votre fiche établissement pour publier des missions puis les retrouver dans l'agenda.</p>
+          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
         </Card>
       ) : (
         <>
@@ -276,7 +276,7 @@ export default function EstablishmentAgendaPage() {
                     <div>
                       <span>Calendrier</span>
                       <div className="agenda-month-title">
-                        <button type="button" className="agenda-arrow-button" aria-label="Mois precedent" title="Mois precedent" onClick={() => goToMonth(-1)}>
+                        <button type="button" className="agenda-arrow-button" aria-label="Mois précédent" title="Mois précédent" onClick={() => goToMonth(-1)}>
                           &larr;
                         </button>
                         <h2>{monthLabel(calendarMonth)}</h2>
@@ -284,7 +284,7 @@ export default function EstablishmentAgendaPage() {
                           &rarr;
                         </button>
                       </div>
-                      <p className="small">Missions publiees, candidatures retenues et accords dates.</p>
+                      <p className="small">Missions publiées, candidatures retenues et accords datés.</p>
                     </div>
                     <div className="agenda-month-actions">
                       <Button type="button" variant="light" onClick={goToToday}>
@@ -368,11 +368,11 @@ export default function EstablishmentAgendaPage() {
                   </div>
 
                   {detailOpen ? (
-                    <div className="agenda-day-popover" role="dialog" aria-label="Details du jour">
+                    <div className="agenda-day-popover" role="dialog" aria-label="Détails du jour">
                       <div className="agenda-popover-head">
                         <div>
-                          <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour selectionne'}</strong>
-                          <span>{selectedRows.length} evenement(s)</span>
+                          <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</strong>
+                          <span>{selectedRows.length} événement(s)</span>
                         </div>
                         <button type="button" className="agenda-popover-close" aria-label="Fermer" onClick={() => setDetailOpen(false)}>x</button>
                       </div>
@@ -383,7 +383,7 @@ export default function EstablishmentAgendaPage() {
                             <div key={row.mission.id} className="agenda-detail-event">
                               <div>
                                 <strong>{row.mission.title}</strong>
-                                <span>{candidateName(row.selectedApplication) || row.mission.establishment?.name || row.mission.city || 'Candidat a confirmer'}</span>
+                                <span>{candidateName(row.selectedApplication) || row.mission.establishment?.name || row.mission.city || 'Candidat à confirmer'}</span>
                               </div>
                               <Badge tone={establishmentMissionTone(row)}>{establishmentMissionLabel(row)}</Badge>
                               <div className="actions">
@@ -395,8 +395,8 @@ export default function EstablishmentAgendaPage() {
                         </div>
                       ) : (
                         <div className="dashboard-empty compact">
-                          <strong>Aucun evenement</strong>
-                          <p>Vous pouvez quand meme ajouter une note pour cette journee.</p>
+                          <strong>Aucun événement</strong>
+                          <p>Vous pouvez quand même ajouter une note pour cette journée.</p>
                         </div>
                       )}
 
@@ -419,7 +419,7 @@ export default function EstablishmentAgendaPage() {
                               <Textarea
                                 value={draftNote}
                                 onChange={(event) => setDraftNote(event.target.value)}
-                                placeholder="Ex : appeler le candidat, verifier les documents, preparer l'accueil..."
+                                placeholder="Ex : appeler le candidat, vérifier les documents, préparer l'accueil..."
                               />
                             </label>
                             <div className="actions">
