@@ -599,7 +599,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
   }
 
   return (
-    <div className="candidate-current-tab-panel">
+    <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
       <div className="candidate-current-documents">
         <div>
           <span>Documents de mission</span>
