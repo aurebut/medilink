@@ -104,7 +104,7 @@ export class NotificationsService {
       userId: recipient.id,
       type: NotificationType.APPLICATION_RECEIVED,
       title: 'Nouvelle candidature',
-      body: `${candidateName} a postule pour ${application.mission.title}.`,
+      body: `${candidateName} a postulé pour ${application.mission.title}.`,
       data: { applicationId, missionId: application.missionId },
     });
 
@@ -139,7 +139,7 @@ export class NotificationsService {
     await this.create({
       userId: application.candidateUserId,
       type: NotificationType.APPLICATION_STATUS_CHANGED,
-      title: 'Statut candidature mis a jour',
+      title: 'Statut candidature mis à jour',
       body: `Votre candidature pour ${application.mission.title} est maintenant ${statusLabel}.`,
       data: { applicationId, missionId: application.missionId, status },
     });
@@ -203,7 +203,7 @@ export class NotificationsService {
     const messagePreview = workflowAction ? undefined : this.messagePreview(latestMessage?.body);
     const notificationBody = workflowAction
       ? `${senderName} : ${workflowAction}.`
-      : `Vous avez recu un nouveau message de ${senderName}.`;
+      : `Vous avez reçu un nouveau message de ${senderName}.`;
     const candidateName = this.userDisplayName(conversation.application.candidate);
 
     const recipientUsers = await this.prisma.user.findMany({
@@ -264,11 +264,11 @@ export class NotificationsService {
     await this.create({
       userId,
       type,
-      title: status === 'APPROVED' ? 'Document valide' : 'Document refuse',
+      title: status === 'APPROVED' ? 'Document validé' : 'Document refusé',
       body:
         status === 'APPROVED'
-          ? `Votre ${documentLabel} a ete valide.`
-          : `Votre ${documentLabel} a ete refuse.${reason ? ` Motif : ${reason}` : ''}`,
+          ? `Votre ${documentLabel} a été validé.`
+          : `Votre ${documentLabel} a été refusé.${reason ? ` Motif : ${reason}` : ''}`,
     });
 
     this.email.sendDocumentStatusEmail(user.id, user.email, status, reason, {
@@ -296,28 +296,28 @@ export class NotificationsService {
     try {
       const payload = JSON.parse(body.slice(WORKFLOW_PREFIX.length));
       const labels: Record<string, string> = {
-        FINAL_PROPOSAL: 'Proposition finale envoyee',
-        PAYMENT_REQUIRED: 'Proposition acceptee, paiement requis',
-        PROPOSAL_REJECTED: 'Proposition refusee',
-        FUNDS_SECURED: 'Paiement securise',
-        MISSION_COMPLETED: 'Mission terminee',
-        PAYMENT_RELEASED: 'Paiement libere',
-        INVOICES_GENERATED: 'Factures generees',
+        FINAL_PROPOSAL: 'Proposition finale envoyée',
+        PAYMENT_REQUIRED: 'Proposition acceptée, paiement requis',
+        PROPOSAL_REJECTED: 'Proposition refusée',
+        FUNDS_SECURED: 'Paiement sécurisé',
+        MISSION_COMPLETED: 'Mission terminée',
+        PAYMENT_RELEASED: 'Paiement libéré',
+        INVOICES_GENERATED: 'Factures générées',
       };
-      return labels[payload.kind] || 'Mise a jour de la mission';
+      return labels[payload.kind] || 'Mise à jour de la mission';
     } catch {
-      return 'Mise a jour de la mission';
+      return 'Mise à jour de la mission';
     }
   }
 
   private applicationStatusLabel(status: string) {
     const labels: Record<string, string> = {
-      SUBMITTED: 'envoyee',
-      VIEWED: 'consultee',
-      ACCEPTED: 'acceptee',
-      REJECTED: 'refusee',
-      WITHDRAWN: 'retiree',
-      CANCELLED: 'annulee',
+      SUBMITTED: 'envoyée',
+      VIEWED: 'consultée',
+      ACCEPTED: 'acceptée',
+      REJECTED: 'refusée',
+      WITHDRAWN: 'retirée',
+      CANCELLED: 'annulée',
     };
     return labels[status] || status;
   }
@@ -327,11 +327,11 @@ export class NotificationsService {
       CV: 'CV',
       ATTESTATION: 'attestation',
       CONVENTION: 'convention',
-      DIPLOMA: 'diplome',
-      IDENTITY_DOCUMENT: "piece d'identite",
+      DIPLOMA: 'diplôme',
+      IDENTITY_DOCUMENT: "pièce d'identité",
       INSURANCE: 'assurance',
       AVATAR: 'photo de profil',
-      MESSAGE_ATTACHMENT: 'piece jointe',
+      MESSAGE_ATTACHMENT: 'pièce jointe',
       OTHER: 'document',
     };
     return type ? labels[type] || 'document' : 'document';

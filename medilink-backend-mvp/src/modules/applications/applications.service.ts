@@ -129,7 +129,7 @@ export class ApplicationsService {
           conversationId: conversation.id,
           senderUserId: user.id,
           messageType: MessageType.SYSTEM,
-          body: `${candidateArticle} a postule a la mission.`,
+          body: `${candidateArticle} a postulé à la mission.`,
         },
       });
 

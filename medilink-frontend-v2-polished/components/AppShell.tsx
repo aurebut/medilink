@@ -20,6 +20,7 @@ import {
   restoreNotificationInCache,
   restoreNotificationsCache,
 } from '@/lib/notification-cache';
+import { formatNotificationText } from '@/lib/notification-text';
 import type { CandidateDashboardData, Conversation, Establishment, EstablishmentBillingStatus, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
@@ -234,7 +235,7 @@ function getNotificationBody(notification: Notification, conversations: Conversa
       return `Vous avez reçu un nouveau message de ${conv.establishment?.name || 'l\'établissement'}.`;
     }
   }
-  return notification.body;
+  return formatNotificationText(notification.body);
 }
 
 function getNotificationLinkLabel(notification: Notification, area: 'candidate' | 'establishment' | 'admin') {
@@ -703,7 +704,7 @@ export function AppShell({
 
           <div className="notification-menu-wrap" ref={notificationsRef}>
             {notificationsOpen ? (
-              <div className="notification-menu" role="dialog" aria-label="Notifications recentes">
+              <div className="notification-menu" role="dialog" aria-label="Notifications récentes">
                 <div className="notification-menu-head">
                   <div>
                     <strong>Notifications</strong>
@@ -744,13 +745,13 @@ export function AppShell({
                       return (
                         <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
                           <div className="notification-menu-item-head">
-                            <strong>{notification.title}</strong>
+                            <strong>{formatNotificationText(notification.title)}</strong>
                             <span className="notification-menu-item-meta">
                               <span>{formatDateTime(notification.createdAt)}</span>
                               <button
                                 type="button"
                                 className="notification-delete-button"
-                                aria-label={`Supprimer la notification ${notification.title}`}
+                                aria-label={`Supprimer la notification ${formatNotificationText(notification.title)}`}
                                 onClick={() => void deleteNotification(notification.id)}
                               >
                                 <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">

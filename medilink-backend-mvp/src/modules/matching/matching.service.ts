@@ -116,8 +116,8 @@ export class MatchingService {
         await this.notifications.create({
           userId: candidate.candidateUserId,
           type: NotificationType.MISSION_RECOMMENDATION,
-          title: 'Mission recommandee',
-          body: `${mission.title} correspond fortement a votre profil.`,
+          title: 'Mission recommandée',
+          body: `${mission.title} correspond fortement à votre profil.`,
           data: {
             missionId: mission.id,
             score: candidate.score,

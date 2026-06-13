@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { api, subscribeApiCache } from '@/lib/api';
 import { confirmNotificationRead, normalizeNotifications } from '@/lib/notification-cache';
+import { formatNotificationText } from '@/lib/notification-text';
 import type { Notification } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatDateTime } from '@/lib/format';
@@ -85,8 +86,8 @@ export default function RecruiterNotificationsPage() {
                 <Badge tone={n.readAt ? 'neutral' : 'warning'}>{n.readAt ? 'Lue' : 'Non lue'}</Badge>
                 <span className="small">{formatDateTime(n.createdAt)}</span>
               </div>
-              <h3>{n.title}</h3>
-              <p>{n.body}</p>
+              <h3>{formatNotificationText(n.title)}</h3>
+              <p>{formatNotificationText(n.body)}</p>
               <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
                 {getNotificationLink(n) ? (
                   <LinkButton href={getNotificationLink(n)!} variant="secondary" onClick={() => openNotification(n)}>

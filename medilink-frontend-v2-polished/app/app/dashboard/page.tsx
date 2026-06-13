@@ -9,6 +9,7 @@ import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
 import { confirmNotificationRead, normalizeNotifications, primeNotificationsCache } from '@/lib/notification-cache';
+import { formatNotificationText } from '@/lib/notification-text';
 import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -71,7 +72,7 @@ function getNotificationBody(notification: Notification, conversations: Conversa
       return `Vous avez reçu un nouveau message de ${conv.establishment?.name || 'l\'établissement'}.`;
     }
   }
-  return notification.body;
+  return formatNotificationText(notification.body);
 }
 
 function getNotificationLinkLabel(notification: Notification) {
@@ -361,7 +362,7 @@ export default function CandidateDashboardPage() {
                         <Badge tone={notification.readAt ? 'neutral' : 'warning'}>{notification.readAt ? 'Lue' : 'Non lue'}</Badge>
                         <span className="small">{formatDateTime(notification.createdAt)}</span>
                       </div>
-                      <strong>{notification.title}</strong>
+                      <strong>{formatNotificationText(notification.title)}</strong>
                       <p>{getNotificationBody(notification, conversations)}</p>
                       {notificationLink ? (
                         <Link
