@@ -4,9 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { api, clearApiCache, isMockStorageUrl, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
-import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
+import { statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
-import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
+import { getDepartmentLabel, getEquipmentLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -432,21 +432,6 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
       {activeSection === 'brief' ? (
         <div className="candidate-current-tab-panel">
-          <div className="candidate-current-grid">
-            <div className="candidate-current-panel">
-              <span>Mission</span>
-              <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
-              <p>{formatCompensation(row.agreement || mission || {})}</p>
-              <small>{mission?.specialty || 'Spécialité à confirmer'}</small>
-            </div>
-            <div className="candidate-current-panel">
-              <span>Contexte</span>
-              <strong>{getDepartmentLabel(mission?.departmentInfo) || getSectorLabel(mission?.sector) || 'Service à confirmer'}</strong>
-              <p>{mission?.teamInfo || 'Équipe et organisation à confirmer dans la messagerie.'}</p>
-              <small>{getPatientTypeLabel(mission?.patientType || establishment?.patientType) || 'Patientèle à confirmer'}</small>
-            </div>
-          </div>
-
           <div className="candidate-current-info">
             <div>
               <h3>Consignes de l’établissement</h3>
