@@ -1381,6 +1381,10 @@ button { touch-action: manipulation; }
   border-top: 0;
 }
 
+.candidate-current-unified .candidate-current-day-documents {
+  column-gap: 18px;
+}
+
 .candidate-current-unified .candidate-current-panel,
 .candidate-current-unified .candidate-current-info > div,
 .candidate-current-unified .candidate-current-detail-grid > div,
