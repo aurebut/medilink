@@ -3957,13 +3957,36 @@ tbody tr:hover { background: #FAFBFD; }
 .establishment-application-section {
   display: grid;
   gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(26,82,160,.14);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: 0 10px 30px rgba(11,25,41,.045);
+}
+.establishment-application-section-current {
+  border-left: 5px solid var(--primary);
+  background: linear-gradient(90deg, rgba(26,82,160,.075), rgba(255,255,255,.98) 34%);
+}
+.establishment-application-section-history {
+  border-color: rgba(97,111,126,.18);
+  border-left: 5px solid rgba(97,111,126,.42);
+  background: #FBFAF7;
+}
+.establishment-application-section-history .table-wrap {
+  box-shadow: none;
+}
+.establishment-application-section-history tbody tr {
+  opacity: .78;
+}
+.establishment-application-section-history tbody tr:hover {
+  opacity: 1;
 }
 .establishment-application-section-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
-  padding: 0 2px;
+  padding: 0 2px 4px;
 }
 .establishment-application-section-head h2 {
   margin: 0;
@@ -3986,9 +4009,7 @@ tbody tr:hover { background: #FAFBFD; }
   .establishment-application-section {
     gap: 12px;
     padding: 14px;
-    border: 1px solid rgba(26,82,160,.12);
     border-radius: 14px;
-    background: rgba(255,255,255,.86);
     box-shadow: 0 8px 26px rgba(11,25,41,.045);
   }
   .establishment-application-section-head {

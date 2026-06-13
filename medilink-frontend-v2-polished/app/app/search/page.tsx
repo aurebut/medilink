@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import type { Application, Mission, MissionType, Paginated, Profile, RequiredLevel } from '@/lib/types';
+import type { Application, ApplicationStatus, Mission, MissionType, Paginated, Profile, RequiredLevel } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { missionTypeOptions, requiredLevelOptions, statusLabel } from '@/lib/labels';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
@@ -41,6 +41,12 @@ function applicationTone(status: string) {
   if (status === 'REJECTED' || status === 'WITHDRAWN') return 'danger';
   if (status === 'VIEWED') return 'warning';
   return 'neutral';
+}
+
+const closedApplicationStatuses: ApplicationStatus[] = ['ACCEPTED', 'REJECTED', 'WITHDRAWN', 'CANCELLED'];
+
+function isClosedApplication(status: ApplicationStatus) {
+  return closedApplicationStatuses.includes(status);
 }
 
 const secondaryFilterKeys = [
@@ -512,64 +518,129 @@ export default function SearchMissionsPage() {
               }
             />
           ) : (
-            <div className="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Mission</th>
-                    <th>Établissement</th>
-                    <th>Statut</th>
-                    <th>Date</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((a) => (
-                    <tr key={a.id}>
-                      <td>
-                        <strong>{a.mission?.title}</strong>
-                        <div className="small">{a.mission?.city}</div>
-                      </td>
-                      <td>{a.mission?.establishment?.name || '—'}</td>
-                      <td>
-                        <Badge tone={applicationTone(a.status) as any}>
-                          {statusLabel(a.status)}
-                        </Badge>
-                      </td>
-                      <td>{formatDateTime(a.createdAt)}</td>
-                      <td className="actions">
-                        {a.conversation ? (
-                          <Link
-                            className="btn btn-light"
-                            href={getCandidateConversationPath(a.conversation.id)}
-                          >
-                            Messagerie
-                          </Link>
-                        ) : null}
-                        {a.missionId ? (
-                          <Link
-                            className="btn btn-secondary"
-                            href={getCandidateMissionPath(a.missionId)}
-                          >
-                            Voir mission
-                          </Link>
-                        ) : null}
-                        <Button
-                          variant="danger"
-                          onClick={() => withdraw(a.id)}
-                          disabled={['ACCEPTED', 'REJECTED', 'WITHDRAWN', 'CANCELLED'].includes(a.status)}
-                        >
-                          Retirer
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ApplicationsTab applications={applications} withdraw={withdraw} />
           )}
         </>
       )}
     </>
+  );
+}
+
+function ApplicationsTab({
+  applications,
+  withdraw,
+}: {
+  applications: Application[];
+  withdraw: (id: string) => Promise<void>;
+}) {
+  const currentApplications = applications.filter((application) => !isClosedApplication(application.status));
+  const historicalApplications = applications.filter((application) => isClosedApplication(application.status));
+
+  return (
+    <div className="establishment-application-sections">
+      <ApplicationSection
+        title="Candidatures d'actualité"
+        description="Candidatures envoyées ou vues, avec une action encore possible."
+        variant="current"
+        applications={currentApplications}
+        emptyLabel="Aucune candidature d'actualité."
+        withdraw={withdraw}
+      />
+      <ApplicationSection
+        title="Historique des candidatures"
+        description="Candidatures acceptées, refusées, retirées ou annulées, conservées pour suivi."
+        variant="history"
+        applications={historicalApplications}
+        emptyLabel="Aucune candidature dans l'historique."
+        withdraw={withdraw}
+      />
+    </div>
+  );
+}
+
+function ApplicationSection({
+  title,
+  description,
+  variant,
+  applications,
+  emptyLabel,
+  withdraw,
+}: {
+  title: string;
+  description: string;
+  variant: 'current' | 'history';
+  applications: Application[];
+  emptyLabel: string;
+  withdraw: (id: string) => Promise<void>;
+}) {
+  return (
+    <section className={`establishment-application-section establishment-application-section-${variant}`}>
+      <div className="establishment-application-section-head">
+        <div>
+          <h2>{title}</h2>
+          <p>{description}</p>
+        </div>
+        <Badge tone={applications.length ? 'neutral' : 'warning'}>{applications.length}</Badge>
+      </div>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Mission</th>
+              <th>Établissement</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {applications.length > 0 ? applications.map((a) => (
+              <tr key={a.id}>
+                <td>
+                  <strong>{a.mission?.title}</strong>
+                  <div className="small">{a.mission?.city}</div>
+                </td>
+                <td>{a.mission?.establishment?.name || '—'}</td>
+                <td>
+                  <Badge tone={applicationTone(a.status) as any}>
+                    {statusLabel(a.status)}
+                  </Badge>
+                </td>
+                <td>{formatDateTime(a.createdAt)}</td>
+                <td className="actions">
+                  {a.conversation ? (
+                    <Link
+                      className="btn btn-light"
+                      href={getCandidateConversationPath(a.conversation.id)}
+                    >
+                      Messagerie
+                    </Link>
+                  ) : null}
+                  {a.missionId ? (
+                    <Link
+                      className="btn btn-secondary"
+                      href={getCandidateMissionPath(a.missionId)}
+                    >
+                      Voir mission
+                    </Link>
+                  ) : null}
+                  <Button
+                    variant="danger"
+                    onClick={() => withdraw(a.id)}
+                    disabled={isClosedApplication(a.status)}
+                  >
+                    Retirer
+                  </Button>
+                </td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={5}>{emptyLabel}</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }

@@ -282,10 +282,10 @@ function ApplicationsTab({
   onMissionDeleted: (missionId: string) => void;
 }) {
   const historicalApplications = applications.filter((application) => (
-    application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN'
+    application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN' || application.status === 'CANCELLED'
   ));
   const currentApplications = applications.filter((application) => (
-    application.status !== 'ACCEPTED' && application.status !== 'REJECTED' && application.status !== 'WITHDRAWN'
+    application.status !== 'ACCEPTED' && application.status !== 'REJECTED' && application.status !== 'WITHDRAWN' && application.status !== 'CANCELLED'
   ));
 
   if (applications.length === 0) {
@@ -302,6 +302,7 @@ function ApplicationsTab({
       <ApplicationSection
         title="Candidatures d’actualité"
         description="Nouvelles candidatures et profils encore à qualifier."
+        variant="current"
         applications={currentApplications}
         emptyLabel="Aucune candidature d’actualité."
         updatingId={updatingId}
@@ -310,7 +311,8 @@ function ApplicationsTab({
       />
       <ApplicationSection
         title="Historique des candidatures"
-        description="Candidatures acceptées, refusées ou retirées, conservées pour suivi."
+        description="Candidatures acceptées, refusées, retirées ou annulées, conservées pour suivi."
+        variant="history"
         applications={historicalApplications}
         emptyLabel="Aucune candidature dans l’historique."
         updatingId={updatingId}
@@ -324,6 +326,7 @@ function ApplicationsTab({
 function ApplicationSection({
   title,
   description,
+  variant,
   applications,
   emptyLabel,
   updatingId,
@@ -332,6 +335,7 @@ function ApplicationSection({
 }: {
   title: string;
   description: string;
+  variant: 'current' | 'history';
   applications: Application[];
   emptyLabel: string;
   updatingId: string | null;
@@ -339,7 +343,7 @@ function ApplicationSection({
   onMissionDeleted: (missionId: string) => void;
 }) {
   return (
-    <section className="establishment-application-section">
+    <section className={`establishment-application-section establishment-application-section-${variant}`}>
       <div className="establishment-application-section-head">
         <div>
           <h2>{title}</h2>
@@ -360,7 +364,7 @@ function ApplicationSection({
         </thead>
         <tbody>
           {applications.length > 0 ? applications.map((application) => {
-            const isFinal = application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN';
+            const isFinal = application.status === 'ACCEPTED' || application.status === 'REJECTED' || application.status === 'WITHDRAWN' || application.status === 'CANCELLED';
             const isUpdating = updatingId === application.id;
 
             return (
