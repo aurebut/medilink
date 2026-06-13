@@ -57,7 +57,7 @@ function checklistCopy(type: DocumentType, doc?: Document) {
   }
   if (doc.verificationStatus === 'APPROVED') return 'Validé et consultable par les établissements après candidature.';
   if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoyé, en attente de validation MediLink.';
-  if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Upload à finaliser.';
+  if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Téléversement à finaliser.';
   if (doc.verificationStatus === 'REJECTED') {
     return doc.rejectionReason ? `Refusé : ${doc.rejectionReason}` : 'Refusé, vous pouvez envoyer une nouvelle version.';
   }
@@ -140,16 +140,16 @@ export function DocumentSection() {
           headers: uploadResponse.headers,
           body: file,
         });
-        if (!put.ok) throw new Error('Upload fichier impossible vers le stockage.');
+        if (!put.ok) throw new Error('Téléversement du fichier impossible vers le stockage.');
       }
 
       await api.post(`/documents/${uploadResponse.documentId}/confirm-upload`, {});
       setFile(null);
       setFileInputKey((key) => key + 1);
-      setMessage('Document envoye. Il passe en verification si necessaire.');
+      setMessage('Document envoyé. Il passe en vérification si nécessaire.');
       await load();
     } catch (e: any) {
-      setError(e.message || 'Erreur upload.');
+      setError(e.message || 'Erreur lors du téléversement.');
     } finally {
       setSubmitting(false);
     }
@@ -162,7 +162,7 @@ export function DocumentSection() {
       const result = await api.get<DownloadResponse>(`/documents/${documentId}/download-url`);
       if (isMockStorageUrl(result.downloadUrl)) {
         previewWindow?.close();
-        alert('Storage en mode mock : aucun fichier reel a ouvrir. En production, une URL temporaire serait ouverte.');
+        alert('Stockage en mode mock : aucun fichier réel à ouvrir. En production, une URL temporaire serait ouverte.');
         return;
       }
       showDocumentInPreview(result.downloadUrl, previewWindow);
@@ -264,7 +264,7 @@ export function DocumentSection() {
       {file ? (
         <div className="document-selected-file">
           <span>Sélection : <strong>{file.name}</strong></span>
-          <Button onClick={upload} disabled={submitting}>{submitting ? 'Upload...' : 'Envoyer'}</Button>
+          <Button onClick={upload} disabled={submitting}>{submitting ? 'Envoi en cours...' : 'Envoyer'}</Button>
         </div>
       ) : null}
 

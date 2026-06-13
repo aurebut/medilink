@@ -142,7 +142,7 @@ export default function ProfilePage() {
     try {
       const updated = await api.patch<Profile>('/me/profile', payload);
       applyProfile(updated);
-      setMessage(`Profil ${gendered(updated, 'mis a jour', 'mise a jour')}.`);
+      setMessage(`Profil ${gendered(updated, 'mis à jour', 'mise à jour')}.`);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -172,7 +172,7 @@ export default function ProfilePage() {
           body: avatarFile,
         });
 
-        if (!put.ok) throw new Error('Upload de la photo impossible.');
+        if (!put.ok) throw new Error('Téléversement de la photo impossible.');
       }
 
       await api.post(`/documents/${upload.documentId}/confirm-upload`, {});
@@ -180,9 +180,9 @@ export default function ProfilePage() {
       applyProfile(updated);
       setAvatarFile(null);
       setAvatarInputKey((key) => key + 1);
-      setMessage('Photo de profil mise a jour.');
+      setMessage('Photo de profil mise à jour.');
     } catch (e: any) {
-      setError(e.message || 'Erreur upload photo.');
+      setError(e.message || 'Erreur lors du téléversement de la photo.');
     } finally {
       setUploadingAvatar(false);
     }
@@ -200,7 +200,7 @@ export default function ProfilePage() {
       applyProfile(updated);
       setMessage(healthVerificationMessage(updated.healthVerificationStatus));
     } catch (e: any) {
-      setError(e.message || 'Verification RPPS impossible.');
+      setError(e.message || 'Vérification RPPS impossible.');
       try {
         const refreshed = await api.get<Profile>('/me/profile');
         applyProfile(refreshed);
@@ -251,12 +251,12 @@ export default function ProfilePage() {
                   />
                 </Field>
                 <Button type="button" disabled={!avatarFile || uploadingAvatar} onClick={uploadAvatar}>
-                  {uploadingAvatar ? 'Upload...' : 'Mettre à jour la photo'}
+                  {uploadingAvatar ? 'Envoi en cours...' : 'Mettre à jour la photo'}
                 </Button>
               </div>
             </div>
             <div className="divider" />
-            <h2>Completion</h2>
+            <h2>Complétion</h2>
             <div className="stat">
               <strong>{profile.completionScore}%</strong>
               <ProgressBar value={profile.completionScore} />
@@ -299,15 +299,15 @@ export default function ProfilePage() {
                 {activeTab === 'identity' ? (
                   <>
                     <div className="form-row">
-                      <Field label="Prenom"><Input value={form.firstName || ''} onChange={(e) => set('firstName', e.target.value)} /></Field>
+                      <Field label="Prénom"><Input value={form.firstName || ''} onChange={(e) => set('firstName', e.target.value)} /></Field>
                       <Field label="Nom"><Input value={form.lastName || ''} onChange={(e) => set('lastName', e.target.value)} /></Field>
                     </div>
 
                     <div className="form-row">
                       <Field label="Sexe / accord grammatical">
                         <Select value={form.candidateGender || ''} onChange={(e) => set('candidateGender', e.target.value as CandidateGender)}>
-                          <option value="">Selectionner</option>
-                          <option value="FEMININE">Feminin</option>
+                          <option value="">Sélectionner</option>
+                          <option value="FEMININE">Féminin</option>
                           <option value="MASCULINE">Masculin</option>
                         </Select>
                       </Field>
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                           {healthVerificationLabel(profile.healthVerificationStatus)}
                         </Badge>
                       </div>
-                      <Field label="Numero RPPS">
+                      <Field label="Numéro RPPS">
                         <Input
                           inputMode="numeric"
                           value={form.rpps || ''}
@@ -367,9 +367,9 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="form-row">
-                      <Field label="Statut medical">
+                      <Field label="Statut médical">
                         <Select value={form.medicalStatus || ''} onChange={(e) => set('medicalStatus', e.target.value as MedicalStatus)}>
-                          <option value="">Selectionner</option>
+                          <option value="">Sélectionner</option>
                           {candidateMedicalStatusOptions.map((o) => (
                             <option key={o.value} value={o.value}>
                               {medicalStatusLabel(o.value, form)}
@@ -386,8 +386,8 @@ export default function ProfilePage() {
                     </div>
 
                     {form.medicalStatus === 'OTHER' ? (
-                      <Field label="Statut personnalise">
-                        <Input value={form.medicalStatusOther || ''} onChange={(e) => set('medicalStatusOther', e.target.value)} placeholder="Ex : assistant specialiste..." />
+                      <Field label="Statut personnalisé">
+                        <Input value={form.medicalStatusOther || ''} onChange={(e) => set('medicalStatusOther', e.target.value)} placeholder="Ex : assistant spécialiste..." />
                       </Field>
                     ) : null}
 

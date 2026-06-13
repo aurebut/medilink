@@ -94,7 +94,7 @@ export function statusLabel(status?: UserStatus | MissionStatus | ApplicationSta
     REJECTED: 'Refusée',
     WITHDRAWN: 'Retirée',
     CANCELLED: 'Annulée',
-    UPLOAD_PENDING: 'Upload en attente',
+    UPLOAD_PENDING: 'Téléversement en attente',
     PENDING_VERIFICATION: 'À vérifier',
     APPROVED: 'Validé',
     EXPIRED: 'Expiré',
