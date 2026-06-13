@@ -97,19 +97,19 @@ export const weekdayOptions: ChoiceOption[] = [
   { value: 'WEEKDAYS', label: 'Semaine' },
   { value: 'SATURDAY', label: 'Samedi' },
   { value: 'SUNDAY', label: 'Dimanche' },
-  { value: 'HOLIDAYS', label: 'Jours feries' },
+  { value: 'HOLIDAYS', label: 'Jours fériés' },
 ];
 
 export const timeSlotOptions: ChoiceOption[] = [
   { value: 'MORNING', label: 'Matin' },
-  { value: 'DAY', label: 'Journee' },
-  { value: 'EVENING', label: 'Soiree' },
+  { value: 'DAY', label: 'Journée' },
+  { value: 'EVENING', label: 'Soirée' },
   { value: 'NIGHT', label: 'Nuit' },
   { value: 'TWENTY_FOUR_HOURS', label: 'Garde 24 h' },
 ];
 
 export const noticeOptions: ChoiceOption[] = [
-  { value: '0', label: 'Derniere minute' },
+  { value: '0', label: 'Dernière minute' },
   { value: '24', label: '24 h' },
   { value: '48', label: '48 h' },
   { value: '72', label: '72 h' },
@@ -120,16 +120,16 @@ export const noticeOptions: ChoiceOption[] = [
 export const mobilityRangeOptions: ChoiceOption[] = [
   { value: 'LOCAL_ONLY', label: 'Autour de ma ville uniquement' },
   { value: 'NEARBY_WITH_CAR', label: 'Proche avec voiture' },
-  { value: 'REGIONAL', label: 'Dans ma region' },
+  { value: 'REGIONAL', label: 'Dans ma région' },
   { value: 'NATIONAL_WITH_HOUSING', label: 'Partout si logement fourni' },
 ];
 
 export const practiceSettingOptions: ChoiceOption[] = [
   { value: 'CABINET', label: 'Cabinet individuel' },
   { value: 'GROUP_PRACTICE', label: 'Cabinet de groupe' },
-  { value: 'MEDICAL_CENTER', label: 'Centre / maison de sante' },
+  { value: 'MEDICAL_CENTER', label: 'Centre / maison de santé' },
   { value: 'CLINIC', label: 'Clinique' },
-  { value: 'HOSPITAL', label: 'Hopital' },
+  { value: 'HOSPITAL', label: 'Hôpital' },
   { value: 'EMERGENCY_DEPARTMENT', label: 'Urgences' },
   { value: 'EHPAD', label: 'EHPAD' },
 ];
@@ -138,13 +138,13 @@ export const missionActOptions: ChoiceOption[] = [
   { value: 'CONSULTATIONS', label: 'Consultations' },
   { value: 'SUTURES', label: 'Sutures' },
   { value: 'ECG', label: 'ECG' },
-  { value: 'ULTRASOUND', label: 'Echographie' },
+  { value: 'ULTRASOUND', label: 'Échographie' },
   { value: 'SMALL_TRAUMA', label: 'Petite traumatologie' },
   { value: 'EMERGENCY_PROCEDURES', label: "Gestes d'urgence" },
   { value: 'VENOUS_ACCESS', label: 'Pose de voie veineuse' },
   { value: 'WOUND_CARE', label: 'Gestion des plaies' },
-  { value: 'GYNECOLOGY', label: 'Gynecologie courante' },
-  { value: 'PEDIATRICS', label: 'Pediatrie' },
+  { value: 'GYNECOLOGY', label: 'Gynécologie courante' },
+  { value: 'PEDIATRICS', label: 'Pédiatrie' },
 ];
 
 export const durationOptions: ChoiceOption[] = [
