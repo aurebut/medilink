@@ -13,6 +13,7 @@ import {
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
+import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel, getSpecialtyLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
@@ -37,7 +38,7 @@ function establishmentAddress(mission?: Mission) {
     mission?.location || establishment?.address,
     mission?.city || establishment?.city,
     establishment?.country,
-  ].filter(Boolean).join(', ') || 'Adresse a confirmer';
+  ].filter(Boolean).join(', ') || 'Adresse à confirmer';
 }
 
 function mapsHref(address: string) {
@@ -53,13 +54,13 @@ function isPersonalMission(context?: MissionContext | null) {
 
 function contextDetails(mission?: Mission) {
   return [
-    { label: 'Service', value: mission?.departmentInfo || mission?.sector },
-    { label: 'Equipe', value: mission?.teamInfo },
-    { label: 'Materiel', value: mission?.equipmentInfo || mission?.equipmentAvailable?.join(', ') },
-    { label: 'Logiciel', value: mission?.softwareUsed || mission?.establishment?.softwareUsed },
-    { label: 'Patientele', value: mission?.patientType || mission?.establishment?.patientType },
+    { label: 'Service', value: getDepartmentLabel(mission?.departmentInfo) || getSectorLabel(mission?.sector) },
+    { label: 'Équipe', value: mission?.teamInfo },
+    { label: 'Matériel', value: mission?.equipmentInfo || mission?.equipmentAvailable?.map(getEquipmentLabel).join(', ') },
+    { label: 'Logiciel', value: getSoftwareLabel(mission?.softwareUsed || mission?.establishment?.softwareUsed) },
+    { label: 'Patientèle', value: getPatientTypeLabel(mission?.patientType || mission?.establishment?.patientType) },
     { label: 'Patients / jour', value: mission?.averagePatientsPerDay ? `${mission.averagePatientsPerDay}` : null },
-    { label: 'Secretariat', value: mission?.hasSecretary ? mission.secretaryType || 'Disponible' : null },
+    { label: 'Secrétariat', value: mission?.hasSecretary ? getSecretaryTypeLabel(mission.secretaryType) || 'Disponible' : null },
     { label: 'Parking', value: mission?.parkingAvailable ? 'Disponible' : null },
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
@@ -93,7 +94,7 @@ function MissionAnnouncementView({
 
       {application ? (
         <Alert type="info">
-          Candidature {statusLabel(application.status).toLowerCase()}. La page deviendra votre suivi de mission personnel quand l'etablissement aura valide la mission.
+          Candidature {statusLabel(application.status).toLowerCase()}. La page deviendra votre suivi de mission personnel quand l'établissement aura validé la mission.
         </Alert>
       ) : null}
 
@@ -102,13 +103,13 @@ function MissionAnnouncementView({
           <span>Annonce</span>
           <strong>{missionTypeLabel(mission.missionType)} - {requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</strong>
           <p>{mission.description || 'Aucune description pour cette mission.'}</p>
-          <small>{mission.specialty || 'Specialite non precisee'}</small>
+          <small>{getSpecialtyLabel(mission.specialty) || 'Spécialité non précisée'}</small>
         </Card>
 
         <Card className="candidate-current-panel">
-          <span>Remuneration</span>
+          <span>Rémunération</span>
           <strong>{formatCompensation(mission)}</strong>
-          <p>{mission.establishment?.name || 'Etablissement'} - {mission.city}</p>
+          <p>{mission.establishment?.name || 'Établissement'} - {mission.city}</p>
           <small>{formatDate(mission.startDate)} {mission.startTime ? `- ${mission.startTime}` : ''}{mission.endTime ? ` / ${mission.endTime}` : ''}</small>
         </Card>
       </div>
@@ -120,15 +121,15 @@ function MissionAnnouncementView({
             <div><span>Date</span><strong>{formatDate(mission.startDate)}</strong></div>
             <div><span>Fin</span><strong>{formatDate(mission.endDate)}</strong></div>
             <div><span>Horaire</span><strong>{mission.startTime || '-'} {mission.endTime ? `- ${mission.endTime}` : ''}</strong></div>
-            <div><span>Duree</span><strong>{mission.durationHours || '-'} h</strong></div>
+            <div><span>Durée</span><strong>{mission.durationHours || '-'} h</strong></div>
             <div><span>Adresse</span><strong>{address}</strong></div>
           </div>
         </Card>
 
         <Card>
-          <h3>Etablissement</h3>
-          <p>{mission.establishment?.name || 'Etablissement a confirmer'}</p>
-          <p className="small">{mission.establishment?.description || mission.practicalInfo || 'Les details complementaires seront confirmes dans la messagerie.'}</p>
+          <h3>Établissement</h3>
+          <p>{mission.establishment?.name || 'Établissement à confirmer'}</p>
+          <p className="small">{mission.establishment?.description || mission.practicalInfo || 'Les détails complémentaires seront confirmés dans la messagerie.'}</p>
         </Card>
       </div>
 
@@ -246,12 +247,12 @@ export default function CandidateMissionDetailPage() {
       <>
         <PageHeader
           title="Mission"
-          description="Cette mission n'est pas encore rattachee a votre espace candidat."
+          description="Cette mission n'est pas encore rattachée à votre espace candidat."
           actions={<LinkButton href="/app/search" variant="light">Retour aux annonces</LinkButton>}
         />
         <EmptyState
           title="Aucun suivi candidat"
-          description="Postulez d'abord a la mission pour ouvrir un suivi personnel."
+          description="Postulez d'abord à la mission pour ouvrir un suivi personnel."
           action={<LinkButton href={getMissionApplyPath(id)}>Postuler</LinkButton>}
         />
       </>
@@ -273,7 +274,7 @@ export default function CandidateMissionDetailPage() {
 
   const mission = context.application.mission;
   const address = establishmentAddress(mission);
-  const hasAddress = address !== 'Adresse a confirmer';
+  const hasAddress = address !== 'Adresse à confirmer';
   const detailItems = contextDetails(mission);
   const start = missionDate(context.application, context.agreement);
   const end = missionEndDate(context.application, context.agreement);
@@ -292,14 +293,14 @@ export default function CandidateMissionDetailPage() {
 
       <section className="candidate-command-strip" aria-label="Mission personnelle">
         <div className="candidate-command-main">
-          <span>Mission confirmee</span>
-          <h2>{mission?.establishment?.name || mission?.city || 'Etablissement a confirmer'}</h2>
+          <span>Mission confirmée</span>
+          <h2>{mission?.establishment?.name || mission?.city || 'Établissement à confirmer'}</h2>
           <p>{address}</p>
         </div>
         <div className="candidate-command-stat">
-          <span>Debut</span>
+          <span>Début</span>
           <strong>{formatDate(start)}</strong>
-          <small>{end ? `Fin ${formatDate(end)}` : 'Fin a confirmer'}</small>
+          <small>{end ? `Fin ${formatDate(end)}` : 'Fin à confirmer'}</small>
         </div>
         <div className="candidate-command-stat">
           <span>Statut</span>
@@ -307,7 +308,7 @@ export default function CandidateMissionDetailPage() {
           <small>{agreementNextStep(context.agreement?.status)}</small>
         </div>
         <div className="candidate-command-actions">
-          {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itineraire</a> : null}
+          {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itinéraire</a> : null}
           <LinkButton href={getCandidateBillingMissionPath(context.conversation, context.agreement)} variant="secondary">Compta</LinkButton>
         </div>
       </section>
@@ -316,22 +317,22 @@ export default function CandidateMissionDetailPage() {
         <Card className="candidate-current-panel">
           <span>Brief</span>
           <strong>{missionTypeLabel(mission?.missionType)} - {requiredLevelLabels(mission?.requiredLevels, mission?.requiredLevel)}</strong>
-          <p>{mission?.description || mission?.practicalInfo || 'Brief a confirmer dans la messagerie.'}</p>
-          <small>{mission?.specialty || 'Specialite a confirmer'}</small>
+          <p>{mission?.description || mission?.practicalInfo || 'Brief à confirmer dans la messagerie.'}</p>
+          <small>{getSpecialtyLabel(mission?.specialty) || 'Spécialité à confirmer'}</small>
         </Card>
 
         <Card className="candidate-current-panel">
-          <span>Remuneration</span>
+          <span>Rémunération</span>
           <strong>{context.agreement ? candidateAmountLabel(context.agreement) : formatCompensation(mission || {})}</strong>
           <p>{context.agreement ? agreementLabel(context.agreement.status) : statusLabel(context.application.status)}</p>
-          <small>{context.agreement?.terms || 'Conditions a retrouver dans la proposition ou la messagerie.'}</small>
+          <small>{context.agreement?.terms || 'Conditions à retrouver dans la proposition ou la messagerie.'}</small>
         </Card>
       </div>
 
       <div className="candidate-current-info">
         <Card>
           <h3>Consignes</h3>
-          <p>{mission?.practicalInfo || mission?.departmentInfo || 'Les consignes detaillees seront ajoutees par l etablissement ou envoyees dans la messagerie.'}</p>
+          <p>{mission?.practicalInfo || mission?.departmentInfo || 'Les consignes détaillées seront ajoutées par l\'établissement ou envoyées dans la messagerie.'}</p>
         </Card>
         <Card>
           <h3>Lieu & contact</h3>
@@ -352,7 +353,7 @@ export default function CandidateMissionDetailPage() {
       ) : null}
 
       <div className="actions">
-        {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)} variant="secondary">Contacter l'etablissement</LinkButton> : null}
+        {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)} variant="secondary">Contacter l'établissement</LinkButton> : null}
         <Button
           variant="danger"
           onClick={() => withdraw(context.application.id)}

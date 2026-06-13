@@ -234,3 +234,43 @@ export const pressureLevelOptions: ChoiceOption[] = [
   { value: 'Soutenu', label: 'Soutenu' },
   { value: 'Tres soutenu', label: 'Très soutenu' },
 ];
+
+export function getPatientTypeLabel(value?: string | null) {
+  if (!value) return '';
+  return patientTypeOptions.find((x) => x.value === value)?.label || value;
+}
+
+export function getDepartmentLabel(value?: string | null) {
+  if (!value) return '';
+  return establishmentDepartmentOptions.find((x) => x.value === value)?.label || value;
+}
+
+export function getSoftwareLabel(value?: string | null) {
+  if (!value) return '';
+  return softwareOptions.find((x) => x.value === value)?.label || value;
+}
+
+export function getSpecialtyLabel(value?: string | null) {
+  if (!value) return '';
+  return specialtyOptions.find((x) => x.value === value)?.label || value;
+}
+
+export function getSectorLabel(value?: string | null) {
+  if (!value) return '';
+  const labels: Record<string, string> = {
+    SECTEUR_1: 'Secteur 1',
+    SECTEUR_2: 'Secteur 2',
+    SECTEUR_3: 'Secteur 3',
+  };
+  return labels[value] || value;
+}
+
+export function getSecretaryTypeLabel(value?: string | null) {
+  if (!value) return '';
+  return secretaryTypeOptions.find((x) => x.value === value)?.label || value;
+}
+
+export function getEquipmentLabel(value?: string | null) {
+  if (!value) return '';
+  return equipmentOptions.find((x) => x.value === value)?.label || value;
+}

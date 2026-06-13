@@ -249,8 +249,8 @@ function DraftsTab({
     return (
       <Card>
         <h2>Aucun brouillon</h2>
-        <p>Les missions gardees en brouillon apparaitront ici avant publication.</p>
-        <LinkButton href="/establishment/missions/new">Creer une mission</LinkButton>
+        <p>Les missions gardées en brouillon apparaîtront ici avant publication.</p>
+        <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
       </Card>
     );
   }

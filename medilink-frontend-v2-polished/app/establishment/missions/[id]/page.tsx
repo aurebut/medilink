@@ -10,6 +10,7 @@ import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateNoun } from '@/lib/grammar';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
 import { getMissionPublicPath } from '@/lib/mission-links';
+import { getDepartmentLabel, getPatientTypeLabel, getSectorLabel, getSoftwareLabel, getSpecialtyLabel } from '@/lib/profile-options';
 import type { Application, ApplicationStatus, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 
@@ -210,7 +211,7 @@ export default function EstablishmentMissionDetailPage() {
               <span>Besoin</span>
               <strong>{missionTypeLabel(mission.missionType)} - {requiredLevelLabels(mission.requiredLevels, mission.requiredLevel)}</strong>
               <p>{mission.description || 'Aucune description pour cette mission.'}</p>
-              <small>{mission.specialty || 'Spécialité à confirmer'}</small>
+              <small>{getSpecialtyLabel(mission.specialty) || 'Spécialité à confirmer'}</small>
             </div>
             <div className="candidate-current-panel">
               <span>Planning</span>
@@ -220,9 +221,9 @@ export default function EstablishmentMissionDetailPage() {
             </div>
           </div>
           <div className="candidate-current-detail-grid">
-            <div><span>Service</span><strong>{mission.departmentInfo || mission.sector || '-'}</strong></div>
-            <div><span>Patientèle</span><strong>{mission.patientType || '-'}</strong></div>
-            <div><span>Logiciel</span><strong>{mission.softwareUsed || '-'}</strong></div>
+            <div><span>Service</span><strong>{getDepartmentLabel(mission.departmentInfo) || getSectorLabel(mission.sector) || '-'}</strong></div>
+            <div><span>Patientèle</span><strong>{getPatientTypeLabel(mission.patientType) || '-'}</strong></div>
+            <div><span>Logiciel</span><strong>{getSoftwareLabel(mission.softwareUsed) || '-'}</strong></div>
             <div><span>Équipe</span><strong>{mission.teamInfo || '-'}</strong></div>
           </div>
         </Card>

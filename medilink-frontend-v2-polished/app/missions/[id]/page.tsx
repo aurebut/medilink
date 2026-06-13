@@ -10,6 +10,7 @@ import { Alert, Badge, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
+import { getDepartmentLabel, getPatientTypeLabel, getSoftwareLabel } from '@/lib/profile-options';
 import { getMissionApplyPath } from '@/lib/mission-links';
 import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
@@ -180,10 +181,10 @@ export default function MissionPage() {
               <Card>
                 <h2>Contexte de la mission</h2>
                 <div className="info-list">
-                  {mission.patientType ? <div><span>Patientèle</span><strong>{mission.patientType}</strong></div> : null}
-                  {mission.softwareUsed ? <div><span>Logiciel utilisé</span><strong>{mission.softwareUsed}</strong></div> : null}
+                  {mission.patientType ? <div><span>Patientèle</span><strong>{getPatientTypeLabel(mission.patientType)}</strong></div> : null}
+                  {mission.softwareUsed ? <div><span>Logiciel utilisé</span><strong>{getSoftwareLabel(mission.softwareUsed)}</strong></div> : null}
                   {mission.hasSecretary != null ? <div><span>Secrétaire</span><strong>{mission.hasSecretary ? 'Oui' : 'Non'}</strong></div> : null}
-                  {mission.departmentInfo ? <div><span>Département / service / type de cabinet</span><strong>{mission.departmentInfo}</strong></div> : null}
+                  {mission.departmentInfo ? <div><span>Département / service / type de cabinet</span><strong>{getDepartmentLabel(mission.departmentInfo)}</strong></div> : null}
                   {mission.teamInfo ? <div><span>Équipe sur place</span><strong>{mission.teamInfo}</strong></div> : null}
                   {mission.equipmentInfo ? <div><span>Matériel disponible</span><strong>{mission.equipmentInfo}</strong></div> : null}
                   {mission.practicalInfo ? <div><span>Accès</span><strong>{mission.practicalInfo}</strong></div> : null}
