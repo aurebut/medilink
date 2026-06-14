@@ -9416,18 +9416,98 @@ td {
   border-top: 1px solid var(--line);
 }
 
-.monthly-chart-shell {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
+.chart-mobile {
+  display: grid;
+  gap: 0;
+  font-size: 13px;
+  line-height: 1.3;
 }
 
-.monthly-chart-shell:focus-visible {
-  outline: 2px solid rgba(14,138,122,.34);
-  outline-offset: 4px;
-  border-radius: 12px;
+.chart-mobile-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.chart-mobile-header strong {
+  color: var(--heading);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.chart-mobile-bars {
+  display: grid;
+  gap: 5px;
+}
+
+.chart-mobile-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.chart-mobile-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.chart-mobile-track {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.chart-mobile-fill {
+  height: 100%;
+  border-radius: 999px;
+  min-width: 4px;
+  transition: width .3s ease;
+}
+
+.chart-mobile-value {
+  color: var(--heading);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chart-mobile-footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.chart-mobile-footer strong {
+  color: var(--heading);
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.monthly-chart-shell {
+  width: 100%;
 }
 
 .monthly-bar-chart {
@@ -9982,15 +10062,6 @@ td {
   .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
     margin-top: 10px;
     padding-top: 10px;
-  }
-
-  .monthly-chart-shell {
-    margin: 0 -4px;
-    padding: 2px 4px 8px;
-  }
-
-  .monthly-bar-chart {
-    min-width: 620px;
   }
 
   .billing-hero-card.billing-hero-chart .billing-hero-copy {

@@ -1,12 +1,51 @@
 'use client';
 
-import { useId, useMemo } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { formatMoney } from '@/lib/format';
 
 export type ChartRow = {
   date?: string | null;
   amount: number;
 };
+
+const LABELS = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+
+function computeMonths(rows: ChartRow[], year: number) {
+  const monthlyTotals = Array(12).fill(0) as number[];
+  rows.forEach(row => {
+    if (!row.date) return;
+    const d = new Date(row.date);
+    if (d.getFullYear() !== year) return;
+    monthlyTotals[d.getMonth()] += row.amount;
+  });
+  let cumulative = 0;
+  return monthlyTotals.map((amount, i) => {
+    cumulative += amount;
+    return { label: LABELS[i], amount, cumulative };
+  });
+}
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 719px)');
+    setMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return mobile;
+}
+
+function formatAxisMoney(value: number) {
+  if (Math.abs(value) < 1000) return formatMoney(Math.round(value));
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR',
+    notation: 'compact',
+    maximumFractionDigits: value >= 10000 ? 0 : 1,
+  }).format(value);
+}
 
 export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var(--teal)', lineColor = 'var(--heading)' }: {
   rows: ChartRow[];
@@ -15,25 +54,66 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
   barColor?: string;
   lineColor?: string;
 }) {
+  const isMobile = useIsMobile();
+  const months = useMemo(() => computeMonths(rows, year), [rows, year]);
+  const yearlyTotal = months.reduce((s, m) => s + m.amount, 0);
+
+  if (isMobile) {
+    return <MonthlyBarChartMobile months={months} total={yearlyTotal} label={label} barColor={barColor} lineColor={lineColor} />;
+  }
+
+  return <MonthlyBarChartDesktop months={months} label={label} barColor={barColor} lineColor={lineColor} />;
+}
+
+function MonthlyBarChartMobile({ months, total, label, barColor, lineColor }: {
+  months: { label: string; amount: number; cumulative: number }[];
+  total: number;
+  label: string;
+  barColor: string;
+  lineColor: string;
+}) {
+  const maxAmount = Math.max(...months.map(m => m.amount), 1);
+
+  return (
+    <div className="chart-mobile" role="region" aria-label={`Graphique ${label} mensuel`}>
+      <div className="chart-mobile-header">
+        <span>{label} {months.length > 0 && months[0].label}–{months[months.length - 1]?.label || ''}</span>
+        <strong>{formatAxisMoney(total)}</strong>
+      </div>
+      <div className="chart-mobile-bars">
+        {months.map((m) => (
+          <div key={m.label} className="chart-mobile-row">
+            <span className="chart-mobile-label">{m.label}</span>
+            <div className="chart-mobile-track">
+              <div
+                className="chart-mobile-fill"
+                style={{
+                  width: `${(m.amount / maxAmount) * 100}%`,
+                  backgroundColor: barColor,
+                }}
+              />
+            </div>
+            <span className="chart-mobile-value">{formatAxisMoney(m.amount)}</span>
+          </div>
+        ))}
+      </div>
+      <div className="chart-mobile-footer">
+        <span>Total cumulé</span>
+        <strong>{formatMoney(months[months.length - 1]?.cumulative || 0)}</strong>
+      </div>
+    </div>
+  );
+}
+
+function MonthlyBarChartDesktop({ months, label, barColor, lineColor }: {
+  months: { label: string; amount: number; cumulative: number }[];
+  label: string;
+  barColor: string;
+  lineColor: string;
+}) {
   const id = useId().replace(/:/g, '');
   const barGradientId = `barGrad-${id}`;
   const areaGradientId = `areaGrad-${id}`;
-  const months = useMemo(() => {
-    const monthlyTotals = Array(12).fill(0) as number[];
-    rows.forEach(row => {
-      if (!row.date) return;
-      const d = new Date(row.date);
-      if (d.getFullYear() !== year) return;
-      monthlyTotals[d.getMonth()] += row.amount;
-    });
-
-    const labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-    let cumulative = 0;
-    return monthlyTotals.map((amount, i) => {
-      cumulative += amount;
-      return { label: labels[i], amount, cumulative };
-    });
-  }, [rows, year]);
 
   const maxVal = Math.max(...months.map(m => Math.max(m.amount, m.cumulative)), 1);
   const pad = maxVal * 0.1;
@@ -62,18 +142,7 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
   }
 
   const cumulativeLine = months.map((m, i) => `${i === 0 ? 'M' : 'L'}${xPos(i).toFixed(1)},${yVal(m.cumulative).toFixed(1)}`).join(' ');
-
   const gridLines = [0, 0.25, 0.5, 0.75, 1];
-
-  function formatAxisMoney(value: number) {
-    if (Math.abs(value) < 1000) return formatMoney(Math.round(value));
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'EUR',
-      notation: 'compact',
-      maximumFractionDigits: value >= 10000 ? 0 : 1,
-    }).format(value);
-  }
 
   return (
     <div className="monthly-chart-shell" role="region" aria-label={`Graphique ${label} mensuel`} tabIndex={0}>
