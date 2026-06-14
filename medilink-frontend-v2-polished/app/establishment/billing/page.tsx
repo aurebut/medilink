@@ -563,9 +563,7 @@ export default function RecruiterBillingPage() {
       {activeTab === 'overview' ? (
         <OverviewTab
           dashboard={dashboard}
-          budgetLimit={budgetLimit}
           selectedYear={selectedYear}
-          setBudgetLimit={setBudgetLimit}
           openMissions={() => setActiveTab('missions')}
           openDocuments={() => setActiveTab('documents')}
         />
@@ -753,23 +751,19 @@ function formatCents(amount: number, currency = 'EUR') {
 
 function OverviewTab({
   dashboard,
-  budgetLimit,
   selectedYear,
-  setBudgetLimit,
   openMissions,
   openDocuments,
 }: {
   dashboard: DashboardData;
-  budgetLimit: number;
   selectedYear: number;
-  setBudgetLimit: (value: number) => void;
   openMissions: () => void;
   openDocuments: () => void;
 }) {
   return (
     <>
-      <div className="billing-overview-summary">
-        <Card className="billing-hero-card">
+      <Card className="billing-hero-card billing-hero-chart">
+        <div className="billing-hero-top">
           <div className="billing-hero-copy">
             <span>Exercice {selectedYear}</span>
             <h2>{formatMoney(dashboard.totalExpenses)}</h2>
@@ -792,48 +786,8 @@ function OverviewTab({
               <small>Missions terminées à solder</small>
             </div>
           </div>
-        </Card>
-
-        <Card className="billing-overview-side">
-          <div className="billing-side-row">
-            <div>
-              <span>Frais de service MediLink</span>
-              <strong>{formatMoney(dashboard.platformFees)}</strong>
-            </div>
-          </div>
-          <div className="billing-side-row">
-            <div>
-              <span>Rémunération candidats</span>
-              <strong>{formatMoney(dashboard.netRemuneration)}</strong>
-            </div>
-          </div>
-          <div className="billing-side-progress">
-            <div>
-              <span>Budget consommé</span>
-              <Badge tone={dashboard.budgetProgress >= 85 ? 'warning' : 'success'}>{dashboard.budgetProgress}%</Badge>
-            </div>
-            <div className="billing-progress"><span style={{ width: `${dashboard.budgetProgress}%` }} /></div>
-            <small>{formatMoney(dashboard.remainingBudget)} disponible avant seuil {formatMoney(budgetLimit)}</small>
-          </div>
-          <input
-            className="billing-slider"
-            type="range"
-            min="50000"
-            max="500000"
-            step="10000"
-            value={budgetLimit}
-            onChange={(event) => setBudgetLimit(Number(event.target.value))}
-            aria-label="Budget annuel cible"
-          />
-        </Card>
-      </div>
-
-      <Card className="billing-chart-card">
-        <div className="card-body">
-          <div className="billing-chart-header">
-            <h3>Dépenses mensuelles</h3>
-            <span>{formatMoney(dashboard.totalExpenses)} sur l'exercice</span>
-          </div>
+        </div>
+        <div className="billing-hero-chart-section">
           <MonthlyBarChart rows={dashboard.paidRows} year={selectedYear} label="Dépenses" />
         </div>
       </Card>

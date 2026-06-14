@@ -9399,32 +9399,21 @@ td {
   gap: 16px;
 }
 
-.billing-chart-card {
-  margin-bottom: 14px;
+.billing-hero-card.billing-hero-chart {
+  display: block;
 }
 
-.billing-chart-card .card-body {
-  padding: 20px 24px 12px;
+.billing-hero-card.billing-hero-chart .billing-hero-top {
+  display: grid;
+  grid-template-columns: minmax(0, .84fr) minmax(360px, 1.16fr);
+  gap: 26px;
+  align-items: center;
 }
 
-.billing-chart-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 10px;
-}
-
-.billing-chart-header h3 {
-  margin: 0;
-  color: var(--heading);
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.billing-chart-header span {
-  color: var(--muted);
-  font-size: 13px;
+.billing-hero-card.billing-hero-chart .billing-hero-chart-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
 
 .billing-overview-grid {
@@ -9955,13 +9944,22 @@ td {
   }
 
   .billing-hero-card {
-    gap: 0;
     min-height: 0;
     padding: 14px;
     border-color: rgba(14,138,122,.18);
     background:
       linear-gradient(135deg, rgba(14,138,122,.08) 0%, rgba(255,255,255,.96) 42%, rgba(248,251,251,.98) 100%);
     box-shadow: 0 12px 30px rgba(11,25,41,.05);
+  }
+
+  .billing-hero-card.billing-hero-chart .billing-hero-top {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
+    margin-top: 12px;
+    padding-top: 12px;
   }
 
   .billing-hero-copy {

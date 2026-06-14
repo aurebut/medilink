@@ -409,9 +409,7 @@ export default function CandidateBillingPage() {
       {activeTab === 'overview' ? (
         <OverviewTab
           dashboard={dashboard}
-          provisionRate={provisionRate}
           selectedYear={selectedYear}
-          setProvisionRate={setProvisionRate}
           openDocuments={() => setActiveTab('documents')}
         />
       ) : null}
@@ -452,21 +450,17 @@ export default function CandidateBillingPage() {
 
 function OverviewTab({
   dashboard,
-  provisionRate,
   selectedYear,
-  setProvisionRate,
   openDocuments,
 }: {
   dashboard: DashboardData;
-  provisionRate: number;
   selectedYear: number;
-  setProvisionRate: (value: number) => void;
   openDocuments: () => void;
 }) {
   return (
     <>
-      <div className="billing-overview-summary">
-        <Card className="billing-hero-card">
+      <Card className="billing-hero-card billing-hero-chart">
+        <div className="billing-hero-top">
           <div className="billing-hero-copy">
             <span>Exercice {selectedYear}</span>
             <h2>{formatMoney(dashboard.revenue)}</h2>
@@ -489,49 +483,8 @@ function OverviewTab({
               <small>Fin de mission avant rétrocession</small>
             </div>
           </div>
-        </Card>
-
-        <Card className="billing-overview-side">
-          <div className="billing-side-row">
-            <div>
-              <span>Provision prudente</span>
-              <strong>{formatMoney(dashboard.provision)}</strong>
-            </div>
-            <Badge>{provisionRate}%</Badge>
-          </div>
-          <div className="billing-side-row">
-            <div>
-              <span>Net prudent</span>
-              <strong>{formatMoney(dashboard.netAvailable)}</strong>
-            </div>
-          </div>
-          <div className="billing-side-progress">
-            <div>
-              <span>Seuil micro-BNC</span>
-              <Badge tone={dashboard.thresholdProgress >= 85 ? 'warning' : 'success'}>{dashboard.thresholdProgress}%</Badge>
-            </div>
-            <div className="billing-progress"><span style={{ width: `${dashboard.thresholdProgress}%` }} /></div>
-            <small>{formatMoney(dashboard.remainingBeforeThreshold)} avant {formatMoney(MICRO_BNC_THRESHOLD)}</small>
-          </div>
-          <input
-            className="billing-slider"
-            type="range"
-            min="20"
-            max="65"
-            step="1"
-            value={provisionRate}
-            onChange={(event) => setProvisionRate(Number(event.target.value))}
-            aria-label="Taux de provision"
-          />
-        </Card>
-      </div>
-
-      <Card className="billing-chart-card">
-        <div className="card-body">
-          <div className="billing-chart-header">
-            <h3>Recettes mensuelles</h3>
-            <span>{formatMoney(dashboard.revenue)} sur l'exercice</span>
-          </div>
+        </div>
+        <div className="billing-hero-chart-section">
           <MonthlyBarChart rows={dashboard.collectedRows} year={selectedYear} label="Recettes" barColor="var(--blue-lt)" lineColor="var(--blue)" />
         </div>
       </Card>
