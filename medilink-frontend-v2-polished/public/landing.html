@@ -135,33 +135,6 @@ section,footer,.search-section{position:relative;z-index:1;}
 .stagger-child{opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
 .stagger-child.visible{opacity:1;transform:none}
 
-/* ── Mockup 3D scroll animation ── */
-#mockup-wrap {
-  perspective: 1200px;
-  perspective-origin: 50% 40%;
-}
-.laptop {
-  transform-origin: center bottom;
-  transform: rotateX(52deg) rotateY(-8deg) scale(.82);
-  opacity: 0;
-  transition: none; /* driven by JS */
-  will-change: transform, opacity;
-  filter: drop-shadow(0 32px 64px rgba(11,25,41,.22));
-}
-.laptop.landed {
-  /* final state once fully revealed */
-}
-
-/* ── Mockup section ── */
-.mockup-section{
-  padding:80px 40px 80px;
-  display:flex;
-  justify-content:center;
-}
-.mockup-section-inner{
-  max-width:900px;
-  width:100%;
-}
 .hero-h{font-family:var(--serif);font-size:clamp(36px,4.5vw,62px);color:var(--navy);line-height:1.05;letter-spacing:0;margin-bottom:22px}
 .hero-h em{font-style:italic;color:var(--blue)}
 .hero-sub{font-size:17px;color:var(--text-3);max-width:460px;margin:0 0 36px;line-height:1.6}
@@ -169,43 +142,6 @@ section,footer,.search-section{position:relative;z-index:1;}
 .hero-stats{display:flex;gap:36px;flex-wrap:wrap}
 .hero-stat-num{font-family:var(--serif);font-size:32px;color:var(--navy);font-weight:400}
 .hero-stat-label{font-size:12px;color:var(--text-3);margin-top:2px}
-/* Laptop mockup */
-.laptop{position:relative;width:100%;max-width:620px}
-.laptop-body{background:var(--navy);border-radius:14px 14px 0 0;padding:10px 10px 0;box-shadow:0 24px 80px rgba(11,25,41,.28)}
-.laptop-cam{width:6px;height:6px;background:#1A3355;border-radius:50%;margin:0 auto 8px}
-.laptop-screen{background:var(--ivory);border-radius:8px;overflow:hidden;aspect-ratio:16/10;position:relative}
-.laptop-base{background:var(--navy-2);height:14px;border-radius:0 0 4px 4px;position:relative}
-.laptop-base::after{content:'';display:block;width:60px;height:5px;background:#112238;border-radius:0 0 4px 4px;margin:0 auto}
-.laptop-stand{width:80px;height:6px;background:#0D1624;border-radius:0 0 8px 8px;margin:0 auto}
-/* Mini dashboard inside screen */
-.dash-mini{width:100%;height:100%;display:flex;background:var(--ivory);font-size:0;overflow:hidden}
-.dash-side{width:44px;background:var(--navy);flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:5px}
-.dash-side-dot{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.08)}
-.dash-side-dot.active{background:rgba(26,82,160,.4)}
-.dash-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.dash-top{height:32px;background:#fff;border-bottom:1px solid var(--gray-2);display:flex;align-items:center;padding:0 12px;gap:6px}
-.dash-top-pill{height:14px;border-radius:10px;background:var(--gray-2)}
-.dash-content{flex:1;padding:10px;display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto auto;gap:7px;overflow:hidden}
-.dash-card{background:#fff;border:1px solid var(--gray-2);border-radius:7px;padding:8px 9px}
-.dash-card-wide{grid-column:1/3}
-.dash-card-tall{grid-row:1/3}
-.dash-num{font-family:var(--serif);font-size:20px;color:var(--navy)}
-.dash-bar{height:3px;border-radius:2px;margin-top:4px}
-.dash-bar-blue{background:var(--blue);width:60%}
-.dash-bar-teal{background:var(--teal);width:80%}
-.dash-bar-lt{background:var(--gray-2);width:45%}
-.dash-row{height:18px;border-radius:4px;background:var(--gray-1);margin-bottom:5px}
-.dash-row:last-child{margin-bottom:0;width:70%}
-.dash-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
-.dash-line{display:flex;align-items:center;gap:5px;margin-bottom:6px}
-.dash-label{display:block;height:8px;border-radius:4px;background:var(--gray-2)}
-.dash-badge{display:inline-block;height:12px;border-radius:10px;background:var(--blue);opacity:.2;width:40px;margin-top:4px}
-.dash-mini-row{display:flex;align-items:center;gap:4px;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--gray-1)}
-.dash-mini-row:last-child{border-bottom:none;margin-bottom:0}
-.dash-av{width:18px;height:18px;border-radius:50%;background:var(--gray-2);flex-shrink:0}
-.dash-text-sm{flex:1;height:7px;border-radius:3px;background:var(--gray-2)}
-.dash-text-xs{width:30px;height:7px;border-radius:3px;background:var(--gray-1)}
-
 /* SEARCH BAR */
 .search-section{padding:0 40px;margin-top:-28px;position:relative;z-index:10}
 .search-bar-wrap{max-width:900px;margin:0 auto;background:var(--white);border-radius:16px;padding:8px;box-shadow:0 8px 32px rgba(11,25,41,.12);border:1px solid var(--gray-2);display:flex;gap:0;align-items:center;transition:all .35s cubic-bezier(.22,1,.36,1)}
@@ -526,80 +462,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
       Rechercher
     </button>
-  </div>
-</div>
-
-<!-- MOCKUP SECTION -->
-<div class="mockup-section">
-  <div class="mockup-section-inner" id="mockup-wrap">
-    <div class="laptop" style="max-width:900px;margin:0 auto">
-      <div class="laptop-body">
-        <div class="laptop-cam"></div>
-        <div class="laptop-screen">
-          <div class="dash-mini">
-            <div class="dash-side">
-              <div class="dash-side-dot active"></div>
-              <div class="dash-side-dot"></div>
-              <div class="dash-side-dot"></div>
-              <div class="dash-side-dot"></div>
-              <div style="margin-top:auto"><div class="dash-side-dot"></div></div>
-            </div>
-            <div class="dash-main">
-              <div class="dash-top">
-                <div class="dash-top-pill" style="width:60px"></div>
-                <div style="margin-left:auto;display:flex;gap:5px">
-                  <div class="dash-top-pill" style="width:50px;background:#EAF0FC"></div>
-                  <div style="width:18px;height:18px;border-radius:50%;background:#C8D8EE"></div>
-                </div>
-              </div>
-              <div class="dash-content">
-                <div class="dash-card dash-card-wide">
-                  <div class="dash-label" style="width:120px;margin-bottom:5px;background:#0B1929;opacity:.12"></div>
-                  <div class="dash-label" style="width:80px;margin-bottom:8px"></div>
-                  <div style="display:flex;gap:5px;margin-top:4px">
-                    <div style="height:20px;width:80px;border-radius:5px;background:var(--navy);opacity:.85"></div>
-                    <div style="height:20px;width:70px;border-radius:5px;background:var(--gray-1);border:1px solid var(--gray-2)"></div>
-                  </div>
-                </div>
-                <div class="dash-card">
-                  <div class="dash-label" style="width:50px;margin-bottom:6px"></div>
-                  <div class="dash-num" style="font-size:22px;line-height:1">4</div>
-                  <div class="dash-bar dash-bar-blue" style="margin-top:6px"></div>
-                </div>
-                <div class="dash-card dash-card-wide" style="grid-row:2">
-                  <div class="dash-label" style="width:90px;margin-bottom:8px"></div>
-                  <div class="dash-mini-row">
-                    <div class="dash-dot" style="background:#1A52A0"></div>
-                    <div class="dash-text-sm"></div>
-                    <div class="dash-text-xs"></div>
-                    <div style="width:28px;height:12px;border-radius:10px;background:#E8F0FC"></div>
-                  </div>
-                  <div class="dash-mini-row">
-                    <div class="dash-dot" style="background:#0E8A7A"></div>
-                    <div class="dash-text-sm"></div>
-                    <div class="dash-text-xs"></div>
-                    <div style="width:28px;height:12px;border-radius:10px;background:#E0F5F2"></div>
-                  </div>
-                  <div class="dash-mini-row">
-                    <div class="dash-dot" style="background:#C89A3A"></div>
-                    <div class="dash-text-sm"></div>
-                    <div class="dash-text-xs"></div>
-                    <div style="width:28px;height:12px;border-radius:10px;background:#FDF3E0"></div>
-                  </div>
-                </div>
-                <div class="dash-card" style="grid-row:2">
-                  <div class="dash-label" style="width:50px;margin-bottom:6px"></div>
-                  <div class="dash-num" style="font-size:22px;line-height:1">11</div>
-                  <div class="dash-bar dash-bar-teal" style="margin-top:6px"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="laptop-base"></div>
-      <div class="laptop-stand"></div>
-    </div>
   </div>
 </div>
 
@@ -961,39 +823,6 @@ document.querySelectorAll('.btn').forEach(btn => {
     btn.style.setProperty('--y', y + '%');
   });
 });
-
-// ── Laptop scroll-driven 3D animation ──
-const laptopEl  = document.querySelector('.laptop');
-const wrapEl    = document.getElementById('mockup-wrap');
-
-function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
-function lerp(a, b, t)      { return a + (b - a) * t; }
-
-function onScroll() {
-  if (!wrapEl || !laptopEl) return;
-
-  const rect    = wrapEl.getBoundingClientRect();
-  const wh      = window.innerHeight;
-
-  const start   = wh;
-  const end     = wh * 0.1;
-  const raw     = (start - rect.top) / (start - end);
-  const progress = clamp(raw, 0, 1);
-
-  const t = 1 - Math.pow(1 - progress, 2.2);
-
-  const rotX  = lerp(52,  0, t);
-  const rotY  = lerp(-8,  0, t);
-  const scale = lerp(.80, 1, t);
-  const opac  = clamp(lerp(0, 1, t * 1.1), 0, 1);
-
-  laptopEl.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
-  laptopEl.style.opacity   = opac;
-}
-
-window.addEventListener('scroll', onScroll, { passive: true });
-window.addEventListener('resize', onScroll);
-onScroll();
 </script>
 </body>
 </html>
