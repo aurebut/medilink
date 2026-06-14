@@ -237,6 +237,7 @@ export class MatchingService {
       include: {
         profile: true,
       },
+      orderBy: { createdAt: 'desc' },
       take: 500,
     });
 
@@ -282,7 +283,7 @@ export class MatchingService {
     const requiredLevels = mission.requiredLevels.length ? mission.requiredLevels : [mission.requiredLevel];
     const candidateLevel = this.medicalStatusToRequiredLevel(profile.medicalStatus);
     if (candidateLevel && this.isLevelCompatible(requiredLevels, candidateLevel)) {
-      add('requiredLevel', 18, 'niveau candidat compatible');
+      add('requiredLevel', 15, 'niveau candidat compatible');
     }
 
     const specialtyScore = this.specialtyScore(mission.specialty, [
@@ -294,57 +295,57 @@ export class MatchingService {
     const city = this.normalize(mission.city);
     const preferredCities = profile.preferredCities.map((value: string) => this.normalize(value));
     if (city && preferredCities.includes(city)) {
-      add('location', 16, 'ville dans les preferences');
+      add('location', 14, 'ville dans les preferences');
     } else if (city && this.normalize(profile.city) === city) {
-      add('location', 14, 'meme ville que le profil');
+      add('location', 12, 'meme ville que le profil');
     } else if (this.hasFlexibleMobility(profile)) {
       add('location', 8, 'mobilite compatible');
     }
 
     if (this.acceptedMissionTypes(profile).includes(mission.missionType)) {
-      add('missionType', 12, 'type de mission accepte');
+      add('missionType', 10, 'type de mission accepte');
     }
 
     const missionTimeSlots = this.missionTimeSlots(mission);
     if (missionTimeSlots.length && this.hasIntersection(missionTimeSlots, profile.acceptedTimeSlots || [])) {
-      add('timeSlot', 8, 'creneau accepte');
+      add('timeSlot', 7, 'creneau accepte');
     }
 
     const missionDuration = this.missionDurationLabel(mission);
     if (missionDuration && profile.preferredDurations?.some((value: string) => this.sameText(value, missionDuration))) {
-      add('duration', 6, 'format de duree prefere');
+      add('duration', 5, 'format de duree prefere');
     }
 
     const practiceSetting = this.practiceSettingForMission(mission);
     if (practiceSetting && profile.acceptedPracticeSettings?.includes(practiceSetting)) {
-      add('practiceSetting', 8, "cadre d'exercice accepte");
+      add('practiceSetting', 7, "cadre d'exercice accepte");
     }
 
     if (mission.knownSoftware.length && this.hasIntersection(mission.knownSoftware, profile.knownSoftware)) {
-      add('software', 6, 'logiciel connu');
+      add('software', 5, 'logiciel connu');
     } else if (mission.softwareUsed && profile.knownSoftware.some((value: string) => this.sameText(value, mission.softwareUsed))) {
-      add('software', 6, 'logiciel connu');
+      add('software', 5, 'logiciel connu');
     }
 
     if (mission.acceptedPatientTypes.length && this.hasIntersection(mission.acceptedPatientTypes, profile.acceptedPatientTypes)) {
-      add('patientType', 5, 'patientele compatible');
+      add('patientType', 4, 'patientele compatible');
     } else if (mission.patientType && profile.acceptedPatientTypes.some((value: string) => this.sameText(value, mission.patientType))) {
-      add('patientType', 5, 'patientele compatible');
+      add('patientType', 4, 'patientele compatible');
     }
 
     if (mission.requiredActs.length && this.hasIntersection(mission.requiredActs, profile.acceptedActs || [])) {
-      add('acts', 8, 'actes attendus acceptes');
+      add('acts', 7, 'actes attendus acceptes');
     }
 
     if (mission.hasSecretary === true && profile.secretaryRequired !== false) {
-      add('workConditions', 4, 'secretariat compatible');
+      add('workConditions', 3, 'secretariat compatible');
     }
 
     if (mission.accommodationProvided && profile.accommodationRequired) {
-      add('accommodation', 4, 'logement fourni');
+      add('accommodation', 3, 'logement fourni');
     }
 
-    const score = Math.min(100, Object.values(breakdown).reduce((total, value) => total + value, 0));
+    const score = Object.values(breakdown).reduce((total, value) => total + value, 0);
 
     return {
       candidateUserId: candidate.id,
@@ -443,7 +444,9 @@ export class MatchingService {
     }
 
     const acceptedMissionTypes = this.acceptedMissionTypes(profile);
-    if (acceptedMissionTypes.length && !acceptedMissionTypes.includes(mission.missionType)) {
+    if (!acceptedMissionTypes.length) {
+      reasons.push('preferences mission non renseignees');
+    } else if (!acceptedMissionTypes.includes(mission.missionType)) {
       reasons.push('type de mission non accepte');
     }
 
@@ -674,8 +677,8 @@ export class MatchingService {
     for (const value of candidateValues) {
       const candidate = this.normalize(value);
       if (!candidate) continue;
-      if (candidate === mission) return 24;
-      if (candidate.includes(mission) || mission.includes(candidate)) return 14;
+      if (candidate === mission) return 20;
+      if (candidate.includes(mission) || mission.includes(candidate)) return 12;
     }
 
     return 0;
