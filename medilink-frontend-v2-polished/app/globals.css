@@ -9411,8 +9411,8 @@ td {
 }
 
 .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--line);
 }
 
@@ -9958,8 +9958,8 @@ td {
   }
 
   .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
-    margin-top: 12px;
-    padding-top: 12px;
+    margin-top: 6px;
+    padding-top: 6px;
   }
 
   .billing-hero-copy {
