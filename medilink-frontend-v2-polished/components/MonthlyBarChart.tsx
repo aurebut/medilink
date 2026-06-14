@@ -37,8 +37,8 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
   const scaleMax = maxVal + pad;
 
   const W = 700;
-  const H = 130;
-  const PAD_LEFT = 45;
+  const H = 120;
+  const PAD_LEFT = 42;
   const PAD_RIGHT = 10;
   const PAD_TOP = 10;
   const PAD_BOTTOM = 22;
@@ -84,7 +84,7 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
         return (
           <g key={ratio}>
             <line x1={PAD_LEFT} x2={W - PAD_RIGHT} y1={y} y2={y} stroke="var(--line)" strokeWidth="1" />
-            <text x={PAD_LEFT - 6} y={y + 4} textAnchor="end" fill="var(--muted)" fontSize="11">
+            <text x={PAD_LEFT - 6} y={y + 4} textAnchor="end" fill="var(--muted)" fontSize="9">
               {formatMoney(val)}
             </text>
           </g>
@@ -114,7 +114,7 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
       <path d={`${cumulativeLine} L${xPos(11)},${PAD_TOP + chartH} L${xPos(0)},${PAD_TOP + chartH} Z`} fill="url(#areaGrad)" />
 
       {months.map((m, i) => (
-        <circle key={m.label} cx={xPos(i)} cy={yVal(m.cumulative)} r="3" fill={lineColor}>
+        <circle key={m.label} cx={xPos(i)} cy={yVal(m.cumulative)} r="2.5" fill={lineColor}>
           <title>{m.label} cumul : {formatMoney(m.cumulative)}</title>
         </circle>
       ))}
@@ -122,13 +122,13 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
       {months.map((m, i) => {
         const show = i % 2 === 0;
         return show ? (
-          <text key={m.label} x={xPos(i)} y={H - 6} textAnchor="middle" fill="var(--muted)" fontSize="11">
+          <text key={m.label} x={xPos(i)} y={H - 6} textAnchor="middle" fill="var(--muted)" fontSize="9">
             {m.label}
           </text>
         ) : null;
       })}
 
-      <text x={PAD_LEFT} y={14} fill="var(--muted)" fontSize="11" fontWeight="600">
+      <text x={PAD_LEFT} y={14} fill="var(--muted)" fontSize="9" fontWeight="600">
         {label} mensuel
       </text>
     </svg>

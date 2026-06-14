@@ -9947,7 +9947,7 @@ td {
 
   .billing-hero-card {
     min-height: 0;
-    padding: 14px;
+    padding: 12px;
     border-color: rgba(14,138,122,.18);
     background:
       linear-gradient(135deg, rgba(14,138,122,.08) 0%, rgba(255,255,255,.96) 42%, rgba(248,251,251,.98) 100%);
@@ -9960,8 +9960,12 @@ td {
   }
 
   .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
-    margin-top: 6px;
-    padding-top: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .billing-hero-card.billing-hero-chart .billing-hero-copy {
+    padding-bottom: 0;
   }
 
   .billing-hero-copy {
@@ -10001,7 +10005,7 @@ td {
     gap: 4px 12px;
     align-items: baseline;
     min-height: 0;
-    padding: 12px 0 10px;
+    padding: 8px 0 6px;
   }
 
   .billing-overview-kpis > div + div {
