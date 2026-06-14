@@ -37,11 +37,11 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
   const scaleMax = maxVal + pad;
 
   const W = 700;
-  const H = 120;
+  const H = 180;
   const PAD_LEFT = 42;
   const PAD_RIGHT = 10;
-  const PAD_TOP = 10;
-  const PAD_BOTTOM = 22;
+  const PAD_TOP = 20;
+  const PAD_BOTTOM = 25;
   const chartW = W - PAD_LEFT - PAD_RIGHT;
   const chartH = H - PAD_TOP - PAD_BOTTOM;
   const barW = chartW / 12 * 0.55;
