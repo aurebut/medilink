@@ -8,6 +8,7 @@ import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Conversation, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
+import { MonthlyBarChart } from '@/components/MonthlyBarChart';
 
 type ManualRevenue = {
   id: string;
@@ -524,6 +525,16 @@ function OverviewTab({
           />
         </Card>
       </div>
+
+      <Card className="billing-chart-card">
+        <div className="card-body">
+          <div className="billing-chart-header">
+            <h3>Recettes mensuelles</h3>
+            <span>{formatMoney(dashboard.revenue)} sur l'exercice</span>
+          </div>
+          <MonthlyBarChart rows={dashboard.collectedRows} year={selectedYear} label="Recettes" barColor="var(--blue-lt)" lineColor="var(--blue)" />
+        </div>
+      </Card>
 
       <div className="billing-overview-grid">
         <Card className="dashboard-panel">

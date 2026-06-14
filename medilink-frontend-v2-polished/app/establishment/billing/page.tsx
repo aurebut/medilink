@@ -8,6 +8,7 @@ import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Conversation, EstablishmentBillingStatus, MissionAgreement, Application } from '@/lib/types';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { MonthlyBarChart } from '@/components/MonthlyBarChart';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -826,6 +827,16 @@ function OverviewTab({
           />
         </Card>
       </div>
+
+      <Card className="billing-chart-card">
+        <div className="card-body">
+          <div className="billing-chart-header">
+            <h3>Dépenses mensuelles</h3>
+            <span>{formatMoney(dashboard.totalExpenses)} sur l'exercice</span>
+          </div>
+          <MonthlyBarChart rows={dashboard.paidRows} year={selectedYear} label="Dépenses" />
+        </div>
+      </Card>
 
       <div className="billing-overview-grid">
         <Card className="dashboard-panel">
