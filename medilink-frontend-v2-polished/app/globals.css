@@ -9416,6 +9416,26 @@ td {
   border-top: 1px solid var(--line);
 }
 
+.monthly-chart-shell {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.monthly-chart-shell:focus-visible {
+  outline: 2px solid rgba(14,138,122,.34);
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.monthly-bar-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .billing-overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, .38fr);
@@ -9962,6 +9982,15 @@ td {
   .billing-hero-card.billing-hero-chart .billing-hero-chart-section {
     margin-top: 10px;
     padding-top: 10px;
+  }
+
+  .monthly-chart-shell {
+    margin: 0 -4px;
+    padding: 2px 4px 8px;
+  }
+
+  .monthly-bar-chart {
+    min-width: 620px;
   }
 
   .billing-hero-card.billing-hero-chart .billing-hero-copy {
@@ -11347,5 +11376,4 @@ td {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 
