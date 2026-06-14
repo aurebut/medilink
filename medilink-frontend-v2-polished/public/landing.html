@@ -21,13 +21,14 @@ html{scroll-behavior:smooth}
 body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0}
+nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0;transition:all .35s cubic-bezier(.22,1,.36,1)}
+nav.nav-scrolled{background:rgba(248,247,243,.97);box-shadow:0 4px 24px rgba(11,25,41,.06);border-bottom-color:rgba(26,82,160,.06)}
 .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:36px}
 .nav-name{font-family:var(--serif);font-size:20px;color:var(--navy);letter-spacing:0}
 .nav-name em{font-style:italic;color:var(--blue)}
 .nav-links{display:flex;gap:2px}
-.nav-link{font-size:13px;color:var(--text-2);padding:6px 12px;border-radius:8px;text-decoration:none;transition:color .15s,background .15s}
-.nav-link:hover{color:var(--navy);background:var(--gray-1)}
+.nav-link{font-size:13px;color:var(--text-2);padding:6px 12px;border-radius:8px;text-decoration:none;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.nav-link:hover{color:var(--navy);background:var(--gray-1);transform:translateY(-1px)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap}
 .btn-ghost{background:transparent;color:var(--text-2)}
@@ -40,10 +41,32 @@ nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-
 .btn-outline{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
 .btn-outline:hover{background:var(--navy);color:#C8DFF5}
 
+/* ── Enhanced button interactions ── */
+.btn{position:relative;overflow:hidden}
+.btn::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at var(--x,50%) var(--y,50%),rgba(255,255,255,.25),transparent 60%);
+  opacity:0;
+  transition:opacity .35s;
+  pointer-events:none;
+}
+.btn:hover::after{opacity:1}
+.btn:active{transform:scale(.97);transition-duration:.08s}
+.btn-primary{box-shadow:0 4px 14px rgba(11,25,41,.2)}
+.btn-primary:hover{box-shadow:0 8px 24px rgba(11,25,41,.3);transform:translateY(-1px)}
+.btn-teal:hover{box-shadow:0 8px 24px rgba(14,138,122,.3);transform:translateY(-1px)}
+.btn-outline:hover{box-shadow:0 8px 24px rgba(11,25,41,.15);transform:translateY(-1px)}
+.btn-lg:active{transform:scale(.97)}
+
 /* HERO */
 .hero{min-height:92vh;display:flex;align-items:center;padding:80px 40px 60px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
-.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18}
+.hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.18;animation:blobFloat 8s ease-in-out infinite}
+.hero-blob-2{animation-delay:-3s}
+.hero-blob-3{animation-delay:-5s}
+@keyframes blobFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-20px) scale(1.03)}}
 .hero-blob-1{width:600px;height:500px;background:var(--blue);top:-100px;left:-100px}
 .hero-blob-2{width:500px;height:500px;background:var(--teal);bottom:-80px;right:-80px}
 .hero-blob-3{width:400px;height:300px;background:#7AAAD8;top:30%;left:30%}
@@ -74,15 +97,43 @@ section,footer,.search-section{position:relative;z-index:1;}
 .reveal{
   opacity:0;
   transform:translateY(28px);
-  transition:opacity .65s ease, transform .65s ease;
+  transition:opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1);
 }
 .reveal.visible{
   opacity:1;
   transform:none;
 }
+.reveal-left{
+  opacity:0;
+  transform:translateX(-40px);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.reveal-left.visible{opacity:1;transform:none}
+.reveal-right{
+  opacity:0;
+  transform:translateX(40px);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.reveal-right.visible{opacity:1;transform:none}
+.reveal-scale{
+  opacity:0;
+  transform:scale(.92);
+  transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.reveal-scale.visible{opacity:1;transform:none}
+.reveal-zoom{
+  opacity:0;
+  transform:scale(.85) translateY(16px);
+  transition:opacity .75s cubic-bezier(.22,1,.36,1), transform .75s cubic-bezier(.22,1,.36,1);
+}
+.reveal-zoom.visible{opacity:1;transform:none}
 .reveal-delay-1{transition-delay:.1s}
 .reveal-delay-2{transition-delay:.2s}
 .reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+.reveal-delay-5{transition-delay:.5s}
+.stagger-child{opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
+.stagger-child.visible{opacity:1;transform:none}
 
 /* ── Mockup 3D scroll animation ── */
 #mockup-wrap {
@@ -157,15 +208,18 @@ section,footer,.search-section{position:relative;z-index:1;}
 
 /* SEARCH BAR */
 .search-section{padding:0 40px;margin-top:-28px;position:relative;z-index:10}
-.search-bar-wrap{max-width:900px;margin:0 auto;background:var(--white);border-radius:16px;padding:8px;box-shadow:0 8px 32px rgba(11,25,41,.12);border:1px solid var(--gray-2);display:flex;gap:0;align-items:center}
+.search-bar-wrap{max-width:900px;margin:0 auto;background:var(--white);border-radius:16px;padding:8px;box-shadow:0 8px 32px rgba(11,25,41,.12);border:1px solid var(--gray-2);display:flex;gap:0;align-items:center;transition:all .35s cubic-bezier(.22,1,.36,1)}
+.search-bar-wrap:focus-within{box-shadow:0 12px 44px rgba(26,82,160,.16);border-color:rgba(26,82,160,.25);transform:translateY(-2px)}
 .search-field{flex:1;display:flex;align-items:center;gap:10px;padding:8px 16px;border-right:1px solid var(--gray-2)}
 .search-field:last-of-type{border-right:none}
 .search-field svg{width:16px;height:16px;stroke:var(--gray-4);fill:none;stroke-width:1.8;stroke-linecap:round;flex-shrink:0}
-.search-field input,.search-field select{flex:1;border:none;outline:none;font-family:var(--sans);font-size:13px;color:var(--text);background:transparent}
+.search-field input,.search-field select{flex:1;border:none;outline:none;font-family:var(--sans);font-size:13px;color:var(--text);background:transparent;transition:all .25s}
+.search-field input:focus,.search-field select:focus{color:var(--navy)}
 .search-field input::placeholder,.search-field select{color:var(--text-3)}
 .search-field select{appearance:none;cursor:pointer}
-.search-btn{background:var(--navy);color:#C8DFF5;font-family:var(--sans);font-size:13px;font-weight:500;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:background .15s;flex-shrink:0}
-.search-btn:hover{background:var(--navy-2)}
+.search-btn{background:var(--navy);color:#C8DFF5;font-family:var(--sans);font-size:13px;font-weight:500;border:none;border-radius:10px;padding:12px 24px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap;transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
+.search-btn:hover{background:var(--navy-2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(11,25,41,.2)}
+.search-btn:active{transform:scale(.97);transition-duration:.06s}
 .search-btn svg{width:15px;height:15px;stroke:#AACBE8;fill:none;stroke-width:2;stroke-linecap:round}
 
 /* HOW IT WORKS */
@@ -179,13 +233,13 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-shell{position:relative;max-width:1080px;margin:0 auto}
 .how-steps{position:relative;display:grid;gap:28px;padding:10px 0 18px}
 .how-steps::before{content:'';position:absolute;left:50%;top:28px;bottom:22px;width:2px;transform:translateX(-50%);background:linear-gradient(180deg,rgba(26,82,160,.06),rgba(26,82,160,.22) 18%,rgba(14,138,122,.42) 50%,rgba(26,82,160,.22) 82%,rgba(26,82,160,.06))}
-.how-step{position:relative;width:calc(50% - 54px);min-height:188px;padding:24px 24px 24px;background:rgba(255,255,255,.9);border:1px solid rgba(200,210,228,.86);border-radius:22px;box-shadow:0 18px 44px rgba(11,25,41,.07);transition:border-color .2s,box-shadow .2s,transform .2s;backdrop-filter:blur(10px)}
+.how-step{position:relative;width:calc(50% - 54px);min-height:188px;padding:24px 24px 24px;background:rgba(255,255,255,.9);border:1px solid rgba(200,210,228,.86);border-radius:22px;box-shadow:0 18px 44px rgba(11,25,41,.07);transition:all .35s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(10px)}
 .how-step:nth-child(odd){justify-self:start}
 .how-step:nth-child(even){justify-self:end}
 .how-step::before{content:'';position:absolute;top:45px;width:42px;height:2px;background:linear-gradient(90deg,rgba(26,82,160,.28),rgba(14,138,122,.44))}
 .how-step:nth-child(odd)::before{right:-43px}
 .how-step:nth-child(even)::before{left:-43px;transform:rotate(180deg)}
-.how-step:hover{border-color:rgba(26,82,160,.3);box-shadow:0 24px 54px rgba(11,25,41,.1);transform:translateY(-3px)}
+.how-step:hover{border-color:rgba(26,82,160,.3);box-shadow:0 28px 60px rgba(11,25,41,.12);transform:translateY(-5px)}
 .how-step-num{position:absolute;top:22px;width:48px;height:48px;border-radius:50%;background:var(--navy);color:#C8DFF5;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:21px;font-weight:400;line-height:1;border:5px solid var(--ivory);box-shadow:0 14px 30px rgba(11,25,41,.18);z-index:2}
 .how-step:nth-child(odd) .how-step-num{right:-78px}
 .how-step:nth-child(even) .how-step-num{left:-78px}
@@ -204,16 +258,18 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-panel-list{position:relative;display:grid;gap:10px;margin-bottom:20px}
 .how-panel-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:#D7E6F5;line-height:1.45}
 .how-panel-item::before{content:'';width:7px;height:7px;margin-top:6px;border-radius:50%;background:var(--teal-lt);box-shadow:0 0 0 5px rgba(20,168,150,.12);flex-shrink:0}
-.how-panel-cta{position:relative;display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:13px;font-weight:500;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:11px 15px;transition:background .15s,transform .15s}
-.how-panel-cta:hover{background:rgba(255,255,255,.18);transform:translateY(-1px)}
+.how-panel-cta{position:relative;display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:13px;font-weight:500;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:11px 15px;transition:all .25s cubic-bezier(.22,1,.36,1)}
+.how-panel-cta:hover{background:rgba(255,255,255,.22);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
 
 /* PROFILES */
 .profiles{padding:0 40px 100px}
 .profiles-inner{max-width:1100px;margin:0 auto}
 .profiles-header{text-align:center;margin-bottom:48px}
 .profiles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.profile-card{border-radius:20px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s}
-.profile-card:hover{transform:translateY(-4px)}
+.profile-card{border-radius:20px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1)}
+.profile-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%);opacity:0;transition:opacity .35s;pointer-events:none}
+.profile-card:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(11,25,41,.2)}
+.profile-card:hover::before{opacity:1}
 .profile-card.card-etudiant{background:linear-gradient(135deg,#112238 0%,#1A3355 100%)}
 .profile-card.card-interne{background:linear-gradient(135deg,#0B3A32 0%,#0E8A7A 100%)}
 .profile-card.card-docteur{background:linear-gradient(135deg,#1A3A70 0%,#2D6CC8 100%)}
@@ -223,17 +279,20 @@ section,footer,.search-section{position:relative;z-index:1;}
 .profile-card-features{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
 .profile-card-feature{display:flex;align-items:center;gap:8px;font-size:12px;opacity:.8}
 .profile-card-feature::before{content:'';width:5px;height:5px;background:currentColor;border-radius:50%;opacity:.5;flex-shrink:0}
-.profile-card-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;text-decoration:none;color:#fff;transition:background .15s}
-.profile-card-cta:hover{background:rgba(255,255,255,.25)}
+.profile-card-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;text-decoration:none;color:#fff;transition:all .25s cubic-bezier(.22,1,.36,1)}
+.profile-card-cta:hover{background:rgba(255,255,255,.28);transform:translateX(4px)}
 
 /* MISSIONS PREVIEW */
 .missions-preview{padding:0 40px 100px}
 .missions-inner{max-width:1100px;margin:0 auto}
 .missions-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
 .missions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.mission-card{background:var(--white);border:1px solid var(--gray-2);border-radius:16px;padding:20px 22px;transition:border-color .15s,box-shadow .15s,transform .15s;cursor:pointer}
-.mission-card:hover{border-color:#7AAAD8;box-shadow:0 4px 16px rgba(11,25,41,.08);transform:translateY(-2px)}
+.mission-card{background:var(--white);border:1px solid var(--gray-2);border-radius:16px;padding:20px 22px;transition:all .3s cubic-bezier(.22,1,.36,1);cursor:pointer;position:relative}
+.mission-card::after{content:'';position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity .3s;pointer-events:none;background:linear-gradient(135deg,rgba(26,82,160,.03),rgba(14,138,122,.03))}
+.mission-card:hover{border-color:#7AAAD8;box-shadow:0 8px 28px rgba(11,25,41,.1);transform:translateY(-4px)}
+.mission-card:hover::after{opacity:1}
 .mission-card.featured{border-color:rgba(26,82,160,.3);background:linear-gradient(135deg,#fff 85%,#F0F6FF)}
+.mission-card.featured:hover{box-shadow:0 12px 36px rgba(26,82,160,.12)}
 .mc-spec{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);font-weight:500;margin-bottom:6px}
 .mc-title{font-size:14px;font-weight:500;color:var(--navy);margin-bottom:8px;line-height:1.3}
 .mc-remun{font-family:var(--serif);font-size:22px;color:var(--navy);font-weight:400;margin-bottom:10px}
@@ -246,8 +305,9 @@ section,footer,.search-section{position:relative;z-index:1;}
 .tag-teal{background:#E0F5F2;color:var(--teal)}
 .tag-amber{background:#FDF3E0;color:#8A6010}
 .tag-slate{background:var(--gray-1);color:var(--gray-5)}
-.mc-apply{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:500;background:var(--navy);color:#C8DFF5;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;transition:opacity .15s}
-.mc-apply:hover{opacity:.8}
+.mc-apply{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:500;background:var(--navy);color:#C8DFF5;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.mc-apply:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 12px rgba(11,25,41,.2)}
+.mc-apply:active{transform:scale(.96);transition-duration:.06s}
 
 /* TRUST */
 .trust{background:var(--navy);padding:80px 40px;text-align:center}
@@ -257,7 +317,8 @@ section,footer,.search-section{position:relative;z-index:1;}
 .trust-logos{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:48px;opacity:.45}
 .trust-logo{font-family:var(--serif);font-size:18px;color:#fff;font-style:italic}
 .trust-testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:left}
-.testimonial{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px}
+.testimonial{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;transition:all .3s cubic-bezier(.22,1,.36,1)}
+.testimonial:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);transform:translateY(-3px)}
 .testimonial-text{font-size:13px;color:#A8C0D8;line-height:1.7;margin-bottom:16px;font-style:italic}
 .testimonial-author{display:flex;align-items:center;gap:10px}
 .testimonial-av{width:36px;height:36px;border-radius:50%;background:var(--navy-3);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:14px;color:#AACBE8;flex-shrink:0}
@@ -266,7 +327,8 @@ section,footer,.search-section{position:relative;z-index:1;}
 
 /* CTA BAND */
 .cta-band{padding:80px 40px;text-align:center}
-.cta-band-inner{max-width:680px;margin:0 auto;background:var(--white);border:1px solid var(--gray-2);border-radius:24px;padding:56px 48px;box-shadow:0 12px 40px rgba(11,25,41,.08)}
+.cta-band-inner{max-width:680px;margin:0 auto;background:var(--white);border:1px solid var(--gray-2);border-radius:24px;padding:56px 48px;box-shadow:0 12px 40px rgba(11,25,41,.08);transition:all .35s cubic-bezier(.22,1,.36,1)}
+.cta-band-inner:hover{box-shadow:0 18px 56px rgba(11,25,41,.12);transform:translateY(-3px)}
 .cta-band h2{font-family:var(--serif);font-size:clamp(26px,3vw,40px);color:var(--navy);font-weight:400;letter-spacing:0;margin-bottom:12px}
 .cta-band p{font-size:15px;color:var(--text-3);margin-bottom:32px}
 .cta-band-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -437,9 +499,9 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <a class="btn btn-outline btn-lg" href="#">Je suis un cabinet</a>
       </div>
       <div class="hero-stats fade-up fade-up-4" style="justify-content:center">
-        <div><div class="hero-stat-num">2 800+</div><div class="hero-stat-label">Missions publiées</div></div>
-        <div><div class="hero-stat-num">1 200</div><div class="hero-stat-label">Médecins remplaçants</div></div>
-        <div><div class="hero-stat-num">640</div><div class="hero-stat-label">Cabinets partenaires</div></div>
+        <div><div class="hero-stat-num" data-count="2800" data-suffix="+">0</div><div class="hero-stat-label">Missions publiées</div></div>
+        <div><div class="hero-stat-num" data-count="1200" data-suffix="">0</div><div class="hero-stat-label">Médecins remplaçants</div></div>
+        <div><div class="hero-stat-num" data-count="640" data-suffix="">0</div><div class="hero-stat-label">Cabinets partenaires</div></div>
       </div>
     </div>
   </div>
@@ -552,35 +614,35 @@ footer{background:var(--navy);padding:60px 40px 32px}
   </div>
   <div class="how-shell">
     <div class="how-steps">
-      <div class="how-step reveal">
+      <div class="how-step reveal-left">
         <div class="how-step-num">01</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h10"/></svg></div>
         <div class="how-step-meta"><span class="how-chip">Cabinet</span><span class="how-chip teal">3 minutes</span></div>
         <h3>Le besoin est cadré dès le départ</h3>
         <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le remplaçant sait exactement à quoi il candidate.</p>
       </div>
-      <div class="how-step reveal reveal-delay-1">
+      <div class="how-step reveal-right reveal-delay-1">
         <div class="how-step-num">02</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></div>
         <div class="how-step-meta"><span class="how-chip">Remplaçant</span><span class="how-chip teal">Filtres utiles</span></div>
         <h3>Les missions pertinentes remontent</h3>
         <p>Recherche par zone, disponibilité, durée, type de structure et rémunération. Les annonces incomplètes ou non vérifiées sont écartées pour éviter les allers-retours inutiles.</p>
       </div>
-      <div class="how-step reveal reveal-delay-2">
+      <div class="how-step reveal-left reveal-delay-2">
         <div class="how-step-num">03</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/><path d="M21 12a9 9 0 1 1-3-6.7"/></svg></div>
         <div class="how-step-meta"><span class="how-chip">Profil vérifié</span><span class="how-chip teal">Candidature claire</span></div>
         <h3>La candidature arrive complète</h3>
         <p>Le cabinet reçoit un profil structuré: identité, statut, documents, disponibilités, expérience et message d'intention. Il peut comparer sans repartir de zéro.</p>
       </div>
-      <div class="how-step reveal">
+      <div class="how-step reveal-right reveal-delay-1">
         <div class="how-step-num">04</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg></div>
         <div class="how-step-meta"><span class="how-chip">Messagerie</span><span class="how-chip teal">Accord rapide</span></div>
         <h3>Les derniers détails se règlent au même endroit</h3>
         <p>Questions pratiques, validation du planning, documents complémentaires et confirmation: chaque échange reste rattaché à la mission, sans perte d'information.</p>
       </div>
-      <div class="how-step reveal reveal-delay-1">
+      <div class="how-step reveal-left reveal-delay-2">
         <div class="how-step-num">05</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/><path d="M8 14h4"/><path d="M8 18h8"/></svg></div>
         <div class="how-step-meta"><span class="how-chip">Mission confirmée</span><span class="how-chip teal">Suivi complet</span></div>
@@ -588,7 +650,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
       </div>
     </div>
-    <aside class="how-panel reveal reveal-delay-2">
+    <aside class="how-panel reveal-scale reveal-delay-3">
       <div class="how-panel-kicker">Parcours sécurisé</div>
       <h3>Moins d'improvisation, plus de missions confirmées.</h3>
       <p>La section mission devient le fil conducteur entre le cabinet et le remplaçant: annonce, candidature, échange, confirmation et suivi.</p>
@@ -610,7 +672,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <p class="section-sub">MédiLink a été co-construit avec des médecins généralistes remplaçants et installés. Chaque fonctionnalité répond à un besoin réel du terrain.</p>
     </div>
     <div class="profiles-grid">
-      <div class="profile-card card-etudiant reveal">
+      <div class="profile-card card-etudiant reveal-zoom">
         <div class="profile-card-label">Pour les remplaçants</div>
         <h3>Médecin remplaçant</h3>
         <p>Accédez à un vivier de missions qualifiées, gérez votre agenda et construisez votre réputation de remplaçant fiable.</p>
@@ -622,7 +684,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         </div>
         <a class="profile-card-cta" href="/register">Commencer →</a>
       </div>
-      <div class="profile-card card-interne reveal reveal-delay-1">
+      <div class="profile-card card-interne reveal-zoom reveal-delay-1">
         <div class="profile-card-label">Pour les cabinets</div>
         <h3>Cabinet &amp; Maison de santé</h3>
         <p>Trouvez rapidement un remplaçant qualifié pour vos congés, arrêts maladie ou pics d'activité. Sans intermédiaire.</p>
@@ -634,7 +696,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         </div>
         <a class="profile-card-cta" href="/register">Commencer →</a>
       </div>
-      <div class="profile-card card-docteur reveal reveal-delay-2">
+      <div class="profile-card card-docteur reveal-zoom reveal-delay-2">
         <div class="profile-card-label">Notre promesse</div>
         <h3>Conçu avec des médecins</h3>
         <p>Chaque fonctionnalité a été imaginée avec des généralistes remplaçants et installés pour répondre aux vrais besoins du terrain.</p>
@@ -661,7 +723,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <a class="btn btn-outline" href="/app/search">Voir toutes les missions →</a>
     </div>
     <div class="missions-grid">
-      <div class="mission-card featured reveal">
+      <div class="mission-card featured reveal-scale">
         <div class="mc-spec">Médecine générale</div>
         <div class="mc-title">Garde de nuit — Soins intensifs</div>
         <div class="mc-remun">480 €</div>
@@ -713,13 +775,13 @@ footer{background:var(--navy);padding:60px 40px 32px}
   <div class="trust-inner">
     <h2>Des médecins qui nous font confiance</h2>
     <p class="trust-sub">Plus de 640 cabinets de médecine générale utilisent MédiLink pour trouver leurs remplaçants. Des généralistes qui nous ont aidé à construire la plateforme depuis le premier jour.</p>
-    <div class="trust-logos">
-      <span class="trust-logo">URPS MG Île-de-France</span>
-      <span class="trust-logo">CSMF</span>
-      <span class="trust-logo">Maison de santé des Lilas</span>
-      <span class="trust-logo">SML</span>
-      <span class="trust-logo">REAGJIR</span>
-      <span class="trust-logo">ReAGJIR Île-de-France</span>
+    <div class="trust-logos stagger-container">
+      <span class="trust-logo stagger-child">URPS MG Île-de-France</span>
+      <span class="trust-logo stagger-child">CSMF</span>
+      <span class="trust-logo stagger-child">Maison de santé des Lilas</span>
+      <span class="trust-logo stagger-child">SML</span>
+      <span class="trust-logo stagger-child">REAGJIR</span>
+      <span class="trust-logo stagger-child">ReAGJIR Île-de-France</span>
     </div>
     <div class="trust-testimonials">
       <div class="testimonial">
@@ -802,7 +864,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   </div>
 </footer>
 <script>
-// ── Standard scroll reveal ──
+// ── Scroll reveal with all variants ──
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
@@ -811,7 +873,93 @@ const revealObserver = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-zoom, .stagger-child').forEach(el => revealObserver.observe(el));
+
+// ── Stagger children in grids ──
+const staggerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const children = e.target.querySelectorAll('.stagger-child');
+      children.forEach((child, i) => {
+        setTimeout(() => child.classList.add('visible'), i * 100);
+      });
+      staggerObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.profiles-grid, .missions-grid, .trust-testimonials').forEach(el => staggerObserver.observe(el));
+
+// ── Counter animation ──
+function animateCounter(el, target, suffix, duration) {
+  const start = 0;
+  const startTime = performance.now();
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(start + (target - start) * eased);
+    el.textContent = current.toLocaleString('fr-FR') + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.dataset.suffix || '';
+      animateCounter(el, target, suffix, 1800);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+
+// ── Parallax on hero blobs ──
+const blobs = document.querySelectorAll('.hero-blob');
+let ticking = false;
+function onParallax() {
+  const scrollY = window.scrollY;
+  if (scrollY > window.innerHeight) return;
+  blobs.forEach((blob, i) => {
+    const speed = 0.04 + i * 0.02;
+    const yOffset = scrollY * speed;
+    blob.style.transform = `translateY(${yOffset}px)`;
+    blob.style.animation = 'none';
+  });
+  ticking = false;
+}
+window.addEventListener('scroll', () => {
+  if (!ticking) { requestAnimationFrame(onParallax); ticking = true; }
+}, { passive: true });
+
+// ── Nav scroll effect ──
+const navEl = document.querySelector('nav');
+let navTicking = false;
+function onNavScroll() {
+  if (window.scrollY > 40) {
+    navEl.classList.add('nav-scrolled');
+  } else {
+    navEl.classList.remove('nav-scrolled');
+  }
+  navTicking = false;
+}
+window.addEventListener('scroll', () => {
+  if (!navTicking) { requestAnimationFrame(onNavScroll); navTicking = true; }
+}, { passive: true });
+
+// ── Button ripple (follows cursor) ──
+document.querySelectorAll('.btn').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    btn.style.setProperty('--x', x + '%');
+    btn.style.setProperty('--y', y + '%');
+  });
+});
 
 // ── Laptop scroll-driven 3D animation ──
 const laptopEl  = document.querySelector('.laptop');
@@ -826,20 +974,17 @@ function onScroll() {
   const rect    = wrapEl.getBoundingClientRect();
   const wh      = window.innerHeight;
 
-  // progress: 0 when top of section enters viewport bottom, 1 when fully centered
-  const start   = wh;           // section top at viewport bottom
-  const end     = wh * 0.1;    // section top near midscreen = lands when centered
+  const start   = wh;
+  const end     = wh * 0.1;
   const raw     = (start - rect.top) / (start - end);
   const progress = clamp(raw, 0, 1);
 
-  // Eased progress (ease-out cubic)
   const t = 1 - Math.pow(1 - progress, 2.2);
 
-  // Interpolate transforms
-  const rotX  = lerp(52,  0, t);     // from tilted back to flat
-  const rotY  = lerp(-8,  0, t);     // slight yaw corrects to straight
-  const scale = lerp(.80, 1, t);     // grows from small to full size
-  const opac  = clamp(lerp(0, 1, t * 1.1), 0, 1); // fade in at same pace
+  const rotX  = lerp(52,  0, t);
+  const rotY  = lerp(-8,  0, t);
+  const scale = lerp(.80, 1, t);
+  const opac  = clamp(lerp(0, 1, t * 1.1), 0, 1);
 
   laptopEl.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${scale})`;
   laptopEl.style.opacity   = opac;
@@ -847,7 +992,7 @@ function onScroll() {
 
 window.addEventListener('scroll', onScroll, { passive: true });
 window.addEventListener('resize', onScroll);
-onScroll(); // init on load
+onScroll();
 </script>
 </body>
 </html>
