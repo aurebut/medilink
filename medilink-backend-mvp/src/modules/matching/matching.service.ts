@@ -293,7 +293,7 @@ export class MatchingService {
     add('specialty', specialtyScore, specialtyScore >= 24 ? 'specialite tres proche' : specialtyScore ? 'specialite partiellement proche' : undefined);
 
     const city = this.normalize(mission.city);
-    const preferredCities = profile.preferredCities.map((value: string) => this.normalize(value));
+    const preferredCities = (profile.preferredCities || []).map((value: string) => this.normalize(value));
     if (city && preferredCities.includes(city)) {
       add('location', 14, 'ville dans les preferences');
     } else if (city && this.normalize(profile.city) === city) {
