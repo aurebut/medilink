@@ -366,7 +366,7 @@ export default function AdminMatchingPage() {
       {success ? <Alert type="success">{success}</Alert> : null}
 
       {config ? (
-        <section className="card matching-command">
+        <section className="card matching-command matching-engine-panel">
           <div className="matching-command-main">
             <div className="matching-command-copy">
               <span className="section-kicker">Pilotage du moteur</span>
@@ -376,48 +376,95 @@ export default function AdminMatchingPage() {
             <Badge tone="neutral">Version {config.version}</Badge>
           </div>
 
-          <div className="matching-control-grid">
-            {editableThresholdKeys.map(([key, label]) => (
-              <Field key={key} label={label}>
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={config.thresholds[key] ?? 0}
-                  onChange={(event) => updateThreshold(key, event.target.value)}
-                />
-              </Field>
-            ))}
+          <div className="matching-engine-layout">
+            <div className="matching-tuning-panel">
+              <div className="matching-panel-head">
+                <strong>Seuils de decision</strong>
+                <span>Paliers utilises pour classer les profils.</span>
+              </div>
+              <div className="matching-compact-grid">
+                {editableThresholdKeys.map(([key, label]) => (
+                  <Field key={key} label={label}>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={config.thresholds[key] ?? 0}
+                      onChange={(event) => updateThreshold(key, event.target.value)}
+                    />
+                  </Field>
+                ))}
+              </div>
+            </div>
+
+            <div className="matching-tuning-panel">
+              <div className="matching-panel-head">
+                <strong>Vague par defaut</strong>
+                <span>Valeurs pre-remplies avant l'envoi.</span>
+              </div>
+              <div className="matching-compact-grid">
+                <Field label="Candidats">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={50}
+                    value={targetCount}
+                    onChange={(event) => setTargetCount(Number(event.target.value))}
+                  />
+                </Field>
+                <Field label="Score minimum">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={minimumScore}
+                    onChange={(event) => setMinimumScore(Number(event.target.value))}
+                  />
+                </Field>
+              </div>
+            </div>
+
+            <div className="matching-tuning-panel matching-tuning-panel--wide">
+              <div className="matching-panel-head">
+                <strong>Ponderations principales</strong>
+                <span>Points attribues aux signaux les plus importants.</span>
+              </div>
+              <div className="matching-weights-grid">
+                {editableWeightKeys.map(([key, label]) => (
+                  <Field key={key} label={label}>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={30}
+                      value={config.weights[key] ?? 0}
+                      onChange={(event) => updateWeight(key, event.target.value)}
+                    />
+                  </Field>
+                ))}
+              </div>
+            </div>
+
+            <div className="matching-tuning-panel matching-tuning-panel--wide">
+              <div className="matching-panel-head">
+                <strong>Exclusions automatiques</strong>
+                <span>Contraintes qui sortent un profil du matching.</span>
+              </div>
+              <div className="matching-switch-grid">
+                {editableExclusionKeys.map(([key, label]) => (
+                  <label key={key} className="checkbox-line">
+                    <input
+                      type="checkbox"
+                      checked={config.exclusions[key] !== false}
+                      onChange={(event) => updateExclusion(key, event.target.checked)}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="matching-control-grid">
-            {editableWeightKeys.map(([key, label]) => (
-              <Field key={key} label={label}>
-                <Input
-                  type="number"
-                  min={0}
-                  max={30}
-                  value={config.weights[key] ?? 0}
-                  onChange={(event) => updateWeight(key, event.target.value)}
-                />
-              </Field>
-            ))}
-          </div>
-
-          <div className="matching-filter-row">
-            {editableExclusionKeys.map(([key, label]) => (
-              <label key={key} className="checkbox-line">
-                <input
-                  type="checkbox"
-                  checked={config.exclusions[key] !== false}
-                  onChange={(event) => updateExclusion(key, event.target.checked)}
-                />
-                <span>{label}</span>
-              </label>
-            ))}
-          </div>
-
-          <div className="actions">
+          <div className="actions matching-actions-bar">
             <Button variant="secondary" disabled={configSaving} onClick={() => void loadConfig()}>
               Recharger
             </Button>
