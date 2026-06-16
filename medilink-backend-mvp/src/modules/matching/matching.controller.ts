@@ -8,12 +8,26 @@ import { RequestUser } from '../../common/types/request-user.type';
 import { DispatchMissionMatchesDto } from './dto/dispatch-mission-matches.dto';
 import { PreviewMissionMatchesDto } from './dto/preview-mission-matches.dto';
 import { MatchingService } from './matching.service';
+import { UpdateMatchingConfigDto } from './dto/update-matching-config.dto';
 
 @Controller('admin/matching')
 @UseGuards(AuthGuard, RolesGuard)
 @Roles(UserRole.MEDILINK_ADMIN)
 export class MatchingController {
   constructor(private readonly matching: MatchingService) {}
+
+  @Get('config')
+  getMatchingConfig() {
+    return this.matching.getMatchingConfig();
+  }
+
+  @Post('config')
+  updateMatchingConfig(
+    @CurrentUser() user: RequestUser,
+    @Body() dto: UpdateMatchingConfigDto,
+  ) {
+    return this.matching.updateMatchingConfig(user, dto);
+  }
 
   @Get('missions/:id/preview')
   previewMissionMatches(

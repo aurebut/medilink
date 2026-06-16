@@ -17,6 +17,7 @@ import { EmailService } from '../notifications/email.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { DispatchMissionMatchesDto } from './dto/dispatch-mission-matches.dto';
+import { UpdateMatchingConfigDto } from './dto/update-matching-config.dto';
 
 const MATCH_TIERS = [
   { label: 'excellent', minimumScore: 85 },
@@ -28,6 +29,14 @@ const MATCH_TIERS = [
 const MAX_MATCH_SCORE = 100;
 
 type MatchBreakdown = Record<string, number>;
+
+type MatchingConfig = {
+  version: number;
+  weights: Record<string, number>;
+  thresholds: Record<string, number>;
+  exclusions: Record<string, boolean | number>;
+  dispatch: Record<string, number | boolean>;
+};
 
 type ScoredCandidate = {
   candidateUserId: string;
@@ -47,8 +56,71 @@ type ScoredCandidate = {
   tier: string;
   reasons: string[];
   exclusionReasons: string[];
+  risks: string[];
+  missingData: string[];
+  confidence: number;
   breakdown: MatchBreakdown;
   alreadyNotified: boolean;
+};
+
+const DEFAULT_MATCHING_CONFIG: MatchingConfig = {
+  version: 1,
+  weights: {
+    requiredLevel: 15,
+    specialtyExact: 20,
+    specialtyPartial: 12,
+    locationPreferredCity: 14,
+    locationSameCity: 12,
+    locationFlexibleMobility: 8,
+    missionType: 10,
+    timeSlot: 7,
+    duration: 5,
+    practiceSetting: 7,
+    software: 5,
+    patientType: 4,
+    acts: 7,
+    workConditionsSecretary: 3,
+    accommodation: 3,
+    compensationMet: 8,
+    compensationNear: 4,
+    compensationUnknownPreference: 2,
+    retrocessionStrong: 4,
+    workloadCompatible: 4,
+    workloadNear: 1,
+    workloadUnknown: 2,
+    paymentFixed: 3,
+    paymentRetrocession: 1,
+    profileCompletionStrong: 4,
+    profileCompletionGood: 2,
+    profileVerified: 4,
+    profileIdentitySignal: 2,
+  },
+  thresholds: {
+    excellent: 85,
+    strong: 75,
+    good: 65,
+    exploratory: 55,
+  },
+  exclusions: {
+    minimumProfileCompletion: 35,
+    requireCompatibleLevel: true,
+    excludeRejectedMissionType: true,
+    excludeInsufficientNotice: true,
+    excludeRejectedWeekday: true,
+    excludeRejectedTimeSlot: true,
+    excludeImpossibleLocation: true,
+    excludeMissingAccommodation: true,
+    excludeMissingParking: true,
+    excludeRejectedPracticeSetting: true,
+    excludeRejectedPatientType: true,
+    excludeExcessivePatientLoad: true,
+    excludeRejectedActs: true,
+  },
+  dispatch: {
+    targetCount: 5,
+    minimumScore: 55,
+    maxAlreadyNotifiedPerWave: 0,
+  },
 };
 
 @Injectable()
@@ -60,9 +132,56 @@ export class MatchingService {
     private readonly audit: AuditService,
   ) {}
 
+  async getMatchingConfig() {
+    return this.resolveMatchingConfig();
+  }
+
+  async updateMatchingConfig(admin: RequestUser, dto: UpdateMatchingConfigDto) {
+    const current = await this.resolveMatchingConfig();
+    const next: MatchingConfig = {
+      version: current.version,
+      weights: this.mergeNumberRecord(current.weights, dto.weights),
+      thresholds: this.mergeNumberRecord(current.thresholds, dto.thresholds),
+      exclusions: { ...current.exclusions, ...(dto.exclusions || {}) },
+      dispatch: { ...current.dispatch, ...(dto.dispatch || {}) },
+    };
+
+    const saved = await this.prisma.matchingConfiguration.upsert({
+      where: { id: 'default' },
+      create: {
+        id: 'default',
+        version: next.version,
+        weights: next.weights as Prisma.InputJsonValue,
+        thresholds: next.thresholds as Prisma.InputJsonValue,
+        exclusions: next.exclusions as Prisma.InputJsonValue,
+        dispatch: next.dispatch as Prisma.InputJsonValue,
+        updatedById: admin.id,
+      },
+      update: {
+        version: next.version,
+        weights: next.weights as Prisma.InputJsonValue,
+        thresholds: next.thresholds as Prisma.InputJsonValue,
+        exclusions: next.exclusions as Prisma.InputJsonValue,
+        dispatch: next.dispatch as Prisma.InputJsonValue,
+        updatedById: admin.id,
+      },
+    });
+
+    await this.audit.log({
+      actorUserId: admin.id,
+      action: 'matching.config.updated',
+      entityType: 'matching_configuration',
+      entityId: saved.id,
+      metadata: next,
+    });
+
+    return next;
+  }
+
   async previewMissionMatches(missionId: string, limit = 50) {
     const mission = await this.getPublishedMission(missionId);
-    const scored = await this.scoreCandidatesForMission(mission, Math.min(limit, 200));
+    const config = await this.resolveMatchingConfig();
+    const scored = await this.scoreCandidatesForMission(mission, Math.min(limit, 200), config);
     const eligible = scored.filter((candidate) => candidate.eligible);
     const excluded = scored.filter((candidate) => !candidate.eligible);
 
@@ -70,7 +189,8 @@ export class MatchingService {
 
     return {
       mission: this.missionSummary(mission),
-      thresholds: MATCH_TIERS,
+      config,
+      thresholds: this.thresholdTiers(config),
       total: eligible.length,
       excludedTotal: excluded.length,
       items: eligible.slice(0, limit),
@@ -84,15 +204,16 @@ export class MatchingService {
     dto: DispatchMissionMatchesDto,
   ) {
     const mission = await this.getPublishedMission(missionId);
-    const targetCount = dto.targetCount ?? 5;
-    const minimumScore = dto.minimumScore ?? MATCH_TIERS[MATCH_TIERS.length - 1].minimumScore;
-    const scored = (await this.scoreCandidatesForMission(mission, 200))
+    const config = await this.resolveMatchingConfig();
+    const targetCount = dto.targetCount ?? (Number(config.dispatch.targetCount) || 5);
+    const minimumScore = dto.minimumScore ?? (Number(config.dispatch.minimumScore) || Number(config.thresholds.exploratory) || 55);
+    const scored = (await this.scoreCandidatesForMission(mission, 200, config))
       .filter((candidate) => candidate.eligible && candidate.score >= minimumScore);
 
     await this.persistScores(missionId, scored);
 
     const unsent = scored.filter((candidate) => !candidate.alreadyNotified);
-    const selected = this.selectGradualBatch(unsent, targetCount, minimumScore);
+    const selected = this.selectGradualBatch(unsent, targetCount, minimumScore, config);
 
     if (!selected.length) {
       await this.audit.log({
@@ -216,7 +337,7 @@ export class MatchingService {
     return mission;
   }
 
-  private async scoreCandidatesForMission(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, _limit: number) {
+  private async scoreCandidatesForMission(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, _limit: number, config: MatchingConfig) {
     const existingMatches = await this.prisma.missionCandidateMatch.findMany({
       where: { missionId: mission.id },
       select: { candidateUserId: true, notificationStatus: true },
@@ -247,7 +368,7 @@ export class MatchingService {
 
     return candidates
       .map((candidate) => ({
-        ...this.scoreCandidate(mission, candidate),
+        ...this.scoreCandidate(mission, candidate, config),
         alreadyNotified: sentCandidateIds.has(candidate.id),
       }))
       .sort((a, b) => {
@@ -256,10 +377,12 @@ export class MatchingService {
       });
   }
 
-  private scoreCandidate(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, candidate: any): ScoredCandidate {
+  private scoreCandidate(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, candidate: any, config: MatchingConfig): ScoredCandidate {
     const profile = candidate.profile;
     const reasons: string[] = [];
-    const exclusionReasons = this.exclusionReasons(mission, profile);
+    const missingData = this.missingDataReasons(profile);
+    const risks = this.riskReasons(mission, profile);
+    const exclusionReasons = this.exclusionReasons(mission, profile, config);
     const breakdown: MatchBreakdown = {};
 
     if (exclusionReasons.length) {
@@ -273,6 +396,9 @@ export class MatchingService {
         tier: 'excluded',
         reasons: [],
         exclusionReasons,
+        risks,
+        missingData,
+        confidence: this.confidenceScore(profile, missingData),
         breakdown,
         alreadyNotified: false,
       };
@@ -287,72 +413,72 @@ export class MatchingService {
     const requiredLevels = mission.requiredLevels.length ? mission.requiredLevels : [mission.requiredLevel];
     const candidateLevel = this.medicalStatusToRequiredLevel(profile.medicalStatus);
     if (candidateLevel && this.isLevelCompatible(requiredLevels, candidateLevel)) {
-      add('requiredLevel', 15, 'niveau candidat compatible');
+      add('requiredLevel', config.weights.requiredLevel, 'niveau candidat compatible');
     }
 
     const specialtyScore = this.specialtyScore(mission.specialty, [
       profile.specialty,
       profile.verifiedSpecialty,
-    ]);
+    ], config);
     add('specialty', specialtyScore, specialtyScore >= 24 ? 'specialite tres proche' : specialtyScore ? 'specialite partiellement proche' : undefined);
 
     const city = this.normalize(mission.city);
     const preferredCities = (profile.preferredCities || []).map((value: string) => this.normalize(value));
     if (city && preferredCities.includes(city)) {
-      add('location', 14, 'ville dans les preferences');
+      add('location', config.weights.locationPreferredCity, 'ville dans les preferences');
     } else if (city && this.normalize(profile.city) === city) {
-      add('location', 12, 'meme ville que le profil');
+      add('location', config.weights.locationSameCity, 'meme ville que le profil');
     } else if (this.hasFlexibleMobility(profile)) {
-      add('location', 8, 'mobilite compatible');
+      add('location', config.weights.locationFlexibleMobility, 'mobilite compatible');
     }
 
     if (this.acceptedMissionTypes(profile).includes(mission.missionType)) {
-      add('missionType', 10, 'type de mission accepte');
+      add('missionType', config.weights.missionType, 'type de mission accepte');
     }
 
     const missionTimeSlots = this.missionTimeSlots(mission);
     if (missionTimeSlots.length && this.hasIntersection(missionTimeSlots, profile.acceptedTimeSlots || [])) {
-      add('timeSlot', 7, 'creneau accepte');
+      add('timeSlot', config.weights.timeSlot, 'creneau accepte');
     }
 
     const missionDuration = this.missionDurationLabel(mission);
     if (missionDuration && profile.preferredDurations?.some((value: string) => this.sameText(value, missionDuration))) {
-      add('duration', 5, 'format de duree prefere');
+      add('duration', config.weights.duration, 'format de duree prefere');
     }
 
     const practiceSetting = this.practiceSettingForMission(mission);
     if (practiceSetting && profile.acceptedPracticeSettings?.includes(practiceSetting)) {
-      add('practiceSetting', 7, "cadre d'exercice accepte");
+      add('practiceSetting', config.weights.practiceSetting, "cadre d'exercice accepte");
     }
 
     if (mission.knownSoftware.length && this.hasIntersection(mission.knownSoftware, profile.knownSoftware)) {
-      add('software', 5, 'logiciel connu');
+      add('software', config.weights.software, 'logiciel connu');
     } else if (mission.softwareUsed && profile.knownSoftware.some((value: string) => this.sameText(value, mission.softwareUsed))) {
-      add('software', 5, 'logiciel connu');
+      add('software', config.weights.software, 'logiciel connu');
     }
 
     if (mission.acceptedPatientTypes.length && this.hasIntersection(mission.acceptedPatientTypes, profile.acceptedPatientTypes)) {
-      add('patientType', 4, 'patientele compatible');
+      add('patientType', config.weights.patientType, 'patientele compatible');
     } else if (mission.patientType && profile.acceptedPatientTypes.some((value: string) => this.sameText(value, mission.patientType))) {
-      add('patientType', 4, 'patientele compatible');
+      add('patientType', config.weights.patientType, 'patientele compatible');
     }
 
     if (mission.requiredActs.length && this.hasIntersection(mission.requiredActs, profile.acceptedActs || [])) {
-      add('acts', 7, 'actes attendus acceptes');
+      add('acts', config.weights.acts, 'actes attendus acceptes');
     }
 
     if (mission.hasSecretary === true && profile.secretaryRequired !== false) {
-      add('workConditions', 3, 'secretariat compatible');
+      add('workConditions', config.weights.workConditionsSecretary, 'secretariat compatible');
     }
 
     if (mission.accommodationProvided && profile.accommodationRequired) {
-      add('accommodation', 3, 'logement fourni');
+      add('accommodation', config.weights.accommodation, 'logement fourni');
     }
 
-    add('compensation', this.compensationScore(mission, profile), 'remuneration compatible');
-    add('workload', this.workloadScore(mission, profile), 'charge patient compatible');
-    add('payment', this.paymentScore(mission, profile), 'mode de paiement rassurant');
-    add('profileQuality', this.profileQualityScore(profile), 'profil renseigne et verifie');
+    add('compensation', this.compensationScore(mission, profile, config), 'remuneration compatible');
+    add('workload', this.workloadScore(mission, profile, config), 'charge patient compatible');
+    add('payment', this.paymentScore(mission, profile, config), 'mode de paiement rassurant');
+    add('profileQuality', this.profileQualityScore(profile, config), 'profil renseigne et verifie');
 
     const score = Math.min(
       MAX_MATCH_SCORE,
@@ -366,9 +492,12 @@ export class MatchingService {
       profile: this.candidateProfileSummary(profile),
       eligible: true,
       score,
-      tier: this.tierForScore(score),
+      tier: this.tierForScore(score, config),
       reasons,
       exclusionReasons: [],
+      risks,
+      missingData,
+      confidence: this.confidenceScore(profile, missingData),
       breakdown,
       alreadyNotified: false,
     };
@@ -414,10 +543,10 @@ export class MatchingService {
     }
   }
 
-  private selectGradualBatch(candidates: ScoredCandidate[], targetCount: number, minimumScore: number) {
+  private selectGradualBatch(candidates: ScoredCandidate[], targetCount: number, minimumScore: number, config: MatchingConfig) {
     const selected: ScoredCandidate[] = [];
 
-    for (const tier of MATCH_TIERS) {
+    for (const tier of this.thresholdTiers(config)) {
       if (tier.minimumScore < minimumScore) continue;
 
       const tierCandidates = candidates.filter(
@@ -438,111 +567,187 @@ export class MatchingService {
     return selected;
   }
 
-  private tierForScore(score: number) {
-    return MATCH_TIERS.find((tier) => score >= tier.minimumScore)?.label || 'below_threshold';
+  private tierForScore(score: number, config: MatchingConfig) {
+    return this.thresholdTiers(config).find((tier) => score >= tier.minimumScore)?.label || 'below_threshold';
   }
 
-  private exclusionReasons(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+  private exclusionReasons(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any, config: MatchingConfig) {
     const reasons: string[] = [];
     const requiredLevels = mission.requiredLevels.length ? mission.requiredLevels : [mission.requiredLevel];
     const candidateLevel = this.medicalStatusToRequiredLevel(profile.medicalStatus);
+    const exclusions = config.exclusions;
 
-    if ((profile.completionScore || 0) < 35) {
+    if ((profile.completionScore || 0) < Number(exclusions.minimumProfileCompletion || 35)) {
       reasons.push('Profil candidat trop incomplet');
     }
 
-    if (!candidateLevel || !this.isLevelCompatible(requiredLevels, candidateLevel)) {
+    if (exclusions.requireCompatibleLevel !== false && (!candidateLevel || !this.isLevelCompatible(requiredLevels, candidateLevel))) {
       reasons.push('Niveau ou diplôme incompatible');
     }
 
     const acceptedMissionTypes = this.acceptedMissionTypes(profile);
-    if (acceptedMissionTypes.length && !acceptedMissionTypes.includes(mission.missionType)) {
+    if (exclusions.excludeRejectedMissionType !== false && acceptedMissionTypes.length && !acceptedMissionTypes.includes(mission.missionType)) {
       reasons.push('Type de mission non accepté');
     }
 
-    if (this.hasInsufficientNotice(mission, profile.minimumNoticeHours)) {
+    if (exclusions.excludeInsufficientNotice !== false && this.hasInsufficientNotice(mission, profile.minimumNoticeHours)) {
       reasons.push('Préavis insuffisant');
     }
 
-    if (this.hasRejectedWeekday(mission, profile.acceptedWeekdays || [], profile.refusedSchedules || [])) {
+    if (exclusions.excludeRejectedWeekday !== false && this.hasRejectedWeekday(mission, profile.acceptedWeekdays || [], profile.refusedSchedules || [])) {
       reasons.push('Jour de mission non accepté');
     }
 
-    if (this.hasRejectedTimeSlot(mission, profile.acceptedTimeSlots || [], profile.refusedSchedules || [])) {
+    if (exclusions.excludeRejectedTimeSlot !== false && this.hasRejectedTimeSlot(mission, profile.acceptedTimeSlots || [], profile.refusedSchedules || [])) {
       reasons.push('Créneau horaire non accepté');
     }
 
-    if (this.hasImpossibleLocation(mission, profile)) {
+    if (exclusions.excludeImpossibleLocation !== false && this.hasImpossibleLocation(mission, profile)) {
       reasons.push('Localisation incompatible');
     }
 
-    if (profile.accommodationRequired && !mission.accommodationProvided) {
+    if (exclusions.excludeMissingAccommodation !== false && profile.accommodationRequired && !mission.accommodationProvided) {
       reasons.push('Logement obligatoire absent');
     }
 
-    if (profile.parkingRequired && mission.parkingAvailable === false) {
+    if (exclusions.excludeMissingParking !== false && profile.parkingRequired && mission.parkingAvailable === false) {
       reasons.push('Parking obligatoire absent');
     }
 
     const practiceSetting = this.practiceSettingForMission(mission);
-    if (practiceSetting && profile.acceptedPracticeSettings?.length && !profile.acceptedPracticeSettings.includes(practiceSetting)) {
+    if (exclusions.excludeRejectedPracticeSetting !== false && practiceSetting && profile.acceptedPracticeSettings?.length && !profile.acceptedPracticeSettings.includes(practiceSetting)) {
       reasons.push("Cadre d'exercice non accepté");
     }
 
-    if (this.refusesPatientType(mission, profile.refusedPatientTypes || [])) {
+    if (exclusions.excludeRejectedPatientType !== false && this.refusesPatientType(mission, profile.refusedPatientTypes || [])) {
       reasons.push('Patientèle refusée');
     }
 
-    if (profile.maxPatientsPerDay && mission.averagePatientsPerDay && mission.averagePatientsPerDay > profile.maxPatientsPerDay) {
+    if (exclusions.excludeExcessivePatientLoad !== false && profile.maxPatientsPerDay && mission.averagePatientsPerDay && mission.averagePatientsPerDay > profile.maxPatientsPerDay) {
       reasons.push('Charge patients trop élevée');
     }
 
-    if (mission.requiredActs.length && this.hasIntersection(mission.requiredActs, profile.refusedActs || [])) {
+    if (exclusions.excludeRejectedActs !== false && mission.requiredActs.length && this.hasIntersection(mission.requiredActs, profile.refusedActs || [])) {
       reasons.push('Acte requis refusé');
     }
 
     return reasons;
   }
 
-  private compensationScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+  private compensationScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any, config: MatchingConfig) {
     const minimum = profile.minimumCompensation;
-    if (!minimum || minimum <= 0) return 2;
+    if (!minimum || minimum <= 0) return config.weights.compensationUnknownPreference;
 
     if (mission.compensationMode === CompensationMode.FIXED_AMOUNT) {
       if (!mission.compensationAmount) return 0;
-      if (mission.compensationAmount >= minimum) return 8;
-      if (mission.compensationAmount >= minimum * 0.9) return 4;
+      if (mission.compensationAmount >= minimum) return config.weights.compensationMet;
+      if (mission.compensationAmount >= minimum * 0.9) return config.weights.compensationNear;
       return 0;
     }
 
-    if (mission.minimumCompensation && mission.minimumCompensation >= minimum) return 8;
-    if (mission.retrocessionPercentage && mission.retrocessionPercentage >= 40) return 4;
+    if (mission.minimumCompensation && mission.minimumCompensation >= minimum) return config.weights.compensationMet;
+    if (mission.retrocessionPercentage && mission.retrocessionPercentage >= 40) return config.weights.retrocessionStrong;
     return 0;
   }
 
-  private workloadScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
-    if (!profile.maxPatientsPerDay || !mission.averagePatientsPerDay) return 2;
-    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay) return 4;
-    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay + 5) return 1;
+  private workloadScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any, config: MatchingConfig) {
+    if (!profile.maxPatientsPerDay || !mission.averagePatientsPerDay) return config.weights.workloadUnknown;
+    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay) return config.weights.workloadCompatible;
+    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay + 5) return config.weights.workloadNear;
     return 0;
   }
 
-  private paymentScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+  private paymentScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any, config: MatchingConfig) {
     if (!profile.fastPaymentImportant) return 0;
-    return mission.compensationMode === CompensationMode.FIXED_AMOUNT ? 3 : 1;
+    return mission.compensationMode === CompensationMode.FIXED_AMOUNT ? config.weights.paymentFixed : config.weights.paymentRetrocession;
   }
 
-  private profileQualityScore(profile: any) {
+  private profileQualityScore(profile: any, config: MatchingConfig) {
     let score = 0;
     const completionScore = profile.completionScore || 0;
 
-    if (completionScore >= 80) score += 4;
-    else if (completionScore >= 60) score += 2;
+    if (completionScore >= 80) score += config.weights.profileCompletionStrong;
+    else if (completionScore >= 60) score += config.weights.profileCompletionGood;
 
-    if (profile.healthVerificationStatus === HealthVerificationStatus.VERIFIED) score += 4;
-    else if (profile.rpps || profile.ansPractitionerId) score += 2;
+    if (profile.healthVerificationStatus === HealthVerificationStatus.VERIFIED) score += config.weights.profileVerified;
+    else if (profile.rpps || profile.ansPractitionerId) score += config.weights.profileIdentitySignal;
 
     return score;
+  }
+
+  private async resolveMatchingConfig(): Promise<MatchingConfig> {
+    const stored = await this.prisma.matchingConfiguration.findUnique({ where: { id: 'default' } });
+    if (!stored) return DEFAULT_MATCHING_CONFIG;
+
+    return {
+      version: stored.version || DEFAULT_MATCHING_CONFIG.version,
+      weights: this.mergeNumberRecord(DEFAULT_MATCHING_CONFIG.weights, stored.weights as Record<string, number>),
+      thresholds: this.mergeNumberRecord(DEFAULT_MATCHING_CONFIG.thresholds, stored.thresholds as Record<string, number>),
+      exclusions: { ...DEFAULT_MATCHING_CONFIG.exclusions, ...((stored.exclusions || {}) as Record<string, boolean | number>) },
+      dispatch: { ...DEFAULT_MATCHING_CONFIG.dispatch, ...((stored.dispatch || {}) as Record<string, number | boolean>) },
+    };
+  }
+
+  private mergeNumberRecord(base: Record<string, number>, override?: Record<string, unknown>) {
+    const next = { ...base };
+    Object.entries(override || {}).forEach(([key, value]) => {
+      const numberValue = Number(value);
+      if (Number.isFinite(numberValue) && numberValue >= 0) next[key] = numberValue;
+    });
+    return next;
+  }
+
+  private thresholdTiers(config: MatchingConfig) {
+    return Object.entries(config.thresholds)
+      .map(([label, minimumScore]) => ({ label, minimumScore: Number(minimumScore) || 0 }))
+      .sort((left, right) => right.minimumScore - left.minimumScore);
+  }
+
+  private missingDataReasons(profile: any) {
+    const reasons: string[] = [];
+
+    if (!profile.specialty && !profile.verifiedSpecialty) reasons.push('Spécialité non renseignée');
+    if (!profile.city && !profile.preferredCities?.length) reasons.push('Localisation préférée absente');
+    if (!profile.acceptedMissionTypes?.length) reasons.push('Types de missions acceptées non renseignés');
+    if (!profile.acceptedTimeSlots?.length) reasons.push('Créneaux acceptés non renseignés');
+    if (!profile.minimumCompensation) reasons.push('Rémunération minimale non renseignée');
+    if (!profile.acceptedPatientTypes?.length) reasons.push('Patientèle acceptée non renseignée');
+
+    return reasons;
+  }
+
+  private riskReasons(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+    const risks: string[] = [];
+
+    if ((profile.completionScore || 0) < 60) risks.push('Profil encore peu complété');
+    if (profile.healthVerificationStatus !== HealthVerificationStatus.VERIFIED) risks.push('Statut santé non vérifié');
+    if (profile.minimumCompensation && mission.compensationAmount && mission.compensationAmount < profile.minimumCompensation) {
+      risks.push('Rémunération sous le minimum déclaré');
+    }
+    if (profile.maxPatientsPerDay && mission.averagePatientsPerDay && mission.averagePatientsPerDay > profile.maxPatientsPerDay) {
+      risks.push('Charge patient au-dessus de la préférence');
+    }
+    if (profile.fastPaymentImportant && mission.compensationMode !== CompensationMode.FIXED_AMOUNT) {
+      risks.push('Paiement rapide important pour le candidat');
+    }
+
+    return risks;
+  }
+
+  private confidenceScore(profile: any, missingData: string[]) {
+    let confidence = 45;
+    const completionScore = profile.completionScore || 0;
+
+    if (completionScore >= 80) confidence += 25;
+    else if (completionScore >= 60) confidence += 15;
+    else if (completionScore >= 40) confidence += 5;
+
+    if (profile.healthVerificationStatus === HealthVerificationStatus.VERIFIED) confidence += 15;
+    else if (profile.rpps || profile.ansPractitionerId) confidence += 8;
+
+    confidence -= Math.min(30, missingData.length * 5);
+
+    return Math.max(0, Math.min(100, Math.round(confidence)));
   }
 
   private isLevelCompatible(requiredLevels: RequiredLevel[], candidateLevel: RequiredLevel) {
@@ -721,15 +926,15 @@ export class MatchingService {
     return status ? mapping[status] || null : null;
   }
 
-  private specialtyScore(missionSpecialty: string, candidateValues: Array<string | null | undefined>) {
+  private specialtyScore(missionSpecialty: string, candidateValues: Array<string | null | undefined>, config: MatchingConfig) {
     const mission = this.normalize(missionSpecialty);
     if (!mission) return 0;
 
     for (const value of candidateValues) {
       const candidate = this.normalize(value);
       if (!candidate) continue;
-      if (candidate === mission) return 20;
-      if (candidate.includes(mission) || mission.includes(candidate)) return 12;
+      if (candidate === mission) return config.weights.specialtyExact;
+      if (candidate.includes(mission) || mission.includes(candidate)) return config.weights.specialtyPartial;
     }
 
     return 0;

@@ -30,8 +30,19 @@ type MatchCandidate = {
   tier: string;
   reasons: string[];
   exclusionReasons: string[];
+  risks: string[];
+  missingData: string[];
+  confidence: number;
   breakdown: Record<string, number>;
   alreadyNotified: boolean;
+};
+
+type MatchingConfig = {
+  version: number;
+  weights: Record<string, number>;
+  thresholds: Record<string, number>;
+  exclusions: Record<string, boolean | number>;
+  dispatch: Record<string, number | boolean>;
 };
 
 type MatchPreview = {
@@ -49,6 +60,7 @@ type MatchPreview = {
   excludedTotal: number;
   items: MatchCandidate[];
   excluded: MatchCandidate[];
+  config: MatchingConfig;
 };
 
 type DispatchResult = {
@@ -86,6 +98,35 @@ const breakdownLabels: Record<string, string> = {
   payment: 'Paiement',
   profileQuality: 'Qualite du profil',
 };
+
+const editableWeightKeys = [
+  ['requiredLevel', 'Niveau'],
+  ['specialtyExact', 'Specialite exacte'],
+  ['specialtyPartial', 'Specialite proche'],
+  ['locationPreferredCity', 'Ville preferee'],
+  ['locationSameCity', 'Meme ville'],
+  ['locationFlexibleMobility', 'Mobilite'],
+  ['missionType', 'Type mission'],
+  ['timeSlot', 'Creneau'],
+  ['compensationMet', 'Remuneration OK'],
+  ['profileVerified', 'Profil verifie'],
+];
+
+const editableThresholdKeys = [
+  ['excellent', 'Excellent'],
+  ['strong', 'Fort'],
+  ['good', 'Bon'],
+  ['exploratory', 'Exploratoire'],
+];
+
+const editableExclusionKeys = [
+  ['requireCompatibleLevel', 'Niveau compatible obligatoire'],
+  ['excludeRejectedMissionType', 'Type refuse excluant'],
+  ['excludeImpossibleLocation', 'Localisation impossible excluante'],
+  ['excludeRejectedTimeSlot', 'Creneau refuse excluant'],
+  ['excludeMissingAccommodation', 'Logement obligatoire excluant'],
+  ['excludeRejectedActs', 'Actes refuses excluants'],
+];
 
 function tierTone(tier: string) {
   if (tier === 'excellent') return 'success';
@@ -128,6 +169,8 @@ export default function AdminMatchingPage() {
   const [selectedMissionId, setSelectedMissionId] = useState('');
   const [selectedCandidateId, setSelectedCandidateId] = useState('');
   const [preview, setPreview] = useState<MatchPreview | null>(null);
+  const [config, setConfig] = useState<MatchingConfig | null>(null);
+  const [configSaving, setConfigSaving] = useState(false);
   const [targetCount, setTargetCount] = useState(5);
   const [minimumScore, setMinimumScore] = useState(55);
   const [displayMinimumScore, setDisplayMinimumScore] = useState(0);
@@ -198,6 +241,66 @@ export default function AdminMatchingPage() {
     }
   }
 
+  async function loadConfig() {
+    try {
+      const nextConfig = await api.get<MatchingConfig>('/admin/matching/config');
+      setConfig(nextConfig);
+      setMinimumScore(Number(nextConfig.dispatch.minimumScore) || Number(nextConfig.thresholds.exploratory) || 55);
+      setTargetCount(Number(nextConfig.dispatch.targetCount) || 5);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }
+
+  function updateWeight(key: string, value: string) {
+    const numberValue = Number(value);
+    setConfig((current) => current ? {
+      ...current,
+      weights: { ...current.weights, [key]: Number.isFinite(numberValue) ? numberValue : 0 },
+    } : current);
+  }
+
+  function updateThreshold(key: string, value: string) {
+    const numberValue = Number(value);
+    setConfig((current) => current ? {
+      ...current,
+      thresholds: { ...current.thresholds, [key]: Number.isFinite(numberValue) ? numberValue : 0 },
+    } : current);
+  }
+
+  function updateExclusion(key: string, value: boolean) {
+    setConfig((current) => current ? {
+      ...current,
+      exclusions: { ...current.exclusions, [key]: value },
+    } : current);
+  }
+
+  async function saveConfig() {
+    if (!config) return;
+    try {
+      setConfigSaving(true);
+      setError(null);
+      setSuccess(null);
+      const nextConfig = await api.post<MatchingConfig>('/admin/matching/config', {
+        weights: config.weights,
+        thresholds: config.thresholds,
+        exclusions: config.exclusions,
+        dispatch: {
+          ...config.dispatch,
+          targetCount,
+          minimumScore,
+        },
+      });
+      setConfig(nextConfig);
+      setSuccess('Configuration du matching enregistree.');
+      if (selectedMissionId) await loadPreview(selectedMissionId);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setConfigSaving(false);
+    }
+  }
+
   const loadPreview = useCallback(async (missionId?: string) => {
     const id = missionId || selectedMissionId;
     if (!id) return;
@@ -236,7 +339,10 @@ export default function AdminMatchingPage() {
     }
   }
 
-  useEffect(() => { void loadMissions(); }, []);
+  useEffect(() => {
+    void loadMissions();
+    void loadConfig();
+  }, []);
 
   useEffect(() => {
     setPreview(null);
@@ -258,6 +364,69 @@ export default function AdminMatchingPage() {
 
       {error ? <Alert type="error">{error}</Alert> : null}
       {success ? <Alert type="success">{success}</Alert> : null}
+
+      {config ? (
+        <section className="card matching-command">
+          <div className="matching-command-main">
+            <div className="matching-command-copy">
+              <span className="section-kicker">Pilotage du moteur</span>
+              <h2>Parametres de scoring</h2>
+              <p>Controle les poids, seuils et exclusions utilises pour classer les candidats.</p>
+            </div>
+            <Badge tone="neutral">Version {config.version}</Badge>
+          </div>
+
+          <div className="matching-control-grid">
+            {editableThresholdKeys.map(([key, label]) => (
+              <Field key={key} label={label}>
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={config.thresholds[key] ?? 0}
+                  onChange={(event) => updateThreshold(key, event.target.value)}
+                />
+              </Field>
+            ))}
+          </div>
+
+          <div className="matching-control-grid">
+            {editableWeightKeys.map(([key, label]) => (
+              <Field key={key} label={label}>
+                <Input
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={config.weights[key] ?? 0}
+                  onChange={(event) => updateWeight(key, event.target.value)}
+                />
+              </Field>
+            ))}
+          </div>
+
+          <div className="matching-filter-row">
+            {editableExclusionKeys.map(([key, label]) => (
+              <label key={key} className="checkbox-line">
+                <input
+                  type="checkbox"
+                  checked={config.exclusions[key] !== false}
+                  onChange={(event) => updateExclusion(key, event.target.checked)}
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+
+          <div className="actions">
+            <Button variant="secondary" disabled={configSaving} onClick={() => void loadConfig()}>
+              Recharger
+            </Button>
+            <Button disabled={configSaving} onClick={() => void saveConfig()}>
+              {configSaving ? 'Enregistrement...' : 'Enregistrer les parametres'}
+            </Button>
+          </div>
+        </section>
+      ) : null}
 
       <section className="card matching-command">
         <div className="matching-command-main">
@@ -427,6 +596,7 @@ export default function AdminMatchingPage() {
 
                     <div className="matching-profile-grid">
                       <div><span>Score</span><strong>{selectedCandidate.eligible ? `${selectedCandidate.score}/100` : '0/100'}</strong></div>
+                      <div><span>Confiance</span><strong>{selectedCandidate.confidence ?? 0}%</strong></div>
                       <div><span>Palier</span><strong>{tierLabels[selectedCandidate.tier] || selectedCandidate.tier}</strong></div>
                       <div><span>Niveau</span><strong>{medicalStatusLabel(selectedCandidate.profile.medicalStatus)}</strong></div>
                       <div><span>Profil complété</span><strong>{selectedCandidate.profile.completionScore}%</strong></div>
@@ -446,7 +616,21 @@ export default function AdminMatchingPage() {
                         </div>
 
                         <div className="matching-detail-section">
-                          <h4>Score détaillé</h4>
+                          <h4>Points de vigilance</h4>
+                          <div className="matching-exclusion-list">
+                            {selectedCandidate.risks?.length ? selectedCandidate.risks.map((risk) => <span key={risk}>{risk}</span>) : <em>Aucun risque fort detecte.</em>}
+                          </div>
+                        </div>
+
+                        <div className="matching-detail-section">
+                          <h4>Donnees manquantes</h4>
+                          <div className="matching-exclusion-list">
+                            {selectedCandidate.missingData?.length ? selectedCandidate.missingData.map((item) => <span key={item}>{item}</span>) : <em>Profil suffisamment renseigne.</em>}
+                          </div>
+                        </div>
+
+                        <div className="matching-detail-section">
+                          <h4>Score detaille</h4>
                           <div className="matching-breakdown-list">
                             {sortedBreakdown(selectedCandidate).map(([key, value]) => (
                               <div key={key} className="matching-breakdown-item">

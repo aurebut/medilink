@@ -253,6 +253,7 @@ model User {
   emailEvents     EmailEvent[]
   auditLogs       AuditLog[] @relation("ActorAuditLogs")
   agreementEvents AgreementEvent[] @relation("AgreementEventActor")
+  matchingConfigurationsUpdated MatchingConfiguration[]
 }
 
 model Session {
@@ -553,6 +554,10 @@ model MissionCandidateMatch {
   breakdown          Json?
   notificationStatus MissionMatchNotificationStatus @default(PENDING)
   notifiedAt         DateTime?
+  manualOverrideEligible Boolean?
+  manualOverrideReason   String?
+  manualOverrideBy       String?
+  manualOverrideAt       DateTime?
   lastScoredAt       DateTime                       @default(now())
   createdAt          DateTime                       @default(now())
   updatedAt          DateTime                       @updatedAt
@@ -564,6 +569,20 @@ model MissionCandidateMatch {
   @@index([missionId, score])
   @@index([candidateUserId])
   @@index([notificationStatus])
+}
+
+model MatchingConfiguration {
+  id        String   @id @default("default")
+  version   Int      @default(1)
+  weights   Json
+  thresholds Json
+  exclusions Json
+  dispatch  Json
+  updatedById String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model BillingCustomer {
