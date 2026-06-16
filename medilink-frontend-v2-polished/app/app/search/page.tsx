@@ -97,6 +97,39 @@ function includesMatch(source?: string | null, target?: string | null) {
   return !!a && !!b && (a.includes(b) || b.includes(a));
 }
 
+function medicalStatusToRequiredLevel(status?: string | null): RequiredLevel | null {
+  const mapping: Record<string, RequiredLevel> = {
+    STUDENT: 'STUDENT',
+    INTERN: 'INTERN',
+    JUNIOR_DOCTOR: 'JUNIOR_DOCTOR',
+    DOCTOR: 'DOCTOR',
+    REGULAR_LOCUM: 'DOCTOR',
+    NURSE: 'NURSE',
+    OPERATING_ROOM_ASSISTANT: 'OPERATING_ROOM_ASSISTANT',
+    OTHER: 'OTHER',
+  };
+  return status ? mapping[status] || null : null;
+}
+
+function isLevelCompatible(requiredLevels: RequiredLevel[], candidateLevel: RequiredLevel) {
+  const compatible: Record<RequiredLevel, RequiredLevel[]> = {
+    STUDENT: ['STUDENT', 'INTERN', 'JUNIOR_DOCTOR', 'DOCTOR'],
+    INTERN: ['INTERN', 'JUNIOR_DOCTOR', 'DOCTOR'],
+    JUNIOR_DOCTOR: ['JUNIOR_DOCTOR', 'DOCTOR'],
+    DOCTOR: ['DOCTOR'],
+    NURSE: ['NURSE'],
+    OPERATING_ROOM_ASSISTANT: ['OPERATING_ROOM_ASSISTANT'],
+    OTHER: ['OTHER'],
+  };
+
+  return requiredLevels.some((requiredLevel) => compatible[requiredLevel]?.includes(candidateLevel));
+}
+
+function hasIntersection(left?: string[] | null, right?: string[] | null) {
+  const rightSet = new Set((right || []).map(normalize).filter(Boolean));
+  return (left || []).some((value) => rightSet.has(normalize(value)));
+}
+
 function scoreMissionForProfile(mission: Mission, profile: Profile | null, appliedMissionIds: Set<string>) {
   let score = 0;
 
@@ -105,13 +138,22 @@ function scoreMissionForProfile(mission: Mission, profile: Profile | null, appli
   if (profile?.preferredCities?.some((city) => includesMatch(mission.city, city))) score += 12;
   if (includesMatch(mission.city, profile?.city)) score += 8;
   if (includesMatch(mission.specialty, profile?.specialty)) score += 10;
-  if (profile?.medicalStatus && (mission.requiredLevels || [mission.requiredLevel]).includes(profile.medicalStatus as RequiredLevel)) score += 6;
+  if (includesMatch(mission.specialty, profile?.verifiedSpecialty)) score += 10;
+  const candidateLevel = medicalStatusToRequiredLevel(profile?.medicalStatus);
+  if (candidateLevel && isLevelCompatible(mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel], candidateLevel)) score += 15;
   if (mission.patientType && profile?.acceptedPatientTypes?.some((patientType) => includesMatch(mission.patientType, patientType))) score += 5;
+  if (mission.acceptedPatientTypes?.length && hasIntersection(mission.acceptedPatientTypes, profile?.acceptedPatientTypes)) score += 5;
   if (mission.softwareUsed && profile?.knownSoftware?.some((software) => includesMatch(mission.softwareUsed, software))) score += 4;
+  if (mission.knownSoftware?.length && hasIntersection(mission.knownSoftware, profile?.knownSoftware)) score += 4;
   if (mission.missionType && profile?.acceptedMissionTypes?.includes(mission.missionType)) score += 5;
-  if (profile?.minimumCompensation && mission.retrocessionPercentage && mission.retrocessionPercentage >= profile.minimumCompensation) score += 3;
+  if (mission.requiredActs?.length && hasIntersection(mission.requiredActs, profile?.acceptedActs)) score += 6;
+  if (profile?.minimumCompensation && mission.compensationAmount && mission.compensationAmount >= profile.minimumCompensation) score += 6;
+  if (profile?.minimumCompensation && mission.minimumCompensation && mission.minimumCompensation >= profile.minimumCompensation) score += 6;
+  if (profile?.minimumCompensation && mission.retrocessionPercentage && mission.retrocessionPercentage >= 40) score += 3;
+  if ((profile?.completionScore || 0) >= 80) score += 4;
+  if (profile?.healthVerificationStatus === 'VERIFIED') score += 4;
 
-  return score;
+  return Math.min(100, score);
 }
 
 export default function SearchMissionsPage() {

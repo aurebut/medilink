@@ -81,6 +81,10 @@ const breakdownLabels: Record<string, string> = {
   acts: 'Actes',
   workConditions: 'Conditions',
   accommodation: 'Logement',
+  compensation: 'Remuneration',
+  workload: 'Charge patient',
+  payment: 'Paiement',
+  profileQuality: 'Qualite du profil',
 };
 
 function tierTone(tier: string) {

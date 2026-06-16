@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import {
+  CompensationMode,
+  HealthVerificationStatus,
   MedicalStatus,
   MissionMatchNotificationStatus,
   MissionStatus,
@@ -22,6 +24,8 @@ const MATCH_TIERS = [
   { label: 'good', minimumScore: 65 },
   { label: 'exploratory', minimumScore: 55 },
 ];
+
+const MAX_MATCH_SCORE = 100;
 
 type MatchBreakdown = Record<string, number>;
 
@@ -345,7 +349,15 @@ export class MatchingService {
       add('accommodation', 3, 'logement fourni');
     }
 
-    const score = Object.values(breakdown).reduce((total, value) => total + value, 0);
+    add('compensation', this.compensationScore(mission, profile), 'remuneration compatible');
+    add('workload', this.workloadScore(mission, profile), 'charge patient compatible');
+    add('payment', this.paymentScore(mission, profile), 'mode de paiement rassurant');
+    add('profileQuality', this.profileQualityScore(profile), 'profil renseigne et verifie');
+
+    const score = Math.min(
+      MAX_MATCH_SCORE,
+      Object.values(breakdown).reduce((total, value) => total + value, 0),
+    );
 
     return {
       candidateUserId: candidate.id,
@@ -435,63 +447,102 @@ export class MatchingService {
     const requiredLevels = mission.requiredLevels.length ? mission.requiredLevels : [mission.requiredLevel];
     const candidateLevel = this.medicalStatusToRequiredLevel(profile.medicalStatus);
 
-    if ((profile.completionScore || 0) < 40) {
-      reasons.push('profil candidat trop incomplet');
+    if ((profile.completionScore || 0) < 35) {
+      reasons.push('Profil candidat trop incomplet');
     }
 
     if (!candidateLevel || !this.isLevelCompatible(requiredLevels, candidateLevel)) {
-      reasons.push('niveau ou diplome incompatible');
+      reasons.push('Niveau ou diplôme incompatible');
     }
 
     const acceptedMissionTypes = this.acceptedMissionTypes(profile);
-    if (!acceptedMissionTypes.length) {
-      reasons.push('preferences mission non renseignees');
-    } else if (!acceptedMissionTypes.includes(mission.missionType)) {
-      reasons.push('type de mission non accepte');
+    if (acceptedMissionTypes.length && !acceptedMissionTypes.includes(mission.missionType)) {
+      reasons.push('Type de mission non accepté');
     }
 
     if (this.hasInsufficientNotice(mission, profile.minimumNoticeHours)) {
-      reasons.push('preavis insuffisant');
+      reasons.push('Préavis insuffisant');
     }
 
     if (this.hasRejectedWeekday(mission, profile.acceptedWeekdays || [], profile.refusedSchedules || [])) {
-      reasons.push('jour de mission non accepte');
+      reasons.push('Jour de mission non accepté');
     }
 
     if (this.hasRejectedTimeSlot(mission, profile.acceptedTimeSlots || [], profile.refusedSchedules || [])) {
-      reasons.push('creneau horaire non accepte');
+      reasons.push('Créneau horaire non accepté');
     }
 
     if (this.hasImpossibleLocation(mission, profile)) {
-      reasons.push('localisation incompatible');
+      reasons.push('Localisation incompatible');
     }
 
     if (profile.accommodationRequired && !mission.accommodationProvided) {
-      reasons.push('logement obligatoire absent');
+      reasons.push('Logement obligatoire absent');
     }
 
     if (profile.parkingRequired && mission.parkingAvailable === false) {
-      reasons.push('parking obligatoire absent');
+      reasons.push('Parking obligatoire absent');
     }
 
     const practiceSetting = this.practiceSettingForMission(mission);
     if (practiceSetting && profile.acceptedPracticeSettings?.length && !profile.acceptedPracticeSettings.includes(practiceSetting)) {
-      reasons.push("cadre d'exercice non accepte");
+      reasons.push("Cadre d'exercice non accepté");
     }
 
     if (this.refusesPatientType(mission, profile.refusedPatientTypes || [])) {
-      reasons.push('patientele refusee');
+      reasons.push('Patientèle refusée');
     }
 
     if (profile.maxPatientsPerDay && mission.averagePatientsPerDay && mission.averagePatientsPerDay > profile.maxPatientsPerDay) {
-      reasons.push('charge patients trop elevee');
+      reasons.push('Charge patients trop élevée');
     }
 
     if (mission.requiredActs.length && this.hasIntersection(mission.requiredActs, profile.refusedActs || [])) {
-      reasons.push('acte requis refuse');
+      reasons.push('Acte requis refusé');
     }
 
     return reasons;
+  }
+
+  private compensationScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+    const minimum = profile.minimumCompensation;
+    if (!minimum || minimum <= 0) return 2;
+
+    if (mission.compensationMode === CompensationMode.FIXED_AMOUNT) {
+      if (!mission.compensationAmount) return 0;
+      if (mission.compensationAmount >= minimum) return 8;
+      if (mission.compensationAmount >= minimum * 0.9) return 4;
+      return 0;
+    }
+
+    if (mission.minimumCompensation && mission.minimumCompensation >= minimum) return 8;
+    if (mission.retrocessionPercentage && mission.retrocessionPercentage >= 40) return 4;
+    return 0;
+  }
+
+  private workloadScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+    if (!profile.maxPatientsPerDay || !mission.averagePatientsPerDay) return 2;
+    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay) return 4;
+    if (mission.averagePatientsPerDay <= profile.maxPatientsPerDay + 5) return 1;
+    return 0;
+  }
+
+  private paymentScore(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, profile: any) {
+    if (!profile.fastPaymentImportant) return 0;
+    return mission.compensationMode === CompensationMode.FIXED_AMOUNT ? 3 : 1;
+  }
+
+  private profileQualityScore(profile: any) {
+    let score = 0;
+    const completionScore = profile.completionScore || 0;
+
+    if (completionScore >= 80) score += 4;
+    else if (completionScore >= 60) score += 2;
+
+    if (profile.healthVerificationStatus === HealthVerificationStatus.VERIFIED) score += 4;
+    else if (profile.rpps || profile.ansPractitionerId) score += 2;
+
+    return score;
   }
 
   private isLevelCompatible(requiredLevels: RequiredLevel[], candidateLevel: RequiredLevel) {
