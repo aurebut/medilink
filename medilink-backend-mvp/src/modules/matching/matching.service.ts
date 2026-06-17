@@ -3,6 +3,7 @@ import {
   CompensationMode,
   HealthVerificationStatus,
   MedicalStatus,
+  MatchingDispatchJobStatus,
   MissionMatchNotificationStatus,
   MissionStatus,
   NotificationType,
@@ -27,6 +28,14 @@ const MATCH_TIERS = [
 ];
 
 const MAX_MATCH_SCORE = 100;
+
+// Score cache: a fresh preview/dispatch within this window reuses persisted scores
+// instead of re-scanning the candidate pool.
+const SCORE_CACHE_TTL_MS = 5 * 60 * 1000;
+
+// Pagination: scan candidates in batches (cursor-based) up to this safety ceiling.
+const CANDIDATE_BATCH_SIZE = 500;
+const MAX_CANDIDATES_SCAN = 5000;
 
 type MatchBreakdown = Record<string, number>;
 
@@ -181,7 +190,7 @@ export class MatchingService {
   async previewMissionMatches(missionId: string, limit = 50) {
     const mission = await this.getPublishedMission(missionId);
     const config = await this.resolveMatchingConfig();
-    const scored = await this.scoreCandidatesForMission(mission, Math.min(limit, 200), config);
+    const scored = await this.computeScoredCandidates(mission, config, { forceRescore: true });
     const eligible = scored.filter((candidate) => candidate.eligible);
     const excluded = scored.filter((candidate) => !candidate.eligible);
 
@@ -207,7 +216,9 @@ export class MatchingService {
     const config = await this.resolveMatchingConfig();
     const targetCount = dto.targetCount ?? (Number(config.dispatch.targetCount) || 5);
     const minimumScore = dto.minimumScore ?? (Number(config.dispatch.minimumScore) || Number(config.thresholds.exploratory) || 55);
-    const scored = (await this.scoreCandidatesForMission(mission, 200, config))
+
+    // Reuse persisted scores when fresh enough (avoid re-scanning the whole pool).
+    const scored = (await this.computeScoredCandidates(mission, config, { forceRescore: false }))
       .filter((candidate) => candidate.eligible && candidate.score >= minimumScore);
 
     await this.persistScores(missionId, scored);
@@ -226,98 +237,70 @@ export class MatchingService {
 
       return {
         mission: this.missionSummary(mission),
+        accepted: 0,
         sent: 0,
+        jobId: null,
         selectedTier: null,
         minimumScore,
         items: [],
       };
     }
 
-    const sent: ScoredCandidate[] = [];
-    const failed: Array<{ candidateUserId: string; error: string }> = [];
-
-    for (const candidate of selected) {
-      try {
-        await this.notifications.create({
-          userId: candidate.candidateUserId,
-          type: NotificationType.MISSION_RECOMMENDATION,
-          title: 'Mission recommandée',
-          body: `${mission.title} correspond fortement à votre profil.`,
-          data: {
-            missionId: mission.id,
-            score: candidate.score,
-            tier: candidate.tier,
-            reasons: candidate.reasons,
-          },
-        });
-
-        await this.email.sendMissionRecommendationEmail(candidate.candidateUserId, candidate.email, {
-          missionTitle: mission.title,
-          establishmentName: mission.establishment.name,
-          city: mission.city,
-          startDate: mission.startDate,
-          endDate: mission.endDate,
-          startTime: mission.startTime,
-          endTime: mission.endTime,
-          score: candidate.score,
-          reasons: candidate.reasons,
-          missionId: mission.id,
-        });
-
-        await this.prisma.missionCandidateMatch.update({
-          where: {
-            missionId_candidateUserId: {
-              missionId,
-              candidateUserId: candidate.candidateUserId,
-            },
-          },
-          data: {
-            notificationStatus: MissionMatchNotificationStatus.SENT,
-            notifiedAt: new Date(),
-          },
-        });
-
-        sent.push(candidate);
-      } catch (error: any) {
-        failed.push({
-          candidateUserId: candidate.candidateUserId,
-          error: error?.message || 'Erreur inconnue',
-        });
-
-        await this.prisma.missionCandidateMatch.update({
-          where: {
-            missionId_candidateUserId: {
-              missionId,
-              candidateUserId: candidate.candidateUserId,
-            },
-          },
-          data: { notificationStatus: MissionMatchNotificationStatus.FAILED },
-        });
-      }
-    }
+    // Enqueue an async dispatch job: notification/email sends happen in the background
+    // worker, the admin response returns immediately with the accepted count.
+    const job = await this.prisma.matchingDispatchJob.create({
+      data: {
+        missionId,
+        actorUserId: admin.id,
+        status: MatchingDispatchJobStatus.QUEUED,
+        targetCount,
+        minimumScore,
+        candidateUserIds: selected.map((candidate) => candidate.candidateUserId),
+        selectedTier: selected[selected.length - 1]?.tier ?? null,
+        acceptedCount: selected.length,
+      },
+    });
 
     await this.audit.log({
       actorUserId: admin.id,
-      action: 'matching.dispatch.sent',
+      action: 'matching.dispatch.queued',
       entityType: 'mission',
       entityId: missionId,
       metadata: {
+        jobId: job.id,
         targetCount,
         minimumScore,
-        sent: sent.length,
-        failed: failed.length,
-        selectedTier: selected[selected.length - 1]?.tier,
+        accepted: selected.length,
+        selectedTier: job.selectedTier,
       },
     });
 
     return {
       mission: this.missionSummary(mission),
-      sent: sent.length,
-      failed,
-      selectedTier: selected[selected.length - 1]?.tier ?? null,
+      accepted: selected.length,
+      sent: 0,
+      jobId: job.id,
+      selectedTier: job.selectedTier,
       minimumScore,
-      items: sent,
+      items: selected,
     };
+  }
+
+  async getDispatchJob(jobId: string) {
+    const job = await this.prisma.matchingDispatchJob.findUnique({
+      where: { id: jobId },
+      include: { mission: { include: { establishment: { select: { name: true } } } } },
+    });
+    if (!job) throw new NotFoundException('Job de dispatch introuvable.');
+    return job;
+  }
+
+  async listDispatchJobsForMission(missionId: string) {
+    return this.prisma.matchingDispatchJob.findMany({
+      where: { missionId },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
   }
 
   private async getPublishedMission(missionId: string) {
@@ -337,7 +320,171 @@ export class MatchingService {
     return mission;
   }
 
-  private async scoreCandidatesForMission(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, _limit: number, config: MatchingConfig) {
+  /**
+   * Resolve the scored candidate list for a mission.
+   *
+   * When `forceRescore` is false (dispatch path) and persisted scores are fresher
+   * than SCORE_CACHE_TTL_MS, reuse them instead of re-scanning the candidate pool.
+   * Otherwise, scan candidates with SQL pre-filtering + cursor pagination and score in JS.
+   */
+  private async computeScoredCandidates(
+    mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>,
+    config: MatchingConfig,
+    opts: { forceRescore: boolean },
+  ): Promise<ScoredCandidate[]> {
+    if (!opts.forceRescore) {
+      const cached = await this.loadCachedScores(mission.id, config);
+      if (cached) return cached;
+    }
+
+    return this.scoreCandidatesForMission(mission, config);
+  }
+
+  /**
+   * Load persisted MissionCandidateMatch rows when fresh enough and rebuild
+   * ScoredCandidate objects. Returns null when no fresh cache is available.
+   */
+  private async loadCachedScores(missionId: string, config: MatchingConfig): Promise<ScoredCandidate[] | null> {
+    const cacheThreshold = new Date(Date.now() - SCORE_CACHE_TTL_MS);
+    const freshCount = await this.prisma.missionCandidateMatch.count({
+      where: { missionId, lastScoredAt: { gt: cacheThreshold } },
+    });
+    if (freshCount === 0) return null;
+
+    const rows = await this.prisma.missionCandidateMatch.findMany({
+      where: { missionId },
+      include: {
+        candidate: {
+          select: { id: true, email: true, profile: true },
+        },
+      },
+    });
+
+    const sentIds = new Set(
+      rows
+        .filter((row) => row.notificationStatus === MissionMatchNotificationStatus.SENT)
+        .map((row) => row.candidateUserId),
+    );
+
+    return rows
+      .map((row) => {
+        const profile = row.candidate.profile;
+        return {
+          candidateUserId: row.candidateUserId,
+          email: row.candidate.email,
+          displayName: [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || row.candidate.email,
+          profile: profile
+            ? {
+                firstName: profile.firstName,
+                lastName: profile.lastName,
+                city: profile.city,
+                medicalStatus: profile.medicalStatus,
+                specialty: profile.specialty,
+                verifiedSpecialty: profile.verifiedSpecialty,
+                completionScore: profile.completionScore || 0,
+              }
+            : { completionScore: 0 },
+          eligible: row.eligible,
+          score: row.score,
+          tier: row.tier,
+          reasons: (row.reasons as string[]) || [],
+          exclusionReasons: (row.exclusionReasons as string[]) || [],
+          risks: [],
+          missingData: [],
+          confidence: 0,
+          breakdown: (row.breakdown as MatchBreakdown) || {},
+          alreadyNotified: sentIds.has(row.candidateUserId),
+        } satisfies ScoredCandidate;
+      })
+      .sort((a, b) => {
+        if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+        return b.score - a.score;
+      });
+  }
+
+  /**
+   * Build the Prisma where-clause that pushes hard exclusions into SQL so the JS
+   * scoring engine only processes a small, mostly-eligible candidate set.
+   *
+   * Conservative by design: a criterion is only pushed down when it cannot produce
+   * false exclusions. Remaining exclusions (mission type legacy strings, time-slot
+   * derivation, accommodation/parking, patient load, refused acts...) stay in JS.
+   */
+  private buildCandidateWhere(
+    mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>,
+    config: MatchingConfig,
+    appliedCandidateIds: string[],
+  ): Prisma.UserWhereInput {
+    const requiredLevels = mission.requiredLevels.length ? mission.requiredLevels : [mission.requiredLevel];
+    const acceptableStatuses = this.acceptableMedicalStatuses(requiredLevels);
+    const minimumCompletion = Number(config.exclusions.minimumProfileCompletion || 35);
+    const hoursUntilStart = (mission.startDate.getTime() - Date.now()) / 36e5;
+    const missionCity = mission.city;
+    const useMissionTypeFilter = config.exclusions.excludeRejectedMissionType !== false;
+    const useLocationFilter = config.exclusions.excludeImpossibleLocation !== false;
+    const useNoticeFilter = config.exclusions.excludeInsufficientNotice !== false;
+
+    const profileWhere: Prisma.ProfileWhereInput = {
+      // Hard exclusion 1: profile completion
+      completionScore: { gte: minimumCompletion },
+      // Hard exclusion 2: medical status compatible with required levels
+      ...(acceptableStatuses.length ? { medicalStatus: { in: acceptableStatuses } } : {}),
+    };
+
+    // Hard exclusion 3: minimum notice hours (only excludes when a notice is set and too short).
+    if (useNoticeFilter) {
+      profileWhere.OR = [
+        { minimumNoticeHours: null },
+        { minimumNoticeHours: { lte: Math.floor(hoursUntilStart) } },
+      ];
+    }
+
+    // Hard exclusion 4 (conservative): impossible location — only excludes LOCAL_ONLY
+    // profiles whose city/preferredCities do not contain the mission city.
+    // The full housing-based check remains in JS.
+    if (useLocationFilter && missionCity) {
+      profileWhere.AND = [
+        {
+          OR: [
+            { city: missionCity },
+            { preferredCities: { has: missionCity } },
+            { mobilityRangeType: { not: 'LOCAL_ONLY' } },
+            { mobilityRangeType: null },
+          ],
+        },
+      ];
+    }
+
+    // Hard exclusion 5 (conservative): mission type overlap — only applied when the
+    // candidate has explicitly listed accepted types. Legacy free-text values that
+    // don't match the enum are handled in JS, so we also keep candidates whose
+    // accepted list is empty to avoid false exclusions.
+    if (useMissionTypeFilter) {
+      profileWhere.AND = [
+        ...(profileWhere.AND as Prisma.ProfileWhereInput[] | undefined) || [],
+        {
+          OR: [
+            { acceptedMissionTypes: { isEmpty: true } },
+            { acceptedMissionTypes: { has: mission.missionType } },
+          ],
+        },
+      ];
+    }
+
+    return {
+      role: UserRole.CANDIDATE,
+      status: UserStatus.ACTIVE,
+      emailVerified: true,
+      id: { notIn: appliedCandidateIds },
+      NOT: { profile: null },
+      profile: profileWhere,
+    };
+  }
+
+  private async scoreCandidatesForMission(
+    mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>,
+    config: MatchingConfig,
+  ): Promise<ScoredCandidate[]> {
     const existingMatches = await this.prisma.missionCandidateMatch.findMany({
       where: { missionId: mission.id },
       select: { candidateUserId: true, notificationStatus: true },
@@ -347,34 +494,71 @@ export class MatchingService {
         .filter((match) => match.notificationStatus === MissionMatchNotificationStatus.SENT)
         .map((match) => match.candidateUserId),
     );
-    const appliedCandidateIds = new Set(mission.applications.map((application) => application.candidateUserId));
+    const appliedCandidateIds = Array.from(new Set(mission.applications.map((application) => application.candidateUserId)));
 
-    const candidates = await this.prisma.user.findMany({
-      where: {
-        role: UserRole.CANDIDATE,
-        status: UserStatus.ACTIVE,
-        emailVerified: true,
-        id: { notIn: Array.from(appliedCandidateIds) },
-        profile: {
-          isNot: null,
-        },
-      },
-      include: {
-        profile: true,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 500,
-    });
+    const where = this.buildCandidateWhere(mission, config, appliedCandidateIds);
 
-    return candidates
-      .map((candidate) => ({
-        ...this.scoreCandidate(mission, candidate, config),
-        alreadyNotified: sentCandidateIds.has(candidate.id),
-      }))
-      .sort((a, b) => {
-        if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
-        return b.score - a.score;
+    // Cursor-paginated scan: pull CANDIDATE_BATCH_SIZE at a time, score, accumulate,
+    // stop early when MAX_CANDIDATES_SCAN is reached or no more rows.
+    const scored: ScoredCandidate[] = [];
+    let cursor: { createdAt: Date; id: string } | null = null;
+    let scanned = 0;
+
+    while (scanned < MAX_CANDIDATES_SCAN) {
+      const batch = await this.prisma.user.findMany({
+        where,
+        include: { profile: true },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: CANDIDATE_BATCH_SIZE,
+        ...(cursor
+          ? {
+              skip: 1,
+              cursor: { id: cursor.id },
+            }
+          : {}),
       });
+
+      if (!batch.length) break;
+
+      for (const candidate of batch) {
+        scored.push({
+          ...this.scoreCandidate(mission, candidate, config),
+          alreadyNotified: sentCandidateIds.has(candidate.id),
+        });
+      }
+
+      scanned += batch.length;
+      const last = batch[batch.length - 1];
+      cursor = { createdAt: last.createdAt, id: last.id };
+
+      if (batch.length < CANDIDATE_BATCH_SIZE) break;
+    }
+
+    return scored.sort((a, b) => {
+      if (a.eligible !== b.eligible) return a.eligible ? -1 : 1;
+      return b.score - a.score;
+    });
+  }
+
+  /**
+   * Map required levels to the set of MedicalStatus values that satisfy them
+   * (mirrors `isLevelCompatible` + `medicalStatusToRequiredLevel`).
+   */
+  private acceptableMedicalStatuses(requiredLevels: RequiredLevel[]): MedicalStatus[] {
+    const compatible: Record<RequiredLevel, MedicalStatus[]> = {
+      STUDENT: [MedicalStatus.STUDENT, MedicalStatus.INTERN, MedicalStatus.JUNIOR_DOCTOR, MedicalStatus.DOCTOR, MedicalStatus.REGULAR_LOCUM],
+      INTERN: [MedicalStatus.INTERN, MedicalStatus.JUNIOR_DOCTOR, MedicalStatus.DOCTOR, MedicalStatus.REGULAR_LOCUM],
+      JUNIOR_DOCTOR: [MedicalStatus.JUNIOR_DOCTOR, MedicalStatus.DOCTOR, MedicalStatus.REGULAR_LOCUM],
+      DOCTOR: [MedicalStatus.DOCTOR, MedicalStatus.REGULAR_LOCUM],
+      NURSE: [MedicalStatus.NURSE],
+      OPERATING_ROOM_ASSISTANT: [MedicalStatus.OPERATING_ROOM_ASSISTANT],
+      OTHER: [MedicalStatus.OTHER],
+    };
+    const set = new Set<MedicalStatus>();
+    for (const level of requiredLevels) {
+      for (const status of compatible[level] || []) set.add(status);
+    }
+    return Array.from(set);
   }
 
   private scoreCandidate(mission: Awaited<ReturnType<MatchingService['getPublishedMission']>>, candidate: any, config: MatchingConfig): ScoredCandidate {

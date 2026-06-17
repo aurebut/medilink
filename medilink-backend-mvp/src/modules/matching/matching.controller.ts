@@ -45,4 +45,14 @@ export class MatchingController {
   ) {
     return this.matching.dispatchMissionMatches(user, missionId, dto);
   }
+
+  @Get('dispatch-jobs/:jobId')
+  getDispatchJob(@Param('jobId') jobId: string) {
+    return this.matching.getDispatchJob(jobId);
+  }
+
+  @Get('missions/:id/dispatch-jobs')
+  listDispatchJobs(@Param('id') missionId: string) {
+    return this.matching.listDispatchJobsForMission(missionId);
+  }
 }

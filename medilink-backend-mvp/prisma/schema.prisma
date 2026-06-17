@@ -254,6 +254,9 @@ model User {
   auditLogs       AuditLog[] @relation("ActorAuditLogs")
   agreementEvents AgreementEvent[] @relation("AgreementEventActor")
   matchingConfigurationsUpdated MatchingConfiguration[]
+  matchingDispatchJobsActed MatchingDispatchJob[] @relation("MatchingDispatchJobActor")
+
+  @@index([role, status, emailVerified])
 }
 
 model Session {
@@ -349,6 +352,11 @@ model Profile {
 
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userSkills UserSkill[]
+
+  @@index([preferredCities], type: Gin)
+  @@index([acceptedMissionTypes], type: Gin)
+  @@index([medicalStatus])
+  @@index([completionScore])
 }
 
 model Skill {
@@ -531,6 +539,7 @@ model Mission {
   agreements    MissionAgreement[]
   publicationCredit PublicationCredit?
   candidateMatches MissionCandidateMatch[]
+  matchingDispatchJobs MatchingDispatchJob[]
 
   @@index([status])
   @@index([missionType])
@@ -583,6 +592,41 @@ model MatchingConfiguration {
   updatedAt DateTime @updatedAt
 
   updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+enum MatchingDispatchJobStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  PARTIAL
+  FAILED
+  CANCELLED
+}
+
+model MatchingDispatchJob {
+  id              String                    @id @default(uuid())
+  missionId       String
+  actorUserId     String
+  status          MatchingDispatchJobStatus @default(QUEUED)
+  targetCount     Int
+  minimumScore    Int
+  candidateUserIds String[]                 @default([])
+  selectedTier    String?
+  acceptedCount   Int                       @default(0)
+  sentCount       Int                       @default(0)
+  failedCount     Int                       @default(0)
+  failures        Json?
+  error           String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  mission  Mission @relation(fields: [missionId], references: [id], onDelete: Cascade)
+  actor    User    @relation("MatchingDispatchJobActor", fields: [actorUserId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([missionId])
 }
 
 model BillingCustomer {
