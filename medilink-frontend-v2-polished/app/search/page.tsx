@@ -20,7 +20,6 @@ export default function PublicSearchPage() {
   const [filters, setFilters] = useState(emptyFilters);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -29,7 +28,6 @@ export default function PublicSearchPage() {
     const mt = params.get('missionType') || '';
     const initialFilters = { q, city, missionType: (missionTypeOptions.find((o) => o.value === mt) ? mt : '') as MissionType | '' };
     setFilters(initialFilters);
-    setInitialized(true);
     void loadMissions(initialFilters);
   }, []);
 
@@ -75,17 +73,13 @@ export default function PublicSearchPage() {
           </div>
         </nav>
 
-        <section style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 'clamp(34px, 4vw, 52px)', margin: '12px 0 6px', lineHeight: 1.05, color: 'var(--heading)' }}>
-            Rechercher une mission
-          </h1>
-          <p style={{ color: 'var(--muted)', lineHeight: 1.65, maxWidth: 640 }}>
-            Parcourir les missions publiées par les établissements partenaires.
-          </p>
+        <section className="public-search-head">
+          <h1>Rechercher une mission</h1>
+          <p>Parcourir les missions publiées par les établissements partenaires.</p>
 
-          <div className="card search-card" style={{ marginTop: 22 }}>
+          <div className="card public-search-form">
             <form className="form" onSubmit={submit}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) auto', gap: 12, alignItems: 'end' }}>
+              <div className="public-search-fields">
                 <Field label="Mot-clé">
                   <Input value={filters.q} onChange={(e) => set('q', e.target.value)} placeholder="Spécialité, établissement…" />
                 </Field>
@@ -98,33 +92,37 @@ export default function PublicSearchPage() {
                     {missionTypeOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </Select>
                 </Field>
-                <Button disabled={loading} style={{ marginBottom: 2 }}>
+                <Button disabled={loading}>
                   {loading ? 'Chargement...' : 'Rechercher'}
                 </Button>
               </div>
             </form>
-            </div>
+          </div>
         </section>
 
-        {error ? <Alert type="error">{error}</Alert> : null}
+        <section className="public-search-results">
+          {error ? <Alert type="error">{error}</Alert> : null}
 
-        {loading ? (
-          <LoadingCard label="Recherche des missions..." />
-        ) : (
-          <div className="grid">
-            <div className="toolbar">
-              <div>
-                <strong style={{ fontSize: 18 }}>{total} résultat(s)</strong>
-                <div className="small">Missions publiées disponibles</div>
+          {loading ? (
+            <LoadingCard label="Recherche des missions..." />
+          ) : (
+            <>
+              <div className="toolbar">
+                <div>
+                  <strong style={{ fontSize: 18 }}>{total} résultat(s)</strong>
+                  <div className="small">Missions publiées disponibles</div>
+                </div>
               </div>
-            </div>
-            {items.length > 0 ? items.map((mission) => (
-              <PublicMissionCard key={mission.id} mission={mission} />
-            )) : (
-              <Card><p>Aucune mission publiée ne correspond à votre recherche.</p></Card>
-            )}
-          </div>
-        )}
+              <div className="grid">
+                {items.length > 0 ? items.map((mission) => (
+                  <PublicMissionCard key={mission.id} mission={mission} />
+                )) : (
+                  <Card><p>Aucune mission publiée ne correspond à votre recherche.</p></Card>
+                )}
+              </div>
+            </>
+          )}
+        </section>
       </div>
     </main>
   );

@@ -8252,6 +8252,50 @@ td {
 .public-mission-hero {
   border-bottom: 1px solid rgba(26,82,160,.10);
 }
+.public-mission-page .grid-2 {
+  margin-top: 28px;
+}
+.public-search-head h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(34px, 4vw, 52px);
+  margin: 12px 0 6px;
+  line-height: 1.05;
+  color: var(--heading);
+}
+.public-search-head p {
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 640px;
+}
+.public-search-head {
+  margin-bottom: 32px;
+}
+.public-search-form {
+  margin-top: 22px;
+  padding: 24px;
+}
+.public-search-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+.public-search-results {
+  display: grid;
+  gap: 0;
+}
+@media (max-width: 720px) {
+  .public-search-fields {
+    grid-template-columns: 1fr;
+  }
+  .public-search-form {
+    padding: 18px;
+  }
+  .public-search-head {
+    margin-bottom: 24px;
+  }
+}
 .public-mission-photo,
 .photo-carousel {
   border-radius: 14px;
