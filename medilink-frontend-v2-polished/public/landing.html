@@ -442,17 +442,17 @@ footer{background:var(--navy);padding:60px 40px 32px}
   <div class="search-bar-wrap">
     <div class="search-field" style="flex:1.5">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-      <input type="text" placeholder="Spécialité, établissement…"/>
+      <input id="search-q" type="text" placeholder="Spécialité, établissement…"/>
     </div>
     <div class="search-field">
       <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-      <input type="text" placeholder="Ville, département"/>
+      <input id="search-city" type="text" placeholder="Ville, département"/>
     </div>
     <div class="search-field">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      <select><option value="">Type de mission</option><option>Garde</option><option>Remplacement</option><option>Vacation</option><option>Aide opératoire</option></select>
+      <select id="search-type"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="AIDE_OP">Aide opératoire</option></select>
     </div>
-    <button class="search-btn" onclick="location.href='/app/search'">
+    <button class="search-btn" onclick="doSearch()">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
       Rechercher
     </button>
@@ -577,7 +577,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <h2 class="section-h">Missions à la une</h2>
         <p class="section-sub">Publiées cette semaine</p>
       </div>
-      <a class="btn btn-outline" href="/app/search">Voir toutes les missions →</a>
+      <a class="btn btn-outline" href="/search">Voir toutes les missions →</a>
     </div>
     <div class="missions-grid">
       <div class="mission-card featured reveal-scale">
@@ -592,7 +592,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="mc-footer">
           <span class="tag tag-blue">Interne</span>
           <span class="tag tag-teal">Encadrée</span>
-          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
         </div>
       </div>
       <div class="mission-card">
@@ -606,7 +606,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         </div>
         <div class="mc-footer">
           <span class="tag tag-blue">Interne</span>
-          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
         </div>
       </div>
       <div class="mission-card">
@@ -620,7 +620,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         </div>
         <div class="mc-footer">
           <span class="tag tag-blue">Médecin thésé</span>
-          <button class="mc-apply" onclick="location.href='/app/search'">Voir →</button>
+          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
         </div>
       </div>
     </div>
@@ -691,7 +691,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <div class="footer-col">
         <h4>Candidats</h4>
         <a href="#">Comment ça marche</a>
-        <a href="/app/search">Rechercher une mission</a>
+        <a href="/search">Rechercher une mission</a>
         <a href="/register">Créer un profil</a>
         <a href="#">Guide du remplaçant</a>
       </div>
@@ -806,6 +806,19 @@ function onNavScroll() {
 window.addEventListener('scroll', () => {
   if (!navTicking) { requestAnimationFrame(onNavScroll); navTicking = true; }
 }, { passive: true });
+
+// ── Search ──
+function doSearch() {
+  const q = document.getElementById('search-q').value;
+  const city = document.getElementById('search-city').value;
+  const missionType = document.getElementById('search-type').value;
+  const params = new URLSearchParams();
+  if (q) params.set('q', q);
+  if (city) params.set('city', city);
+  if (missionType) params.set('missionType', missionType);
+  const qs = params.toString();
+  location.href = '/search' + (qs ? '?' + qs : '');
+}
 
 // ── Button ripple (follows cursor) ──
 document.querySelectorAll('.btn').forEach(btn => {
