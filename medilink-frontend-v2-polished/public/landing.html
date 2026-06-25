@@ -269,6 +269,22 @@ section,footer,.search-section{position:relative;z-index:1;}
 .cta-band p{font-size:15px;color:var(--text-3);margin-bottom:32px}
 .cta-band-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 
+/* FAQ */
+.faq{padding:0 40px 88px;background:var(--ivory)}
+.faq-inner{max-width:980px;margin:0 auto}
+.faq-header{max-width:640px;margin:0 auto 34px;text-align:center}
+.faq-kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;border:1px solid rgba(14,138,122,.18);background:rgba(255,255,255,.78);border-radius:999px;padding:6px 12px;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);box-shadow:0 8px 24px rgba(11,25,41,.04)}
+.faq-kicker::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.faq-list{display:grid;gap:12px}
+.faq-item{background:rgba(255,255,255,.9);border:1px solid rgba(200,210,228,.86);border-radius:18px;box-shadow:0 14px 34px rgba(11,25,41,.06);overflow:hidden;transition:border-color .25s cubic-bezier(.22,1,.36,1),box-shadow .25s cubic-bezier(.22,1,.36,1),transform .25s cubic-bezier(.22,1,.36,1)}
+.faq-item:hover{border-color:rgba(26,82,160,.24);box-shadow:0 20px 44px rgba(11,25,41,.09);transform:translateY(-2px)}
+.faq-item[open]{border-color:rgba(14,138,122,.26);box-shadow:0 22px 50px rgba(11,25,41,.1)}
+.faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 24px;font-size:15px;font-weight:500;color:var(--navy)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';width:28px;height:28px;border-radius:50%;background:#E8F5F3;color:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:400;line-height:1;flex-shrink:0;transition:all .25s cubic-bezier(.22,1,.36,1)}
+.faq-item[open] summary::after{content:'-';background:var(--teal);color:#fff}
+.faq-answer{padding:0 24px 22px;color:var(--text-3);font-size:14px;line-height:1.7;max-width:780px}
+
 /* FOOTER */
 footer{background:var(--navy);padding:60px 40px 32px}
 .footer-inner{max-width:1100px;margin:0 auto}
@@ -301,7 +317,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .hero-inner{flex:1 1 auto;max-width:680px}
   .hero-sub{margin-left:auto;margin-right:auto}
   .search-section{left:24px;right:24px;bottom:18px}
-  .how,.mockup-section,.trust,.cta-band,footer{padding-left:24px;padding-right:24px}
+  .how,.mockup-section,.trust,.cta-band,.faq,footer{padding-left:24px;padding-right:24px}
   .profiles,.missions-preview{padding-left:24px;padding-right:24px}
   .how-header{max-width:720px;margin-bottom:42px}
   .how-step{width:calc(50% - 44px)}
@@ -382,6 +398,11 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .cta-band-inner{padding:34px 22px;border-radius:18px}
   .cta-band-btns{display:grid;grid-template-columns:1fr}
   .cta-band-btns .btn{justify-content:center;width:100%}
+  .faq{padding:0 18px 58px}
+  .faq-header{margin-bottom:24px}
+  .faq-item{border-radius:14px}
+  .faq-item summary{padding:18px 18px;font-size:14px;align-items:flex-start}
+  .faq-answer{padding:0 18px 18px;font-size:13px}
   footer{padding:46px 18px 28px}
   .footer-top{grid-template-columns:1fr;gap:28px;margin-bottom:34px}
   .footer-bottom{display:grid;grid-template-columns:1fr;gap:14px}
@@ -675,6 +696,43 @@ footer{background:var(--navy);padding:60px 40px 32px}
     <div class="cta-band-btns">
       <a class="btn btn-primary btn-lg" href="/register">Je crée mon compte</a>
       <a class="btn btn-ghost btn-lg" href="/login">J'ai déjà un compte</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-inner">
+    <div class="faq-header reveal">
+      <div class="faq-kicker">Questions fréquentes</div>
+      <h2 class="section-h">Ce qu'il faut savoir avant de rejoindre MédiLink</h2>
+      <p class="section-sub">Des réponses simples sur l'inscription, la vérification des profils, les missions et le fonctionnement de la plateforme.</p>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item reveal">
+        <summary>Qui peut s'inscrire sur MédiLink ?</summary>
+        <div class="faq-answer">La plateforme s'adresse aux médecins généralistes remplaçants, internes autorisés selon leur situation, médecins thésés, cabinets libéraux, maisons de santé et structures qui recherchent un remplacement en médecine générale.</div>
+      </details>
+      <details class="faq-item reveal reveal-delay-1">
+        <summary>Les profils des remplaçants sont-ils vérifiés ?</summary>
+        <div class="faq-answer">Oui. Les informations professionnelles et les documents nécessaires sont contrôlés avant de rendre un profil pleinement opérationnel. L'objectif est de sécuriser les échanges entre cabinets et remplaçants.</div>
+      </details>
+      <details class="faq-item reveal reveal-delay-2">
+        <summary>Combien coûte l'inscription ?</summary>
+        <div class="faq-answer">La création de compte est gratuite. Les candidats peuvent consulter les missions disponibles, créer leur profil et postuler aux remplacements correspondant à leurs disponibilités.</div>
+      </details>
+      <details class="faq-item reveal reveal-delay-3">
+        <summary>Comment un cabinet trouve-t-il un remplaçant ?</summary>
+        <div class="faq-answer">Le cabinet publie une mission avec les dates, le lieu, la rémunération et les conditions pratiques. MédiLink met ensuite en avant les profils compatibles pour faciliter une prise de contact rapide et qualifiée.</div>
+      </details>
+      <details class="faq-item reveal reveal-delay-4">
+        <summary>Les échanges se font-ils directement sur la plateforme ?</summary>
+        <div class="faq-answer">Oui. La messagerie permet de centraliser les questions, les confirmations et les informations liées à chaque candidature, afin d'éviter les échanges dispersés par téléphone ou email.</div>
+      </details>
+      <details class="faq-item reveal reveal-delay-5">
+        <summary>MédiLink prélève-t-il une commission sur les honoraires ?</summary>
+        <div class="faq-answer">Non, la promesse de MédiLink est de ne pas prélever de commission sur les honoraires du remplaçant. La relation de remplacement reste lisible pour le candidat comme pour le cabinet.</div>
+      </details>
     </div>
   </div>
 </section>
