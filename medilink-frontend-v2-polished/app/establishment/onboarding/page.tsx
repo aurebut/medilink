@@ -9,14 +9,10 @@ import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import {
-  acceptedMissionTypeOptions,
   cityOptions,
   countryOptions,
-  durationOptions,
   equipmentOptions,
-  mobilityOptions,
   patientTypeOptions,
-  refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
   softwareOptions,
@@ -110,13 +106,8 @@ export default function EstablishmentOnboardingPage() {
     try {
       await api.post<Establishment>('/establishments', {
         ...form,
-        mobilityOptions: cleanArray(form.mobilityOptions),
-        acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
-        minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
         averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? undefined : Number(form.averagePatientsPerDay),
         equipmentAvailable: cleanArray(form.equipmentAvailable),
-        preferredDurations: cleanArray(form.preferredDurations),
-        refusedSchedules: cleanArray(form.refusedSchedules),
         acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
         knownSoftware: cleanArray(form.knownSoftware),
       });
@@ -318,15 +309,8 @@ export default function EstablishmentOnboardingPage() {
             <MultiChoiceField label="Matériel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
             <div className="profile-preferences-section">
               <h3>Critères habituels de mission</h3>
-              <MultiChoiceField label="Mobilité utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-              <MultiChoiceField label="Types de missions proposées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-              <MultiChoiceField label="Durées habituelles" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-              <MultiChoiceField label="Horaires rarement proposés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
               <MultiChoiceField label="Patientèles reçues" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
               <MultiChoiceField label="Logiciels utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-              <Field label="Rémunération minimale habituelle (EUR)">
-                <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
-              </Field>
             </div>
             <Field label="Adresse"><Input value={form.address || ''} onChange={(e) => set('address', e.target.value)} /></Field>
             <div className="form-row">

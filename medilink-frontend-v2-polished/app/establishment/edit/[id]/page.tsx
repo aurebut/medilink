@@ -10,14 +10,10 @@ import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManage
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import {
-  acceptedMissionTypeOptions,
   cityOptions,
   countryOptions,
-  durationOptions,
   equipmentOptions,
-  mobilityOptions,
   patientTypeOptions,
-  refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
   softwareOptions,
@@ -48,13 +44,8 @@ export default function EditEstablishmentPage() {
         averagePatientsPerDay: establishment.averagePatientsPerDay ?? '',
         isMultidisciplinary: establishment.isMultidisciplinary,
         equipmentAvailable: establishment.equipmentAvailable || [],
-        mobilityOptions: establishment.mobilityOptions || [],
-        acceptedMissionTypes: establishment.acceptedMissionTypes || [],
-        preferredDurations: establishment.preferredDurations || [],
-        refusedSchedules: establishment.refusedSchedules || [],
         acceptedPatientTypes: establishment.acceptedPatientTypes || [],
         knownSoftware: establishment.knownSoftware || [],
-        minimumCompensation: establishment.minimumCompensation ?? '',
         address: establishment.address || '',
         email: establishment.email || '',
         phone: establishment.phone || '',
@@ -77,13 +68,8 @@ export default function EditEstablishmentPage() {
     try {
       await api.patch<Establishment>(`/establishments/${id}`, {
         ...form,
-        mobilityOptions: cleanArray(form.mobilityOptions),
-        acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
-        minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? null : Number(form.minimumCompensation),
         averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? null : Number(form.averagePatientsPerDay),
         equipmentAvailable: cleanArray(form.equipmentAvailable),
-        preferredDurations: cleanArray(form.preferredDurations),
-        refusedSchedules: cleanArray(form.refusedSchedules),
         acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
         knownSoftware: cleanArray(form.knownSoftware),
       });
@@ -231,30 +217,6 @@ export default function EditEstablishmentPage() {
               <div className="profile-preferences-section">
                 <h3>Critères habituels de mission</h3>
                 <MultiChoiceField
-                  label="Mobilité utile"
-                  values={safeArray(form.mobilityOptions)}
-                  options={mobilityOptions}
-                  onChange={(values) => set('mobilityOptions', values)}
-                />
-                <MultiChoiceField
-                  label="Types de missions proposées"
-                  values={safeArray(form.acceptedMissionTypes)}
-                  options={acceptedMissionTypeOptions}
-                  onChange={(values) => set('acceptedMissionTypes', values)}
-                />
-                <MultiChoiceField
-                  label="Durées habituelles"
-                  values={safeArray(form.preferredDurations)}
-                  options={durationOptions}
-                  onChange={(values) => set('preferredDurations', values)}
-                />
-                <MultiChoiceField
-                  label="Horaires rarement proposés"
-                  values={safeArray(form.refusedSchedules)}
-                  options={refusedScheduleOptions}
-                  onChange={(values) => set('refusedSchedules', values)}
-                />
-                <MultiChoiceField
                   label="Patientèles reçues"
                   values={safeArray(form.acceptedPatientTypes)}
                   options={patientTypeOptions}
@@ -266,15 +228,6 @@ export default function EditEstablishmentPage() {
                   options={softwareOptions}
                   onChange={(values) => set('knownSoftware', values)}
                 />
-                <Field label="Rémunération minimale habituelle (EUR)">
-                  <Input
-                    type="number"
-                    min={0}
-                    value={form.minimumCompensation ?? ''}
-                    onChange={(e) => set('minimumCompensation', e.target.value)}
-                    placeholder="Ex : 600"
-                  />
-                </Field>
               </div>
               <Field label="Adresse">
                 <Input value={form.address || ''} onChange={(e) => set('address', e.target.value)} />

@@ -11,23 +11,17 @@ import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/com
 import {
   acceptedMissionTypeOptions,
   actsPerformedOptions,
+  additionalTrainingOptions,
   candidateMedicalStatusOptions,
   cityOptions,
   countryOptions,
-  durationOptions,
-  hospitalOrFacultyOptions,
   missionActOptions,
   mobilityOptions,
-  mobilityRangeOptions,
   noticeOptions,
   patientTypeOptions,
-  pressureLevelOptions,
   practiceSettingOptions,
-  refusedScheduleOptions,
   softwareOptions,
-  specialtyOptions,
   timeSlotOptions,
-  universityDiplomaOptions,
   weekdayOptions,
 } from '@/lib/profile-options';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -106,12 +100,10 @@ export default function ProfilePage() {
       country: form.country || undefined,
       medicalStatus: form.medicalStatus || undefined,
       medicalStatusOther: form.medicalStatus === 'OTHER' ? form.medicalStatusOther || undefined : undefined,
-      specialty: form.specialty || undefined,
-      orientation: form.orientation || undefined,
-      hospitalOrFaculty: form.hospitalOrFaculty || undefined,
+      orientation: buildOrientationValue(form),
       bio: form.bio || undefined,
       experienceYears: form.experienceYears === '' || form.experienceYears == null ? undefined : Number(form.experienceYears),
-      actsPerformed: cleanArray(form.actsPerformed),
+      actsPerformed: normalizeCandidateSkills(form.actsPerformed),
       availabilityNotes: form.availabilityNotes || undefined,
       preferredCities: cleanArray(form.preferredCities),
       maxTravelRadiusKm: form.maxTravelRadiusKm === '' || form.maxTravelRadiusKm == null ? undefined : Number(form.maxTravelRadiusKm),
@@ -119,24 +111,18 @@ export default function ProfilePage() {
       acceptedWeekdays: cleanArray(form.acceptedWeekdays),
       acceptedTimeSlots: cleanArray(form.acceptedTimeSlots),
       minimumNoticeHours: form.minimumNoticeHours === '' || form.minimumNoticeHours == null ? undefined : Number(form.minimumNoticeHours),
-      mobilityRangeType: form.mobilityRangeType || undefined,
-      housingRequiredBeyondKm: form.housingRequiredBeyondKm === '' || form.housingRequiredBeyondKm == null ? undefined : Number(form.housingRequiredBeyondKm),
       acceptedPracticeSettings: cleanArray(form.acceptedPracticeSettings),
       acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
       minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
-      preferredDurations: cleanArray(form.preferredDurations),
-      refusedSchedules: cleanArray(form.refusedSchedules),
       knownSoftware: cleanArray(form.knownSoftware),
       acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
       refusedPatientTypes: cleanArray(form.refusedPatientTypes),
-      maxPatientsPerDay: form.maxPatientsPerDay === '' || form.maxPatientsPerDay == null ? undefined : Number(form.maxPatientsPerDay),
       parkingRequired: form.parkingRequired,
       acceptedActs: cleanArray(form.acceptedActs),
       refusedActs: cleanArray(form.refusedActs),
       secretaryRequired: form.secretaryRequired,
       accommodationRequired: form.accommodationRequired,
       fastPaymentImportant: form.fastPaymentImportant,
-      acceptedPressureLevel: form.acceptedPressureLevel || undefined,
     };
 
     try {
@@ -377,12 +363,7 @@ export default function ProfilePage() {
                           ))}
                         </Select>
                       </Field>
-                      <MultiChoiceTextField
-                        label="Spécialité"
-                        value={form.specialty || ''}
-                        options={specialtyOptions}
-                        onChange={(value) => set('specialty', value)}
-                      />
+                      <BooleanPreference label="Thésé" value={readOrientationFlag(form.orientation, 'Thèse')} onChange={(value) => set('orientation', setOrientationFlag(form.orientation, 'Thèse', value))} />
                     </div>
 
                     {form.medicalStatus === 'OTHER' ? (
@@ -392,8 +373,8 @@ export default function ProfilePage() {
                     ) : null}
 
                     <div className="form-row">
-                      <MultiChoiceTextField label="Diplôme universitaire" value={form.orientation || ''} options={universityDiplomaOptions} onChange={(value) => set('orientation', value)} />
-                      <SingleChoiceField label="Hôpital / faculté" value={form.hospitalOrFaculty || ''} options={hospitalOrFacultyOptions} onChange={(value) => set('hospitalOrFaculty', value)} />
+                      <BooleanPreference label="DES médecin généraliste" value={readOrientationFlag(form.orientation, 'DES médecin généraliste')} onChange={(value) => set('orientation', setOrientationFlag(form.orientation, 'DES médecin généraliste', value))} />
+                      <MultiChoiceTextField label="Formation supplémentaire" value={orientationTrainingsValue(form.orientation)} options={additionalTrainingOptions} onChange={(value) => set('orientation', setOrientationTrainings(form.orientation, value))} />
                     </div>
 
                     <div className="form-row">
@@ -425,22 +406,17 @@ export default function ProfilePage() {
                       <Field label="Rayon maximum (km)">
                         <Input type="number" min={0} max={1000} value={form.maxTravelRadiusKm ?? ''} onChange={(e) => set('maxTravelRadiusKm', e.target.value)} placeholder="Ex : 50" />
                       </Field>
-                      <Field label="Rémunération minimale (EUR)">
-                        <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 600" />
+                      <Field label="Rémunération minimale (%)">
+                        <Input type="number" min={0} max={100} value={form.minimumCompensation ?? ''} onChange={(e) => set('minimumCompensation', e.target.value)} placeholder="Ex : 70" />
                       </Field>
                     </div>
 
                     <MultiChoiceField label="Mobilité" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
                     <div className="form-row">
-                      <SingleChoiceField label="Type de mobilité" value={form.mobilityRangeType || ''} options={mobilityRangeOptions} onChange={(value) => set('mobilityRangeType', value)} />
-                      <Field label="Logement requis au-delà de (km)">
-                        <Input type="number" min={0} max={1000} value={form.housingRequiredBeyondKm ?? ''} onChange={(e) => set('housingRequiredBeyondKm', e.target.value)} placeholder="Ex : 50" />
-                      </Field>
+                      <BooleanPreference label="Logement nécessaire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
                     </div>
                     <MultiChoiceField label="Types de missions acceptées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
                     <MultiChoiceField label="Cadres d'exercice acceptés" values={safeArray(form.acceptedPracticeSettings)} options={practiceSettingOptions} onChange={(values) => set('acceptedPracticeSettings', values)} />
-                    <MultiChoiceField label="Durée préférée" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-                    <MultiChoiceField label="Horaires refusés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
                     <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
                     <MultiChoiceField label="Patientèle acceptée" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
                     <MultiChoiceField label="Patientèle refusée" values={safeArray(form.refusedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('refusedPatientTypes', values)} />
@@ -449,23 +425,15 @@ export default function ProfilePage() {
                        <h3>Actes et charge de travail</h3>
                        <MultiChoiceField label="Actes acceptés" values={safeArray(form.acceptedActs)} options={missionActOptions} onChange={(values) => set('acceptedActs', values)} />
                        <MultiChoiceField label="Actes refusés" values={safeArray(form.refusedActs)} options={missionActOptions} onChange={(values) => set('refusedActs', values)} />
-                      <Field label="Patients par jour maximum">
-                        <Input type="number" min={0} max={300} value={form.maxPatientsPerDay ?? ''} onChange={(e) => set('maxPatientsPerDay', e.target.value)} placeholder="Ex : 25" />
-                      </Field>
                     </div>
 
                     <div className="form-row">
                       <BooleanPreference label="Secrétaire obligatoire" value={form.secretaryRequired} onChange={(value) => set('secretaryRequired', value)} />
-                      <BooleanPreference label="Logement obligatoire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
-                    </div>
-
-                    <div className="form-row">
                       <BooleanPreference label="Parking obligatoire" value={form.parkingRequired} onChange={(value) => set('parkingRequired', value)} />
-                      <BooleanPreference label="Paiement rapide important" value={form.fastPaymentImportant} onChange={(value) => set('fastPaymentImportant', value)} />
                     </div>
 
                     <div className="form-row">
-                      <SingleChoiceField label="Niveau de pression accepté" value={form.acceptedPressureLevel || ''} options={pressureLevelOptions} onChange={(value) => set('acceptedPressureLevel', value)} />
+                      <BooleanPreference label="Paiement rapide important" value={form.fastPaymentImportant} onChange={(value) => set('fastPaymentImportant', value)} />
                     </div>
                   </>
                 ) : null}
@@ -519,6 +487,48 @@ function safeArray(value: unknown): string[] {
 
 function cleanArray(value: unknown): string[] {
   return safeArray(value).map((item) => item.trim()).filter(Boolean);
+}
+
+const ORIENTATION_FLAGS = ['Thèse', 'DES médecin généraliste'];
+const ADDITIONAL_TRAINING_VALUES = new Set(additionalTrainingOptions.map((option) => option.value));
+
+function orientationParts(value: unknown) {
+  return String(value || '').split(',').map((item) => item.trim()).filter(Boolean);
+}
+
+function orientationTrainingsValue(value: unknown) {
+  return orientationParts(value).filter((item) => ADDITIONAL_TRAINING_VALUES.has(item)).join(', ');
+}
+
+function readOrientationFlag(value: unknown, label: string) {
+  const yes = `${label}: Oui`;
+  const no = `${label}: Non`;
+  const parts = orientationParts(value);
+  if (parts.includes(yes)) return true;
+  if (parts.includes(no)) return false;
+  return null;
+}
+
+function setOrientationFlag(value: unknown, label: string, enabled: boolean) {
+  const parts = orientationParts(value).filter((item) => item !== `${label}: Oui` && item !== `${label}: Non`);
+  return [...parts, `${label}: ${enabled ? 'Oui' : 'Non'}`].join(', ');
+}
+
+function setOrientationTrainings(value: unknown, trainings: string) {
+  const parts = orientationParts(value).filter((item) => !ADDITIONAL_TRAINING_VALUES.has(item));
+  return [...parts, ...orientationParts(trainings)].join(', ');
+}
+
+function buildOrientationValue(form: any) {
+  return orientationParts(form.orientation).filter((item) => {
+    if (ADDITIONAL_TRAINING_VALUES.has(item)) return true;
+    return ORIENTATION_FLAGS.some((label) => item === `${label}: Oui` || item === `${label}: Non`);
+  }).join(', ') || undefined;
+}
+
+function normalizeCandidateSkills(value: unknown) {
+  const values = cleanArray(value);
+  return values.includes('ECG / vaccination') ? values : ['ECG / vaccination', ...values];
 }
 
 function BooleanPreference({ label, value, onChange }: { label: string; value?: boolean | null; onChange: (value: boolean) => void }) {

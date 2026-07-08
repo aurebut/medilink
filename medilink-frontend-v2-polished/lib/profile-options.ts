@@ -57,6 +57,13 @@ export const universityDiplomaOptions: ChoiceOption[] = [
   { value: 'These medecine', label: 'Thèse de médecine' },
 ];
 
+export const additionalTrainingOptions: ChoiceOption[] = [
+  { value: 'DU', label: 'DU' },
+  { value: 'DIU', label: 'DIU' },
+  { value: 'FST', label: 'FST' },
+  { value: 'Competence', label: 'Compétence' },
+];
+
 export const establishmentDepartmentOptions: ChoiceOption[] = [
   { value: 'Urgences adultes', label: 'Urgences adultes' },
   { value: 'Urgences pediatriques', label: 'Urgences pédiatriques' },
@@ -82,15 +89,12 @@ export const hospitalOrFacultyOptions: ChoiceOption[] = [
 export const mobilityOptions: ChoiceOption[] = [
   { value: 'Voiture', label: 'Voiture' },
   { value: 'Train', label: 'Train' },
-  { value: 'Logement necessaire', label: 'Logement nécessaire' },
 ];
 
 export const acceptedMissionTypeOptions: ChoiceOption[] = [
-  { value: 'GARDE', label: 'Garde' },
-  { value: 'REMPLACEMENT', label: 'Remplacement' },
-  { value: 'VACATION', label: 'Vacation' },
+  { value: 'REMPLACEMENT', label: 'Remplacement courte durée' },
+  { value: 'VACATION', label: 'Remplacement longue durée' },
   { value: 'STAGE', label: 'Stage' },
-  { value: 'AIDE_OP', label: 'Aide op.' },
 ];
 
 export const weekdayOptions: ChoiceOption[] = [
@@ -143,8 +147,6 @@ export const missionActOptions: ChoiceOption[] = [
   { value: 'ECG', label: 'ECG' },
   { value: 'ULTRASOUND', label: 'Échographie' },
   { value: 'SMALL_TRAUMA', label: 'Petite traumatologie' },
-  { value: 'EMERGENCY_PROCEDURES', label: "Gestes d'urgence" },
-  { value: 'VENOUS_ACCESS', label: 'Pose de voie veineuse' },
   { value: 'WOUND_CARE', label: 'Gestion des plaies' },
   { value: 'GYNECOLOGY', label: 'Gynécologie courante' },
   { value: 'PEDIATRICS', label: 'Pédiatrie' },
@@ -193,11 +195,10 @@ export const secretaryTypeOptions: ChoiceOption[] = [
 export const equipmentOptions: ChoiceOption[] = [
   { value: 'ECG', label: 'ECG' },
   { value: 'Echographe', label: 'Échographe' },
-  { value: 'Radiologie', label: 'Radiologie' },
-  { value: 'Biologie rapide', label: 'Biologie rapide' },
   { value: 'Materiel de suture', label: 'Matériel de suture' },
   { value: 'Salle de soins', label: 'Salle de soins' },
   { value: 'Oxymetre', label: 'Oxymètre' },
+  { value: 'Oxygene', label: 'Oxygène' },
   { value: 'Defibrillateur', label: 'Défibrillateur' },
 ];
 
@@ -206,9 +207,7 @@ export const patientTypeOptions: ChoiceOption[] = [
   { value: 'Enfants', label: 'Enfants' },
   { value: 'Nourrissons', label: 'Nourrissons' },
   { value: 'Personnes agees', label: 'Personnes âgées' },
-  { value: 'Patientele chronique', label: 'Patientèle chronique' },
-  { value: 'Patientele rurale', label: 'Patientèle rurale' },
-  { value: 'Patientele urbaine', label: 'Patientèle urbaine' },
+  { value: 'Gynecologie', label: 'Gynécologie' },
   { value: 'Patientele precaire', label: 'Patientèle précaire' },
   { value: 'EHPAD', label: 'EHPAD' },
   { value: 'Soins non programmes', label: 'Soins non programmés' },
@@ -217,18 +216,13 @@ export const patientTypeOptions: ChoiceOption[] = [
 
 export const actsPerformedOptions: ChoiceOption[] = [
   { value: 'Consultations', label: 'Consultations' },
-  { value: 'Vaccination', label: 'Vaccination' },
-  { value: 'Sutures', label: 'Sutures' },
-  { value: 'ECG', label: 'ECG' },
+  { value: 'ECG / vaccination', label: 'ECG / vaccination' },
   { value: 'Echographie', label: 'Échographie' },
-  { value: 'Pose de sterilet', label: 'Pose de stérilet' },
+  { value: 'Pose de sterilet / implant', label: 'Pose de stérilet / implant' },
   { value: 'Frottis', label: 'Frottis' },
   { value: 'Infiltration', label: 'Infiltration' },
-  { value: 'Aerosoltherapie', label: 'Aérosolthérapie' },
-  { value: 'Pose de voie veineuse', label: 'Pose de voie veineuse' },
   { value: 'Gestion plaies', label: 'Gestion des plaies' },
-  { value: 'Petite traumatologie', label: 'Petite traumatologie' },
-  { value: 'Gestes d urgence', label: "Gestes d'urgence" },
+  { value: 'Suture / petite traumatologie', label: 'Suture / petite traumatologie' },
 ];
 
 export const pressureLevelOptions: ChoiceOption[] = [

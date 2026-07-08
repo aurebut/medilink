@@ -24,17 +24,15 @@ export const documentTypeOptions: Array<{ value: DocumentType; label: string }> 
 export const establishmentTypeOptions: Array<{ value: EstablishmentType; label: string }> = [
   { value: 'HOSPITAL', label: 'Hôpital public' },
   { value: 'CLINIC', label: 'Clinique privée' },
-  { value: 'CABINET', label: 'Cabinet' },
-  { value: 'MEDICAL_SERVICE', label: 'Service médical' },
+  { value: 'CABINET', label: 'Regroupement cabinet' },
+  { value: 'AGENCY', label: 'Maison de santé' },
   { value: 'OTHER', label: 'Autre' },
 ];
 
 export const missionTypeOptions: Array<{ value: MissionType; label: string }> = [
-  { value: 'GARDE', label: 'Garde' },
-  { value: 'REMPLACEMENT', label: 'Remplacement' },
-  { value: 'VACATION', label: 'Vacation' },
+  { value: 'REMPLACEMENT', label: 'Remplacement courte durée' },
+  { value: 'VACATION', label: 'Remplacement longue durée' },
   { value: 'STAGE', label: 'Stage' },
-  { value: 'AIDE_OP', label: 'Aide op.' },
 ];
 
 export const requiredLevelOptions: Array<{ value: RequiredLevel; label: string }> = [

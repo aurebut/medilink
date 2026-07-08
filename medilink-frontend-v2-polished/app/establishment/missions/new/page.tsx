@@ -16,10 +16,8 @@ import {
   equipmentOptions,
   establishmentDepartmentOptions,
   missionActOptions,
-  mobilityOptions,
   patientTypeOptions,
   practiceSettingOptions,
-  refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
   softwareOptions,
@@ -52,7 +50,7 @@ const steps = [
 ];
 
 const initialForm = {
-  missionType: 'GARDE' as MissionType,
+  missionType: 'REMPLACEMENT' as MissionType,
   requiredLevel: 'INTERN' as RequiredLevel,
   requiredLevels: ['INTERN'] as RequiredLevel[],
   compensationMode: 'RETROCESSION',
@@ -189,7 +187,7 @@ function findStoppedStep(form: any, establishment?: any) {
 function missionToWizardForm(mission: any) {
   const tagsText = mission.tags?.map((tag: any) => tag.tag).join(', ') || '';
   return {
-    missionType: mission.missionType || 'GARDE',
+    missionType: mission.missionType || 'REMPLACEMENT',
     requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel || 'INTERN',
     requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean),
     compensationMode: mission.compensationMode || 'RETROCESSION',
@@ -558,11 +556,9 @@ export default function NewMissionPage() {
       averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? undefined : Number(form.averagePatientsPerDay),
       isMultidisciplinary: form.isMultidisciplinary,
       equipmentAvailable: cleanArray(form.equipmentAvailable),
-      mobilityOptions: cleanArray(form.mobilityOptions),
       acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
       minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
       preferredDurations: cleanArray(form.preferredDurations),
-      refusedSchedules: cleanArray(form.refusedSchedules),
       acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
       knownSoftware: cleanArray(form.knownSoftware),
       tags: String(form.tagsText || '').split(',').map((x: string) => x.trim()).filter(Boolean),
@@ -1168,7 +1164,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
           <p>Un titre clair et une spécialité précise aident les bons profils à se projeter.</p>
         </div>
         <Field label="Titre de la mission">
-          <Input required value={form.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Garde aux urgences - nuit" />
+          <Input required value={form.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Remplacement courte durée - journée" />
         </Field>
         <SingleChoiceField required label="Spécialité" value={form.specialty || ''} options={specialtyOptions} onChange={(value) => set('specialty', value)} />
       </div>
@@ -1296,7 +1292,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         </div>
         <ChoiceSection title="Options d'accueil">
           <BooleanChoice
-            label="Logement proposé"
+            label="Logement nécessaire"
             value={form.accommodationProvided}
             onChange={(value) => set('accommodationProvided', value)}
           />
@@ -1341,7 +1337,7 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
       <div className="wizard-step-content">
         <div>
           <h2>Durée et rémunération</h2>
-          <p>Indiquez la durée de la mission, le taux de rétrocession et la rémunération minimale.</p>
+          <p>Indiquez la durée de la mission, le taux de rétrocession et la rémunération minimale en pourcentage.</p>
         </div>
         <Field label="Durée estimée en heures">
           <NumberStepper min={1} max={72} step={1} value={form.durationHours || ''} onChange={(value) => set('durationHours', value)} />
@@ -1350,8 +1346,8 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
         <Field label="Pourcentage de rétrocession">
           <NumberStepper min={1} max={100} step={1} value={form.retrocessionPercentage || ''} onChange={(value) => set('retrocessionPercentage', value)} suffix="%" />
         </Field>
-        <Field label="Rémunération minimale indicative (EUR)">
-          <NumberStepper min={0} step={50} value={form.minimumCompensation ?? ''} onChange={(value) => set('minimumCompensation', value)} placeholder="Ex : 600" suffix="EUR" />
+        <Field label="Rémunération minimale indicative (%)">
+          <NumberStepper min={0} max={100} step={1} value={form.minimumCompensation ?? ''} onChange={(value) => set('minimumCompensation', value)} placeholder="Ex : 70" suffix="%" />
         </Field>
       </div>
     );

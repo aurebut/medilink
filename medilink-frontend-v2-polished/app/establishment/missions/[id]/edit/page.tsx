@@ -10,14 +10,11 @@ import { missionTypeLabel, missionTypeOptions, requiredLevelLabels, requiredLeve
 import {
   acceptedMissionTypeOptions,
   cityOptions,
-  durationOptions,
   equipmentOptions,
   establishmentDepartmentOptions,
   missionActOptions,
-  mobilityOptions,
   patientTypeOptions,
   practiceSettingOptions,
-  refusedScheduleOptions,
   sectorOptions,
   secretaryTypeOptions,
   softwareOptions,
@@ -53,7 +50,7 @@ function missionToForm(mission: Mission) {
   return {
     title: mission.title || '',
     description: mission.description || '',
-    missionType: mission.missionType || 'GARDE',
+    missionType: mission.missionType || 'REMPLACEMENT',
     specialty: mission.specialty || '',
     requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel || 'INTERN',
     requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean),
@@ -69,11 +66,8 @@ function missionToForm(mission: Mission) {
     averagePatientsPerDay: mission.averagePatientsPerDay ?? '',
     isMultidisciplinary: mission.isMultidisciplinary,
     equipmentAvailable: mission.equipmentAvailable || [],
-    mobilityOptions: mission.mobilityOptions || [],
     acceptedMissionTypes: mission.acceptedMissionTypes || [],
     minimumCompensation: mission.minimumCompensation ?? '',
-    preferredDurations: mission.preferredDurations || [],
-    refusedSchedules: mission.refusedSchedules || [],
     acceptedPatientTypes: mission.acceptedPatientTypes || [],
     knownSoftware: mission.knownSoftware || [],
     departmentInfo: mission.departmentInfo || '',
@@ -113,11 +107,8 @@ function buildPayload(form: any) {
     averagePatientsPerDay: form.averagePatientsPerDay === '' || form.averagePatientsPerDay == null ? null : Number(form.averagePatientsPerDay),
     isMultidisciplinary: form.isMultidisciplinary ?? null,
     equipmentAvailable: cleanArray(form.equipmentAvailable),
-    mobilityOptions: cleanArray(form.mobilityOptions),
     acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
     minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? null : Number(form.minimumCompensation),
-    preferredDurations: cleanArray(form.preferredDurations),
-    refusedSchedules: cleanArray(form.refusedSchedules),
     acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
     knownSoftware: cleanArray(form.knownSoftware),
     departmentInfo: optionalText(form.departmentInfo),
@@ -348,7 +339,7 @@ export default function EditMissionPage() {
                 <Textarea rows={3} value={form.practicalInfo || ''} onChange={(event) => set('practicalInfo', event.target.value)} />
               </Field>
               <div className="form-row">
-                <BooleanField label="Logement proposé" value={form.accommodationProvided} onChange={(value) => set('accommodationProvided', value)} />
+                <BooleanField label="Logement nécessaire" value={form.accommodationProvided} onChange={(value) => set('accommodationProvided', value)} />
                 <BooleanField label="Parking disponible" value={form.parkingAvailable} onChange={(value) => set('parkingAvailable', value)} />
               </div>
             </div>
@@ -401,13 +392,10 @@ export default function EditMissionPage() {
                 <Input value={form.tagsText || ''} onChange={(event) => set('tagsText', event.target.value)} />
               </Field>
               <MultiChoiceField label="Types de missions associés" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-              <MultiChoiceField label="Mobilité utile" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
-              <MultiChoiceField label="Durées proposées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-              <MultiChoiceField label="Horaires non proposés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
               <MultiChoiceField label="Patientèles acceptées" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
               <MultiChoiceField label="Logiciels utiles" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
-              <Field label="Rémunération minimale indicative (EUR)">
-                <Input type="number" min={0} value={form.minimumCompensation ?? ''} onChange={(event) => set('minimumCompensation', event.target.value)} />
+              <Field label="Rémunération minimale indicative (%)">
+                <Input type="number" min={0} max={100} value={form.minimumCompensation ?? ''} onChange={(event) => set('minimumCompensation', event.target.value)} />
               </Field>
             </div>
           </Card>
