@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input, Select } from '@/components/ui';
@@ -22,6 +22,13 @@ export default function RegisterPage() {
   const [rpps, setRpps] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const requestedType = new URLSearchParams(window.location.search).get('type');
+    if (requestedType === 'candidate' || requestedType === 'establishment') {
+      setAccountType(requestedType);
+    }
+  }, []);
 
   async function submit(e: FormEvent) {
     e.preventDefault();

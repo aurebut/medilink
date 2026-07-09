@@ -1,0 +1,1 @@
+document.querySelectorAll('.reveal').forEach(function(el){new IntersectionObserver(function(entries,observer){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}})},{threshold:.12}).observe(el)});
