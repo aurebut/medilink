@@ -496,29 +496,28 @@ export class ConversationsService {
 
     const candidateProfile = conversation.application.candidate.profile;
     const candidateName = [candidateProfile?.firstName, candidateProfile?.lastName].filter(Boolean).join(' ') || conversation.application.candidate.email;
-    const title = type === 'recruiter' ? 'Facture etablissement' : 'Justificatif candidat';
+    const title = type === 'recruiter' ? 'Facture de retrocession' : 'Justificatif de retrocession';
     const fileName = `${invoice.number}-${type === 'recruiter' ? 'facture-etablissement' : 'justificatif-candidat'}.pdf`;
-    const buffer = this.buildInvoicePdf([
+    const buffer = this.buildInvoicePdf({
+      type,
       title,
-      `Numero: ${invoice.number}`,
-      `Date d'emission: ${invoice.issuedAt.toLocaleDateString('fr-FR')}`,
-      '',
-      `Mission: ${conversation.mission.title}`,
-      `Etablissement: ${conversation.establishment.name}`,
-      `Candidat: ${candidateName}`,
-      `Ville: ${conversation.mission.city}`,
-      `Date mission: ${agreement.startDate ? agreement.startDate.toLocaleDateString('fr-FR') : '-'}`,
-      `Horaire: ${agreement.startTime || '-'}${agreement.endTime ? ` - ${agreement.endTime}` : ''}`,
-      '',
-      `Mode: ${agreement.compensationMode === CompensationMode.RETROCESSION ? "Retrocession d'honoraires" : 'Montant fixe'}`,
-      agreement.retrocessionPercentage ? `Retrocession: ${agreement.retrocessionPercentage}%` : null,
-      `Montant: ${invoice.amount.toLocaleString('fr-FR', { style: 'currency', currency: invoice.currency })}`,
-      '',
-      type === 'recruiter'
-        ? 'Document genere pour le recruteur apres validation de la mission.'
-        : 'Document genere pour le candidat apres validation de la mission.',
-      'Medilink - document genere automatiquement.',
-    ].filter(Boolean) as string[]);
+      number: invoice.number,
+      issuedAt: invoice.issuedAt,
+      amount: invoice.amount,
+      currency: invoice.currency,
+      missionTitle: conversation.mission.title,
+      establishmentName: conversation.establishment.name,
+      establishmentAddress: [conversation.establishment.address, conversation.establishment.city, conversation.establishment.country].filter(Boolean).join(', '),
+      candidateName,
+      candidateReference: candidateProfile?.rpps ? `RPPS ${candidateProfile.rpps}` : conversation.application.candidate.email,
+      city: conversation.mission.city,
+      startDate: agreement.startDate,
+      endDate: agreement.endDate,
+      startTime: agreement.startTime,
+      endTime: agreement.endTime,
+      compensationMode: agreement.compensationMode,
+      retrocessionPercentage: agreement.retrocessionPercentage,
+    });
 
     return { buffer, fileName };
   }
@@ -642,26 +641,123 @@ export class ConversationsService {
     return invoices.sort((a, b) => a.issuedAt.getTime() - b.issuedAt.getTime());
   }
 
-  private buildInvoicePdf(lines: string[]) {
-    const escapePdfText = (value: string) => value
+  private buildInvoicePdf(data: {
+    type: InvoiceDownloadType;
+    title: string;
+    number: string;
+    issuedAt: Date;
+    amount: number;
+    currency: string;
+    missionTitle: string;
+    establishmentName: string;
+    establishmentAddress: string;
+    candidateName: string;
+    candidateReference: string;
+    city: string;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    startTime?: string | null;
+    endTime?: string | null;
+    compensationMode: CompensationMode;
+    retrocessionPercentage?: number | null;
+  }) {
+    const commands: string[] = [];
+    const safe = (value: unknown, maxLength = 90) => String(value ?? '')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[\\()]/g, '\\$&');
-    const textCommands = lines.map((line, index) => {
-      const size = index === 0 ? 20 : 11;
-      const leading = index === 0 ? 28 : 17;
-      const escaped = escapePdfText(line);
-      return index === 0
-        ? `BT /F1 ${size} Tf 54 770 Td (${escaped}) Tj ET`
-        : `BT /F1 ${size} Tf 54 ${770 - 28 - ((index - 1) * leading)} Td (${escaped}) Tj ET`;
-    }).join('\n');
-    const stream = `${textCommands}\n`;
+      .replace(/[^\x20-\x7E]/g, ' ')
+      .replace(/[\\()]/g, '\\$&')
+      .slice(0, maxLength);
+    const color = (hex: string) => {
+      const clean = hex.replace('#', '');
+      return [0, 2, 4].map((offset) => parseInt(clean.slice(offset, offset + 2), 16) / 255)
+        .map((value) => value.toFixed(3)).join(' ');
+    };
+    const rect = (x: number, y: number, width: number, height: number, fill: string, radius = 0) => {
+      const fillColor = color(fill);
+      if (!radius) {
+        commands.push(`${fillColor} rg ${x} ${y} ${width} ${height} re f`);
+        return;
+      }
+      const r = Math.min(radius, width / 2, height / 2);
+      const k = 0.5522847498;
+      commands.push(`${fillColor} rg ${x + r} ${y} m ${x + width - r} ${y} l ${x + width - r + r * k} ${y} ${x + width} ${y + r - r * k} ${x + width} ${y + r} c ${x + width} ${y + height - r} l ${x + width} ${y + height - r + r * k} ${x + width - r + r * k} ${y + height} ${x + width - r} ${y + height} c ${x + r} ${y + height} l ${x + r - r * k} ${y + height} ${x} ${y + height - r + r * k} ${x} ${y + height - r} c ${x} ${y + r} l ${x} ${y + r - r * k} ${x + r - r * k} ${y} ${x + r} ${y} c f`);
+    };
+    const line = (x1: number, y1: number, x2: number, y2: number, stroke: string, width = 1) => {
+      commands.push(`${color(stroke)} RG ${width} w ${x1} ${y1} m ${x2} ${y2} l S`);
+    };
+    const text = (value: unknown, x: number, y: number, size = 10, fill = '#243145', font: 'F1' | 'F2' = 'F1', align: 'left' | 'right' = 'left', maxLength = 90) => {
+      const content = safe(value, maxLength);
+      const estimatedWidth = content.length * size * (font === 'F2' ? 0.55 : 0.5);
+      const targetX = align === 'right' ? x - estimatedWidth : x;
+      commands.push(`BT /${font} ${size} Tf ${color(fill)} rg ${targetX.toFixed(1)} ${y} Td (${content}) Tj ET`);
+    };
+    const formatDate = (value?: Date | null) => value ? value.toLocaleDateString('fr-FR') : '-';
+    const formatAmount = (amount: number) => amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    rect(0, 687, 595, 155, '#102A43');
+    rect(0, 687, 12, 155, '#15B8A6');
+    text('Medi', 46, 782, 25, '#FFFFFF', 'F2');
+    text('Link', 102, 782, 25, '#15B8A6', 'F2');
+    text('REMPLACEMENTS MEDICAUX', 47, 760, 8, '#A9C3D6', 'F2');
+    text(data.title.toUpperCase(), 548, 790, 17, '#FFFFFF', 'F2', 'right');
+    text(`N. ${data.number}`, 548, 766, 10, '#C9D8E5', 'F1', 'right');
+    text(`Emise le ${formatDate(data.issuedAt)}`, 548, 748, 9, '#C9D8E5', 'F1', 'right');
+    rect(46, 709, 102, 24, '#15B8A6', 12);
+    text('MISSION VALIDEE', 60, 717, 8, '#FFFFFF', 'F2');
+
+    text(data.type === 'recruiter' ? 'EMETTEUR' : 'BENEFICIAIRE', 46, 650, 8, '#678198', 'F2');
+    text(data.candidateName, 46, 628, 13, '#102A43', 'F2', 'left', 42);
+    text(data.candidateReference, 46, 610, 9, '#526A7D', 'F1', 'left', 48);
+    text(data.type === 'recruiter' ? 'DESTINATAIRE' : 'VERSE PAR', 322, 650, 8, '#678198', 'F2');
+    text(data.establishmentName, 322, 628, 13, '#102A43', 'F2', 'left', 38);
+    text(data.establishmentAddress || data.city, 322, 610, 9, '#526A7D', 'F1', 'left', 46);
+    line(46, 583, 549, 583, '#D9E4EC');
+
+    text('DETAIL DE LA PRESTATION', 46, 552, 9, '#102A43', 'F2');
+    rect(46, 510, 503, 28, '#EAF8F6', 4);
+    text('Mission', 60, 520, 8, '#426276', 'F2');
+    text('Periode', 355, 520, 8, '#426276', 'F2');
+    text('Montant', 532, 520, 8, '#426276', 'F2', 'right');
+    text(data.missionTitle, 60, 481, 11, '#102A43', 'F2', 'left', 45);
+    text(data.city, 60, 463, 9, '#678198', 'F1', 'left', 40);
+    const period = data.endDate && formatDate(data.endDate) !== formatDate(data.startDate)
+      ? `${formatDate(data.startDate)} - ${formatDate(data.endDate)}`
+      : formatDate(data.startDate);
+    text(period, 355, 481, 9, '#243145', 'F1', 'left', 25);
+    const hours = [data.startTime, data.endTime].filter(Boolean).join(' - ');
+    if (hours) text(hours, 355, 463, 8, '#678198');
+    text(`${formatAmount(data.amount)} ${data.currency}`, 532, 476, 11, '#102A43', 'F2', 'right');
+    line(46, 441, 549, 441, '#D9E4EC');
+
+    rect(46, 345, 292, 72, '#F4F7FA', 8);
+    text('MODALITE', 62, 393, 8, '#678198', 'F2');
+    text(data.compensationMode === CompensationMode.RETROCESSION ? "Retrocession d'honoraires" : 'Montant fixe', 62, 371, 11, '#102A43', 'F2');
+    if (data.retrocessionPercentage) text(`Taux contractuel : ${data.retrocessionPercentage}%`, 62, 353, 9, '#526A7D');
+    rect(359, 345, 190, 72, '#102A43', 8);
+    text('TOTAL', 377, 391, 8, '#A9C3D6', 'F2');
+    text(`${formatAmount(data.amount)} ${data.currency}`, 531, 361, 19, '#FFFFFF', 'F2', 'right');
+
+    rect(46, 250, 503, 65, '#EAF8F6', 8);
+    text('INFORMATION', 62, 290, 8, '#128578', 'F2');
+    text(data.amount > 0
+      ? 'Le montant ci-dessus correspond a la retrocession validee pour cette mission.'
+      : 'Le taux contractuel est valide. Le montant reel reste a completer apres encaissement.', 62, 269, 9, '#315A63', 'F1', 'left', 88);
+
+    line(46, 117, 549, 117, '#D9E4EC');
+    text('Document genere automatiquement par MediLink', 46, 91, 8, '#678198');
+    text('Reference mission et historique disponibles dans votre espace securise.', 46, 75, 8, '#8AA0B2');
+    text('medilink.fr', 549, 91, 8, '#128578', 'F2', 'right');
+    text('Page 1 / 1', 549, 75, 8, '#8AA0B2', 'F1', 'right');
+
+    const stream = `${commands.join('\n')}\n`;
     const objects = [
       '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
       '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
-      '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj\n',
+      '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >> endobj\n',
       '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n',
       `5 0 obj << /Length ${Buffer.byteLength(stream, 'utf8')} >> stream\n${stream}endstream endobj\n`,
+      '6 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj\n',
     ];
     let pdf = '%PDF-1.4\n';
     const offsets = [0];

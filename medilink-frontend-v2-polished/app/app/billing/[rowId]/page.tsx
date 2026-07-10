@@ -24,8 +24,6 @@ type AccountingRow = {
   classified: boolean;
 };
 
-const STORAGE_KEY = 'medilink_candidate_billing_v2';
-
 function amountFromAgreement(agreement?: MissionAgreement | null) {
   if (!agreement) return 0;
   return agreement.candidateAmount || agreement.amount || 0;
@@ -37,27 +35,6 @@ function rowStatusFromAgreement(agreement?: MissionAgreement | null): Accounting
   if (agreement.status === 'COMPLETED') return 'COMPLETED';
   if (agreement.status === 'PROPOSED') return 'PROPOSED';
   return 'PENDING';
-}
-
-function readClassifiedIds() {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY) || window.localStorage.getItem('medilink_candidate_billing_v1');
-    if (!stored) return [] as string[];
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed.classifiedIds) ? parsed.classifiedIds as string[] : [];
-  } catch {
-    return [] as string[];
-  }
-}
-
-function writeClassifiedIds(classifiedIds: string[]) {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) : {};
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...parsed, classifiedIds }));
-  } catch {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ classifiedIds }));
-  }
 }
 
 function buildMissionRows(conversations: Conversation[], classifiedIds: string[]) {
@@ -128,7 +105,6 @@ export default function BillingMissionDetailPage() {
   const cachedConversations = api.getSync<Conversation[]>('/conversations');
   const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
-  const [storageReady, setStorageReady] = useState(false);
   const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -139,19 +115,21 @@ export default function BillingMissionDetailPage() {
       : await api.get<Conversation[]>('/conversations'));
   }
 
+  async function loadAccounting(options: { reload?: boolean } = {}) {
+    const path = '/billing/accounting/candidate';
+    const workspace = options.reload
+      ? await api.reload<{ classifiedIds: string[] }>(path)
+      : await api.get<{ classifiedIds: string[] }>(path);
+    setClassifiedIds(workspace.classifiedIds);
+  }
+
   useEffect(() => {
-    setClassifiedIds(readClassifiedIds());
-    setStorageReady(true);
-    loadConversations()
+    Promise.all([loadConversations(), loadAccounting()])
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !loading });
-
-  useEffect(() => {
-    if (storageReady) writeClassifiedIds(classifiedIds);
-  }, [classifiedIds, storageReady]);
+  useAutoRefresh(() => Promise.all([loadConversations({ reload: true }), loadAccounting({ reload: true })]).then(() => undefined), { enabled: !loading && !busyId });
 
   const row = useMemo(() => buildMissionRows(conversations, classifiedIds).find((item) => item.id === rowId), [classifiedIds, conversations, rowId]);
 
@@ -182,8 +160,20 @@ export default function BillingMissionDetailPage() {
     }
   }
 
-  function toggleClassified(id: string) {
-    setClassifiedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]);
+  async function toggleClassified(id: string) {
+    setBusyId(id);
+    setError(null);
+    try {
+      const workspace = await api.post<{ classifiedIds: string[] }>('/billing/accounting/candidate/classification', {
+        recordKey: id,
+        classified: !classifiedIds.includes(id),
+      });
+      setClassifiedIds(workspace.classifiedIds);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
   if (loading) return <LoadingCard />;

@@ -27,8 +27,6 @@ type AccountingRow = {
   classified: boolean;
 };
 
-const STORAGE_KEY = 'medilink_establishment_billing_v2';
-
 function amountFromAgreement(agreement?: MissionAgreement | null) {
   if (!agreement) return 0;
   return agreement.amount || 0;
@@ -45,27 +43,6 @@ function rowStatusFromAgreement(agreement?: MissionAgreement | null): Accounting
   if (agreement.status === 'COMPLETED') return 'COMPLETED';
   if (agreement.status === 'PROPOSED') return 'PROPOSED';
   return 'PENDING';
-}
-
-function readClassifiedIds() {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (!stored) return [] as string[];
-    const parsed = JSON.parse(stored);
-    return Array.isArray(parsed.classifiedIds) ? parsed.classifiedIds as string[] : [];
-  } catch {
-    return [] as string[];
-  }
-}
-
-function writeClassifiedIds(classifiedIds: string[]) {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = stored ? JSON.parse(stored) : {};
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...parsed, classifiedIds }));
-  } catch {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ classifiedIds }));
-  }
 }
 
 function latestAgreement(conversation?: Conversation | null) {
@@ -175,7 +152,6 @@ export default function RecruiterBillingMissionDetailPage() {
     cachedConversations && primary ? cachedConversations.filter((c) => c.establishmentId === primary.id) : [],
   );
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
-  const [storageReady, setStorageReady] = useState(false);
   const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -187,20 +163,25 @@ export default function RecruiterBillingMissionDetailPage() {
     setConversations(primary ? data.filter((c) => c.establishmentId === primary.id) : []);
   }
 
-  useEffect(() => {
-    setClassifiedIds(readClassifiedIds());
-    setStorageReady(true);
+  async function loadAccounting(options: { reload?: boolean } = {}) {
+    if (!primary) {
+      setClassifiedIds([]);
+      return;
+    }
+    const path = `/billing/accounting/establishments/${primary.id}`;
+    const workspace = options.reload
+      ? await api.reload<{ classifiedIds: string[] }>(path)
+      : await api.get<{ classifiedIds: string[] }>(path);
+    setClassifiedIds(workspace.classifiedIds);
+  }
 
-    loadConversations()
+  useEffect(() => {
+    Promise.all([loadConversations(), loadAccounting()])
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, [primary]);
 
-  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !establishmentLoading && !loading });
-
-  useEffect(() => {
-    if (storageReady) writeClassifiedIds(classifiedIds);
-  }, [classifiedIds, storageReady]);
+  useAutoRefresh(() => Promise.all([loadConversations({ reload: true }), loadAccounting({ reload: true })]).then(() => undefined), { enabled: !establishmentLoading && !loading && !busyId });
 
   const row = useMemo(() => buildMissionRows(conversations, classifiedIds).find((item) => item.id === rowId), [classifiedIds, conversations, rowId]);
 
@@ -231,8 +212,21 @@ export default function RecruiterBillingMissionDetailPage() {
     }
   }
 
-  function toggleClassified(id: string) {
-    setClassifiedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]);
+  async function toggleClassified(id: string) {
+    if (!primary) return;
+    setBusyId(id);
+    setError(null);
+    try {
+      const workspace = await api.post<{ classifiedIds: string[] }>(`/billing/accounting/establishments/${primary.id}/classification`, {
+        recordKey: id,
+        classified: !classifiedIds.includes(id),
+      });
+      setClassifiedIds(workspace.classifiedIds);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
   if (establishmentLoading || loading) return <LoadingCard />;

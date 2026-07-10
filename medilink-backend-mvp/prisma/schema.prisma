@@ -225,6 +225,16 @@ enum PublicationCreditSource {
   ADMIN_GRANT
 }
 
+enum AccountingOwnerType {
+  CANDIDATE
+  ESTABLISHMENT
+}
+
+enum AccountingEntryKind {
+  REVENUE
+  EXPENSE
+}
+
 model User {
   id            String     @id @default(uuid())
   email         String     @unique
@@ -827,6 +837,56 @@ model AgreementEvent {
 
   @@index([agreementId, createdAt])
   @@index([conversationId, createdAt])
+}
+
+model AccountingWorkspace {
+  id            String              @id @default(uuid())
+  ownerType     AccountingOwnerType
+  ownerId       String
+  provisionRate Int?
+  budgetLimit   Int?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  entries         AccountingEntry[]
+  classifications AccountingClassification[]
+
+  @@unique([ownerType, ownerId])
+  @@index([ownerType, ownerId])
+}
+
+model AccountingEntry {
+  id            String              @id @default(uuid())
+  workspaceId   String
+  kind          AccountingEntryKind
+  entryDate     DateTime
+  counterparty  String
+  missionLabel  String
+  amountCents   Int
+  currency      String              @default("EUR")
+  paymentMethod String
+  notes         String?
+  hasReceipt    Boolean             @default(false)
+  createdById   String
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  workspace AccountingWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, entryDate])
+}
+
+model AccountingClassification {
+  id          String   @id @default(uuid())
+  workspaceId String
+  recordKey   String
+  createdById String
+  createdAt   DateTime @default(now())
+
+  workspace AccountingWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, recordKey])
+  @@index([workspaceId])
 }
 
 model Notification {

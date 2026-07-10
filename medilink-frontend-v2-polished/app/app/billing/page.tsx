@@ -21,6 +21,23 @@ type ManualRevenue = {
   hasReceipt?: boolean;
 };
 
+type AccountingWorkspacePayload = {
+  settings: { provisionRate?: number | null; budgetLimit?: number | null };
+  entries: Array<{
+    id: string;
+    kind: 'REVENUE' | 'EXPENSE';
+    date: string;
+    counterparty: string;
+    mission: string;
+    amount: number;
+    currency: string;
+    paymentMethod: string;
+    notes?: string | null;
+    hasReceipt: boolean;
+  }>;
+  classifiedIds: string[];
+};
+
 type AccountingRow = {
   id: string;
   source: 'MEDILINK' | 'MANUAL';
@@ -56,7 +73,6 @@ type DashboardData = {
 
 type BillingTab = 'overview' | 'revenues' | 'documents' | 'tax' | 'exports';
 
-const STORAGE_KEY = 'medilink_candidate_billing_v2';
 const DEFAULT_PROVISION_RATE = 45;
 const MICRO_BNC_THRESHOLD = 77700;
 
@@ -80,31 +96,6 @@ function amountFromAgreement(agreement?: MissionAgreement | null) {
 
 function getCurrentYear() {
   return new Date().getFullYear();
-}
-
-function readStoredState() {
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY) || window.localStorage.getItem('medilink_candidate_billing_v1');
-    if (!stored) {
-      return {
-        manualRows: [] as ManualRevenue[],
-        provisionRate: DEFAULT_PROVISION_RATE,
-        classifiedIds: [] as string[],
-      };
-    }
-    const parsed = JSON.parse(stored);
-    return {
-      manualRows: Array.isArray(parsed.manualRows) ? parsed.manualRows as ManualRevenue[] : [],
-      provisionRate: typeof parsed.provisionRate === 'number' ? parsed.provisionRate : DEFAULT_PROVISION_RATE,
-      classifiedIds: Array.isArray(parsed.classifiedIds) ? parsed.classifiedIds as string[] : [],
-    };
-  } catch {
-    return {
-      manualRows: [] as ManualRevenue[],
-      provisionRate: DEFAULT_PROVISION_RATE,
-      classifiedIds: [] as string[],
-    };
-  }
 }
 
 function rowYear(row: Pick<AccountingRow, 'date'>, fallback: number) {
@@ -177,6 +168,7 @@ export default function CandidateBillingPage() {
   const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [settingsReady, setSettingsReady] = useState(false);
 
   async function loadConversations(options: { reload?: boolean } = {}) {
     setConversations(options.reload
@@ -184,22 +176,46 @@ export default function CandidateBillingPage() {
       : await api.get<Conversation[]>('/conversations'));
   }
 
-  useEffect(() => {
-    const stored = readStoredState();
-    setManualRows(stored.manualRows);
-    setProvisionRate(stored.provisionRate);
-    setClassifiedIds(stored.classifiedIds);
+  function applyWorkspace(workspace: AccountingWorkspacePayload) {
+    setManualRows(workspace.entries.filter((entry) => entry.kind === 'REVENUE').map((entry) => ({
+      id: entry.id,
+      date: entry.date,
+      client: entry.counterparty,
+      mission: entry.mission,
+      amount: entry.amount,
+      paymentMethod: entry.paymentMethod,
+      notes: entry.notes || undefined,
+      hasReceipt: entry.hasReceipt,
+    })));
+    setClassifiedIds(workspace.classifiedIds);
+    setProvisionRate(workspace.settings.provisionRate ?? DEFAULT_PROVISION_RATE);
+    setSettingsReady(true);
+  }
 
-    loadConversations()
+  async function loadAccounting(options: { reload?: boolean } = {}) {
+    const path = '/billing/accounting/candidate';
+    const workspace = options.reload
+      ? await api.reload<AccountingWorkspacePayload>(path)
+      : await api.get<AccountingWorkspacePayload>(path);
+    applyWorkspace(workspace);
+  }
+
+  useEffect(() => {
+    Promise.all([loadConversations(), loadAccounting()])
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
 
-  useAutoRefresh(() => loadConversations({ reload: true }), { enabled: !loading });
+  useAutoRefresh(() => Promise.all([loadConversations({ reload: true }), loadAccounting({ reload: true })]).then(() => undefined), { enabled: !loading && !busyId });
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ manualRows, provisionRate, classifiedIds }));
-  }, [manualRows, provisionRate, classifiedIds]);
+    if (!settingsReady) return;
+    const timeout = window.setTimeout(() => {
+      void api.patch<AccountingWorkspacePayload>('/billing/accounting/candidate/settings', { provisionRate })
+        .catch((e: any) => setError(e.message));
+    }, 500);
+    return () => window.clearTimeout(timeout);
+  }, [provisionRate, settingsReady]);
 
   const accountingRows = useMemo<AccountingRow[]>(() => {
     const medilinkRowMap = new Map<string, AccountingRow>();
@@ -335,7 +351,7 @@ export default function CandidateBillingPage() {
     }
   }
 
-  function addManualRevenue(event: React.FormEvent<HTMLFormElement>) {
+  async function addManualRevenue(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     const amount = safeNumber(form.get('amount'));
@@ -348,26 +364,53 @@ export default function CandidateBillingPage() {
     }
 
     setError(null);
-    setManualRows((rows) => [{
-      id: `manual-${Date.now()}`,
-      date,
-      client,
-      mission,
-      amount,
-      paymentMethod: String(form.get('paymentMethod') || 'Virement'),
-      notes: String(form.get('notes') || '').trim(),
-      hasReceipt: form.get('hasReceipt') === 'on',
-    }, ...rows]);
-    event.currentTarget.reset();
+    setBusyId('manual-entry');
+    try {
+      const workspace = await api.post<AccountingWorkspacePayload>('/billing/accounting/candidate/entries', {
+        kind: 'REVENUE',
+        date,
+        counterparty: client,
+        mission,
+        amountCents: Math.round(amount * 100),
+        currency: 'EUR',
+        paymentMethod: String(form.get('paymentMethod') || 'Virement'),
+        notes: String(form.get('notes') || '').trim() || undefined,
+        hasReceipt: form.get('hasReceipt') === 'on',
+      });
+      applyWorkspace(workspace);
+      event.currentTarget.reset();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
-  function removeManualRevenue(id: string) {
-    setManualRows((rows) => rows.filter((row) => row.id !== id));
-    setClassifiedIds((ids) => ids.filter((item) => item !== id));
+  async function removeManualRevenue(id: string) {
+    setBusyId(id);
+    setError(null);
+    try {
+      applyWorkspace(await api.delete<AccountingWorkspacePayload>(`/billing/accounting/candidate/entries/${encodeURIComponent(id)}`));
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
-  function toggleClassified(id: string) {
-    setClassifiedIds((ids) => ids.includes(id) ? ids.filter((item) => item !== id) : [...ids, id]);
+  async function toggleClassified(id: string) {
+    setBusyId(id);
+    setError(null);
+    try {
+      applyWorkspace(await api.post<AccountingWorkspacePayload>('/billing/accounting/candidate/classification', {
+        recordKey: id,
+        classified: !classifiedIds.includes(id),
+      }));
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
   function exportCsv(scope: 'year' | 'filtered') {
