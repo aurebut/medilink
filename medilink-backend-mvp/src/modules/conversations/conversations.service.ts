@@ -496,7 +496,7 @@ export class ConversationsService {
 
     const candidateProfile = conversation.application.candidate.profile;
     const candidateName = [candidateProfile?.firstName, candidateProfile?.lastName].filter(Boolean).join(' ') || conversation.application.candidate.email;
-    const title = type === 'recruiter' ? 'Facture de retrocession' : 'Justificatif de retrocession';
+    const title = type === 'recruiter' ? 'Facture de rétrocession' : 'Justificatif de rétrocession';
     const fileName = `${invoice.number}-${type === 'recruiter' ? 'facture-etablissement' : 'justificatif-candidat'}.pdf`;
     const buffer = this.buildInvoicePdf({
       type,
@@ -662,12 +662,22 @@ export class ConversationsService {
     retrocessionPercentage?: number | null;
   }) {
     const commands: string[] = [];
+    const winAnsiExtras: Record<string, number> = {
+      '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
+      'ˆ': 0x88, '‰': 0x89, 'Š': 0x8a, '‹': 0x8b, 'Œ': 0x8c, 'Ž': 0x8e, '‘': 0x91,
+      '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97, '˜': 0x98,
+      '™': 0x99, 'š': 0x9a, '›': 0x9b, 'œ': 0x9c, 'ž': 0x9e, 'Ÿ': 0x9f,
+    };
     const safe = (value: unknown, maxLength = 90) => String(value ?? '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^\x20-\x7E]/g, ' ')
-      .replace(/[\\()]/g, '\\$&')
+      .normalize('NFC')
+      .replace(/[\u00A0\u202F]/g, ' ')
+      .replace(/[\u0000-\u001F]/g, ' ')
       .slice(0, maxLength);
+    const encodePdfText = (value: string) => [...value].map((character) => {
+      const code = character.charCodeAt(0);
+      const byte = code <= 0x7f ? code : (code >= 0xa0 && code <= 0xff ? code : winAnsiExtras[character]);
+      return (byte === undefined ? 0x3f : byte).toString(16).padStart(2, '0');
+    }).join('');
     const color = (hex: string) => {
       const clean = hex.replace('#', '');
       return [0, 2, 4].map((offset) => parseInt(clean.slice(offset, offset + 2), 16) / 255)
@@ -690,7 +700,7 @@ export class ConversationsService {
       const content = safe(value, maxLength);
       const estimatedWidth = content.length * size * (font === 'F2' ? 0.55 : 0.5);
       const targetX = align === 'right' ? x - estimatedWidth : x;
-      commands.push(`BT /${font} ${size} Tf ${color(fill)} rg ${targetX.toFixed(1)} ${y} Td (${content}) Tj ET`);
+      commands.push(`BT /${font} ${size} Tf ${color(fill)} rg ${targetX.toFixed(1)} ${y} Td <${encodePdfText(content)}> Tj ET`);
     };
     const formatDate = (value?: Date | null) => value ? value.toLocaleDateString('fr-FR') : '-';
     const formatAmount = (amount: number) => amount.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -699,25 +709,25 @@ export class ConversationsService {
     rect(0, 687, 12, 155, '#15B8A6');
     text('Medi', 46, 782, 25, '#FFFFFF', 'F2');
     text('Link', 102, 782, 25, '#15B8A6', 'F2');
-    text('REMPLACEMENTS MEDICAUX', 47, 760, 8, '#A9C3D6', 'F2');
+    text('REMPLACEMENTS MÉDICAUX', 47, 760, 8, '#A9C3D6', 'F2');
     text(data.title.toUpperCase(), 548, 790, 17, '#FFFFFF', 'F2', 'right');
     text(`N. ${data.number}`, 548, 766, 10, '#C9D8E5', 'F1', 'right');
-    text(`Emise le ${formatDate(data.issuedAt)}`, 548, 748, 9, '#C9D8E5', 'F1', 'right');
+    text(`Émise le ${formatDate(data.issuedAt)}`, 548, 748, 9, '#C9D8E5', 'F1', 'right');
     rect(46, 709, 102, 24, '#15B8A6', 12);
-    text('MISSION VALIDEE', 60, 717, 8, '#FFFFFF', 'F2');
+    text('MISSION VALIDÉE', 60, 717, 8, '#FFFFFF', 'F2');
 
-    text(data.type === 'recruiter' ? 'EMETTEUR' : 'BENEFICIAIRE', 46, 650, 8, '#678198', 'F2');
+    text(data.type === 'recruiter' ? 'ÉMETTEUR' : 'BÉNÉFICIAIRE', 46, 650, 8, '#678198', 'F2');
     text(data.candidateName, 46, 628, 13, '#102A43', 'F2', 'left', 42);
     text(data.candidateReference, 46, 610, 9, '#526A7D', 'F1', 'left', 48);
-    text(data.type === 'recruiter' ? 'DESTINATAIRE' : 'VERSE PAR', 322, 650, 8, '#678198', 'F2');
+    text(data.type === 'recruiter' ? 'DESTINATAIRE' : 'VERSÉ PAR', 322, 650, 8, '#678198', 'F2');
     text(data.establishmentName, 322, 628, 13, '#102A43', 'F2', 'left', 38);
     text(data.establishmentAddress || data.city, 322, 610, 9, '#526A7D', 'F1', 'left', 46);
     line(46, 583, 549, 583, '#D9E4EC');
 
-    text('DETAIL DE LA PRESTATION', 46, 552, 9, '#102A43', 'F2');
+    text('DÉTAIL DE LA PRESTATION', 46, 552, 9, '#102A43', 'F2');
     rect(46, 510, 503, 28, '#EAF8F6', 4);
     text('Mission', 60, 520, 8, '#426276', 'F2');
-    text('Periode', 355, 520, 8, '#426276', 'F2');
+    text('Période', 355, 520, 8, '#426276', 'F2');
     text('Montant', 532, 520, 8, '#426276', 'F2', 'right');
     text(data.missionTitle, 60, 481, 11, '#102A43', 'F2', 'left', 45);
     text(data.city, 60, 463, 9, '#678198', 'F1', 'left', 40);
@@ -731,8 +741,8 @@ export class ConversationsService {
     line(46, 441, 549, 441, '#D9E4EC');
 
     rect(46, 345, 292, 72, '#F4F7FA', 8);
-    text('MODALITE', 62, 393, 8, '#678198', 'F2');
-    text(data.compensationMode === CompensationMode.RETROCESSION ? "Retrocession d'honoraires" : 'Montant fixe', 62, 371, 11, '#102A43', 'F2');
+    text('MODALITÉ', 62, 393, 8, '#678198', 'F2');
+    text(data.compensationMode === CompensationMode.RETROCESSION ? "Rétrocession d'honoraires" : 'Montant fixe', 62, 371, 11, '#102A43', 'F2');
     if (data.retrocessionPercentage) text(`Taux contractuel : ${data.retrocessionPercentage}%`, 62, 353, 9, '#526A7D');
     rect(359, 345, 190, 72, '#102A43', 8);
     text('TOTAL', 377, 391, 8, '#A9C3D6', 'F2');
@@ -741,12 +751,12 @@ export class ConversationsService {
     rect(46, 250, 503, 65, '#EAF8F6', 8);
     text('INFORMATION', 62, 290, 8, '#128578', 'F2');
     text(data.amount > 0
-      ? 'Le montant ci-dessus correspond a la retrocession validee pour cette mission.'
-      : 'Le taux contractuel est valide. Le montant reel reste a completer apres encaissement.', 62, 269, 9, '#315A63', 'F1', 'left', 88);
+      ? 'Le montant ci-dessus correspond à la rétrocession validée pour cette mission.'
+      : 'Le taux contractuel est validé. Le montant réel reste à compléter après encaissement.', 62, 269, 9, '#315A63', 'F1', 'left', 88);
 
     line(46, 117, 549, 117, '#D9E4EC');
-    text('Document genere automatiquement par MediLink', 46, 91, 8, '#678198');
-    text('Reference mission et historique disponibles dans votre espace securise.', 46, 75, 8, '#8AA0B2');
+    text('Document généré automatiquement par MediLink', 46, 91, 8, '#678198');
+    text('Référence mission et historique disponibles dans votre espace sécurisé.', 46, 75, 8, '#8AA0B2');
     text('medilink.fr', 549, 91, 8, '#128578', 'F2', 'right');
     text('Page 1 / 1', 549, 75, 8, '#8AA0B2', 'F1', 'right');
 
@@ -755,9 +765,9 @@ export class ConversationsService {
       '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n',
       '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n',
       '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >> endobj\n',
-      '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj\n',
+      '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >> endobj\n',
       `5 0 obj << /Length ${Buffer.byteLength(stream, 'utf8')} >> stream\n${stream}endstream endobj\n`,
-      '6 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >> endobj\n',
+      '6 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >> endobj\n',
     ];
     let pdf = '%PDF-1.4\n';
     const offsets = [0];
