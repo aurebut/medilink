@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api, getApiUrl, getAuthToken } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, latestAgreement } from '@/lib/candidate-workspace';
+import type { AccountingEntry, AccountingWorkspacePayload } from '@/lib/accounting';
 import { formatDate, formatMoney } from '@/lib/format';
 import type { Conversation, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -22,6 +23,7 @@ type AccountingRow = {
   notes?: string;
   hasReceipt: boolean;
   classified: boolean;
+  classificationKey: string;
 };
 
 function amountFromAgreement(agreement?: MissionAgreement | null) {
@@ -37,8 +39,13 @@ function rowStatusFromAgreement(agreement?: MissionAgreement | null): Accounting
   return 'PENDING';
 }
 
-function buildMissionRows(conversations: Conversation[], classifiedIds: string[]) {
+function buildMissionRows(conversations: Conversation[], entries: AccountingEntry[], classifiedIds: string[]) {
   const medilinkRowMap = new Map<string, AccountingRow>();
+  const entryByAgreement = new Map(
+    entries
+      .filter((entry) => entry.agreementId)
+      .map((entry) => [entry.agreementId!, entry]),
+  );
 
   conversations
     .map((conversation) => ({ conversation, agreement: latestAgreement(conversation) }))
@@ -46,7 +53,9 @@ function buildMissionRows(conversations: Conversation[], classifiedIds: string[]
     .forEach(({ conversation, agreement }) => {
       const released = agreement?.status === 'PAYMENT_RELEASED';
       const rowId = `medilink-${agreement?.id || conversation.applicationId || conversation.id}`;
-      const amount = amountFromAgreement(agreement);
+      const accountingEntry = agreement?.id ? entryByAgreement.get(agreement.id) : undefined;
+      const amount = accountingEntry?.amount ?? amountFromAgreement(agreement);
+      const classificationKey = accountingEntry?.id || rowId;
       const row = {
         id: rowId,
         date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
@@ -57,8 +66,9 @@ function buildMissionRows(conversations: Conversation[], classifiedIds: string[]
         status: rowStatusFromAgreement(agreement),
         conversationId: conversation.id,
         agreement,
-        hasReceipt: released || Boolean(agreement?.invoices?.some((invoice) => invoice.type === 'CANDIDATE_RECEIPT')),
-        classified: classifiedIds.includes(rowId),
+        hasReceipt: Boolean(accountingEntry?.hasReceipt || agreement?.invoices?.some((invoice) => invoice.type === 'CANDIDATE_RECEIPT')),
+        classified: classifiedIds.includes(classificationKey),
+        classificationKey,
       };
 
       const existing = medilinkRowMap.get(rowId);
@@ -104,6 +114,7 @@ export default function BillingMissionDetailPage() {
   const rowId = decodeURIComponent(params.rowId);
   const cachedConversations = api.getSync<Conversation[]>('/conversations');
   const [conversations, setConversations] = useState<Conversation[]>(cachedConversations || []);
+  const [accountingEntries, setAccountingEntries] = useState<AccountingEntry[]>([]);
   const [classifiedIds, setClassifiedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(!cachedConversations);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -118,9 +129,10 @@ export default function BillingMissionDetailPage() {
   async function loadAccounting(options: { reload?: boolean } = {}) {
     const path = '/billing/accounting/candidate';
     const workspace = options.reload
-      ? await api.reload<{ classifiedIds: string[] }>(path)
-      : await api.get<{ classifiedIds: string[] }>(path);
+      ? await api.reload<AccountingWorkspacePayload>(path)
+      : await api.get<AccountingWorkspacePayload>(path);
     setClassifiedIds(workspace.classifiedIds);
+    setAccountingEntries(workspace.entries);
   }
 
   useEffect(() => {
@@ -131,7 +143,10 @@ export default function BillingMissionDetailPage() {
 
   useAutoRefresh(() => Promise.all([loadConversations({ reload: true }), loadAccounting({ reload: true })]).then(() => undefined), { enabled: !loading && !busyId });
 
-  const row = useMemo(() => buildMissionRows(conversations, classifiedIds).find((item) => item.id === rowId), [classifiedIds, conversations, rowId]);
+  const row = useMemo(
+    () => buildMissionRows(conversations, accountingEntries, classifiedIds).find((item) => item.id === rowId),
+    [accountingEntries, classifiedIds, conversations, rowId],
+  );
 
   async function downloadCandidateInvoice(conversationId: string) {
     setBusyId(conversationId);
@@ -268,7 +283,7 @@ export default function BillingMissionDetailPage() {
                 </Button>
               ) : null}
               {row.hasReceipt ? (
-                <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => toggleClassified(row.id)}>
+                <Button type="button" variant={row.classified ? 'secondary' : 'light'} onClick={() => toggleClassified(row.classificationKey)}>
                   {row.classified ? 'Classé' : 'Marquer classé'}
                 </Button>
               ) : null}

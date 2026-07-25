@@ -9,7 +9,7 @@ import { AccountingService } from './accounting.service';
   imports: [AuditModule, PermissionsModule],
   controllers: [BillingController],
   providers: [BillingService, AccountingService],
-  exports: [BillingService],
+  exports: [BillingService, AccountingService],
 })
 export class BillingModule {}
 

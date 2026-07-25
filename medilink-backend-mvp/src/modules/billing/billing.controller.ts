@@ -7,7 +7,7 @@ import { RequestUser } from '../../common/types/request-user.type';
 import { BillingService } from './billing.service';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { AccountingService } from './accounting.service';
-import { CreateAccountingEntryDto, SetAccountingClassificationDto, UpdateAccountingSettingsDto } from './dto/accounting.dto';
+import { CreateAccountingEntryDto, SetAccountingClassificationDto, UpdateAccountingSettingsDto, UpdateCandidateAccountingProfileDto } from './dto/accounting.dto';
 
 @Controller('billing')
 export class BillingController {
@@ -38,6 +38,12 @@ export class BillingController {
   @UseGuards(AuthGuard)
   updateCandidateAccountingSettings(@CurrentUser() user: RequestUser, @Body() dto: UpdateAccountingSettingsDto) {
     return this.accounting.updateCandidateSettings(user, dto);
+  }
+
+  @Patch('accounting/candidate/profile')
+  @UseGuards(AuthGuard)
+  updateCandidateAccountingProfile(@CurrentUser() user: RequestUser, @Body() dto: UpdateCandidateAccountingProfileDto) {
+    return this.accounting.updateCandidateProfile(user, dto);
   }
 
   @Post('accounting/candidate/classification')

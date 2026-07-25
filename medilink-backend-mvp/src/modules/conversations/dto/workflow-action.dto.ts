@@ -1,5 +1,5 @@
 import { CompensationMode } from '@prisma/client';
-import { IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export class SendProposalDto {
   @IsOptional()
@@ -42,6 +42,33 @@ export class SendProposalDto {
   @IsString()
   @MaxLength(20)
   endTime?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(1200)
+  notes?: string;
+}
+
+export class ReleasePaymentDto {
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Max(1000000000)
+  grossHonorariaCents?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(1000000000)
+  candidateAmountCents?: number;
+
+  @IsOptional()
+  @IsDateString()
+  dueDate?: string;
+
+  @IsOptional()
+  @IsDateString()
+  paidAt?: string;
 
   @IsOptional()
   @IsString()

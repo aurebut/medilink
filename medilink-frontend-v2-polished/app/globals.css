@@ -9985,6 +9985,30 @@ td {
   grid-column: span 2;
 }
 
+.accounting-profile-card {
+  grid-column: 1 / -1;
+}
+
+.accounting-inline-action {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--teal);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.accounting-revenue-amount {
+  color: var(--success);
+}
+
+.accounting-expense-amount {
+  color: var(--danger);
+}
+
 .billing-tax-card h2 {
   font-size: clamp(36px, 5vw, 56px);
 }
@@ -10032,6 +10056,36 @@ td {
   line-height: 1.4;
 }
 
+.retrocession-release-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 4px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+
+.retrocession-release-heading,
+.retrocession-release-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.retrocession-release-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.retrocession-release-heading span,
+.retrocession-release-footer > span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 @media (max-width: 1080px) {
   .billing-hero-grid,
   .billing-overview-summary,
@@ -10060,6 +10114,18 @@ td {
 
   .billing-mission-detail {
     position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .retrocession-release-form .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .retrocession-release-heading,
+  .retrocession-release-footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

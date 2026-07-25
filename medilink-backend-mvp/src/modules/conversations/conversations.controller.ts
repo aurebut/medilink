@@ -7,7 +7,7 @@ import { RequestUser } from '../../common/types/request-user.type';
 import { ConversationEventsService } from './conversation-events.service';
 import { ConversationsService } from './conversations.service';
 import { SendMessageDto } from './dto/send-message.dto';
-import { SendProposalDto } from './dto/workflow-action.dto';
+import { ReleasePaymentDto, SendProposalDto } from './dto/workflow-action.dto';
 
 @Controller('conversations')
 @UseGuards(AuthGuard)
@@ -68,8 +68,8 @@ export class ConversationsController {
   }
 
   @Post(':id/payment/release')
-  releasePayment(@CurrentUser() user: RequestUser, @Param('id') id: string) {
-    return this.conversations.releasePayment(user, id);
+  releasePayment(@CurrentUser() user: RequestUser, @Param('id') id: string, @Body() dto: ReleasePaymentDto) {
+    return this.conversations.releasePayment(user, id, dto);
   }
 
   @Post(':id/invoices/generate')

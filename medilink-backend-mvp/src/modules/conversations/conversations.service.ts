@@ -12,13 +12,14 @@ import {
 } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
+import { AccountingService } from '../billing/accounting.service';
 import { BillingService } from '../billing/billing.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConversationEventsService } from './conversation-events.service';
 import { SendMessageDto } from './dto/send-message.dto';
-import { SendProposalDto } from './dto/workflow-action.dto';
+import { ReleasePaymentDto, SendProposalDto } from './dto/workflow-action.dto';
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
 type InvoiceDownloadType = 'recruiter' | 'candidate';
@@ -32,6 +33,7 @@ export class ConversationsService {
     private readonly audit: AuditService,
     private readonly events: ConversationEventsService,
     private readonly billing: BillingService,
+    private readonly accounting: AccountingService,
   ) {}
 
   async list(user: RequestUser) {
@@ -391,19 +393,30 @@ export class ConversationsService {
     return message;
   }
 
-  async releasePayment(user: RequestUser, conversationId: string) {
+  async releasePayment(user: RequestUser, conversationId: string, dto: ReleasePaymentDto) {
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.COMPLETED);
 
     const message = await this.prisma.$transaction(async (tx) => {
+      const paidAt = new Date();
+      const accountingResult = await this.accounting.recordReleasedRetrocessionTx(
+        tx,
+        user.id,
+        agreement,
+        dto,
+        paidAt,
+      );
       const updatedAgreement = await tx.missionAgreement.update({
         where: { id: agreement.id },
         data: {
           status: MissionAgreementStatus.PAYMENT_RELEASED,
+          amount: accountingResult.legacyAmount,
+          candidateAmount: accountingResult.legacyAmount,
           payment: {
             update: {
               status: EscrowPaymentStatus.RELEASED,
-              releasedAt: new Date(),
+              amount: accountingResult.legacyAmount,
+              releasedAt: paidAt,
             },
           },
           events: {
@@ -411,6 +424,10 @@ export class ConversationsService {
               conversationId,
               actorUserId: user.id,
               type: AgreementEventType.PAYMENT_RELEASED,
+              metadata: {
+                candidateAmountCents: accountingResult.candidateAmountCents,
+                accountingEntryId: accountingResult.entryId,
+              },
             },
           },
         },
@@ -436,6 +453,7 @@ export class ConversationsService {
 
     const message = await this.prisma.$transaction(async (tx) => {
       const invoices = await this.ensureInvoicesTx(tx, agreement);
+      await this.accounting.markAgreementReceiptAvailableTx(tx, agreement.id);
 
       await tx.agreementEvent.create({
         data: {
@@ -453,7 +471,7 @@ export class ConversationsService {
           id: invoice.id,
           type: invoice.type,
           number: invoice.number,
-          amount: invoice.amount,
+          amount: invoice.amountCents != null ? invoice.amountCents / 100 : invoice.amount,
           currency: invoice.currency,
           issuedAt: invoice.issuedAt,
         })),
@@ -503,7 +521,7 @@ export class ConversationsService {
       title,
       number: invoice.number,
       issuedAt: invoice.issuedAt,
-      amount: invoice.amount,
+      amount: invoice.amountCents != null ? invoice.amountCents / 100 : invoice.amount,
       currency: invoice.currency,
       missionTitle: conversation.mission.title,
       establishmentName: conversation.establishment.name,
@@ -608,7 +626,11 @@ export class ConversationsService {
       orderBy: { issuedAt: 'asc' },
     });
     const invoices = [...existingInvoices];
-    const payment = await tx.escrowPayment.findUnique({ where: { agreementId: agreement.id } });
+    const [payment, settlement] = await Promise.all([
+      tx.escrowPayment.findUnique({ where: { agreementId: agreement.id } }),
+      tx.retrocessionSettlement.findUnique({ where: { agreementId: agreement.id } }),
+    ]);
+    const exactAmountCents = settlement?.finalAmountCents ?? agreement.candidateAmount * 100;
 
     if (!invoices.some((invoice) => invoice.type === InvoiceType.RECRUITER_INVOICE)) {
       const count = await tx.invoice.count();
@@ -619,6 +641,7 @@ export class ConversationsService {
           type: InvoiceType.RECRUITER_INVOICE,
           number: `ML-R-${String(count + 1).padStart(6, '0')}`,
           amount: agreement.amount,
+          amountCents: exactAmountCents,
           currency: agreement.currency,
         },
       }));
@@ -633,6 +656,7 @@ export class ConversationsService {
           type: InvoiceType.CANDIDATE_RECEIPT,
           number: `ML-C-${String(count + 1).padStart(6, '0')}`,
           amount: agreement.candidateAmount,
+          amountCents: exactAmountCents,
           currency: agreement.currency,
         },
       }));

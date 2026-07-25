@@ -86,6 +86,14 @@ type ProposalForm = {
   notes: string;
 };
 
+type ReleasePaymentPayload = {
+  grossHonorariaCents?: number;
+  candidateAmountCents: number;
+  dueDate?: string;
+  paidAt?: string;
+  notes?: string;
+};
+
 function parseWorkflow(message: Message): WorkflowPayload | null {
   if (message.messageType !== 'SYSTEM' || !message.body.startsWith(WORKFLOW_PREFIX)) return null;
   try {
@@ -489,18 +497,25 @@ export function MessageCenter() {
     }
   }
 
-  async function runAction(action: string, path: string) {
+  async function runAction(action: string, path: string, payload: Record<string, unknown> = {}) {
     if (!activeId) return;
     setBusyAction(action);
     setError(null);
     try {
-      await api.post(`/conversations/${activeId}${path}`, {});
+      await api.post(`/conversations/${activeId}${path}`, payload);
       await refresh();
     } catch (e: any) {
       setError(e.message);
     } finally {
       setBusyAction(null);
     }
+  }
+
+  function focusRetrocessionForm() {
+    setMobileOptionsOpen(false);
+    window.setTimeout(() => {
+      document.getElementById('retrocession-release-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   async function withdrawApplication(appId: string, isAccepted: boolean) {
@@ -704,7 +719,7 @@ export function MessageCenter() {
         disabled: Boolean(busyAction),
         busy: busyAction === 'pay',
         busyLabel: 'Validation...',
-        onSelect: () => runAction('pay', '/payment/release'),
+        onSelect: focusRetrocessionForm,
       }] : undefined,
     },
     {
@@ -941,7 +956,7 @@ export function MessageCenter() {
                   onReject={() => runAction('reject', '/proposal/reject')}
                   onSecure={() => runAction('secure', '/payment/secure')}
                   onComplete={() => runAction('complete', '/mission/complete')}
-                  onPay={() => runAction('pay', '/payment/release')}
+                  onPay={(payload) => runAction('pay', '/payment/release', payload)}
                   onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
                   onDownloadRecruiter={() => void downloadInvoice('recruiter')}
                   onDownloadCandidate={() => void downloadInvoice('candidate')}
@@ -1420,7 +1435,7 @@ function WorkflowMessageCard({
   onReject: () => void;
   onSecure: () => void;
   onComplete: () => void;
-  onPay: () => void;
+  onPay: (payload: ReleasePaymentPayload) => void;
   onGenerateInvoices: () => void;
   onDownloadRecruiter: () => void;
   onDownloadCandidate: () => void;
@@ -1505,9 +1520,18 @@ function WorkflowMessageCard({
           <h3>Mission terminée</h3>
           <p>{retrocession ? "La fin de mission a été validée. La rétrocession d'honoraires peut maintenant être confirmée." : `La fin de mission a été validée. Le paiement sécurisé peut maintenant être libéré ${candidateTargetLabel}.`}</p>
           {recruiterCanPay ? (
-            <div className="actions">
-              <Button disabled={Boolean(busyAction)} onClick={onPay}>{busyAction === 'pay' ? 'Validation...' : retrocession ? 'Valider la rétrocession' : 'Libérer le paiement'}</Button>
-            </div>
+            retrocession ? (
+              <RetrocessionReleaseForm
+                percentage={proposal?.retrocessionPercentage || 0}
+                currency={proposal?.currency || 'EUR'}
+                busy={busyAction === 'pay'}
+                onSubmit={onPay}
+              />
+            ) : (
+              <div className="actions">
+                <Button disabled={Boolean(busyAction)} onClick={() => onPay({ candidateAmountCents: Math.round((proposal?.amount || 0) * 100) })}>{busyAction === 'pay' ? 'Validation...' : 'Libérer le paiement'}</Button>
+              </div>
+            )
           ) : null}
         </>
       ) : null}
@@ -1541,5 +1565,102 @@ function WorkflowMessageCard({
         </>
       ) : null}
     </div>
+  );
+}
+
+function todayInputValue() {
+  const now = new Date();
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60_000).toISOString().slice(0, 10);
+}
+
+function RetrocessionReleaseForm({
+  percentage,
+  currency,
+  busy,
+  onSubmit,
+}: {
+  percentage: number;
+  currency: string;
+  busy: boolean;
+  onSubmit: (payload: ReleasePaymentPayload) => void;
+}) {
+  const [grossAmount, setGrossAmount] = useState('');
+  const [candidateAmount, setCandidateAmount] = useState('');
+  const [paidAt, setPaidAt] = useState(todayInputValue);
+  const [notes, setNotes] = useState('');
+  const gross = Number(grossAmount.replace(',', '.'));
+  const candidate = Number(candidateAmount.replace(',', '.'));
+  const grossValid = percentage <= 0 || (Number.isFinite(gross) && gross > 0);
+  const valid = grossValid && Number.isFinite(candidate) && candidate > 0 && Boolean(paidAt);
+
+  function updateGross(value: string) {
+    setGrossAmount(value);
+    const parsed = Number(value.replace(',', '.'));
+    if (Number.isFinite(parsed) && parsed >= 0 && percentage > 0) {
+      setCandidateAmount((parsed * percentage / 100).toFixed(2));
+    }
+  }
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!valid) return;
+    onSubmit({
+      grossHonorariaCents: Number.isFinite(gross) && gross > 0 ? Math.round(gross * 100) : undefined,
+      candidateAmountCents: Math.round(candidate * 100),
+      paidAt,
+      notes: notes.trim() || undefined,
+    });
+  }
+
+  return (
+    <form id="retrocession-release-form" className="workflow-form retrocession-release-form" onSubmit={submit}>
+      <div className="retrocession-release-heading">
+        <div>
+          <strong>Valider le règlement réel</strong>
+          <span>Le montant final sera ajouté au journal comptable du remplaçant.</span>
+        </div>
+        <Badge tone="neutral">Taux convenu : {percentage}%</Badge>
+      </div>
+      <div className="form-row">
+        <Field label={`Honoraires encaissés (${currency})`}>
+          <Input
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            required={percentage > 0}
+            value={grossAmount}
+            onChange={(event) => updateGross(event.target.value)}
+            placeholder="Ex. 1 500,00"
+          />
+        </Field>
+        <Field label={`Rétrocession versée (${currency})`}>
+          <Input
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            required
+            value={candidateAmount}
+            onChange={(event) => setCandidateAmount(event.target.value)}
+            placeholder="Montant réellement versé"
+          />
+        </Field>
+      </div>
+      <div className="form-row">
+        <Field label="Date d’encaissement">
+          <Input type="date" required max={todayInputValue()} value={paidAt} onChange={(event) => setPaidAt(event.target.value)} />
+        </Field>
+        <Field label="Note interne">
+          <Input value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Optionnel" />
+        </Field>
+      </div>
+      <div className="retrocession-release-footer">
+        <span>Vérifiez le montant après éventuels ajustements avant de confirmer.</span>
+        <Button type="submit" disabled={busy || !valid}>
+          {busy ? 'Validation...' : 'Valider la rétrocession'}
+        </Button>
+      </div>
+    </form>
   );
 }

@@ -235,6 +235,51 @@ enum AccountingEntryKind {
   EXPENSE
 }
 
+enum AccountingEntrySource {
+  MANUAL
+  MEDILINK
+  BANK
+  IMPORT
+}
+
+enum AccountingEntryStatus {
+  DRAFT
+  TO_REVIEW
+  VALIDATED
+  VOIDED
+}
+
+enum AccountingTaxRegime {
+  MICRO_BNC
+  CONTROLLED_DECLARATION
+}
+
+enum AccountingSocialScheme {
+  RSPM
+  PAMC
+  OTHER
+}
+
+enum AccountingActivityMode {
+  LIBERAL
+  SALARIED
+  MIXED
+}
+
+enum AccountingDeclarationFrequency {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum RetrocessionSettlementStatus {
+  EXPECTED
+  TO_VALIDATE
+  VALIDATED
+  PAID
+  DISPUTED
+}
+
 model User {
   id            String     @id @default(uuid())
   email         String     @unique
@@ -782,6 +827,8 @@ model MissionAgreement {
   payment       EscrowPayment?
   invoices      Invoice[]
   events        AgreementEvent[]
+  accountingEntries AccountingEntry[]
+  retrocessionSettlement RetrocessionSettlement?
 
   @@index([conversationId, createdAt])
   @@index([status])
@@ -812,6 +859,7 @@ model Invoice {
   status      InvoiceStatus @default(GENERATED)
   number      String        @unique
   amount      Int
+  amountCents Int?
   currency    String        @default("EUR")
   pdfUrl      String?
   issuedAt    DateTime      @default(now())
@@ -850,6 +898,8 @@ model AccountingWorkspace {
 
   entries         AccountingEntry[]
   classifications AccountingClassification[]
+  profile         AccountingProfile?
+  settlements     RetrocessionSettlement[]
 
   @@unique([ownerType, ownerId])
   @@index([ownerType, ownerId])
@@ -867,13 +917,67 @@ model AccountingEntry {
   paymentMethod String
   notes         String?
   hasReceipt    Boolean             @default(false)
+  source        AccountingEntrySource @default(MANUAL)
+  status        AccountingEntryStatus @default(VALIDATED)
+  categoryCode  String?
+  professionalShareBps Int          @default(10000)
+  agreementId   String?
+  sourceKey     String?
+  validatedAt   DateTime?
+  voidedAt      DateTime?
   createdById   String
   createdAt     DateTime            @default(now())
   updatedAt     DateTime            @updatedAt
 
   workspace AccountingWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  agreement MissionAgreement? @relation(fields: [agreementId], references: [id], onDelete: SetNull)
 
   @@index([workspaceId, entryDate])
+  @@index([workspaceId, kind, status, entryDate])
+  @@index([agreementId])
+  @@unique([workspaceId, sourceKey])
+}
+
+model AccountingProfile {
+  id                          String                         @id @default(uuid())
+  workspaceId                 String                         @unique
+  taxRegime                   AccountingTaxRegime?
+  socialScheme                AccountingSocialScheme?
+  activityMode                AccountingActivityMode?
+  declarationFrequency        AccountingDeclarationFrequency?
+  activityStartDate           DateTime?
+  exclusiveLocum              Boolean?
+  hasOtherIndependentActivity Boolean?
+  onboardingCompletedAt       DateTime?
+  createdAt                   DateTime                       @default(now())
+  updatedAt                   DateTime                       @updatedAt
+
+  workspace AccountingWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model RetrocessionSettlement {
+  id                    String                        @id @default(uuid())
+  workspaceId           String
+  agreementId           String                        @unique
+  status                RetrocessionSettlementStatus @default(EXPECTED)
+  rateBasisPoints       Int?
+  grossHonorariaCents   Int?
+  expectedAmountCents   Int?
+  finalAmountCents      Int?
+  currency              String                        @default("EUR")
+  dueDate               DateTime?
+  validatedAt           DateTime?
+  paidAt                DateTime?
+  notes                 String?
+  updatedById           String?
+  createdAt             DateTime                      @default(now())
+  updatedAt             DateTime                      @updatedAt
+
+  workspace AccountingWorkspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  agreement MissionAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, status])
+  @@index([workspaceId, paidAt])
 }
 
 model AccountingClassification {
