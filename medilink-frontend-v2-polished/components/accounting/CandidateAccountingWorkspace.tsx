@@ -357,7 +357,7 @@ function OverviewTab({ summary, year, settlements, openTransactions, openSettlem
           </div>
         </div>
         <div className="billing-hero-chart-section">
-          <MonthlyBarChart rows={summary.revenueEntries.map((entry) => ({ date: entry.date, amount: effectiveAmount(entry) }))} year={year} label="Recettes" barColor="var(--blue-lt)" lineColor="var(--blue)" />
+          <MonthlyBarChart rows={summary.revenueEntries.map((entry) => ({ date: entry.date, amount: effectiveAmount(entry) }))} year={year} label="Recettes" barColor="var(--blue-lt)" lineColor="var(--navy)" />
         </div>
       </Card>
       <div className="billing-overview-grid">

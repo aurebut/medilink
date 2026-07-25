@@ -379,7 +379,7 @@ export default function ProfilePage() {
 
                     <div className="form-row">
                       <Field label="Années d'expérience"><Input type="number" min={0} max={80} value={form.experienceYears ?? ''} onChange={(e) => set('experienceYears', e.target.value)} /></Field>
-                      <MultiChoiceField label="Compétences" values={safeArray(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', values)} />
+                      <MultiChoiceField label="Compétences" values={normalizeCandidateSkills(form.actsPerformed)} options={actsPerformedOptions} onChange={(values) => set('actsPerformed', normalizeCandidateSkills(values))} />
                     </div>
                   </>
                 ) : null}
