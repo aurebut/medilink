@@ -29,7 +29,7 @@ const tabs: Array<{ id: AccountingTab; label: string }> = [
   { id: 'settlements', label: 'Rétrocessions' },
   { id: 'documents', label: 'Justificatifs' },
   { id: 'tax', label: 'Fiscalité' },
-  { id: 'exports', label: 'Documents' },
+  { id: 'exports', label: 'Exports' },
 ];
 
 const DEFAULT_RULES = {
@@ -297,7 +297,7 @@ export function CandidateAccountingWorkspace() {
   if (loading || !workspace) return <LoadingCard />;
 
   return (
-    <>
+    <div className="candidate-accounting-page">
       <PageHeader title="Ma compta" description="Rétrocessions, recettes, dépenses et pilotage de votre activité de remplacement." />
       {error ? <Alert type="error">{error}</Alert> : null}
       {!workspace.profile?.onboardingCompleted ? (
@@ -307,7 +307,22 @@ export function CandidateAccountingWorkspace() {
         </Alert>
       ) : null}
 
-      <div className="billing-nav-row">
+      <nav className="billing-mobile-nav" aria-label="Navigation comptable mobile">
+        <label>
+          <span>Exercice</span>
+          <Select value={selectedYear} onChange={(event) => navigate(activeTab, Number(event.target.value))} aria-label="Année comptable">
+            {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
+          </Select>
+        </label>
+        <label>
+          <span>Section</span>
+          <Select value={activeTab} onChange={(event) => navigate(event.target.value as AccountingTab)} aria-label="Section comptable">
+            {tabs.map((tab) => <option key={tab.id} value={tab.id}>{tab.label}</option>)}
+          </Select>
+        </label>
+      </nav>
+
+      <div className="billing-nav-row billing-desktop-nav">
         <Select value={selectedYear} onChange={(event) => navigate(activeTab, Number(event.target.value))} aria-label="Année comptable">
           {availableYears.map((year) => <option key={year} value={year}>{year}</option>)}
         </Select>
@@ -329,7 +344,7 @@ export function CandidateAccountingWorkspace() {
       {activeTab === 'documents' ? <DocumentsTab entries={yearEntries} settlements={yearSettlements} classifiedIds={workspace.classifiedIds} busyId={busyId} onClassify={toggleClassified} onDownload={downloadReceipt} /> : null}
       {activeTab === 'tax' ? <TaxTab profile={profile} setProfile={setProfile} onSave={saveProfile} busy={busyId === 'profile'} summary={summary} selectedYear={selectedYear} rules={rules} provisionRate={provisionRate} setProvisionRate={setProvisionRate} /> : null}
       {activeTab === 'exports' ? <ExportsTab entries={yearEntries} summary={summary} year={selectedYear} onExport={exportCsv} /> : null}
-    </>
+    </div>
   );
 }
 
@@ -394,6 +409,7 @@ function TransactionsTab({ entries, categories, filter, setFilter, manualKind, s
   onRemove: (id: string) => void;
   onExport: () => void;
 }) {
+  const [manualOpen, setManualOpen] = useState(false);
   const availableCategories = (categories || []).filter((category) => category.kind === manualKind);
   return (
     <div className="billing-workspace">
@@ -408,20 +424,32 @@ function TransactionsTab({ entries, categories, filter, setFilter, manualKind, s
         {!entries.length ? <EmptyState title="Aucune transaction" description="Ajoutez une écriture ou finalisez une rétrocession MediLink." /> : (
           <div className="table-wrap billing-table"><table><thead><tr><th>Date</th><th>Tiers / libellé</th><th>Catégorie</th><th>Montant</th><th>Source</th><th>Action</th></tr></thead><tbody>
             {entries.map((entry) => <tr key={entry.id}>
-              <td>{formatDate(entry.date)}</td>
-              <td><strong>{entry.counterparty}</strong><div className="small">{entry.mission}</div></td>
-              <td>{(categories || []).find((category) => category.code === entry.categoryCode)?.label || 'Non classée'}</td>
-              <td><strong className={entry.kind === 'EXPENSE' ? 'accounting-expense-amount' : 'accounting-revenue-amount'}>{entry.kind === 'EXPENSE' ? '− ' : '+ '}{formatMoney(effectiveAmount(entry), entry.currency)}</strong>{entry.professionalShareBps < 10000 ? <div className="small">Part pro {entry.professionalShareBps / 100}%</div> : null}</td>
-              <td><Badge tone={entry.source === 'MEDILINK' ? 'success' : 'neutral'}>{sourceLabel(entry.source)}</Badge></td>
-              <td className="actions">{entry.agreementId ? <LinkButton href={`/app/billing/${encodeURIComponent(`medilink-${entry.agreementId}`)}`} variant="light">Mission</LinkButton> : null}{entry.source === 'MANUAL' ? <Button type="button" variant="light" disabled={busyId === entry.id} onClick={() => onRemove(entry.id)}>Annuler</Button> : null}</td>
+              <td className="billing-cell-date" data-label="Date">{formatDate(entry.date)}</td>
+              <td className="billing-cell-counterparty" data-label="Tiers / libellé"><strong>{entry.counterparty}</strong><div className="small">{entry.mission}</div></td>
+              <td className="billing-cell-category" data-label="Catégorie">{(categories || []).find((category) => category.code === entry.categoryCode)?.label || 'Non classée'}</td>
+              <td className="billing-cell-amount" data-label="Montant"><strong className={entry.kind === 'EXPENSE' ? 'accounting-expense-amount' : 'accounting-revenue-amount'}>{entry.kind === 'EXPENSE' ? '− ' : '+ '}{formatMoney(effectiveAmount(entry), entry.currency)}</strong>{entry.professionalShareBps < 10000 ? <div className="small">Part pro {entry.professionalShareBps / 100}%</div> : null}</td>
+              <td className="billing-cell-source" data-label="Source"><Badge tone={entry.source === 'MEDILINK' ? 'success' : 'neutral'}>{sourceLabel(entry.source)}</Badge></td>
+              <td className="actions billing-cell-actions" data-label="Action">{entry.agreementId ? <LinkButton href={`/app/billing/${encodeURIComponent(`medilink-${entry.agreementId}`)}`} variant="light">Mission</LinkButton> : null}{entry.source === 'MANUAL' ? <Button type="button" variant="light" disabled={busyId === entry.id} onClick={() => onRemove(entry.id)}>Annuler</Button> : null}</td>
             </tr>)}
           </tbody></table></div>
         )}
       </Card>
       <div className="billing-side">
-        <Card className="dashboard-panel billing-manual-card">
-          <div className="toolbar compact"><div><h2>Ajouter une écriture</h2><p className="small">Pour les opérations hors MediLink ou non synchronisées.</p></div></div>
-          <form className="form" onSubmit={onAdd}>
+        <Card className={`dashboard-panel billing-manual-card ${manualOpen ? 'is-open' : ''}`}>
+          <div className="toolbar compact">
+            <div><h2>Ajouter une écriture</h2><p className="small">Pour les opérations hors MediLink ou non synchronisées.</p></div>
+            <button
+              className="billing-manual-toggle"
+              type="button"
+              aria-expanded={manualOpen}
+              aria-controls="billing-manual-form"
+              onClick={() => setManualOpen((open) => !open)}
+            >
+              <span>{manualOpen ? 'Fermer' : 'Ajouter'}</span>
+              <i aria-hidden="true" />
+            </button>
+          </div>
+          <form className="form billing-manual-form" id="billing-manual-form" onSubmit={onAdd}>
             <Field label="Type"><Select value={manualKind} onChange={(event) => setManualKind(event.target.value as AccountingEntryKind)}><option value="EXPENSE">Dépense</option><option value="REVENUE">Recette</option></Select></Field>
             <Field label="Date de paiement"><Input name="date" type="date" required /></Field>
             <Field label={manualKind === 'REVENUE' ? 'Payeur' : 'Fournisseur'}><Input name="counterparty" required placeholder={manualKind === 'REVENUE' ? 'Cabinet Martin' : 'SNCF, CARMF…'} /></Field>

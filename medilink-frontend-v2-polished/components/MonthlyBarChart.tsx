@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 import { formatMoney } from '@/lib/format';
 
 export type ChartRow = {
@@ -49,18 +49,6 @@ function computeMonths(rows: ChartRow[], year: number): MonthPoint[] {
       future: i > lastRealMonth,
     };
   });
-}
-
-function useIsMobile() {
-  const [mobile, setMobile] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 719px)');
-    setMobile(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-  return mobile;
 }
 
 function formatAxisMoney(value: number) {
@@ -140,7 +128,6 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
   barColor?: string;
   lineColor?: string;
 }) {
-  const isMobile = useIsMobile();
   const months = useMemo(() => computeMonths(rows, year), [rows, year]);
 
   const stats = useMemo(() => {
@@ -170,7 +157,7 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
     <section
       className="mchart"
       style={style}
-      data-empty={stats.total === 0 ? 'true' : 'false'}
+      data-empty={stats.activeCount === 0 ? 'true' : 'false'}
       aria-label={`${label} par mois en ${year}, total ${formatMoney(stats.total)}`}
     >
       <header className="mchart-head">
@@ -189,9 +176,14 @@ export function MonthlyBarChart({ rows, year, label = 'Montant', barColor = 'var
         </div>
       </header>
 
-      {isMobile
-        ? <MonthlyChartMobile months={months} best={stats.best} label={label} />
-        : <MonthlyChartDesktop months={months} average={stats.average} label={label} />}
+      <MonthlyChartDesktop months={months} average={stats.average} label={label} />
+      <MonthlyChartMobile
+        months={months}
+        best={stats.best}
+        label={label}
+        year={year}
+        empty={stats.activeCount === 0}
+      />
 
       <footer className="mchart-foot">
         <div className="mchart-foot-item">
@@ -450,10 +442,12 @@ function MonthlyChartDesktop({ months, average, label }: {
   );
 }
 
-function MonthlyChartMobile({ months, best, label }: {
+function MonthlyChartMobile({ months, best, label, year, empty }: {
   months: MonthPoint[];
   best: MonthPoint | null;
   label: string;
+  year: number;
+  empty: boolean;
 }) {
   const maxAmount = Math.max(...months.map(month => month.amount), 1);
   const visible = months.filter(month => !month.future);
@@ -465,30 +459,54 @@ function MonthlyChartMobile({ months, best, label }: {
   })));
 
   return (
-    <div className="mchart-mobile" role="img" aria-label={`Graphique ${label} mensuel`}>
-      <div className="mchart-spark">
-        <svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
-          {spark ? <path className="mchart-spark-area" d={`${spark} L100,32 L0,32 Z`} /> : null}
-          {spark ? <path className="mchart-spark-line" d={spark} pathLength={1} /> : null}
-        </svg>
-        <span>Cumul</span>
-      </div>
-      <ul className="mchart-rows">
-        {months.map(month => (
-          <li
-            key={month.label}
-            className="mchart-row"
-            data-future={month.future ? 'true' : 'false'}
-            data-best={best && best.index === month.index ? 'true' : 'false'}
-          >
-            <span className="mchart-row-label">{month.label}</span>
-            <span className="mchart-row-track">
-              <span className="mchart-row-fill" style={{ width: `${Math.max((month.amount / maxAmount) * 100, month.amount > 0 ? 3 : 0)}%` }} />
-            </span>
-            <span className="mchart-row-value">{month.amount === 0 ? '—' : formatAxisMoney(month.amount)}</span>
-          </li>
-        ))}
-      </ul>
+    <div className="mchart-mobile" role="group" aria-label={`Graphique ${label} mensuel en ${year}`}>
+      {empty ? (
+        <div className="mchart-mobile-empty" role="status">
+          <span className="mchart-mobile-empty-mark" aria-hidden="true">0&nbsp;€</span>
+          <strong>Aucun mouvement</strong>
+          <span>Aucune donnée enregistrée pour l’exercice {year}.</span>
+        </div>
+      ) : (
+        <>
+          <div className="mchart-spark">
+            <svg viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true">
+              {spark ? <path className="mchart-spark-area" d={`${spark} L100,32 L0,32 Z`} /> : null}
+              {spark ? <path className="mchart-spark-line" d={spark} pathLength={1} /> : null}
+            </svg>
+            <span>Cumul</span>
+          </div>
+          <ul className="mchart-rows" aria-label={`Détail de ${label.toLowerCase()} pour les 12 mois`}>
+            {months.map(month => {
+              const isBest = best?.index === month.index;
+              const accessibleValue = month.future
+                ? `${month.long}, mois à venir`
+                : `${month.long}, ${label.toLowerCase()} ${formatMoney(month.amount)}, cumul ${formatMoney(month.cumulative)}${isBest ? ', meilleur mois' : ''}`;
+              const fill = Math.max((Math.max(month.amount, 0) / maxAmount) * 100, month.amount > 0 ? 6 : 0);
+
+              return (
+                <li
+                  key={month.label}
+                  className="mchart-row"
+                  data-future={month.future ? 'true' : 'false'}
+                  data-best={isBest ? 'true' : 'false'}
+                >
+                  <span className="sr-only">{accessibleValue}</span>
+                  <span className="mchart-row-head" aria-hidden="true">
+                    <span className="mchart-row-label">{month.label}</span>
+                    {isBest ? <span className="mchart-row-best">Pic</span> : null}
+                  </span>
+                  <strong className="mchart-row-value" aria-hidden="true">
+                    {month.amount === 0 ? '—' : formatAxisMoney(month.amount)}
+                  </strong>
+                  <span className="mchart-row-track" aria-hidden="true">
+                    <span className="mchart-row-fill" style={{ width: `${fill}%` }} />
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
     </div>
   );
 }
