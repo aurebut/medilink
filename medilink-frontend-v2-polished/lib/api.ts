@@ -1,5 +1,5 @@
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '');
-const AUTH_TOKEN_KEY = 'medilink_auth_token';
+const LEGACY_AUTH_TOKEN_KEY = 'medilink_auth_token';
 
 export class ApiError extends Error {
   status: number;
@@ -26,47 +26,14 @@ type CacheEntry = {
 
 const GET_CACHE_TTL_MS = 5 * 60_000;
 const REVALIDATE_THROTTLE_MS = 15_000;
-const SESSION_CACHE_PREFIX = 'medilink_api_cache:';
 const getCache = new Map<string, CacheEntry>();
 const revalidatedAt = new Map<string, number>();
 const cacheListeners = new Map<string, Set<(value: unknown) => void>>();
 const cacheVersions = new Map<string, number>();
+let cacheGeneration = 0;
 
 function cacheKey(path: string) {
   return path;
-}
-
-function sessionCacheKey(path: string) {
-  return `${SESSION_CACHE_PREFIX}${path}`;
-}
-
-function readSessionCache<T>(path: string, now: number) {
-  if (typeof window === 'undefined') return null;
-
-  const raw = window.sessionStorage.getItem(sessionCacheKey(path));
-  if (!raw) return null;
-
-  try {
-    const cached = JSON.parse(raw) as { expiresAt: number; value: T };
-    if (cached.expiresAt <= now) {
-      window.sessionStorage.removeItem(sessionCacheKey(path));
-      return null;
-    }
-    return cached.value;
-  } catch {
-    window.sessionStorage.removeItem(sessionCacheKey(path));
-    return null;
-  }
-}
-
-function writeSessionCache<T>(path: string, value: T, expiresAt: number) {
-  if (typeof window === 'undefined' || value === undefined) return;
-
-  try {
-    window.sessionStorage.setItem(sessionCacheKey(path), JSON.stringify({ expiresAt, value }));
-  } catch {
-    // Storage can be full or unavailable; in-memory cache still covers the current view.
-  }
 }
 
 function emitApiCacheUpdate<T>(path: string, value: T) {
@@ -97,22 +64,15 @@ function revalidateApiCache(path: string) {
 
 export function clearApiCache(path?: string) {
   if (!path) {
+    cacheGeneration += 1;
     getCache.clear();
     revalidatedAt.clear();
-    if (typeof window !== 'undefined') {
-      Object.keys(window.sessionStorage)
-        .filter((key) => key.startsWith(SESSION_CACHE_PREFIX))
-        .forEach((key) => window.sessionStorage.removeItem(key));
-    }
     return;
   }
 
   bumpCacheVersion(path);
   getCache.delete(cacheKey(path));
   revalidatedAt.delete(cacheKey(path));
-  if (typeof window !== 'undefined') {
-    window.sessionStorage.removeItem(sessionCacheKey(path));
-  }
 }
 
 export function subscribeApiCache<T>(path: string, listener: (value: T) => void) {
@@ -133,9 +93,6 @@ export function getApiCacheValue<T>(path: string) {
   const cached = getCache.get(cacheKey(path));
   if (cached && cached.expiresAt > now) return cached.promise as Promise<T>;
 
-  const sessionValue = readSessionCache<T>(path, now);
-  if (sessionValue !== null) return Promise.resolve(sessionValue);
-
   return null;
 }
 
@@ -147,7 +104,6 @@ export function primeApiCache<T>(path: string, value: T) {
     promise: Promise.resolve(value),
     value,
   });
-  writeSessionCache(path, value, expiresAt);
   emitApiCacheUpdate(path, value);
 }
 
@@ -157,32 +113,18 @@ export function updateApiCache<T>(path: string, updater: (current: T | null) => 
   return next;
 }
 
-export function getAuthToken() {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(AUTH_TOKEN_KEY);
-}
-
 export function getApiEventUrl(path: string) {
-  const token = getAuthToken();
-  const url = new URL(`${API_URL}${path}`);
-  if (token) url.searchParams.set('access_token', token);
-  return url.toString();
+  const baseUrl = typeof window === 'undefined' ? 'http://localhost' : window.location.origin;
+  return new URL(`${API_URL}${path}`, baseUrl).toString();
 }
 
 export function getApiUrl(path: string) {
   return `${API_URL}${path}`;
 }
 
-export function setAuthToken(token: string) {
+export function clearLegacyAuthToken() {
   if (typeof window === 'undefined') return;
-  clearApiCache();
-  window.localStorage.setItem(AUTH_TOKEN_KEY, token);
-}
-
-export function clearAuthToken() {
-  if (typeof window === 'undefined') return;
-  clearApiCache();
-  window.localStorage.removeItem(AUTH_TOKEN_KEY);
+  window.localStorage.removeItem(LEGACY_AUTH_TOKEN_KEY);
 }
 
 function normalizeError(payload: any): string {
@@ -200,6 +142,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
   const key = cacheKey(path);
   const now = Date.now();
   const requestCacheVersion = versionFor(path);
+  const requestCacheGeneration = cacheGeneration;
 
   if (shouldReadCache) {
     const cached = getCache.get(key);
@@ -208,28 +151,15 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
       return cached.promise as Promise<T>;
     }
 
-    const sessionValue = readSessionCache<T>(path, now);
-    if (sessionValue !== null) {
-      const promise = Promise.resolve(sessionValue);
-      getCache.set(key, {
-        expiresAt: now + GET_CACHE_TTL_MS,
-        promise,
-        value: sessionValue,
-      });
-      revalidateApiCache(path);
-      return promise;
-    }
   }
 
   const hasJsonBody = options.body !== undefined && !(options.body instanceof FormData);
-  const token = getAuthToken();
   const { cacheMode: _cacheMode, invalidateCache: _invalidateCache, ...requestOptions } = options;
   const request = fetch(`${API_URL}${path}`, {
     ...requestOptions,
     credentials: 'include',
     headers: {
       ...(hasJsonBody ? { 'Content-Type': 'application/json' } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(requestOptions.headers || {}),
     },
     body: hasJsonBody ? JSON.stringify(options.body) : (options.body as BodyInit | undefined),
@@ -245,9 +175,10 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     }
 
     if (canUseCache) {
-      const cacheWasMutated = versionFor(path) !== requestCacheVersion;
+      const cacheWasMutated =
+        cacheGeneration !== requestCacheGeneration ||
+        versionFor(path) !== requestCacheVersion;
       if (!cacheWasMutated) {
-        writeSessionCache(path, payload as T, now + GET_CACHE_TTL_MS);
         getCache.set(key, {
           expiresAt: now + GET_CACHE_TTL_MS,
           promise: Promise.resolve(payload as T),
@@ -281,7 +212,7 @@ export function getApiCacheSync<T>(path: string): T | null {
   if (cached && cached.expiresAt > now && cached.value !== undefined) {
     return cached.value as T;
   }
-  return readSessionCache<T>(path, now);
+  return null;
 }
 
 export const api = {
@@ -307,10 +238,10 @@ export function openDocumentPreviewWindow() {
   const previewWindow = window.open('', '_blank');
   if (!previewWindow) return null;
 
-  previewWindow.document.write(
-    '<!doctype html><title>Document</title><body style="font-family:system-ui,sans-serif;padding:24px">Chargement du document...</body>',
-  );
-  previewWindow.document.close();
+  previewWindow.document.title = 'Document';
+  previewWindow.document.body.style.fontFamily = 'system-ui, sans-serif';
+  previewWindow.document.body.style.padding = '24px';
+  previewWindow.document.body.textContent = 'Chargement du document...';
   return previewWindow;
 }
 

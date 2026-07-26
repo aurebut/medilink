@@ -1,29 +1,73 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useAuth } from '@/components/AuthProvider';
 import { Alert, LinkButton } from '@/components/ui';
+import { api } from '@/lib/api';
+import { defaultRouteForUser } from '@/lib/routes';
+import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
 
 function VerifyEmailStatus() {
-  const token = useSearchParams().get('token');
-  const [message, setMessage] = useState('Vérification en cours...');
+  const { token, ready } = useOneTimeUrlToken();
+  const { user, refresh } = useAuth();
+  const submittedToken = useRef<string | null>(null);
+  const [message, setMessage] = useState(
+    'Consultez votre boîte email pour activer votre compte.',
+  );
   const [error, setError] = useState<string | null>(null);
+  const [verified, setVerified] = useState(false);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
-    if (!token) { setMessage('Token manquant.'); return; }
-    api.post<{ message: string }>('/auth/verify-email', { token })
-      .then((r) => setMessage(r.message))
-      .catch((e) => setError(e.message));
-  }, [token]);
+    if (!ready || !token || submittedToken.current === token) return;
 
-  return <main className="auth-page"><div className="auth-card form">
-    <Link className="brand" href="/"><span>Médilink</span></Link>
-    <h1>Vérification email</h1>
-    {error ? <Alert type="error">{error}</Alert> : <Alert type="success">{message}</Alert>}
-    <LinkButton href="/login">Aller à la connexion</LinkButton>
-  </div></main>;
+    submittedToken.current = token;
+    setMessage('Vérification en cours...');
+    api.post<{ message: string }>('/auth/verify-email', { token })
+      .then(async (result) => {
+        await refresh();
+        setVerified(true);
+        setMessage(result.message);
+      })
+      .catch((requestError) => setError(requestError.message));
+  }, [ready, refresh, token]);
+
+  async function resend() {
+    setResending(true);
+    setError(null);
+    try {
+      const result = await api.post<{ message: string }>('/auth/resend-verification');
+      setMessage(result.message);
+    } catch (requestError: any) {
+      setError(requestError.message);
+    } finally {
+      setResending(false);
+    }
+  }
+
+  return (
+    <main className="auth-page">
+      <div className="auth-card form">
+        <Link className="brand" href="/"><span>Médilink</span></Link>
+        <h1>Vérification email</h1>
+        {error ? <Alert type="error">{error}</Alert> : <Alert type="success">{message}</Alert>}
+        {ready && !token && user && !user.emailVerified ? (
+          <button
+            className="btn btn-secondary"
+            type="button"
+            onClick={resend}
+            disabled={resending}
+          >
+            {resending ? 'Envoi...' : 'Renvoyer l’email de vérification'}
+          </button>
+        ) : null}
+        <LinkButton href={verified ? defaultRouteForUser(user) : '/login'}>
+          {verified ? 'Continuer' : 'Aller à la connexion'}
+        </LinkButton>
+      </div>
+    </main>
+  );
 }
 
 export default function VerifyEmailPage() {

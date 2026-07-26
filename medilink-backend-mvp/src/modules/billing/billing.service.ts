@@ -240,18 +240,19 @@ export class BillingService {
     const access = await this.getPublicationAccess(establishmentId);
     if (access.hasActiveSubscription) return;
 
-    const creditEstablishmentIds = userId
-      ? await this.getPublicationCreditScopeEstablishmentIds(userId, establishmentId)
-      : [establishmentId];
+    if (userId) {
+      await this.permissions.ensureEstablishmentMember(userId, establishmentId);
+    }
+
     const availableCredits = await this.prisma.publicationCredit.count({
       where: {
-        establishmentId: { in: creditEstablishmentIds },
+        establishmentId,
         status: PublicationCreditStatus.AVAILABLE,
       },
     });
     const draftMissionsCount = await this.prisma.mission.count({
       where: {
-        establishmentId: { in: creditEstablishmentIds },
+        establishmentId,
         status: MissionStatus.DRAFT,
       },
     });
@@ -265,17 +266,23 @@ export class BillingService {
     });
   }
 
-  async attachPublicationAccessToMission(establishmentId: string, missionId: string, userId?: string) {
-    const access = await this.getPublicationAccess(establishmentId);
+  async attachPublicationAccessToMission(
+    establishmentId: string,
+    missionId: string,
+    userId?: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx || this.prisma;
+    const access = await this.getPublicationAccess(establishmentId, tx);
     if (access.hasActiveSubscription) return { source: 'SUBSCRIPTION' };
 
-    const creditEstablishmentIds = userId
-      ? await this.getPublicationCreditScopeEstablishmentIds(userId, establishmentId)
-      : [establishmentId];
+    if (userId) {
+      await this.permissions.ensureEstablishmentMember(userId, establishmentId);
+    }
 
-    const existing = await this.prisma.publicationCredit.findFirst({
+    const existing = await client.publicationCredit.findFirst({
       where: {
-        establishmentId: { in: creditEstablishmentIds },
+        establishmentId,
         missionId,
         status: { in: [PublicationCreditStatus.RESERVED, PublicationCreditStatus.CONSUMED] },
       },
@@ -283,9 +290,9 @@ export class BillingService {
 
     if (existing) return { source: 'PUBLICATION_CREDIT', credit: existing };
 
-    const credit = await this.prisma.publicationCredit.findFirst({
+    const credit = await client.publicationCredit.findFirst({
       where: {
-        establishmentId: { in: creditEstablishmentIds },
+        establishmentId,
         status: PublicationCreditStatus.AVAILABLE,
       },
       orderBy: { paidAt: 'asc' },
@@ -299,10 +306,13 @@ export class BillingService {
       });
     }
 
-    const claimed = await this.prisma.publicationCredit.updateMany({
-      where: { id: credit.id, status: PublicationCreditStatus.AVAILABLE },
-      data: {
+    const claimed = await client.publicationCredit.updateMany({
+      where: {
+        id: credit.id,
         establishmentId,
+        status: PublicationCreditStatus.AVAILABLE,
+      },
+      data: {
         missionId,
         status: PublicationCreditStatus.RESERVED,
         reservedAt: new Date(),
@@ -310,10 +320,17 @@ export class BillingService {
     });
 
     if (claimed.count === 0) {
-      return this.attachPublicationAccessToMission(establishmentId, missionId, userId);
+      return this.attachPublicationAccessToMission(
+        establishmentId,
+        missionId,
+        userId,
+        tx,
+      );
     }
 
-    const updated = await this.prisma.publicationCredit.findUnique({ where: { id: credit.id } });
+    const updated = await client.publicationCredit.findUnique({
+      where: { id: credit.id },
+    });
     return { source: 'PUBLICATION_CREDIT', credit: updated };
   }
 
@@ -396,13 +413,12 @@ export class BillingService {
       where: {
         establishmentId,
         missionId,
-        status: { in: [PublicationCreditStatus.RESERVED, PublicationCreditStatus.CONSUMED] },
+        status: PublicationCreditStatus.RESERVED,
       },
       data: {
         missionId: null,
         status: PublicationCreditStatus.AVAILABLE,
         reservedAt: null,
-        consumedAt: null,
       },
     });
   }
@@ -443,23 +459,112 @@ export class BillingService {
       throw new BadRequestException('Signature Stripe invalide.');
     }
 
+    const billingEventId = await this.claimBillingEvent(event);
+    if (!billingEventId) {
+      return { received: true, duplicate: true };
+    }
+
     try {
-      await this.prisma.billingEvent.create({
+      await this.processStripeEvent(event, stripe);
+      await this.prisma.billingEvent.update({
+        where: { id: billingEventId },
+        data: {
+          processedAt: new Date(),
+          processingStartedAt: null,
+          failedAt: null,
+          lastError: null,
+        },
+      });
+      return { received: true };
+    } catch (error) {
+      const lastError =
+        error instanceof Error
+          ? `${error.name || 'Error'} while processing Stripe event`
+          : 'Unknown error while processing Stripe event';
+      await this.prisma.billingEvent.updateMany({
+        where: { id: billingEventId, processedAt: null },
+        data: {
+          processingStartedAt: null,
+          failedAt: new Date(),
+          lastError,
+        },
+      }).catch(() => undefined);
+      throw error;
+    }
+  }
+
+  private async claimBillingEvent(event: any): Promise<string | null> {
+    const now = new Date();
+    try {
+      const created = await this.prisma.billingEvent.create({
         data: {
           providerEventId: event.id,
           eventType: event.type,
-          payload: event.data.object as any,
+          payload: {
+            objectId: event.data.object?.id || null,
+            created: event.created || null,
+            livemode: Boolean(event.livemode),
+          },
+          processingStartedAt: now,
+          attemptCount: 1,
         },
+        select: { id: true },
       });
+      return created.id;
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        return { received: true, duplicate: true };
+      if (
+        !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+        error.code !== 'P2002'
+      ) {
+        throw error;
       }
-      throw error;
     }
 
+    const existing = await this.prisma.billingEvent.findUnique({
+      where: { providerEventId: event.id },
+      select: {
+        id: true,
+        processedAt: true,
+      },
+    });
+    if (!existing) {
+      throw new ServiceUnavailableException('Evenement Stripe temporairement indisponible.');
+    }
+    if (existing.processedAt) {
+      return null;
+    }
+
+    const claimed = await this.prisma.billingEvent.updateMany({
+      where: {
+        id: existing.id,
+        processedAt: null,
+        OR: [
+          { failedAt: { not: null } },
+          { processingStartedAt: null },
+          { processingStartedAt: { lt: new Date(now.getTime() - 5 * 60_000) } },
+        ],
+      },
+      data: {
+        processingStartedAt: now,
+        failedAt: null,
+        lastError: null,
+        attemptCount: { increment: 1 },
+      },
+    });
+
+    if (claimed.count !== 1) {
+      throw new ServiceUnavailableException(
+        'Cet evenement Stripe est deja en cours de traitement.',
+      );
+    }
+    return existing.id;
+  }
+
+  private async processStripeEvent(event: any, stripe: any) {
+    const eventCreatedAt = this.dateFromUnix(event.created) || new Date();
+
     if (event.type === 'checkout.session.completed') {
-      await this.handleCheckoutCompleted(event.data.object);
+      await this.handleCheckoutCompleted(event.data.object, eventCreatedAt);
     }
 
     if (
@@ -467,7 +572,7 @@ export class BillingService {
       event.type === 'customer.subscription.updated' ||
       event.type === 'customer.subscription.deleted'
     ) {
-      await this.upsertSubscription(event.data.object);
+      await this.upsertSubscription(event.data.object, eventCreatedAt);
     }
 
     if (event.type === 'invoice.paid' || event.type === 'invoice.payment_failed') {
@@ -475,28 +580,71 @@ export class BillingService {
       const subscriptionId = this.idFromStripeRef(invoice.subscription);
       if (subscriptionId) {
         const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-        await this.upsertSubscription(subscription);
+        await this.upsertSubscription(subscription, eventCreatedAt);
       }
     }
-
-    return { received: true };
   }
 
-  private async handleCheckoutCompleted(session: any) {
+  private async handleCheckoutCompleted(session: any, eventCreatedAt: Date) {
     if (session.metadata?.kind === 'publication_credit') {
       if (session.payment_status !== 'paid') return;
 
       const creditId = session.metadata.creditId;
-      if (!creditId) return;
+      const establishmentId = session.metadata.establishmentId;
+      const amountTotal = Number(session.amount_total);
+      const currency = String(session.currency || '').toUpperCase();
+      if (
+        !creditId ||
+        !establishmentId ||
+        !session.id ||
+        session.mode !== 'payment' ||
+        !Number.isSafeInteger(amountTotal) ||
+        amountTotal <= 0 ||
+        !currency
+      ) {
+        throw new BadRequestException('Session Stripe de credit invalide.');
+      }
+      await this.assertStripeCustomerBinding(establishmentId, session.customer);
 
-      await this.prisma.publicationCredit.update({
-        where: { id: creditId },
+      const claimed = await this.prisma.publicationCredit.updateMany({
+        where: {
+          id: creditId,
+          establishmentId,
+          stripeCheckoutSessionId: session.id,
+          status: PublicationCreditStatus.PENDING_PAYMENT,
+          amount: amountTotal,
+          currency,
+        },
         data: {
           status: PublicationCreditStatus.AVAILABLE,
           stripePaymentIntentId: this.idFromStripeRef(session.payment_intent),
           paidAt: new Date(),
         },
       });
+
+      if (claimed.count !== 1) {
+        const existing = await this.prisma.publicationCredit.findUnique({
+          where: { id: creditId },
+          select: {
+            establishmentId: true,
+            stripeCheckoutSessionId: true,
+            status: true,
+            amount: true,
+            currency: true,
+          },
+        });
+        const alreadyApplied =
+          existing?.establishmentId === establishmentId &&
+          existing.stripeCheckoutSessionId === session.id &&
+          existing.status === PublicationCreditStatus.AVAILABLE &&
+          existing.amount === amountTotal &&
+          existing.currency === currency;
+        if (!alreadyApplied) {
+          throw new BadRequestException(
+            'Le paiement Stripe ne correspond pas au credit attendu.',
+          );
+        }
+      }
       return;
     }
 
@@ -504,35 +652,102 @@ export class BillingService {
       const subscriptionId = this.idFromStripeRef(session.subscription);
       if (!subscriptionId || !this.stripe) return;
       const subscription = await this.stripe.subscriptions.retrieve(subscriptionId);
-      await this.upsertSubscription(subscription);
+      await this.upsertSubscription(subscription, eventCreatedAt);
     }
   }
 
-  private async upsertSubscription(subscription: any) {
+  private async upsertSubscription(subscription: any, eventCreatedAt: Date) {
     const establishmentId = subscription.metadata?.establishmentId;
     if (!establishmentId) return;
+    if (!subscription.id) {
+      throw new BadRequestException('Abonnement Stripe invalide.');
+    }
+    await this.assertStripeCustomerBinding(establishmentId, subscription.customer);
 
-    await this.prisma.establishmentSubscription.upsert({
-      where: { stripeSubscriptionId: subscription.id },
-      update: {
-        status: this.mapSubscriptionStatus(subscription.status),
-        stripePriceId: subscription.items.data[0]?.price?.id,
-        currentPeriodStart: this.dateFromUnix(subscription.current_period_start),
-        currentPeriodEnd: this.dateFromUnix(subscription.current_period_end),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: this.dateFromUnix(subscription.canceled_at),
-      },
-      create: {
-        establishmentId,
-        stripeSubscriptionId: subscription.id,
-        stripePriceId: subscription.items.data[0]?.price?.id,
-        status: this.mapSubscriptionStatus(subscription.status),
-        currentPeriodStart: this.dateFromUnix(subscription.current_period_start),
-        currentPeriodEnd: this.dateFromUnix(subscription.current_period_end),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-        canceledAt: this.dateFromUnix(subscription.canceled_at),
-      },
+    const data = {
+      stripeSubscriptionId: subscription.id,
+      status: this.mapSubscriptionStatus(subscription.status),
+      stripePriceId: subscription.items.data[0]?.price?.id,
+      currentPeriodStart: this.dateFromUnix(subscription.current_period_start),
+      currentPeriodEnd: this.dateFromUnix(subscription.current_period_end),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      canceledAt: this.dateFromUnix(subscription.canceled_at),
+      stripeEventCreatedAt: eventCreatedAt,
+    };
+    const current = await this.prisma.establishmentSubscription.findUnique({
+      where: { establishmentId },
+      select: { id: true, stripeEventCreatedAt: true },
     });
+
+    if (current) {
+      if (
+        current.stripeEventCreatedAt &&
+        current.stripeEventCreatedAt > eventCreatedAt
+      ) {
+        return;
+      }
+      await this.prisma.establishmentSubscription.updateMany({
+        where: {
+          id: current.id,
+          OR: [
+            { stripeEventCreatedAt: null },
+            { stripeEventCreatedAt: { lte: eventCreatedAt } },
+          ],
+        },
+        data,
+      });
+      return;
+    }
+
+    try {
+      await this.prisma.establishmentSubscription.create({
+        data: {
+          establishmentId,
+          ...data,
+        },
+      });
+    } catch (error) {
+      if (
+        !(error instanceof Prisma.PrismaClientKnownRequestError) ||
+        error.code !== 'P2002'
+      ) {
+        throw error;
+      }
+
+      const concurrent = await this.prisma.establishmentSubscription.updateMany({
+        where: {
+          establishmentId,
+          OR: [
+            { stripeEventCreatedAt: null },
+            { stripeEventCreatedAt: { lte: eventCreatedAt } },
+          ],
+        },
+        data,
+      });
+      if (concurrent.count !== 1) {
+        return;
+      }
+    }
+  }
+
+  private async assertStripeCustomerBinding(
+    establishmentId: string,
+    stripeCustomer: unknown,
+  ) {
+    const stripeCustomerId = this.idFromStripeRef(stripeCustomer);
+    const billingCustomer = await this.prisma.billingCustomer.findUnique({
+      where: { establishmentId },
+      select: { stripeCustomerId: true },
+    });
+    if (
+      !stripeCustomerId ||
+      !billingCustomer ||
+      billingCustomer.stripeCustomerId !== stripeCustomerId
+    ) {
+      throw new BadRequestException(
+        'Le client Stripe ne correspond pas a cet etablissement.',
+      );
+    }
   }
 
   private async getPublicationAccess(establishmentId: string, tx?: Prisma.TransactionClient) {
@@ -563,29 +778,6 @@ export class BillingService {
     };
   }
 
-  private async getPublicationCreditScopeEstablishmentIds(userId: string, establishmentId: string) {
-    await this.permissions.ensureEstablishmentMember(userId, establishmentId);
-
-    const memberships = await this.prisma.establishmentMember.findMany({
-      where: {
-        userId,
-        role: {
-          in: [
-            EstablishmentMemberRole.OWNER,
-            EstablishmentMemberRole.ADMIN,
-            EstablishmentMemberRole.RECRUITER,
-          ],
-        },
-      },
-      select: { establishmentId: true },
-    });
-
-    return Array.from(new Set([
-      establishmentId,
-      ...memberships.map((membership) => membership.establishmentId),
-    ]));
-  }
-
   private async ensureBillingManager(userId: string, establishmentId: string) {
     return this.permissions.ensureEstablishmentMember(userId, establishmentId, [
       EstablishmentMemberRole.OWNER,
@@ -599,7 +791,12 @@ export class BillingService {
 
     const establishment = await this.prisma.establishment.findUnique({
       where: { id: establishmentId },
-      include: { members: { include: { user: true }, take: 1 } },
+      include: {
+        members: {
+          include: { user: { select: { email: true } } },
+          take: 1,
+        },
+      },
     });
     if (!establishment) throw new BadRequestException('Etablissement introuvable.');
 
@@ -653,8 +850,16 @@ export class BillingService {
     return value ? new Date(value * 1000) : null;
   }
 
-  private idFromStripeRef(value?: string | { id: string } | null) {
-    if (!value) return null;
-    return typeof value === 'string' ? value : value.id;
+  private idFromStripeRef(value: unknown) {
+    if (typeof value === 'string') return value;
+    if (
+      value &&
+      typeof value === 'object' &&
+      'id' in value &&
+      typeof value.id === 'string'
+    ) {
+      return value.id;
+    }
+    return null;
   }
 }

@@ -1,5 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CompensationMode, EstablishmentMemberRole, MissionStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CompensationMode,
+  EstablishmentMemberRole,
+  MissionAgreementStatus,
+  MissionStatus,
+  Prisma,
+} from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { BillingService } from '../billing/billing.service';
@@ -8,6 +19,15 @@ import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionDto } from './dto/create-mission.dto';
 import { SearchMissionsDto } from './dto/search-missions.dto';
+import { UpdateMissionDto } from './dto/update-mission.dto';
+
+const ALLOWED_MISSION_TRANSITIONS: Record<MissionStatus, MissionStatus[]> = {
+  [MissionStatus.DRAFT]: [MissionStatus.PUBLISHED, MissionStatus.ARCHIVED],
+  [MissionStatus.PUBLISHED]: [MissionStatus.PAUSED, MissionStatus.ARCHIVED],
+  [MissionStatus.PAUSED]: [MissionStatus.PUBLISHED, MissionStatus.ARCHIVED],
+  [MissionStatus.FILLED]: [],
+  [MissionStatus.ARCHIVED]: [],
+};
 
 @Injectable()
 export class MissionsService {
@@ -267,10 +287,8 @@ export class MissionsService {
     return this.withSignedEstablishmentPhotos(mission);
   }
 
-  async update(user: RequestUser, missionId: string, dto: Partial<CreateMissionDto>) {
+  async update(user: RequestUser, missionId: string, dto: UpdateMissionDto) {
     await this.permissions.ensureMissionManager(user.id, missionId);
-
-    const { tags, publishNow, establishmentId, compensationAmount, ...data } = dto as any;
 
     if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
       throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une mission.");
@@ -283,15 +301,50 @@ export class MissionsService {
     const updated = await this.prisma.mission.update({
       where: { id: missionId },
       data: {
-        ...data,
+        title: dto.title,
+        description: dto.description,
+        missionType: dto.missionType,
+        specialty: dto.specialty,
+        requiredLevel: dto.requiredLevel,
+        requiredLevels: dto.requiredLevels,
+        practiceSetting: dto.practiceSetting,
+        requiredActs: dto.requiredActs,
+        location: dto.location,
+        city: dto.city,
+        sector: dto.sector,
+        patientType: dto.patientType,
+        softwareUsed: dto.softwareUsed,
+        hasSecretary: dto.hasSecretary,
+        secretaryType: dto.secretaryType,
+        averagePatientsPerDay: dto.averagePatientsPerDay,
+        isMultidisciplinary: dto.isMultidisciplinary,
+        equipmentAvailable: dto.equipmentAvailable,
+        mobilityOptions: dto.mobilityOptions,
+        acceptedMissionTypes: dto.acceptedMissionTypes,
+        minimumCompensation: dto.minimumCompensation,
+        preferredDurations: dto.preferredDurations,
+        refusedSchedules: dto.refusedSchedules,
+        acceptedPatientTypes: dto.acceptedPatientTypes,
+        knownSoftware: dto.knownSoftware,
+        departmentInfo: dto.departmentInfo,
+        teamInfo: dto.teamInfo,
+        equipmentInfo: dto.equipmentInfo,
+        practicalInfo: dto.practicalInfo,
+        accommodationProvided: dto.accommodationProvided,
+        parkingAvailable: dto.parkingAvailable,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        durationHours: dto.durationHours,
+        retrocessionPercentage: dto.retrocessionPercentage,
+        compensationCurrency: dto.compensationCurrency,
         compensationMode: dto.compensationMode || dto.retrocessionPercentage ? CompensationMode.RETROCESSION : undefined,
         compensationAmount: dto.compensationMode || dto.retrocessionPercentage ? null : undefined,
         startDate: dto.startDate ? new Date(dto.startDate) : undefined,
         endDate: dto.endDate ? new Date(dto.endDate) : undefined,
-        tags: tags
+        tags: dto.tags
           ? {
               deleteMany: {},
-              create: tags.map((tag: string) => ({ tag })),
+              create: dto.tags.map((tag) => ({ tag })),
             }
           : undefined,
       },
@@ -310,22 +363,89 @@ export class MissionsService {
 
   async setStatus(user: RequestUser, missionId: string, status: MissionStatus) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
-    if (status === MissionStatus.PUBLISHED) {
-      await this.billing.attachPublicationAccessToMission(mission.establishmentId, missionId, user.id);
+    const allowed = ALLOWED_MISSION_TRANSITIONS[mission.status] || [];
+    if (!allowed.includes(status)) {
+      throw new ConflictException(
+        `Transition de mission impossible : ${mission.status} vers ${status}.`,
+      );
     }
 
-    if (status === MissionStatus.ARCHIVED) {
-      await this.billing.refundPublicationCreditForCancelledMission(mission.establishmentId, missionId);
-    }
+    const updated = await this.prisma.$transaction(
+      async (tx) => {
+        const claimed = await tx.mission.updateMany({
+          where: {
+            id: missionId,
+            status: mission.status,
+          },
+          data: {
+            status,
+            publishedAt:
+              status === MissionStatus.PUBLISHED ? new Date() : undefined,
+            archivedAt:
+              status === MissionStatus.ARCHIVED ? new Date() : undefined,
+          },
+        });
 
-    const updated = await this.prisma.mission.update({
-      where: { id: missionId },
-      data: {
-        status,
-        publishedAt: status === MissionStatus.PUBLISHED ? new Date() : undefined,
-        archivedAt: status === MissionStatus.ARCHIVED ? new Date() : undefined,
+        if (claimed.count !== 1) {
+          throw new ConflictException(
+            'Le statut de cette mission a deja ete modifie.',
+          );
+        }
+
+        if (status === MissionStatus.PUBLISHED) {
+          await this.billing.attachPublicationAccessToMission(
+            mission.establishmentId,
+            missionId,
+            undefined,
+            tx,
+          );
+        }
+
+        if (status === MissionStatus.ARCHIVED) {
+          await tx.missionAgreement.updateMany({
+            where: {
+              missionId,
+              status: MissionAgreementStatus.PROPOSED,
+              expiresAt: { lte: new Date() },
+            },
+            data: { status: MissionAgreementStatus.EXPIRED },
+          });
+
+          const activeAgreement = await tx.missionAgreement.findFirst({
+            where: {
+              missionId,
+              status: {
+                in: [
+                  MissionAgreementStatus.PROPOSED,
+                  MissionAgreementStatus.PAYMENT_REQUIRED,
+                  MissionAgreementStatus.FUNDS_SECURED,
+                  MissionAgreementStatus.COMPLETED,
+                  MissionAgreementStatus.DISPUTED,
+                ],
+              },
+            },
+            select: { id: true },
+          });
+
+          if (activeAgreement) {
+            throw new BadRequestException(
+              'Cette mission ne peut pas etre archivee tant qu un accord est actif.',
+            );
+          }
+
+          await this.billing.refundPublicationCreditForCancelledMission(
+            mission.establishmentId,
+            missionId,
+            tx,
+          );
+        }
+
+        return tx.mission.findUniqueOrThrow({ where: { id: missionId } });
       },
-    });
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      },
+    );
 
     await this.audit.log({
       actorUserId: user.id,
@@ -339,6 +459,25 @@ export class MissionsService {
 
   async delete(user: RequestUser, missionId: string) {
     const mission = await this.permissions.ensureMissionManager(user.id, missionId);
+
+    if (mission.status !== MissionStatus.DRAFT) {
+      throw new ConflictException(
+        'Seule une mission encore au brouillon peut etre supprimee.',
+      );
+    }
+
+    const [applicationCount, conversationCount, agreementCount] =
+      await Promise.all([
+        this.prisma.application.count({ where: { missionId } }),
+        this.prisma.conversation.count({ where: { missionId } }),
+        this.prisma.missionAgreement.count({ where: { missionId } }),
+      ]);
+
+    if (applicationCount > 0 || conversationCount > 0 || agreementCount > 0) {
+      throw new ConflictException(
+        'Une mission ayant un historique ne peut pas etre supprimee.',
+      );
+    }
 
     await this.billing.refundPublicationCreditForCancelledMission(mission.establishmentId, missionId);
 

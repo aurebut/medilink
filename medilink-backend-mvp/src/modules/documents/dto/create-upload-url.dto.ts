@@ -1,11 +1,22 @@
 import { DocumentType } from '@prisma/client';
-import { IsEnum, IsInt, IsMimeType, IsString, Max, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsMimeType,
+  IsNotEmpty,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateUploadUrlDto {
   @IsEnum(DocumentType)
   documentType: DocumentType;
 
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
   fileName: string;
 
   @IsMimeType()

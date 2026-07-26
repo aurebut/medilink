@@ -1,14 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstablishmentPhotoUploadDto } from './dto/create-establishment-photo-upload.dto';
 import { CreateEstablishmentDto } from './dto/create-establishment.dto';
+import { UpdateEstablishmentDto } from './dto/update-establishment.dto';
 import { EstablishmentsService } from './establishments.service';
 
 @Controller('establishments')
-@UseGuards(AuthGuard)
 export class EstablishmentsController {
   constructor(private readonly establishments: EstablishmentsService) {}
 
@@ -26,7 +25,7 @@ export class EstablishmentsController {
   update(
     @CurrentUser() user: RequestUser,
     @Param('id') id: string,
-    @Body() dto: Partial<CreateEstablishmentDto>,
+    @Body() dto: UpdateEstablishmentDto,
   ) {
     return this.establishments.update(user, id, dto);
   }

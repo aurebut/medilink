@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { api, getApiUrl, getAuthToken } from '@/lib/api';
+import { api, getApiUrl } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, latestAgreement } from '@/lib/candidate-workspace';
 import type { AccountingEntry, AccountingWorkspacePayload } from '@/lib/accounting';
 import { formatDate, formatMoney } from '@/lib/format';
@@ -152,10 +152,8 @@ export default function BillingMissionDetailPage() {
     setBusyId(conversationId);
     setError(null);
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${conversationId}/invoices/candidate.pdf`), {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error('Téléchargement du justificatif impossible.');
 

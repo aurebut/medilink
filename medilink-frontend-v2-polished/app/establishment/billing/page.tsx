@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { api, getApiUrl, getAuthToken } from '@/lib/api';
+import { api, getApiUrl } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
@@ -433,10 +433,8 @@ export default function RecruiterBillingPage() {
     setBusyId(conversationId);
     setError(null);
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${conversationId}/invoices/recruiter.pdf`), {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error('Téléchargement de la facture impossible.');
 

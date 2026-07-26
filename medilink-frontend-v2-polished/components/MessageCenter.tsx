@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { api, getApiCacheValue, getApiEventUrl, getApiUrl, getAuthToken, subscribeApiCache } from '@/lib/api';
+import { api, getApiCacheValue, getApiEventUrl, getApiUrl, subscribeApiCache } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
@@ -541,10 +541,8 @@ export function MessageCenter() {
     setBusyAction(`download-${kind}`);
     setError(null);
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${activeId}/invoices/${kind}.pdf`), {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error('Téléchargement de la facture impossible.');
 

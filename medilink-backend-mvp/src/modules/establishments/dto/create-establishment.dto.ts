@@ -1,37 +1,51 @@
 import { EstablishmentType } from '@prisma/client';
-import { IsArray, IsBoolean, IsEmail, IsEnum, IsInt, IsOptional, IsString, IsUrl, MaxLength, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsUrl,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
+import {
+  IsBoundedString,
+  IsBoundedStringArray,
+} from '../../../common/validators/bounded-input.decorators';
 
 export class CreateEstablishmentDto {
-  @IsString()
+  @IsBoundedString(180)
+  @MinLength(2)
   name: string;
 
   @IsEnum(EstablishmentType)
   type: EstablishmentType;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(300)
   address?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   city?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   country?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(80)
   sector?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(300)
+  @IsBoundedString(300)
   patientType?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(300)
+  @IsBoundedString(300)
   softwareUsed?: string;
 
   @IsOptional()
@@ -39,12 +53,13 @@ export class CreateEstablishmentDto {
   hasSecretary?: boolean;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   secretaryType?: string;
 
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(1000)
   averagePatientsPerDay?: number;
 
   @IsOptional()
@@ -52,58 +67,54 @@ export class CreateEstablishmentDto {
   isMultidisciplinary?: boolean;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   equipmentAvailable?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   mobilityOptions?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   acceptedMissionTypes?: string[];
 
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(1_000_000_000)
   minimumCompensation?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 80)
   preferredDurations?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   refusedSchedules?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   acceptedPatientTypes?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 120)
   knownSoftware?: string[];
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(32)
   phone?: string;
 
   @IsOptional()
   @IsEmail()
+  @MaxLength(254)
   email?: string;
 
   @IsOptional()
   @IsUrl()
+  @MaxLength(2048)
   website?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(5000)
   description?: string;
 }

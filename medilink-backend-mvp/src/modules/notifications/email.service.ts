@@ -38,6 +38,13 @@ export class EmailService {
     private readonly config: ConfigService,
   ) {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
+    const emailFrom = this.config.get<string>('EMAIL_FROM');
+    const isProduction = this.config.get<string>('NODE_ENV') === 'production';
+
+    if (isProduction && (!apiKey || !emailFrom)) {
+      throw new Error('RESEND_API_KEY and EMAIL_FROM are required in production.');
+    }
+
     if (apiKey) {
       this.resend = new Resend(apiKey);
     }
@@ -72,13 +79,9 @@ export class EmailService {
         });
         providerMessageId = result.data?.id;
       } else {
-        this.logger.log(`[EMAIL MOCK] To: ${params.to} | Subject: ${params.subject}`);
-        const linkMatch = params.html.match(/href="([^"]+)"/);
-        if (linkMatch && linkMatch[1]) {
-          this.logger.log(`[EMAIL MOCK] Link: ${linkMatch[1]}`);
-        } else {
-          this.logger.log(`[EMAIL MOCK] Content: ${params.html}`);
-        }
+        this.logger.warn(
+          `[EMAIL MOCK] To: ${params.to} | Subject: ${params.subject} | Content redacted`,
+        );
       }
 
       await this.prisma.emailEvent.update({
@@ -277,7 +280,7 @@ export class EmailService {
 
   sendVerificationEmail(userId: string, to: string, token: string) {
     const frontendUrl = this.getFrontendUrl();
-    const link = `${frontendUrl}/verify-email?token=${token}`;
+    const link = `${frontendUrl}/verify-email#token=${encodeURIComponent(token)}`;
 
     const bodyHtml = `
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Confirmez votre adresse email</h1>
@@ -311,7 +314,7 @@ export class EmailService {
 
   sendPasswordResetEmail(userId: string, to: string, token: string) {
     const frontendUrl = this.getFrontendUrl();
-    const link = `${frontendUrl}/reset-password?token=${token}`;
+    const link = `${frontendUrl}/reset-password#token=${encodeURIComponent(token)}`;
 
     const bodyHtml = `
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Réinitialisation de votre mot de passe</h1>

@@ -68,6 +68,15 @@ export class ApplicationsService {
       throw new NotFoundException('Mission introuvable ou indisponible.');
     }
 
+    if (
+      mission.createdById === user.id ||
+      mission.establishment.members.some((member) => member.userId === user.id)
+    ) {
+      throw new ForbiddenException(
+        'Vous ne pouvez pas postuler à une mission que vous créez ou gérez.',
+      );
+    }
+
     await this.profiles.assertMinimumCompletion(user.id, 40);
 
     const existing = await this.prisma.application.findUnique({
@@ -86,6 +95,9 @@ export class ApplicationsService {
     const profile = await this.prisma.profile.findUnique({ where: { userId: user.id } });
     const candidateArticle = profile?.candidateGender === 'FEMININE' ? 'La candidate' : 'Le candidat';
     const recruiterUserId = mission.createdById;
+    if (recruiterUserId === user.id) {
+      throw new ForbiddenException('Les deux parties de la mission doivent être distinctes.');
+    }
 
     const result = await this.prisma.$transaction(async (tx) => {
       const application = await tx.application.create({
@@ -300,10 +312,19 @@ export class ApplicationsService {
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      const updatedApplication = await tx.application.update({
-        where: { id: application.id },
+      const claimed = await tx.application.updateMany({
+        where: {
+          id: application.id,
+          status: application.status,
+        },
         data: { status: dto.status },
       });
+
+      if (claimed.count !== 1) {
+        throw new ConflictException(
+          'Le statut de cette candidature a déjà été modifié.',
+        );
+      }
 
       await tx.applicationStatusHistory.create({
         data: {
@@ -323,7 +344,7 @@ export class ApplicationsService {
         );
       }
 
-      return updatedApplication;
+      return tx.application.findUniqueOrThrow({ where: { id: application.id } });
     });
 
     await this.notifications.notifyApplicationStatusChanged(application.id, dto.status);
@@ -362,10 +383,19 @@ export class ApplicationsService {
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      const updatedApplication = await tx.application.update({
-        where: { id: application.id },
+      const claimed = await tx.application.updateMany({
+        where: {
+          id: application.id,
+          status: application.status,
+        },
         data: { status: targetStatus },
       });
+
+      if (claimed.count !== 1) {
+        throw new ConflictException(
+          'Le statut de cette candidature a déjà été modifié.',
+        );
+      }
 
       await tx.applicationStatusHistory.create({
         data: {
@@ -384,7 +414,7 @@ export class ApplicationsService {
         );
       }
 
-      return updatedApplication;
+      return tx.application.findUniqueOrThrow({ where: { id: application.id } });
     });
 
     await this.audit.log({

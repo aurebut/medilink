@@ -13,10 +13,12 @@ export class SearchMissionsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(160)
   specialty?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(120)
   city?: string;
 
   @IsOptional()
@@ -45,6 +47,7 @@ export class SearchMissionsDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   q?: string;
 
   @IsOptional()
@@ -76,5 +79,6 @@ export class SearchMissionsDto {
   @Type(() => Number)
   @IsInt()
   @Min(0)
+  @Max(10_000)
   offset?: number = 0;
 }

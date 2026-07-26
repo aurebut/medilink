@@ -1,8 +1,7 @@
-import { Body, Controller, Get, MessageEvent, Param, Post, Res, Sse, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, MessageEvent, Param, Post, Res, Sse } from '@nestjs/common';
 import { Response } from 'express';
 import { Observable } from 'rxjs';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RequestUser } from '../../common/types/request-user.type';
 import { ConversationEventsService } from './conversation-events.service';
 import { ConversationsService } from './conversations.service';
@@ -10,7 +9,6 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { ReleasePaymentDto, SendProposalDto } from './dto/workflow-action.dto';
 
 @Controller('conversations')
-@UseGuards(AuthGuard)
 export class ConversationsController {
   constructor(
     private readonly conversations: ConversationsService,

@@ -1,33 +1,41 @@
 import { CompensationMode, MissionType, RequiredLevel } from '@prisma/client';
 import {
+  ArrayMaxSize,
   IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
-  IsString,
-  MaxLength,
+  IsUUID,
   Max,
   Min,
+  MinLength,
 } from 'class-validator';
+import {
+  IsBoundedString,
+  IsBoundedStringArray,
+} from '../../../common/validators/bounded-input.decorators';
 
 export class CreateMissionDto {
   @IsOptional()
-  @IsString()
+  @IsUUID()
   establishmentId?: string;
 
-  @IsString()
+  @IsBoundedString(180)
+  @MinLength(3)
   title: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(5000)
   description?: string;
 
   @IsEnum(MissionType)
   missionType: MissionType;
 
-  @IsString()
+  @IsBoundedString(160)
+  @MinLength(2)
   specialty: string;
 
   @IsOptional()
@@ -36,37 +44,36 @@ export class CreateMissionDto {
 
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(10)
   @IsEnum(RequiredLevel, { each: true })
   requiredLevels?: RequiredLevel[];
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   practiceSetting?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   requiredActs?: string[];
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(300)
   location?: string;
 
-  @IsString()
+  @IsBoundedString(120)
+  @MinLength(2)
   city: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(80)
   sector?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(300)
+  @IsBoundedString(300)
   patientType?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(300)
+  @IsBoundedString(300)
   softwareUsed?: string;
 
   @IsOptional()
@@ -74,12 +81,13 @@ export class CreateMissionDto {
   hasSecretary?: boolean;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   secretaryType?: string;
 
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(1000)
   averagePatientsPerDay?: number;
 
   @IsOptional()
@@ -87,59 +95,53 @@ export class CreateMissionDto {
   isMultidisciplinary?: boolean;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   equipmentAvailable?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   mobilityOptions?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   acceptedMissionTypes?: string[];
 
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(1_000_000_000)
   minimumCompensation?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 80)
   preferredDurations?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   refusedSchedules?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   acceptedPatientTypes?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 120)
   knownSoftware?: string[];
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(2000)
   departmentInfo?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(2000)
   teamInfo?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(2000)
   equipmentInfo?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(2000)
   practicalInfo?: string;
 
   @IsOptional()
@@ -158,11 +160,11 @@ export class CreateMissionDto {
   endDate?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(20)
   startTime?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(20)
   endTime?: string;
 
   @IsOptional()
@@ -187,12 +189,11 @@ export class CreateMissionDto {
   compensationAmount?: number;
 
   @IsOptional()
-  @IsString()
+  @IsIn(['EUR'])
   compensationCurrency?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(20, 50)
   tags?: string[];
 
   @IsOptional()

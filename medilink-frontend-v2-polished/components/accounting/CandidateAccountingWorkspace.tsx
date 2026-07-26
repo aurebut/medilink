@@ -2,7 +2,7 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { api, getApiUrl, getAuthToken } from '@/lib/api';
+import { api, getApiUrl } from '@/lib/api';
 import {
   AccountingEntry,
   AccountingEntryKind,
@@ -270,10 +270,8 @@ export function CandidateAccountingWorkspace() {
     setBusyId(settlement.id);
     setError(null);
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${settlement.conversationId}/invoices/candidate.pdf`), {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error('Téléchargement du justificatif impossible.');
       const blob = await response.blob();

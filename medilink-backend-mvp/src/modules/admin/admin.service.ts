@@ -37,9 +37,29 @@ export class AdminService {
   }
 
   async suspendUser(admin: RequestUser, userId: string) {
-    const updated = await this.prisma.user.update({
-      where: { id: userId },
-      data: { status: UserStatus.SUSPENDED },
+    if (admin.id === userId) {
+      throw new BadRequestException('Vous ne pouvez pas suspendre votre propre compte.');
+    }
+
+    const now = new Date();
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id: userId },
+        data: { status: UserStatus.SUSPENDED },
+      });
+      await tx.session.updateMany({
+        where: { userId, revokedAt: null },
+        data: { revokedAt: now },
+      });
+      await tx.emailVerificationToken.updateMany({
+        where: { userId, usedAt: null },
+        data: { expiresAt: now },
+      });
+      await tx.passwordResetToken.updateMany({
+        where: { userId, usedAt: null },
+        data: { expiresAt: now },
+      });
+      return user;
     });
 
     await this.audit.log({
@@ -126,7 +146,22 @@ export class AdminService {
 
   listEstablishments() {
     return this.prisma.establishment.findMany({
-      include: { members: { include: { user: true } } },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                status: true,
+                emailVerified: true,
+                profile: true,
+              },
+            },
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: 100,
     });

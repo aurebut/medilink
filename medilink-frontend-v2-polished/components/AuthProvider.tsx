@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { api, clearAuthToken, setAuthToken } from '@/lib/api';
+import { api, clearApiCache, clearLegacyAuthToken } from '@/lib/api';
 import type { CandidateGender, CurrentUser } from '@/lib/types';
 import { resetPlatformSplash } from '@/lib/startup-splash';
 
@@ -33,11 +33,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refresh = useCallback(async () => {
     try {
-      const current = await api.get<CurrentUser>('/auth/me');
+      const current = await api.reload<CurrentUser>('/auth/me');
       setUser(current);
       return current;
     } catch {
-      clearAuthToken();
+      clearApiCache();
+      clearLegacyAuthToken();
       setUser(null);
       return null;
     } finally {
@@ -45,26 +46,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => { void refresh(); }, [refresh]);
+  useEffect(() => {
+    clearLegacyAuthToken();
+    void refresh();
+
+    const refreshWhenActive = () => {
+      if (document.visibilityState === 'visible') void refresh();
+    };
+
+    window.addEventListener('focus', refreshWhenActive);
+    document.addEventListener('visibilitychange', refreshWhenActive);
+    return () => {
+      window.removeEventListener('focus', refreshWhenActive);
+      document.removeEventListener('visibilitychange', refreshWhenActive);
+    };
+  }, [refresh]);
 
   const login = useCallback(async (email: string, password: string) => {
-    const result = await api.post<{ user: CurrentUser; token: string }>('/auth/login', { email, password });
+    const result = await api.post<{ user: CurrentUser }>('/auth/login', { email, password });
     resetPlatformSplash();
-    setAuthToken(result.token);
+    clearApiCache();
     setUser(result.user);
     return result.user;
   }, []);
 
   const register = useCallback(async (data: RegisterPayload) => {
-    const result = await api.post<{ user: CurrentUser; token: string }>('/auth/register', data);
+    const result = await api.post<{ user: CurrentUser }>('/auth/register', data);
     resetPlatformSplash();
-    setAuthToken(result.token);
+    clearApiCache();
     setUser(result.user);
     return result.user;
   }, []);
 
   const logout = useCallback(async () => {
-    try { await api.post('/auth/logout'); } finally { resetPlatformSplash(); clearAuthToken(); setUser(null); }
+    try {
+      await api.post('/auth/logout');
+    } finally {
+      resetPlatformSplash();
+      clearApiCache();
+      clearLegacyAuthToken();
+      setUser(null);
+    }
   }, []);
 
   const value = useMemo(() => ({ user, loading, refresh, login, register, logout }), [user, loading, refresh, login, register, logout]);

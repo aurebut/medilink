@@ -1,13 +1,11 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RequestUser } from '../../common/types/request-user.type';
 import { ApplicationsService } from './applications.service';
 import { ApplyDto } from './dto/apply.dto';
 import { UpdateApplicationStatusDto } from './dto/update-application-status.dto';
 
 @Controller()
-@UseGuards(AuthGuard)
 export class ApplicationsController {
   constructor(private readonly applications: ApplicationsService) {}
 

@@ -7,6 +7,7 @@ import {
   AccountingOwnerType,
   AccountingSocialScheme,
   CompensationMode,
+  EstablishmentMemberRole,
   InvoiceType,
   MissionAgreementStatus,
   Prisma,
@@ -173,28 +174,28 @@ export class AccountingService {
   }
 
   async getEstablishmentWorkspace(user: RequestUser, establishmentId: string) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId);
+    await this.ensureEstablishmentFinanceAccess(user.id, establishmentId);
     return this.getWorkspace({ ownerType: AccountingOwnerType.ESTABLISHMENT, ownerId: establishmentId });
   }
 
   async createEstablishmentEntry(user: RequestUser, establishmentId: string, dto: CreateAccountingEntryDto) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId);
+    await this.ensureEstablishmentFinanceAccess(user.id, establishmentId);
     if (dto.kind !== AccountingEntryKind.EXPENSE) throw new BadRequestException('Une dépense est attendue pour cet espace.');
     return this.createEntry(user, { ownerType: AccountingOwnerType.ESTABLISHMENT, ownerId: establishmentId }, dto);
   }
 
   async deleteEstablishmentEntry(user: RequestUser, establishmentId: string, entryId: string) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId);
+    await this.ensureEstablishmentFinanceAccess(user.id, establishmentId);
     return this.deleteEntry(user, { ownerType: AccountingOwnerType.ESTABLISHMENT, ownerId: establishmentId }, entryId);
   }
 
   async updateEstablishmentSettings(user: RequestUser, establishmentId: string, dto: UpdateAccountingSettingsDto) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId);
+    await this.ensureEstablishmentFinanceAccess(user.id, establishmentId);
     return this.updateSettings(user, { ownerType: AccountingOwnerType.ESTABLISHMENT, ownerId: establishmentId }, dto);
   }
 
   async classifyEstablishmentRecord(user: RequestUser, establishmentId: string, dto: SetAccountingClassificationDto) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId);
+    await this.ensureEstablishmentFinanceAccess(user.id, establishmentId);
     return this.setClassification(user, { ownerType: AccountingOwnerType.ESTABLISHMENT, ownerId: establishmentId }, dto);
   }
 
@@ -598,6 +599,13 @@ export class AccountingService {
       hasReceipt: agreement.invoices.some((invoice: { type: InvoiceType }) => invoice.type === InvoiceType.CANDIDATE_RECEIPT),
       notes: settlement.notes,
     };
+  }
+
+  private ensureEstablishmentFinanceAccess(userId: string, establishmentId: string) {
+    return this.permissions.ensureEstablishmentMember(userId, establishmentId, [
+      EstablishmentMemberRole.OWNER,
+      EstablishmentMemberRole.ADMIN,
+    ]);
   }
 
   private rulesPayload() {

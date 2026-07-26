@@ -1,7 +1,7 @@
-import { IsString } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
 export class CreateCheckoutSessionDto {
-  @IsString()
+  @IsUUID()
   establishmentId: string;
 }
 

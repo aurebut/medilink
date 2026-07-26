@@ -181,30 +181,38 @@ export class AnsDirectoryService {
     input: { firstName?: string | null; lastName?: string | null },
     practitioner: { firstName?: string; lastName?: string; fullName?: string },
   ) {
-    const expectedFirstName = this.normalizeName(input.firstName);
-    const expectedLastName = this.normalizeName(input.lastName);
-    const firstName = this.normalizeName(practitioner.firstName || practitioner.fullName);
-    const lastName = this.normalizeName(practitioner.lastName || practitioner.fullName);
-    const fullName = this.normalizeName(practitioner.fullName);
+    const expectedFirstNames = this.nameTokens(input.firstName);
+    const expectedLastNames = this.nameTokens(input.lastName);
 
-    const firstMatches =
-      !expectedFirstName ||
-      firstName.includes(expectedFirstName) ||
-      fullName.includes(expectedFirstName);
-    const lastMatches =
-      !expectedLastName ||
-      lastName.includes(expectedLastName) ||
-      fullName.includes(expectedLastName);
+    if (!expectedFirstNames.length || !expectedLastNames.length) {
+      return false;
+    }
+
+    const practitionerFirstNames = this.nameTokens(practitioner.firstName);
+    const practitionerLastNames = this.nameTokens(practitioner.lastName);
+    const practitionerFullName = this.nameTokens(practitioner.fullName);
+
+    const firstMatches = expectedFirstNames.every(
+      (name) =>
+        practitionerFirstNames.includes(name) ||
+        practitionerFullName.includes(name),
+    );
+    const lastMatches = expectedLastNames.every(
+      (name) =>
+        practitionerLastNames.includes(name) ||
+        practitionerFullName.includes(name),
+    );
 
     return firstMatches && lastMatches;
   }
 
-  private normalizeName(value?: string | null) {
+  private nameTokens(value?: string | null) {
     return (value || '')
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
-      .replace(/[^a-z]/g, '');
+      .split(/[^a-z]+/)
+      .filter((token) => token.length >= 2);
   }
 
   private includedResourceTypes(bundle: FhirBundle) {

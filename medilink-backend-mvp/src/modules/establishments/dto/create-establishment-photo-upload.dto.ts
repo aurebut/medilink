@@ -1,7 +1,17 @@
-import { IsInt, IsMimeType, IsString, Max, Min } from 'class-validator';
+import {
+  IsInt,
+  IsMimeType,
+  IsNotEmpty,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateEstablishmentPhotoUploadDto {
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(255)
   fileName: string;
 
   @IsMimeType()

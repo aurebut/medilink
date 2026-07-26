@@ -1,5 +1,15 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { EstablishmentMemberRole } from '@prisma/client';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  AccountingOwnerType,
+  EstablishmentMemberRole,
+  UserRole,
+} from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { RequestUser } from '../../common/types/request-user.type';
 import { calculateCompletionScore } from '../../common/utils/completion.util';
@@ -10,6 +20,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AddMemberDto } from './dto/add-member.dto';
 import { CreateEstablishmentPhotoUploadDto } from './dto/create-establishment-photo-upload.dto';
 import { CreateEstablishmentDto } from './dto/create-establishment.dto';
+import { UpdateEstablishmentDto } from './dto/update-establishment.dto';
 
 const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -23,6 +34,15 @@ export class EstablishmentsService {
   ) {}
 
   async create(user: RequestUser, dto: CreateEstablishmentDto) {
+    if (
+      user.role !== UserRole.ESTABLISHMENT_OWNER &&
+      user.role !== UserRole.MEDILINK_ADMIN
+    ) {
+      throw new ForbiddenException(
+        'Seul un compte établissement autorisé peut créer un établissement.',
+      );
+    }
+
     const establishment = await this.prisma.$transaction(async (tx) => {
       const created = await tx.establishment.create({
         data: {
@@ -84,7 +104,7 @@ export class EstablishmentsService {
     return Promise.all(establishments.map((item) => this.withSignedPhotoUrls(item)));
   }
 
-  async update(user: RequestUser, establishmentId: string, dto: Partial<CreateEstablishmentDto>) {
+  async update(user: RequestUser, establishmentId: string, dto: UpdateEstablishmentDto) {
     await this.permissions.ensureEstablishmentMember(user.id, establishmentId, [
       EstablishmentMemberRole.OWNER,
       EstablishmentMemberRole.ADMIN,
@@ -92,7 +112,32 @@ export class EstablishmentsService {
 
     const updated = await this.prisma.establishment.update({
       where: { id: establishmentId },
-      data: dto,
+      data: {
+        name: dto.name,
+        type: dto.type,
+        address: dto.address,
+        city: dto.city,
+        country: dto.country,
+        sector: dto.sector,
+        patientType: dto.patientType,
+        softwareUsed: dto.softwareUsed,
+        hasSecretary: dto.hasSecretary,
+        secretaryType: dto.secretaryType,
+        averagePatientsPerDay: dto.averagePatientsPerDay,
+        isMultidisciplinary: dto.isMultidisciplinary,
+        equipmentAvailable: dto.equipmentAvailable,
+        mobilityOptions: dto.mobilityOptions,
+        acceptedMissionTypes: dto.acceptedMissionTypes,
+        minimumCompensation: dto.minimumCompensation,
+        preferredDurations: dto.preferredDurations,
+        refusedSchedules: dto.refusedSchedules,
+        acceptedPatientTypes: dto.acceptedPatientTypes,
+        knownSoftware: dto.knownSoftware,
+        phone: dto.phone,
+        email: dto.email,
+        website: dto.website,
+        description: dto.description,
+      },
       include: { photos: this.photoInclude },
     });
 
@@ -109,16 +154,69 @@ export class EstablishmentsService {
   async delete(user: RequestUser, establishmentId: string) {
     await this.permissions.ensureEstablishmentMember(user.id, establishmentId, [
       EstablishmentMemberRole.OWNER,
-      EstablishmentMemberRole.ADMIN,
     ]);
 
     const establishment = await this.prisma.establishment.findUnique({
       where: { id: establishmentId },
+      include: {
+        photos: {
+          select: { storageKey: true },
+        },
+      },
     });
 
     if (!establishment) {
       throw new NotFoundException('Etablissement introuvable.');
     }
+
+    const [
+      missionCount,
+      conversationCount,
+      publicationCreditCount,
+      billingCustomer,
+      subscription,
+      accountingWorkspace,
+    ] = await Promise.all([
+      this.prisma.mission.count({ where: { establishmentId } }),
+      this.prisma.conversation.count({ where: { establishmentId } }),
+      this.prisma.publicationCredit.count({ where: { establishmentId } }),
+      this.prisma.billingCustomer.findUnique({
+        where: { establishmentId },
+        select: { id: true },
+      }),
+      this.prisma.establishmentSubscription.findUnique({
+        where: { establishmentId },
+        select: { id: true },
+      }),
+      this.prisma.accountingWorkspace.findUnique({
+        where: {
+          ownerType_ownerId: {
+            ownerType: AccountingOwnerType.ESTABLISHMENT,
+            ownerId: establishmentId,
+          },
+        },
+        select: { id: true },
+      }),
+    ]);
+
+    if (
+      missionCount > 0 ||
+      conversationCount > 0 ||
+      publicationCreditCount > 0 ||
+      billingCustomer ||
+      subscription ||
+      accountingWorkspace
+    ) {
+      throw new ConflictException(
+        'Un etablissement ayant un historique operationnel ou financier ne peut pas etre supprime.',
+      );
+    }
+
+    await Promise.all(
+      establishment.photos.map((photo) =>
+        this.storage.deleteObject(photo.storageKey),
+      ),
+    );
 
     await this.prisma.establishment.delete({
       where: { id: establishmentId },
@@ -151,6 +249,27 @@ export class EstablishmentsService {
 
     if (!memberUser) {
       throw new NotFoundException('Utilisateur introuvable.');
+    }
+
+    if (memberUser.role === UserRole.CANDIDATE) {
+      throw new ForbiddenException(
+        'Un compte candidat ne peut pas recevoir un rôle établissement.',
+      );
+    }
+
+    const existingMembership = await this.prisma.establishmentMember.findUnique({
+      where: {
+        establishmentId_userId: {
+          establishmentId,
+          userId: memberUser.id,
+        },
+      },
+    });
+
+    if (existingMembership?.role === EstablishmentMemberRole.OWNER) {
+      throw new ForbiddenException(
+        'Le rôle du propriétaire ne peut pas être modifié via cette route.',
+      );
     }
 
     const member = await this.prisma.establishmentMember.upsert({
@@ -197,8 +316,13 @@ export class EstablishmentsService {
     await this.ensureCanManagePhotos(user.id, establishmentId);
     this.validatePhoto(dto);
 
-    const safeFileName = dto.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storageKey = `establishments/${establishmentId}/${randomUUID()}-${safeFileName}`;
+    const safeFileName =
+      dto.fileName
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .replace(/\.{2,}/g, '.')
+        .replace(/^\.+/, '') || 'photo';
+    const storageKey =
+      `quarantine/establishments/${establishmentId}/${randomUUID()}-${safeFileName}`;
 
     const photo = await this.prisma.establishmentPhoto.create({
       data: {
@@ -226,16 +350,58 @@ export class EstablishmentsService {
   async confirmPhotoUpload(user: RequestUser, establishmentId: string, photoId: string) {
     await this.ensureCanManagePhotos(user.id, establishmentId);
     const photo = await this.findPhoto(establishmentId, photoId);
+
+    if (photo.uploadedAt) {
+      throw new ConflictException('Cette photo a deja ete confirmee.');
+    }
+
+    const finalStorageKey =
+      `validated/establishments/${establishmentId}/${photo.id}-${photo.fileName}`;
+
+    try {
+      await this.storage.promoteUploadedObject(photo.storageKey, finalStorageKey);
+    } catch {
+      // A previous attempt may already have copied the object before failing
+      // while deleting the quarantine copy.
+    }
+
+    try {
+      await this.storage.assertUploadedObject(
+        finalStorageKey,
+        photo.mimeType,
+        photo.sizeBytes,
+      );
+    } catch {
+      await this.storage.deleteObject(finalStorageKey).catch(() => undefined);
+      throw new BadRequestException(
+        'La photo est absente, incomplete ou ne correspond pas au type declare.',
+      );
+    }
+
     const existingUploaded = await this.prisma.establishmentPhoto.count({
       where: { establishmentId, uploadedAt: { not: null } },
     });
 
-    const updated = await this.prisma.establishmentPhoto.update({
-      where: { id: photo.id },
+    const claimed = await this.prisma.establishmentPhoto.updateMany({
+      where: {
+        id: photo.id,
+        establishmentId,
+        storageKey: photo.storageKey,
+        uploadedAt: null,
+      },
       data: {
+        storageKey: finalStorageKey,
         uploadedAt: new Date(),
         isPrimary: existingUploaded === 0 ? true : photo.isPrimary,
       },
+    });
+
+    if (claimed.count !== 1) {
+      throw new ConflictException('Cette photo a deja ete confirmee.');
+    }
+
+    const updated = await this.prisma.establishmentPhoto.findUniqueOrThrow({
+      where: { id: photo.id },
     });
 
     await this.audit.log({
@@ -251,7 +417,10 @@ export class EstablishmentsService {
 
   async setPrimaryPhoto(user: RequestUser, establishmentId: string, photoId: string) {
     await this.ensureCanManagePhotos(user.id, establishmentId);
-    await this.findPhoto(establishmentId, photoId);
+    const photo = await this.findPhoto(establishmentId, photoId);
+    if (!photo.uploadedAt) {
+      throw new BadRequestException('Cette photo doit etre confirmee avant publication.');
+    }
 
     await this.prisma.$transaction([
       this.prisma.establishmentPhoto.updateMany({
@@ -271,6 +440,7 @@ export class EstablishmentsService {
     await this.ensureCanManagePhotos(user.id, establishmentId);
     const photo = await this.findPhoto(establishmentId, photoId);
 
+    await this.storage.deleteObject(photo.storageKey);
     await this.prisma.establishmentPhoto.delete({ where: { id: photo.id } });
 
     const firstPhoto = await this.prisma.establishmentPhoto.findFirst({

@@ -1,4 +1,15 @@
-import { IsEmail, IsEnum, IsIn, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+  ValidateIf,
+} from 'class-validator';
 
 export enum RegisterAccountType {
   CANDIDATE = 'candidate',
@@ -7,21 +18,29 @@ export enum RegisterAccountType {
 
 export class RegisterDto {
   @IsEmail()
+  @MaxLength(254)
   email: string;
 
   @IsString()
-  @MinLength(8)
+  @MinLength(12)
+  @MaxLength(128)
   password: string;
 
   @IsEnum(RegisterAccountType)
   accountType: RegisterAccountType;
 
-  @IsOptional()
+  @ValidateIf((dto: RegisterDto) => dto.accountType === RegisterAccountType.CANDIDATE)
   @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
   firstName?: string;
 
-  @IsOptional()
+  @ValidateIf((dto: RegisterDto) => dto.accountType === RegisterAccountType.CANDIDATE)
   @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(100)
   lastName?: string;
 
   @IsOptional()
@@ -30,6 +49,7 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(32)
   phone?: string;
 
   @IsOptional()

@@ -60,7 +60,7 @@ async function preloadConversationMessages(conversations: Conversation[]) {
 }
 
 async function warmStartupData(user: CurrentUser | null) {
-  if (!user) return;
+  if (!user || user.status !== 'ACTIVE' || !user.emailVerified) return;
 
   if (user.role === 'CANDIDATE') {
     const [dashboardResult] = await Promise.allSettled([
@@ -105,6 +105,10 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
       router.replace(`/login?next=${encodeURIComponent(pathname)}`);
       return;
     }
+    if (user.status !== 'ACTIVE' || !user.emailVerified) {
+      router.replace('/verify-email');
+      return;
+    }
     if (allowedRoles && !allowedRoles.includes(user.role)) {
       router.replace(defaultRouteForUser(user));
     }
@@ -135,6 +139,7 @@ export function ProtectedRoute({ children, allowedRoles }: { children: React.Rea
       : <div className="content"><LoadingCard /></div>;
   }
   if (!user) return null;
+  if (user.status !== 'ACTIVE' || !user.emailVerified) return null;
   if (allowedRoles && !allowedRoles.includes(user.role)) return null;
   if (showInitialSplash) return <PlatformSplash />;
   return <>{children}</>;

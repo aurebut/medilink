@@ -11,15 +11,19 @@ export function MissionDeleteButton({
   label = 'Supprimer',
   iconOnly = false,
 }: {
-  mission: Pick<Mission, 'id' | 'title'>;
+  mission: Pick<Mission, 'id' | 'title' | 'status'>;
   onDeleted?: (missionId: string) => void;
   label?: string;
   iconOnly?: boolean;
 }) {
   const [deleting, setDeleting] = useState(false);
 
+  if (mission.status !== 'DRAFT') {
+    return null;
+  }
+
   async function remove() {
-    if (!confirm(`Supprimer définitivement la mission "${mission.title}" ? Les candidatures et conversations liées seront aussi supprimées.`)) {
+    if (!confirm(`Supprimer définitivement le brouillon "${mission.title}" ?`)) {
       return;
     }
 

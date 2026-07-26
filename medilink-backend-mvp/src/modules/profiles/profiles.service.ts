@@ -1,4 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   DocumentType,
   DocumentVerificationStatus,
@@ -11,7 +17,7 @@ import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { AnsDirectoryService } from './ans-directory.service';
+import { AnsDirectoryService, HealthVerificationResult } from './ans-directory.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
@@ -70,13 +76,36 @@ export class ProfilesService {
 
   async updateMyProfile(userId: string, dto: UpdateProfileDto) {
     const existing = await this.ensureProfile(userId);
-    const completionScore = this.computeCompletionScore({ ...existing, ...dto });
+    const normalizedDto = {
+      ...dto,
+      firstName: dto.firstName?.trim(),
+      lastName: dto.lastName?.trim(),
+    };
+    const completionScore = this.computeCompletionScore({ ...existing, ...normalizedDto });
+    const identityChanged =
+      (normalizedDto.firstName !== undefined &&
+        this.identityValue(normalizedDto.firstName) !== this.identityValue(existing.firstName)) ||
+      (normalizedDto.lastName !== undefined &&
+        this.identityValue(normalizedDto.lastName) !== this.identityValue(existing.lastName));
 
     const profile = await this.prisma.profile.update({
       where: { userId },
       data: {
-        ...dto,
+        ...normalizedDto,
         completionScore,
+        ...(identityChanged
+          ? {
+              rpps: null,
+              healthVerificationStatus: HealthVerificationStatus.NOT_SUBMITTED,
+              healthVerifiedAt: null,
+              healthVerificationCheckedAt: null,
+              ansPractitionerId: null,
+              ansPractitionerLastUpdated: null,
+              verifiedProfession: null,
+              verifiedSpecialty: null,
+              healthVerificationPayload: Prisma.DbNull,
+            }
+          : {}),
       },
     });
 
@@ -101,31 +130,75 @@ export class ProfilesService {
       throw new BadRequestException('Numero RPPS invalide.');
     }
 
-    await this.prisma.profile.update({
+    if (!this.hasVerifiableName(profile.firstName) || !this.hasVerifiableName(profile.lastName)) {
+      throw new BadRequestException(
+        'Un prénom et un nom complets sont requis pour vérifier le RPPS.',
+      );
+    }
+
+    const pendingProfile = await this.prisma.profile.update({
       where: { userId: user.id },
       data: {
-        rpps,
+        rpps: profile.rpps && profile.rpps !== rpps ? null : undefined,
         healthVerificationStatus: HealthVerificationStatus.PENDING,
+        healthVerifiedAt: null,
         healthVerificationCheckedAt: new Date(),
+        ansPractitionerId: null,
+        ansPractitionerLastUpdated: null,
+        verifiedProfession: null,
+        verifiedSpecialty: null,
+        healthVerificationPayload: { pendingRpps: rpps },
       },
     });
 
+    let result: HealthVerificationResult;
     try {
-      const result = await this.ansDirectory.verifyPractitioner({
+      result = await this.ansDirectory.verifyPractitioner({
         rpps,
         firstName: profile.firstName,
         lastName: profile.lastName,
       });
-      const status = result.notFound
-        ? HealthVerificationStatus.NOT_FOUND
-        : result.matched
-          ? HealthVerificationStatus.VERIFIED
-          : HealthVerificationStatus.MISMATCH;
-      const checkedAt = new Date();
-      const updated = await this.prisma.profile.update({
-        where: { userId: user.id },
+    } catch (error) {
+      await this.prisma.profile.updateMany({
+        where: {
+          userId: user.id,
+          updatedAt: pendingProfile.updatedAt,
+          healthVerificationStatus: HealthVerificationStatus.PENDING,
+        },
         data: {
-          rpps,
+          rpps: null,
+          healthVerificationStatus: HealthVerificationStatus.ERROR,
+          healthVerificationCheckedAt: new Date(),
+        },
+      });
+
+      await this.audit.log({
+        actorUserId: user.id,
+        action: 'profile.health_verification_error',
+        entityType: 'profile',
+        entityId: pendingProfile.id,
+        metadata: { rppsLast4: rpps.slice(-4) },
+      });
+
+      throw error;
+    }
+
+    const status = result.notFound
+      ? HealthVerificationStatus.NOT_FOUND
+      : result.matched
+        ? HealthVerificationStatus.VERIFIED
+        : HealthVerificationStatus.MISMATCH;
+    const checkedAt = new Date();
+
+    try {
+      const applied = await this.prisma.profile.updateMany({
+        where: {
+          userId: user.id,
+          updatedAt: pendingProfile.updatedAt,
+          healthVerificationStatus: HealthVerificationStatus.PENDING,
+        },
+        data: {
+          rpps: status === HealthVerificationStatus.VERIFIED ? rpps : null,
           healthVerificationStatus: status,
           healthVerifiedAt: status === HealthVerificationStatus.VERIFIED ? checkedAt : null,
           healthVerificationCheckedAt: checkedAt,
@@ -139,38 +212,53 @@ export class ProfilesService {
         },
       });
 
-      await this.audit.log({
-        actorUserId: user.id,
-        action:
-          status === HealthVerificationStatus.VERIFIED
-            ? 'profile.health_verified'
-            : 'profile.health_verification_failed',
-        entityType: 'profile',
-        entityId: updated.id,
-        metadata: { rpps, status, bundleTotal: result.bundleTotal },
-      });
-
-      return updated;
+      if (applied.count !== 1) {
+        throw new ConflictException(
+          'Le profil a été modifié pendant la vérification. Veuillez recommencer.',
+        );
+      }
     } catch (error) {
-      const updated = await this.prisma.profile.update({
-        where: { userId: user.id },
-        data: {
-          rpps,
-          healthVerificationStatus: HealthVerificationStatus.ERROR,
-          healthVerificationCheckedAt: new Date(),
-        },
-      });
-
-      await this.audit.log({
-        actorUserId: user.id,
-        action: 'profile.health_verification_error',
-        entityType: 'profile',
-        entityId: updated.id,
-        metadata: { rpps },
-      });
-
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        await this.prisma.profile.updateMany({
+          where: {
+            userId: user.id,
+            updatedAt: pendingProfile.updatedAt,
+            healthVerificationStatus: HealthVerificationStatus.PENDING,
+          },
+          data: {
+            rpps: null,
+            healthVerificationStatus: HealthVerificationStatus.MISMATCH,
+            healthVerificationCheckedAt: checkedAt,
+          },
+        });
+        throw new ConflictException('Ce numéro RPPS est déjà associé à un autre compte.');
+      }
       throw error;
     }
+
+    const updated = await this.prisma.profile.findUniqueOrThrow({
+      where: { userId: user.id },
+    });
+
+    await this.audit.log({
+      actorUserId: user.id,
+      action:
+        status === HealthVerificationStatus.VERIFIED
+          ? 'profile.health_verified'
+          : 'profile.health_verification_failed',
+      entityType: 'profile',
+      entityId: updated.id,
+      metadata: {
+        rppsLast4: rpps.slice(-4),
+        status,
+        bundleTotal: result.bundleTotal,
+      },
+    });
+
+    return updated;
   }
 
   async ensureProfile(userId: string) {
@@ -243,5 +331,20 @@ export class ProfilesService {
     }
 
     return calculateCompletionScore(fields);
+  }
+
+  private identityValue(value?: string | null) {
+    return (value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  private hasVerifiableName(value?: string | null) {
+    return this.identityValue(value)
+      .split(/[^a-z]+/)
+      .some((token) => token.length >= 2);
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { api, clearApiCache, getApiCacheValue, getApiUrl, getAuthToken, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview, subscribeApiCache } from '@/lib/api';
+import { api, clearApiCache, getApiCacheValue, getApiUrl, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
@@ -712,11 +712,8 @@ function MissionControlPanel({
 
   async function downloadRecruiterInvoice(conversationId: string) {
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${conversationId}/invoices/recruiter.pdf`), {
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) throw new Error('Impossible de télécharger la facture.');

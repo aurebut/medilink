@@ -2,14 +2,13 @@ import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@ne
 import { DocumentVerificationStatus, UserRole } from '@prisma/client';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AdminService } from './admin.service';
 import { RejectDocumentDto } from './dto/reject-document.dto';
 
 @Controller('admin')
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(RolesGuard)
 @Roles(UserRole.MEDILINK_ADMIN)
 export class AdminController {
   constructor(private readonly admin: AdminService) {}

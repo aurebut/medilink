@@ -6,7 +6,7 @@ import { FormEvent, Suspense, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input } from '@/components/ui';
-import { defaultRouteForUser } from '@/lib/routes';
+import { safePostLoginRoute } from '@/lib/routes';
 
 function LoginForm() {
   const router = useRouter();
@@ -23,7 +23,7 @@ function LoginForm() {
     setError(null);
     try {
       const user = await login(email, password);
-      router.push(search.get('next') || defaultRouteForUser(user));
+      router.replace(safePostLoginRoute(search.get('next'), user));
     } catch (err: any) {
       setError(err.message || 'Connexion impossible.');
     } finally {

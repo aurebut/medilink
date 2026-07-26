@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { api } from '@/lib/api';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, PasswordInput, LinkButton } from '@/components/ui';
+import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
 
 function ResetPasswordForm() {
-  const token = useSearchParams().get('token') || '';
+  const { token, ready } = useOneTimeUrlToken();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState<string | null>(null);
@@ -19,6 +19,11 @@ function ResetPasswordForm() {
     e.preventDefault();
     setError(null);
     setMessage(null);
+
+    if (!token) {
+      setError('Lien de réinitialisation invalide ou expiré.');
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError('Le nouveau mot de passe et sa confirmation ne correspondent pas.');
@@ -56,29 +61,34 @@ function ResetPasswordForm() {
       
       {!message && (
         <>
+          {ready && !token ? (
+            <Alert type="error">Lien de réinitialisation invalide ou expiré.</Alert>
+          ) : null}
           <Field label="Nouveau mot de passe">
             <PasswordInput
               required
-              minLength={8}
+              minLength={12}
+              maxLength={128}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              disabled={loading}
-              placeholder="Minimum 8 caractères"
+              disabled={loading || !ready || !token}
+              placeholder="Minimum 12 caractères"
             />
           </Field>
 
           <Field label="Confirmer le nouveau mot de passe">
             <PasswordInput
               required
-              minLength={8}
+              minLength={12}
+              maxLength={128}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={loading}
+              disabled={loading || !ready || !token}
               placeholder="Confirmez le mot de passe"
             />
           </Field>
 
-          <Button block disabled={loading}>
+          <Button block disabled={loading || !ready || !token}>
             {loading ? 'Réinitialisation...' : 'Réinitialiser'}
           </Button>
         </>

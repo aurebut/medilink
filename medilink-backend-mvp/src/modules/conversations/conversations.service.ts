@@ -1,4 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   AgreementEventType,
   ApplicationStatus,
@@ -34,6 +42,7 @@ export class ConversationsService {
     private readonly events: ConversationEventsService,
     private readonly billing: BillingService,
     private readonly accounting: AccountingService,
+    private readonly config: ConfigService,
   ) {}
 
   async list(user: RequestUser) {
@@ -162,6 +171,7 @@ export class ConversationsService {
   }
 
   async sendProposal(user: RequestUser, conversationId: string, dto: SendProposalDto) {
+    this.assertEscrowWorkflowAvailable();
     const conversation = await this.ensureRecruiterForConversation(user, conversationId);
     if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
       throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une proposition.");
@@ -175,50 +185,86 @@ export class ConversationsService {
       throw new BadRequestException('Le pourcentage de retrocession est requis.');
     }
 
-    const agreement = await this.prisma.missionAgreement.create({
-      data: {
-        applicationId: conversation.applicationId,
-        conversationId,
-        missionId: conversation.missionId,
-        candidateUserId: conversation.candidateUserId,
-        establishmentId: conversation.establishmentId,
-        compensationMode,
-        retrocessionPercentage,
-        amount,
-        currency: dto.currency || conversation.mission.compensationCurrency || 'EUR',
-        candidateAmount: amount,
-        startDate: this.optionalDate(dto.startDate) || conversation.mission.startDate,
-        endDate: this.optionalDate(dto.endDate) || conversation.mission.endDate,
-        startTime: dto.startTime || conversation.mission.startTime,
-        endTime: dto.endTime || conversation.mission.endTime,
-        terms: dto.notes,
-        expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
-        events: {
-          create: {
-            conversationId,
-            actorUserId: user.id,
-            type: AgreementEventType.PROPOSAL_SENT,
+    const message = await this.prisma.$transaction(async (tx) => {
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: { lastMessageAt: new Date() },
+      });
+      await tx.missionAgreement.updateMany({
+        where: {
+          conversationId,
+          status: MissionAgreementStatus.PROPOSED,
+        },
+        data: { status: MissionAgreementStatus.EXPIRED },
+      });
+
+      const agreement = await tx.missionAgreement.create({
+        data: {
+          applicationId: conversation.applicationId,
+          conversationId,
+          missionId: conversation.missionId,
+          candidateUserId: conversation.candidateUserId,
+          establishmentId: conversation.establishmentId,
+          compensationMode,
+          retrocessionPercentage,
+          amount,
+          currency: dto.currency || conversation.mission.compensationCurrency || 'EUR',
+          candidateAmount: amount,
+          startDate: this.optionalDate(dto.startDate) || conversation.mission.startDate,
+          endDate: this.optionalDate(dto.endDate) || conversation.mission.endDate,
+          startTime: dto.startTime || conversation.mission.startTime,
+          endTime: dto.endTime || conversation.mission.endTime,
+          terms: dto.notes,
+          expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
+          events: {
+            create: {
+              conversationId,
+              actorUserId: user.id,
+              type: AgreementEventType.PROPOSAL_SENT,
+            },
           },
         },
-      },
+      });
+
+      return this.createWorkflowMessageTx(tx, user, conversationId, 'FINAL_PROPOSAL', {
+        agreementId: agreement.id,
+        proposal: this.agreementPayload(agreement),
+      });
     });
 
-    return this.createWorkflowMessage(user, conversationId, 'FINAL_PROPOSAL', {
-      agreementId: agreement.id,
-      proposal: this.agreementPayload(agreement),
-    });
+    await this.notifications.notifyNewMessage(conversationId, user.id);
+    await this.events.emitMessageCreated(conversationId, message);
+    return message;
   }
 
   async acceptProposal(user: RequestUser, conversationId: string) {
+    this.assertEscrowWorkflowAvailable();
     const conversation = await this.ensureCandidateForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PROPOSED);
 
     const message = await this.prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const claimedAgreement = await tx.missionAgreement.updateMany({
+        where: {
+          id: agreement.id,
+          status: MissionAgreementStatus.PROPOSED,
+          expiresAt: { gt: now },
+        },
+        data: {
+          status: MissionAgreementStatus.PAYMENT_REQUIRED,
+          acceptedAt: now,
+        },
+      });
+
+      if (claimedAgreement.count !== 1) {
+        throw new ConflictException(
+          'Cette proposition a expiré ou a déjà reçu une réponse.',
+        );
+      }
+
       const updatedAgreement = await tx.missionAgreement.update({
         where: { id: agreement.id },
         data: {
-          status: MissionAgreementStatus.PAYMENT_REQUIRED,
-          acceptedAt: new Date(),
           payment: {
             create: {
               status: EscrowPaymentStatus.REQUIRES_PAYMENT,
@@ -241,10 +287,19 @@ export class ConversationsService {
         tx,
       );
 
-      await tx.application.update({
-        where: { id: conversation.applicationId },
+      const claimedApplication = await tx.application.updateMany({
+        where: {
+          id: conversation.applicationId,
+          status: conversation.application.status,
+        },
         data: { status: ApplicationStatus.ACCEPTED },
       });
+
+      if (claimedApplication.count !== 1) {
+        throw new ConflictException(
+          'Le statut de cette candidature a déjà été modifié.',
+        );
+      }
 
       await tx.applicationStatusHistory.create({
         data: {
@@ -276,10 +331,24 @@ export class ConversationsService {
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PROPOSED);
 
     const message = await this.prisma.$transaction(async (tx) => {
+      const claimedAgreement = await tx.missionAgreement.updateMany({
+        where: {
+          id: agreement.id,
+          status: MissionAgreementStatus.PROPOSED,
+          expiresAt: { gt: new Date() },
+        },
+        data: { status: MissionAgreementStatus.REJECTED },
+      });
+
+      if (claimedAgreement.count !== 1) {
+        throw new ConflictException(
+          'Cette proposition a expiré ou a déjà reçu une réponse.',
+        );
+      }
+
       await tx.missionAgreement.update({
         where: { id: agreement.id },
         data: {
-          status: MissionAgreementStatus.REJECTED,
           events: {
             create: {
               conversationId,
@@ -290,10 +359,19 @@ export class ConversationsService {
         },
       });
 
-      await tx.application.update({
-        where: { id: conversation.applicationId },
+      const claimedApplication = await tx.application.updateMany({
+        where: {
+          id: conversation.applicationId,
+          status: conversation.application.status,
+        },
         data: { status: ApplicationStatus.REJECTED },
       });
+
+      if (claimedApplication.count !== 1) {
+        throw new ConflictException(
+          'Le statut de cette candidature a déjà été modifié.',
+        );
+      }
 
       await tx.applicationStatusHistory.create({
         data: {
@@ -320,6 +398,7 @@ export class ConversationsService {
   }
 
   async securePayment(user: RequestUser, conversationId: string) {
+    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_REQUIRED);
 
@@ -360,6 +439,7 @@ export class ConversationsService {
   }
 
   async markCompleted(user: RequestUser, conversationId: string) {
+    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.FUNDS_SECURED);
 
@@ -394,6 +474,7 @@ export class ConversationsService {
   }
 
   async releasePayment(user: RequestUser, conversationId: string, dto: ReleasePaymentDto) {
+    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.COMPLETED);
 
@@ -448,6 +529,7 @@ export class ConversationsService {
   }
 
   async generateInvoices(user: RequestUser, conversationId: string) {
+    this.assertEscrowWorkflowAvailable();
     await this.permissions.ensureConversationParticipant(user.id, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_RELEASED);
 
@@ -596,6 +678,17 @@ export class ConversationsService {
     await this.permissions.ensureEstablishmentMember(user.id, conversation.establishmentId);
 
     return conversation;
+  }
+
+  private assertEscrowWorkflowAvailable() {
+    const provider = (this.config.get<string>('ESCROW_PROVIDER') || 'mock').toLowerCase();
+    const isProduction = this.config.get<string>('NODE_ENV') === 'production';
+
+    if (provider !== 'mock' || isProduction) {
+      throw new ServiceUnavailableException(
+        'Le workflow de paiement est désactivé tant qu’un prestataire d’escrow vérifié n’est pas configuré.',
+      );
+    }
   }
 
   private async findLatestAgreement(conversationId: string, status: MissionAgreementStatus) {
@@ -832,21 +925,6 @@ export class ConversationsService {
       endTime: agreement.endTime,
       notes: agreement.terms,
     };
-  }
-
-  private async createWorkflowMessage(
-    user: RequestUser,
-    conversationId: string,
-    kind: string,
-    data: Record<string, unknown>,
-  ) {
-    const message = await this.prisma.$transaction((tx) =>
-      this.createWorkflowMessageTx(tx, user, conversationId, kind, data),
-    );
-
-    await this.notifications.notifyNewMessage(conversationId, user.id);
-    await this.events.emitMessageCreated(conversationId, message);
-    return message;
   }
 
   private async createWorkflowMessageTx(

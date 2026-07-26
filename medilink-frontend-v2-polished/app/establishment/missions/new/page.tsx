@@ -564,7 +564,7 @@ export default function NewMissionPage() {
       tags: String(form.tagsText || '').split(',').map((x: string) => x.trim()).filter(Boolean),
       publishNow,
     };
-  }, [form, selectedEstablishment?.city, selectedEstablishment?.id]);
+  }, [form, selectedEstablishment]);
 
   useEffect(() => {
     draftMissionIdRef.current = draftMissionId;
@@ -599,7 +599,7 @@ export default function NewMissionPage() {
     } finally {
       autosaveInFlightRef.current = false;
     }
-  }, [billingStatus?.canCreateMission, buildMissionPayload, selectedEstablishment?.id]);
+  }, [billingStatus?.canCreateMission, buildMissionPayload, selectedEstablishment]);
 
   async function waitForAutosave() {
     for (let index = 0; index < 20 && autosaveInFlightRef.current; index += 1) {

@@ -70,8 +70,8 @@ export default function RegisterPage() {
           </Select>
         </Field>
         <div className="form-row">
-          <Field label="Prénom"><Input value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
-          <Field label="Nom"><Input value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
+          <Field label="Prénom"><Input required={accountType === 'candidate'} minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
+          <Field label="Nom"><Input required={accountType === 'candidate'} minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
         </div>
         {accountType === 'candidate' ? (
           <>
@@ -94,7 +94,7 @@ export default function RegisterPage() {
         ) : null}
         <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
         <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>
-        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="8 caractères minimum" /></Field>
+        <Field label="Mot de passe"><Input type="password" required minLength={12} maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="12 caractères minimum" /></Field>
         <Button block disabled={loading}>{loading ? 'Création...' : 'Créer le compte'}</Button>
     </AuthPage>
   );

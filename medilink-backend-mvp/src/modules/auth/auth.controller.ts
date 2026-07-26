@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Req, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import { Response, Request } from 'express';
+import { AllowUnverified } from '../../common/decorators/allow-unverified.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-import { AuthGuard } from '../../common/guards/auth.guard';
+import { Public } from '../../common/decorators/public.decorator';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -18,6 +20,8 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 15 * 60_000, blockDuration: 15 * 60_000 } })
   async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.auth.register(dto);
     this.setSessionCookie(res, result.token, result.expiresAt);
@@ -25,34 +29,36 @@ export class AuthController {
       message: result.message,
       userId: result.userId,
       user: result.user,
-      token: result.token,
     };
   }
 
   @Post('login')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 60_000, blockDuration: 5 * 60_000 } })
   async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.auth.login(dto);
     this.setSessionCookie(res, result.token, result.expiresAt);
-    return { user: result.user, token: result.token };
+    return { user: result.user };
   }
 
   @Post('logout')
+  @Public()
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const cookieName = this.cookieName();
-    const token = req.cookies?.[cookieName] || this.bearerToken(req);
+    const token = req.cookies?.[cookieName];
     const result = await this.auth.logout(token);
     res.clearCookie(cookieName, this.cookieOptions());
     return result;
   }
 
   @Get('me')
-  @UseGuards(AuthGuard)
+  @AllowUnverified()
   me(@CurrentUser() user: RequestUser) {
     return user;
   }
 
   @Delete('me')
-  @UseGuards(AuthGuard)
+  @AllowUnverified()
   async deleteAccount(
     @CurrentUser() user: RequestUser,
     @Res({ passthrough: true }) res: Response,
@@ -63,22 +69,29 @@ export class AuthController {
   }
 
   @Post('verify-email')
+  @Public()
+  @Throttle({ default: { limit: 10, ttl: 15 * 60_000 } })
   verifyEmail(@Body() dto: VerifyEmailDto) {
     return this.auth.verifyEmail(dto.token);
   }
 
   @Post('resend-verification')
-  @UseGuards(AuthGuard)
+  @Throttle({ default: { limit: 3, ttl: 60 * 60_000, blockDuration: 60 * 60_000 } })
+  @AllowUnverified()
   resendVerification(@CurrentUser() user: RequestUser) {
     return this.auth.resendVerificationEmail(user.id);
   }
 
   @Post('forgot-password')
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 15 * 60_000, blockDuration: 15 * 60_000 } })
   forgotPassword(@Body() dto: ForgotPasswordDto) {
     return this.auth.forgotPassword(dto);
   }
 
   @Post('reset-password')
+  @Public()
+  @Throttle({ default: { limit: 5, ttl: 15 * 60_000, blockDuration: 15 * 60_000 } })
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.auth.resetPassword(dto);
   }
@@ -96,21 +109,18 @@ export class AuthController {
     return {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? ('none' as const) : ('lax' as const),
+      sameSite: 'lax' as const,
+      priority: 'high' as const,
       path: '/',
     };
   }
 
   private cookieName() {
-    return this.config.get<string>('SESSION_COOKIE_NAME') || 'medilink_session';
-  }
-
-  private bearerToken(req: Request) {
-    const authHeader = req.headers?.authorization;
-    if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
-      return undefined;
-    }
-
-    return authHeader.slice('Bearer '.length).trim();
+    return (
+      this.config.get<string>('SESSION_COOKIE_NAME') ||
+      (this.config.get<string>('NODE_ENV') === 'production'
+        ? '__Host-medilink_session'
+        : 'medilink_session')
+    );
   }
 }

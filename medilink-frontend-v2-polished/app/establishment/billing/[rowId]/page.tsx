@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { api, getApiUrl, getAuthToken } from '@/lib/api';
+import { api, getApiUrl } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
 import type { Conversation, MissionAgreement } from '@/lib/types';
@@ -189,10 +189,8 @@ export default function RecruiterBillingMissionDetailPage() {
     setBusyId(conversationId);
     setError(null);
     try {
-      const token = getAuthToken();
       const response = await fetch(getApiUrl(`/conversations/${conversationId}/invoices/recruiter.pdf`), {
         credentials: 'include',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error('Téléchargement de la facture impossible.');
 

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -48,8 +49,12 @@ export class DocumentsService {
   async createUploadUrl(user: RequestUser, dto: CreateUploadUrlDto) {
     this.validateFile(dto);
 
-    const safeFileName = dto.fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storageKey = `documents/${user.id}/${randomUUID()}-${safeFileName}`;
+    const safeFileName =
+      dto.fileName
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .replace(/\.{2,}/g, '.')
+        .replace(/^\.+/, '') || 'document';
+    const storageKey = `quarantine/documents/${user.id}/${randomUUID()}-${safeFileName}`;
 
     const document = await this.prisma.document.create({
       data: {
@@ -95,14 +100,55 @@ export class DocumentsService {
       throw new ForbiddenException('Vous ne pouvez confirmer que vos documents.');
     }
 
-    const updated = await this.prisma.document.update({
-      where: { id: document.id },
+    if (document.verificationStatus !== DocumentVerificationStatus.UPLOAD_PENDING) {
+      throw new ConflictException('Ce document a deja ete confirme.');
+    }
+
+    const finalStorageKey =
+      `validated/documents/${document.userId}/${document.id}-${document.fileName}`;
+
+    try {
+      await this.storage.promoteUploadedObject(document.storageKey, finalStorageKey);
+    } catch {
+      // A previous attempt may already have copied the object before failing
+      // while deleting the quarantine copy. The final object is authoritative.
+    }
+
+    try {
+      await this.storage.assertUploadedObject(
+        finalStorageKey,
+        document.mimeType,
+        document.sizeBytes,
+      );
+    } catch {
+      await this.storage.deleteObject(finalStorageKey).catch(() => undefined);
+      throw new BadRequestException(
+        'Le fichier est absent, incomplet ou ne correspond pas au type declare.',
+      );
+    }
+
+    const claimed = await this.prisma.document.updateMany({
+      where: {
+        id: document.id,
+        userId: user.id,
+        storageKey: document.storageKey,
+        verificationStatus: DocumentVerificationStatus.UPLOAD_PENDING,
+      },
       data: {
+        storageKey: finalStorageKey,
         verificationStatus:
           document.documentType === DocumentType.AVATAR
             ? DocumentVerificationStatus.APPROVED
             : DocumentVerificationStatus.PENDING_VERIFICATION,
       },
+    });
+
+    if (claimed.count !== 1) {
+      throw new ConflictException('Ce document a deja ete confirme.');
+    }
+
+    const updated = await this.prisma.document.findUniqueOrThrow({
+      where: { id: document.id },
     });
 
     await this.audit.log({
@@ -154,6 +200,8 @@ export class DocumentsService {
     if (!isOwner && !isAdmin) {
       throw new ForbiddenException('Vous ne pouvez pas supprimer ce document.');
     }
+
+    await this.storage.deleteObject(document.storageKey);
 
     const updated = await this.prisma.document.update({
       where: { id: document.id },

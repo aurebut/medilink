@@ -1,5 +1,10 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { EstablishmentMemberRole, UserRole } from '@prisma/client';
+import {
+  ApplicationStatus,
+  DocumentVerificationStatus,
+  EstablishmentMemberRole,
+  UserRole,
+} from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -7,6 +12,13 @@ const DEFAULT_MANAGE_ROLES = [
   EstablishmentMemberRole.OWNER,
   EstablishmentMemberRole.ADMIN,
   EstablishmentMemberRole.RECRUITER,
+];
+
+const ESTABLISHMENT_ACCOUNT_ROLES = [
+  UserRole.ESTABLISHMENT_OWNER,
+  UserRole.ESTABLISHMENT_ADMIN,
+  UserRole.ESTABLISHMENT_RECRUITER,
+  UserRole.ESTABLISHMENT_VIEWER,
 ];
 
 @Injectable()
@@ -23,6 +35,9 @@ export class PermissionsService {
         userId,
         establishmentId,
         role: { in: allowedRoles },
+        user: {
+          role: { in: ESTABLISHMENT_ACCOUNT_ROLES },
+        },
       },
     });
 
@@ -73,13 +88,36 @@ export class PermissionsService {
       return document;
     }
 
+    if (document.verificationStatus !== DocumentVerificationStatus.APPROVED) {
+      throw new ForbiddenException('Ce document n’est pas disponible.');
+    }
+
     const linkedApplication = await this.prisma.application.findFirst({
       where: {
         candidateUserId: document.userId,
+        status: {
+          in: [
+            ApplicationStatus.SUBMITTED,
+            ApplicationStatus.VIEWED,
+            ApplicationStatus.ACCEPTED,
+          ],
+        },
         mission: {
           establishment: {
             members: {
-              some: { userId: user.id },
+              some: {
+                userId: user.id,
+                role: {
+                  in: [
+                    EstablishmentMemberRole.OWNER,
+                    EstablishmentMemberRole.ADMIN,
+                    EstablishmentMemberRole.RECRUITER,
+                  ],
+                },
+                user: {
+                  role: { in: ESTABLISHMENT_ACCOUNT_ROLES },
+                },
+              },
             },
           },
         },

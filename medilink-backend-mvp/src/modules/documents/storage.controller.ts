@@ -9,6 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { Public } from '../../common/decorators/public.decorator';
 import { StorageService } from './storage.service';
 
 @Controller('storage')
@@ -16,6 +17,7 @@ export class StorageController {
   constructor(private readonly storage: StorageService) {}
 
   @Put('upload/:token')
+  @Public()
   async upload(@Param('token') token: string, @Req() req: Request) {
     try {
       const payload = this.storage.verifyToken(token, 'upload');
@@ -27,6 +29,7 @@ export class StorageController {
   }
 
   @Get('download/:token')
+  @Public()
   async download(@Param('token') token: string, @Res() res: Response) {
     let payload: ReturnType<StorageService['verifyToken']>;
 
@@ -46,7 +49,13 @@ export class StorageController {
     }
 
     res.setHeader('Content-Type', payload.mimeType || 'application/octet-stream');
-    res.setHeader('Content-Disposition', `inline; filename="${fileName}"`);
+    res.setHeader(
+      'Content-Disposition',
+      this.storage.contentDisposition(fileName, payload.mimeType),
+    );
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "sandbox; default-src 'none'");
 
     stream.on('error', () => {
       if (!res.headersSent) {

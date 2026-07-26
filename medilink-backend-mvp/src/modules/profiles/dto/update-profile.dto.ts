@@ -1,23 +1,25 @@
 import { MedicalStatus } from '@prisma/client';
 import {
-  IsArray,
   IsBoolean,
   IsEnum,
   IsIn,
   IsInt,
   IsOptional,
-  IsString,
   Max,
   Min,
 } from 'class-validator';
+import {
+  IsBoundedString,
+  IsBoundedStringArray,
+} from '../../../common/validators/bounded-input.decorators';
 
 export class UpdateProfileDto {
   @IsOptional()
-  @IsString()
+  @IsBoundedString(100)
   firstName?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(100)
   lastName?: string;
 
   @IsOptional()
@@ -25,11 +27,11 @@ export class UpdateProfileDto {
   candidateGender?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   city?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   country?: string;
 
   @IsOptional()
@@ -37,23 +39,23 @@ export class UpdateProfileDto {
   medicalStatus?: MedicalStatus;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   medicalStatusOther?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(160)
   specialty?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(120)
   orientation?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(200)
   hospitalOrFaculty?: string;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(3000)
   bio?: string;
 
   @IsOptional()
@@ -63,17 +65,15 @@ export class UpdateProfileDto {
   experienceYears?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   actsPerformed?: string[];
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(1000)
   availabilityNotes?: string;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 120)
   preferredCities?: string[];
 
   @IsOptional()
@@ -83,18 +83,15 @@ export class UpdateProfileDto {
   maxTravelRadiusKm?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   mobilityOptions?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(7, 30)
   acceptedWeekdays?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(20, 40)
   acceptedTimeSlots?: string[];
 
   @IsOptional()
@@ -104,7 +101,7 @@ export class UpdateProfileDto {
   minimumNoticeHours?: number;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(80)
   mobilityRangeType?: string;
 
   @IsOptional()
@@ -114,43 +111,37 @@ export class UpdateProfileDto {
   housingRequiredBeyondKm?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   acceptedPracticeSettings?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   acceptedMissionTypes?: string[];
 
   @IsOptional()
   @IsInt()
   @Min(0)
+  @Max(1_000_000_000)
   minimumCompensation?: number;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 80)
   preferredDurations?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(30, 120)
   refusedSchedules?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 120)
   knownSoftware?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   acceptedPatientTypes?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   refusedPatientTypes?: string[];
 
   @IsOptional()
@@ -164,13 +155,11 @@ export class UpdateProfileDto {
   parkingRequired?: boolean;
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   acceptedActs?: string[];
 
   @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
+  @IsBoundedStringArray(50, 160)
   refusedActs?: string[];
 
   @IsOptional()
@@ -186,6 +175,6 @@ export class UpdateProfileDto {
   fastPaymentImportant?: boolean;
 
   @IsOptional()
-  @IsString()
+  @IsBoundedString(80)
   acceptedPressureLevel?: string;
 }

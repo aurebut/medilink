@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from './email.service';
@@ -7,6 +7,8 @@ const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
 
 @Injectable()
 export class NotificationsService {
+  private readonly logger = new Logger(NotificationsService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
@@ -117,8 +119,8 @@ export class NotificationsService {
       endDate: application.mission.endDate,
       startTime: application.mission.startTime,
       endTime: application.mission.endTime,
-    }).catch((error) => {
-      console.error('Failed to send application received email:', error);
+    }).catch(() => {
+      this.logger.error('Failed to send application received email.');
     });
   }
 
@@ -126,7 +128,7 @@ export class NotificationsService {
     const application = await this.prisma.application.findUnique({
       where: { id: applicationId },
       include: {
-        candidate: true,
+        candidate: { select: { id: true, email: true } },
         mission: { include: { establishment: true } },
         conversation: true,
       },
@@ -158,8 +160,8 @@ export class NotificationsService {
         endTime: application.mission.endTime,
         conversationId: application.conversation?.id,
       },
-    ).catch((error) => {
-      console.error('Failed to send application status email:', error);
+    ).catch(() => {
+      this.logger.error('Failed to send application status email.');
     });
   }
 
@@ -237,8 +239,8 @@ export class NotificationsService {
         recipientRole: user.role,
         messagePreview,
         workflowAction,
-      }).catch((error) => {
-        console.error('Failed to send new message email:', error);
+      }).catch(() => {
+        this.logger.error('Failed to send new message email.');
       });
     }
   }
@@ -274,8 +276,8 @@ export class NotificationsService {
     this.email.sendDocumentStatusEmail(user.id, user.email, status, reason, {
       documentType: document?.documentType,
       fileName: document?.fileName,
-    }).catch((error) => {
-      console.error('Failed to send document status email:', error);
+    }).catch(() => {
+      this.logger.error('Failed to send document status email.');
     });
   }
 
