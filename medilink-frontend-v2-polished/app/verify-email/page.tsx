@@ -49,7 +49,7 @@ function VerifyEmailStatus() {
   return (
     <main className="auth-page">
       <div className="auth-card form">
-        <Link className="brand" href="/"><span>Médilink</span></Link>
+        <Link className="brand" href="/"><span>Médi<em style={{ fontStyle: 'italic' }}>Link</em></span></Link>
         <h1>Vérification email</h1>
         {error ? <Alert type="error">{error}</Alert> : <Alert type="success">{message}</Alert>}
         {ready && !token && user && !user.emailVerified ? (

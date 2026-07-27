@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
 
   return (
     <>
-      <PageHeader title="Admin Médilink" description="Back-office minimal du MVP." />
+      <PageHeader title="Admin MédiLink" description="Back-office de pilotage de la plateforme." />
       <div className="grid-3">
         <StatCard label="Utilisateurs" value={counts.users} action={<LinkButton variant="secondary" href="/admin/users">Voir</LinkButton>} />
         <StatCard label="Documents à vérifier" value={counts.documents} action={<LinkButton variant="secondary" href="/admin/documents">Vérifier</LinkButton>} />

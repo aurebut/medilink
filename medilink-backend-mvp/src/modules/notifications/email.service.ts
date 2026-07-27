@@ -72,7 +72,7 @@ export class EmailService {
 
       if (this.resend) {
         const result = await this.resend.emails.send({
-          from: this.config.get<string>('EMAIL_FROM') || 'Médilink <no-reply@example.com>',
+          from: this.config.get<string>('EMAIL_FROM') || 'MédiLink <no-reply@example.com>',
           to: params.to,
           subject: params.subject,
           html: params.html,
@@ -261,8 +261,8 @@ export class EmailService {
           <!-- Footer -->
           <tr>
             <td style="padding: 32px 48px 40px 48px; text-align: center; font-size: 13px; color: #6A7A92; line-height: 1.6; font-family: 'DM Sans', sans-serif;">
-              <p style="margin: 0 0 8px 0;">Vous recevez cet e-mail dans le cadre de votre activité sur Médilink.</p>
-              <p style="margin: 0 0 16px 0;">© ${new Date().getFullYear()} Médilink. Tous droits réservés.</p>
+              <p style="margin: 0 0 8px 0;">Vous recevez cet e-mail dans le cadre de votre activité sur MédiLink.</p>
+              <p style="margin: 0 0 16px 0;">© ${new Date().getFullYear()} MédiLink. Tous droits réservés.</p>
               <p style="margin: 0;">
                 <a href="${this.getFrontendUrl()}" style="color: #0E8A7A; text-decoration: none; font-weight: 600;">Accéder à la plateforme</a>
               </p>
@@ -285,7 +285,7 @@ export class EmailService {
     const bodyHtml = `
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Confirmez votre adresse email</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Bienvenue sur <strong>Médilink</strong> ! Nous sommes ravis de vous compter parmi nous. 
+        Bienvenue sur <strong>MédiLink</strong> ! Nous sommes ravis de vous compter parmi nous.
         Pour finaliser votre inscription et activer pleinement votre compte, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous.
       </p>
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
@@ -307,8 +307,8 @@ export class EmailService {
       userId,
       to,
       type: 'auth.verify_email',
-      subject: 'Confirmez votre email Médilink',
-      html: this.wrapInLayout('Confirmez votre email Médilink', bodyHtml),
+      subject: 'Confirmez votre email MédiLink',
+      html: this.wrapInLayout('Confirmez votre email MédiLink', bodyHtml),
     });
   }
 
@@ -319,7 +319,7 @@ export class EmailService {
     const bodyHtml = `
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Réinitialisation de votre mot de passe</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Vous avez demandé la réinitialisation du mot de passe de votre compte Médilink. 
+        Vous avez demandé la réinitialisation du mot de passe de votre compte MédiLink.
         Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe. Ce lien expire dans 1 heure.
       </p>
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
@@ -340,7 +340,7 @@ export class EmailService {
       userId,
       to,
       type: 'auth.reset_password',
-      subject: 'Réinitialisation de votre mot de passe Médilink',
+      subject: 'Réinitialisation de votre mot de passe MédiLink',
       html: this.wrapInLayout('Réinitialisation de votre mot de passe', bodyHtml),
     });
   }
@@ -349,7 +349,7 @@ export class EmailService {
     const bodyHtml = `
       <h1 style="font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 700; color: #0B1929; margin-top: 0; margin-bottom: 16px; letter-spacing: -0.5px;">Votre mot de passe a été modifié</h1>
       <p style="font-size: 15px; line-height: 1.6; color: #0F1E32; margin-top: 0; margin-bottom: 24px;">
-        Nous vous informons que le mot de passe de votre compte Médilink a été modifié avec succès.
+        Nous vous informons que le mot de passe de votre compte MédiLink a été modifié avec succès.
       </p>
       <p style="font-size: 13px; line-height: 1.6; color: #B42318; margin-top: 0; margin-bottom: 0; background-color: #FEF2F2; border-radius: 8px; padding: 16px; border: 1px solid rgba(180, 35, 24, 0.15); font-family: 'DM Sans', sans-serif;">
         <strong>Important :</strong> Si vous n'êtes pas à l'origine de cette modification, veuillez contacter immédiatement notre équipe d'assistance pour sécuriser votre compte.
@@ -360,7 +360,7 @@ export class EmailService {
       userId,
       to,
       type: 'auth.password_changed',
-      subject: 'Modification de votre mot de passe Médilink',
+      subject: 'Modification de votre mot de passe MédiLink',
       html: this.wrapInLayout('Modification de votre mot de passe', bodyHtml),
     });
   }
@@ -393,9 +393,9 @@ export class EmailService {
       to,
       type: 'message.new',
       subject: this.subjectText(context.workflowAction
-        ? `${context.workflowAction} - Médilink`
-        : `Nouveau message de ${senderName} - Médilink`),
-      html: this.wrapInLayout('Nouveau message sur Médilink', bodyHtml),
+        ? `${context.workflowAction} - MédiLink`
+        : `Nouveau message de ${senderName} - MédiLink`),
+      html: this.wrapInLayout('Nouveau message sur MédiLink', bodyHtml),
     });
   }
 
@@ -504,7 +504,7 @@ export class EmailService {
       userId,
       to,
       type: 'document.status_changed',
-      subject: `${approved ? 'Document validé' : 'Document refusé'} - Médilink`,
+      subject: `${approved ? 'Document validé' : 'Document refusé'} - MédiLink`,
       html: this.wrapInLayout('Statut de votre document mis à jour', bodyHtml),
     });
   }

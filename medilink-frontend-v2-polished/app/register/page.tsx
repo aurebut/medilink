@@ -8,6 +8,7 @@ import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input, PasswordInput, Select } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
 import type { CandidateGender } from '@/lib/types';
+import { userFacingError } from '@/lib/user-facing';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -47,8 +48,8 @@ export default function RegisterPage() {
         rpps: accountType === 'candidate' ? rpps || undefined : undefined,
       });
       router.push(defaultRouteForUser(user));
-    } catch (err: any) {
-      setError(err.message || 'Inscription impossible.');
+    } catch (err) {
+      setError(userFacingError(err, 'Inscription impossible. Réessayez dans quelques instants.'));
     } finally {
       setLoading(false);
     }
@@ -74,7 +75,7 @@ export default function RegisterPage() {
             <Input
               name="firstName"
               autoComplete="given-name"
-              required={accountType === 'candidate'}
+              required
               minLength={2}
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
@@ -84,7 +85,7 @@ export default function RegisterPage() {
             <Input
               name="lastName"
               autoComplete="family-name"
-              required={accountType === 'candidate'}
+              required
               minLength={2}
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
@@ -100,7 +101,7 @@ export default function RegisterPage() {
                 <option value="MASCULINE">Masculin</option>
               </Select>
             </Field>
-            <Field label="Numero RPPS (facultatif)">
+            <Field label="Numéro RPPS (facultatif)">
               <Input
                 name="rpps"
                 inputMode="numeric"

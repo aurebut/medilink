@@ -48,7 +48,7 @@ function ResetPasswordForm() {
     <AuthPage
       eyebrow="Sécurité"
       title="Nouveau mot de passe"
-      description="Définissez un mot de passe robuste pour protéger l'accès à votre espace Médilink."
+      description="Définissez un mot de passe robuste pour protéger l'accès à votre espace MédiLink."
       onSubmit={submit}
       footer={(
         <Link href="/login" className="small">

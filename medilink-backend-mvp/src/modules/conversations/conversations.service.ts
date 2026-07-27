@@ -878,7 +878,7 @@ export class ConversationsService {
       : 'Le taux contractuel est validé. Le montant réel reste à compléter après encaissement.', 62, 269, 9, '#315A63', 'F1', 'left', 88);
 
     line(46, 117, 549, 117, '#D9E4EC');
-    text('Document généré automatiquement par MediLink', 46, 91, 8, '#678198');
+    text('Document généré automatiquement par MédiLink', 46, 91, 8, '#678198');
     text('Référence mission et historique disponibles dans votre espace sécurisé.', 46, 75, 8, '#8AA0B2');
     text('medilink.fr', 549, 91, 8, '#128578', 'F2', 'right');
     text('Page 1 / 1', 549, 75, 8, '#8AA0B2', 'F1', 'right');

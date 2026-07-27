@@ -1,5 +1,6 @@
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api').replace(/\/$/, '');
 const LEGACY_AUTH_TOKEN_KEY = 'medilink_auth_token';
+const NETWORK_ERROR_MESSAGE = 'Impossible de joindre le service. Vérifiez votre connexion puis réessayez.';
 
 export class ApiError extends Error {
   status: number;
@@ -191,6 +192,13 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     return payload as T;
   }).catch((error) => {
     if (canUseCache) getCache.delete(key);
+    if (
+      !(error instanceof ApiError) &&
+      error instanceof Error &&
+      /failed to fetch|networkerror|network request failed|load failed/i.test(error.message)
+    ) {
+      throw new ApiError(NETWORK_ERROR_MESSAGE, 0);
+    }
     throw error;
   });
 

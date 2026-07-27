@@ -99,7 +99,7 @@ export default function MissionPage() {
       <div className="container">
         <nav className="public-nav">
           <Link href={homeHref} className="brand">
-            <span>Medilink</span>
+            <span>Médi<em style={{ fontStyle: 'italic' }}>Link</em></span>
           </Link>
           <div className="nav-actions">
             {authLoading ? null : user ? (

@@ -209,7 +209,7 @@ function areaLabel(
 ) {
   if (area === 'candidate') return candidateAreaLabel(profile);
   if (area === 'establishment') return 'Espace établissement';
-  if (role === 'MEDILINK_SUPPORT') return 'Support Médilink';
+  if (role === 'MEDILINK_SUPPORT') return 'Support MédiLink';
   return 'Administration';
 }
 
@@ -989,7 +989,7 @@ export function AppShell({
           <header className="topbar">
             <div className="topbar-title">
               <strong>{areaLabel(area, candidateProfile, user?.role)}</strong>
-              <div className="small">Plateforme MediLink</div>
+              <div className="small">Plateforme MédiLink</div>
             </div>
           </header>
         ) : null}

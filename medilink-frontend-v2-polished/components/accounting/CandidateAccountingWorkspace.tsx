@@ -89,7 +89,7 @@ function downloadTextFile(fileName: string, content: string) {
 }
 
 function sourceLabel(source: AccountingEntry['source']) {
-  return { MANUAL: 'Manuelle', MEDILINK: 'MediLink', BANK: 'Banque', IMPORT: 'Import' }[source];
+  return { MANUAL: 'Manuelle', MEDILINK: 'MédiLink', BANK: 'Banque', IMPORT: 'Import' }[source];
 }
 
 export function CandidateAccountingWorkspace() {
@@ -419,7 +419,7 @@ function TransactionsTab({ entries, categories, filter, setFilter, manualKind, s
             <Button type="button" variant="light" onClick={onExport}>Exporter</Button>
           </div>
         </div>
-        {!entries.length ? <EmptyState title="Aucune transaction" description="Ajoutez une écriture ou finalisez une rétrocession MediLink." /> : (
+        {!entries.length ? <EmptyState title="Aucune transaction" description="Ajoutez une écriture ou finalisez une rétrocession MédiLink." /> : (
           <div className="table-wrap billing-table"><table><thead><tr><th>Date</th><th>Tiers / libellé</th><th>Catégorie</th><th>Montant</th><th>Source</th><th>Action</th></tr></thead><tbody>
             {entries.map((entry) => <tr key={entry.id}>
               <td className="billing-cell-date" data-label="Date">{formatDate(entry.date)}</td>
@@ -435,7 +435,7 @@ function TransactionsTab({ entries, categories, filter, setFilter, manualKind, s
       <div className="billing-side">
         <Card className={`dashboard-panel billing-manual-card ${manualOpen ? 'is-open' : ''}`}>
           <div className="toolbar compact">
-            <div><h2>Ajouter une écriture</h2><p className="small">Pour les opérations hors MediLink ou non synchronisées.</p></div>
+            <div><h2>Ajouter une écriture</h2><p className="small">Pour les opérations hors MédiLink ou non synchronisées.</p></div>
             <button
               className="billing-manual-toggle"
               type="button"
@@ -451,7 +451,7 @@ function TransactionsTab({ entries, categories, filter, setFilter, manualKind, s
             <Field label="Type"><Select value={manualKind} onChange={(event) => setManualKind(event.target.value as AccountingEntryKind)}><option value="EXPENSE">Dépense</option><option value="REVENUE">Recette</option></Select></Field>
             <Field label="Date de paiement"><Input name="date" type="date" required /></Field>
             <Field label={manualKind === 'REVENUE' ? 'Payeur' : 'Fournisseur'}><Input name="counterparty" required placeholder={manualKind === 'REVENUE' ? 'Cabinet Martin' : 'SNCF, CARMF…'} /></Field>
-            <Field label="Libellé"><Input name="label" required placeholder={manualKind === 'REVENUE' ? 'Remplacement hors MediLink' : 'Trajet de mission'} /></Field>
+            <Field label="Libellé"><Input name="label" required placeholder={manualKind === 'REVENUE' ? 'Remplacement hors MédiLink' : 'Trajet de mission'} /></Field>
             <Field label="Catégorie"><Select name="categoryCode" required defaultValue=""><option value="" disabled>Choisir</option>{availableCategories.map((category) => <option key={category.code} value={category.code}>{category.label}</option>)}</Select></Field>
             <div className="form-row"><Field label="Montant"><Input name="amount" type="number" min="0.01" step="0.01" required /></Field><Field label="Part professionnelle (%)"><Input name="professionalShare" type="number" min="0" max="100" step="1" defaultValue="100" /></Field></div>
             <Field label="Paiement"><Select name="paymentMethod" defaultValue={manualKind === 'REVENUE' ? 'Virement' : 'Carte'}><option>Virement</option><option>Carte</option><option>Chèque</option><option>Espèces</option><option>Prélèvement</option><option>Autre</option></Select></Field>
@@ -493,7 +493,7 @@ function DocumentsTab({ entries, settlements, classifiedIds, busyId, onClassify,
   onDownload: (settlement: RetrocessionSettlement) => void;
 }) {
   const settlementByAgreement = new Map(settlements.map((settlement) => [settlement.agreementId, settlement]));
-  return <Card className="dashboard-panel"><div className="toolbar"><div><h2>Justificatifs comptables</h2><p className="small">Les pièces MediLink disponibles et les pièces déclarées sur vos écritures manuelles.</p></div></div>
+  return <Card className="dashboard-panel"><div className="toolbar"><div><h2>Justificatifs comptables</h2><p className="small">Les pièces MédiLink disponibles et les pièces déclarées sur vos écritures manuelles.</p></div></div>
     {!entries.length ? <EmptyState title="Aucune pièce connue" description="Les justificatifs apparaîtront avec vos transactions." /> : <div className="billing-doc-grid">
       {entries.map((entry) => {
         const settlement = entry.agreementId ? settlementByAgreement.get(entry.agreementId) : undefined;

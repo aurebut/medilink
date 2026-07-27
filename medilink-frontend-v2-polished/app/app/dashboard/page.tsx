@@ -226,7 +226,7 @@ export default function CandidateDashboardPage() {
     let tone: 'success' | 'warning' | 'info' | 'neutral' = 'neutral';
     let label = 'Aucune action urgente';
     let amountLabel = 'Registre à jour';
-    let description = 'Suivez vos recettes, provisions et remplacements hors MediLink.';
+    let description = 'Suivez vos recettes, provisions et remplacements hors MédiLink.';
     let buttonText = 'Voir ma compta';
     let buttonHref = '/app/billing';
     let buttonVariant: 'primary' | 'secondary' | 'light' = 'light';

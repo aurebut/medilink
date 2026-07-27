@@ -111,7 +111,7 @@ async function bootstrap() {
   const port = config.get<number>('PORT') || 4000;
   await app.listen(port);
 
-  console.log(`Médilink API running on http://localhost:${port}/api`);
+  console.log(`MédiLink API running on http://localhost:${port}/api`);
 }
 
 bootstrap();

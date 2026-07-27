@@ -514,7 +514,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
             <div className="candidate-current-panel">
               <span>Contact</span>
               <strong>{establishment?.name || 'Établissement à confirmer'}</strong>
-              <p>{establishment?.phone || establishment?.email || 'Contact via la messagerie MediLink'}</p>
+              <p>{establishment?.phone || establishment?.email || 'Contact via la messagerie MédiLink'}</p>
               <small>{establishment?.website || 'Site web non renseigné'}</small>
             </div>
           </div>
@@ -634,7 +634,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
         <div>
           <span>Documents de mission</span>
           <strong>Fichiers produits par journée</strong>
-          <p>Ajoutez les documents générés pendant chaque journée de la mission {missionTitle}. Chaque envoi est classé avec la date correspondante dans votre dossier documents MediLink.</p>
+          <p>Ajoutez les documents générés pendant chaque journée de la mission {missionTitle}. Chaque envoi est classé avec la date correspondante dans votre dossier documents MédiLink.</p>
         </div>
 
         <div className="candidate-current-doc-summary">

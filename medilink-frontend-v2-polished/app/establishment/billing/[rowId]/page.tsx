@@ -69,7 +69,7 @@ function buildMissionRows(conversations: Conversation[], classifiedIds: string[]
         id: rowId,
         date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
         remplacant: candidateName(conversation.application),
-        mission: conversation.mission?.title || 'Mission MediLink',
+        mission: conversation.mission?.title || 'Mission MédiLink',
         amount: releasedOrSecured ? amount : 0,
         currency: agreement?.currency || 'EUR',
         status: rowStatusFromAgreement(agreement),
@@ -111,7 +111,7 @@ function agreementNextStepRecruiter(status?: string | null) {
   if (status === 'PAYMENT_RELEASED') return 'Facture disponible';
   if (status === 'REJECTED') return 'Reprendre l’échange';
   if (status === 'CANCELLED' || status === 'EXPIRED') return 'Clôturée';
-  if (status === 'DISPUTED') return 'Suivi MediLink requis';
+  if (status === 'DISPUTED') return 'Suivi MédiLink requis';
   return 'Continuer la discussion';
 }
 
@@ -283,7 +283,7 @@ export default function RecruiterBillingMissionDetailPage() {
             <div><span>Montant brut (HT)</span><strong>{estimatedAmount}</strong></div>
             <div><span>Montant réglé</span><strong>{validatedAmount}</strong></div>
             <div><span>Part Remplaçant</span><strong>{formatMoney(candidateAmount, row.currency)}</strong></div>
-            <div><span>Frais MediLink</span><strong>{formatMoney(feeAmount, row.currency)}</strong></div>
+            <div><span>Frais MédiLink</span><strong>{formatMoney(feeAmount, row.currency)}</strong></div>
             <div><span>Facture</span><strong>{row.hasReceipt ? 'Disponible' : 'Non disponible'}</strong></div>
             <div><span>Prochaine action</span><strong>{statusCopy(row)}</strong></div>
             <div><span>Classement</span><strong>{row.classified ? 'Classé' : 'À classer'}</strong></div>

@@ -64,7 +64,7 @@ export class AnsDirectoryService {
   }): Promise<HealthVerificationResult> {
     const rpps = this.normalizeRpps(input.rpps);
     if (rpps.length < 8 || rpps.length > 14) {
-      throw new BadRequestException('Numero RPPS invalide.');
+      throw new BadRequestException('Numéro RPPS invalide.');
     }
 
     const apiKey = this.config.get<string>('ANS_API_KEY');

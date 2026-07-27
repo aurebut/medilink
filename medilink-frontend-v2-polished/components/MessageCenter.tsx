@@ -1510,7 +1510,7 @@ function WorkflowMessageCard({
             })}</strong></div>
             <div><span>Date</span><strong>{proposal.startDate ? formatDate(proposal.startDate) : '-'}</strong></div>
             <div><span>Horaire</span><strong>{proposal.startTime || '-'} {proposal.endTime ? `- ${proposal.endTime}` : ''}</strong></div>
-            <div><span>Modalité</span><strong>{retrocession ? 'Rétrocession après encaissement' : 'Bloqué par Medilink'}</strong></div>
+            <div><span>Modalité</span><strong>{retrocession ? 'Rétrocession après encaissement' : 'Bloqué par MédiLink'}</strong></div>
           </div>
           {proposal.notes ? <p>{proposal.notes}</p> : null}
           {candidateCanAnswer ? (
@@ -1525,7 +1525,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'PAYMENT_REQUIRED' ? (
         <>
           <h3>{retrocession ? 'Accord accepté' : 'Paiement requis'}</h3>
-          <p>{retrocession ? `${candidateHasLabel} accepte la rétrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le règlement selon les honoraires encaissés.` : `${candidateHasLabel} accepte. Le recruteur doit payer maintenant pour confirmer la mission ; Medilink conserve les fonds jusqu'à la fin.`}</p>
+          <p>{retrocession ? `${candidateHasLabel} accepte la rétrocession d'honoraires. Le recruteur peut confirmer la mission et suivre le règlement selon les honoraires encaissés.` : `${candidateHasLabel} accepte. Le recruteur doit payer maintenant pour confirmer la mission ; MédiLink conserve les fonds jusqu'à la fin.`}</p>
           {recruiterCanSecure ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onSecure}>{busyAction === 'secure' ? 'Confirmation...' : retrocession ? 'Confirmer la mission' : 'Payer et confirmer'}</Button>
@@ -1548,7 +1548,7 @@ function WorkflowMessageCard({
       {workflow.kind === 'FUNDS_SECURED' ? (
         <>
           <h3>Mission confirmée</h3>
-          <p>{retrocession ? "La mission est confirmée avec une rémunération en rétrocession d'honoraires." : `Le paiement du recruteur est sécurisé par Medilink. Les fonds seront libérés ${candidateTargetLabel} après validation de la fin de mission.`}</p>
+          <p>{retrocession ? "La mission est confirmée avec une rémunération en rétrocession d'honoraires." : `Le paiement du recruteur est sécurisé par MédiLink. Les fonds seront libérés ${candidateTargetLabel} après validation de la fin de mission.`}</p>
           {recruiterCanComplete ? (
             <div className="actions">
               <Button disabled={Boolean(busyAction)} onClick={onComplete}>{busyAction === 'complete' ? 'Validation...' : 'Marquer la mission terminée'}</Button>

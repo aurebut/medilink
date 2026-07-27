@@ -3,9 +3,9 @@ import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
-  title: 'Médilink — Missions médicales courtes',
+  title: 'MédiLink — Missions médicales courtes',
   description:
-    'Médilink centralise les missions courtes, candidatures, documents et suivi des rétrocessions entre établissements et professionnels de santé.',
+    'MédiLink centralise les missions courtes, candidatures, documents et suivi des rétrocessions entre établissements et professionnels de santé.',
 };
 
 export const viewport: Viewport = {

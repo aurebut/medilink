@@ -181,7 +181,7 @@ export function AccountSettingsPage() {
       <div>
         <PageHeader
           title="Paramètres du compte"
-          description="Email de connexion, sécurité et déconnexion de votre session Medilink."
+          description="Email de connexion, sécurité et déconnexion de votre session MédiLink."
         />
 
         <div className="grid-main">
@@ -272,7 +272,7 @@ export function AccountSettingsPage() {
                 </svg>
                 Zone de danger
               </h2>
-              <p className="small">Supprimez définitivement votre compte Medilink et toutes vos données.</p>
+              <p className="small">Supprimez définitivement votre compte MédiLink et toutes vos données.</p>
               <div className="actions" style={{ marginTop: '16px' }}>
                 <Button variant="danger" onClick={openDeleteModal}>
                   Supprimer le compte

@@ -30,9 +30,11 @@ export const establishmentTypeOptions: Array<{ value: EstablishmentType; label: 
 ];
 
 export const missionTypeOptions: Array<{ value: MissionType; label: string }> = [
-  { value: 'REMPLACEMENT', label: 'Remplacement courte durée' },
-  { value: 'VACATION', label: 'Remplacement longue durée' },
+  { value: 'GARDE', label: 'Garde' },
+  { value: 'REMPLACEMENT', label: 'Remplacement' },
+  { value: 'VACATION', label: 'Vacation' },
   { value: 'STAGE', label: 'Stage' },
+  { value: 'AIDE_OP', label: 'Aide opératoire' },
 ];
 
 export const requiredLevelOptions: Array<{ value: RequiredLevel; label: string }> = [
@@ -69,8 +71,8 @@ export function roleLabel(role?: UserRole, profile?: CandidateAgreement) {
     ESTABLISHMENT_ADMIN: 'Établissement - admin',
     ESTABLISHMENT_RECRUITER: 'Établissement - recruteur',
     ESTABLISHMENT_VIEWER: 'Établissement - lecture',
-    MEDILINK_ADMIN: 'Admin Médilink',
-    MEDILINK_SUPPORT: 'Support Médilink',
+    MEDILINK_ADMIN: 'Admin MédiLink',
+    MEDILINK_SUPPORT: 'Support MédiLink',
   };
   return role ? map[role] : '—';
 }

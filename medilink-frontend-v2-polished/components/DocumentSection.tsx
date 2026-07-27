@@ -56,7 +56,7 @@ function checklistCopy(type: DocumentType, doc?: Document) {
       : 'À ajouter pour renforcer votre dossier.';
   }
   if (doc.verificationStatus === 'APPROVED') return 'Validé et consultable par les établissements après candidature.';
-  if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoyé, en attente de validation MediLink.';
+  if (doc.verificationStatus === 'PENDING_VERIFICATION') return 'Envoyé, en attente de validation MédiLink.';
   if (doc.verificationStatus === 'UPLOAD_PENDING') return 'Téléversement à finaliser.';
   if (doc.verificationStatus === 'REJECTED') {
     return doc.rejectionReason ? `Refusé : ${doc.rejectionReason}` : 'Refusé, vous pouvez envoyer une nouvelle version.';

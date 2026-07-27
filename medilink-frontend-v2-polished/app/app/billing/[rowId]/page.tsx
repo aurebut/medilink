@@ -60,7 +60,7 @@ function buildMissionRows(conversations: Conversation[], entries: AccountingEntr
         id: rowId,
         date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
         client: conversation.establishment?.name || conversation.mission?.city || 'Établissement',
-        mission: conversation.mission?.title || 'Mission MediLink',
+        mission: conversation.mission?.title || 'Mission MédiLink',
         amount: released ? amount : 0,
         currency: agreement?.currency || 'EUR',
         status: rowStatusFromAgreement(agreement),

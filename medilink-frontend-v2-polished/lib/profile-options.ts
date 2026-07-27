@@ -92,9 +92,11 @@ export const mobilityOptions: ChoiceOption[] = [
 ];
 
 export const acceptedMissionTypeOptions: ChoiceOption[] = [
-  { value: 'REMPLACEMENT', label: 'Remplacement courte durée' },
-  { value: 'VACATION', label: 'Remplacement longue durée' },
+  { value: 'GARDE', label: 'Garde' },
+  { value: 'REMPLACEMENT', label: 'Remplacement' },
+  { value: 'VACATION', label: 'Vacation' },
   { value: 'STAGE', label: 'Stage' },
+  { value: 'AIDE_OP', label: 'Aide opératoire' },
 ];
 
 export const weekdayOptions: ChoiceOption[] = [

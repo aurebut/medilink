@@ -197,6 +197,7 @@ export class MissionsService {
           { title: { contains: dto.q, mode: 'insensitive' } },
           { description: { contains: dto.q, mode: 'insensitive' } },
           { specialty: { contains: dto.q, mode: 'insensitive' } },
+          { establishment: { name: { contains: dto.q, mode: 'insensitive' } } },
           { city: { contains: dto.q, mode: 'insensitive' } },
           { departmentInfo: { contains: dto.q, mode: 'insensitive' } },
           { sector: { contains: dto.q, mode: 'insensitive' } },

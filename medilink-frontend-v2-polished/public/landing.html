@@ -343,12 +343,14 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .nav-right .btn{justify-content:center;font-size:12px;padding:8px 13px;border-radius:8px}
   .nav-right .btn-ghost{background:var(--gray-1);color:var(--text-2)}
   .nav-right .btn-primary{box-shadow:none}
-  .hero{display:flex;flex-direction:column;min-height:calc(100svh - 60px);height:auto;padding:52px 18px 24px;overflow:visible}
+  .hero{display:flex;flex-direction:column;min-height:calc(100svh - 60px);height:auto;padding:52px 18px 24px;overflow:hidden}
   .hero-layout{flex:1;display:flex;align-items:center}
   .hero-h{font-size:clamp(34px,10vw,46px);line-height:1.08;margin-bottom:18px}
   .hero-h br{display:none}
   .hero-sub{font-size:16px;line-height:1.55;margin-bottom:28px}
   .hero-ctas,.hero-stats{display:none}
+  .hero-h,.hero-sub{animation:none;opacity:1;transform:none}
+  .reveal-left,.reveal-right{transform:translateY(20px)}
   .hero-stat-num{font-size:26px}
   .hero-stat-label{font-size:11px;line-height:1.35}
   .hero-blob{filter:blur(60px);opacity:.14}
@@ -482,7 +484,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <div class="search-field">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         <label class="sr-only" for="search-type">Type de mission</label>
-        <select id="search-type" name="missionType"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="AIDE_OP">Aide opératoire</option></select>
+        <select id="search-type" name="missionType"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="STAGE">Stage</option><option value="AIDE_OP">Aide opératoire</option></select>
       </div>
       <button class="search-btn" type="submit">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
@@ -506,7 +508,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       <div class="how-step reveal-left">
         <div class="how-step-num">01</div>
         <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Cabinet</span><span class="how-chip teal">3 minutes</span></div>
+        <div class="how-step-meta"><span class="how-chip">Cabinet</span><span class="how-chip teal">Besoin guidé</span></div>
         <h3>Cadrage du besoin</h3>
         <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
       </div>
@@ -540,7 +542,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
       </div>
     </div>
     <aside class="how-panel reveal-scale reveal-delay-3">
-      <div class="how-panel-kicker">Parcours sécurisé</div>
+      <div class="how-panel-kicker">Parcours encadré</div>
       <h3>Moins d'improvisation, plus de missions confirmées.</h3>
       <p>La section mission devient le fil conducteur entre le cabinet et le remplaçant: annonce, candidature, échange, confirmation et suivi.</p>
       <div class="how-panel-list">
@@ -567,22 +569,22 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <h3>Médecin remplaçant</h3>
         <p>Accédez à un vivier de missions qualifiées, gérez votre agenda et construisez votre réputation de remplaçant fiable.</p>
         <div class="profile-card-features">
-          <div class="profile-card-feature">Missions vérifiées et rémunérées</div>
+          <div class="profile-card-feature">Conditions et rémunération affichées</div>
           <div class="profile-card-feature">Gestion des disponibilités intégrée</div>
           <div class="profile-card-feature">Messagerie directe avec les cabinets</div>
-          <div class="profile-card-feature">Suivi des candidatures en temps réel</div>
+          <div class="profile-card-feature">Suivi des candidatures par statut</div>
         </div>
         <a class="profile-card-cta" href="/landing-medecin.html">Découvrir l'espace médecin →</a>
       </div>
       <div class="profile-card card-interne reveal-zoom reveal-delay-1">
         <div class="profile-card-label">Pour les cabinets</div>
         <h3>Cabinet &amp; Maison de santé</h3>
-        <p>Trouvez rapidement un remplaçant qualifié pour vos congés, arrêts maladie ou pics d'activité. Sans intermédiaire.</p>
+        <p>Trouvez rapidement un remplaçant qualifié pour vos congés, arrêts maladie ou pics d'activité, puis échangez directement.</p>
         <div class="profile-card-features">
           <div class="profile-card-feature">Vivier de remplaçants qualifiés</div>
-          <div class="profile-card-feature">Publication d'offre en 3 minutes</div>
-          <div class="profile-card-feature">Profils vérifiés et notés</div>
-          <div class="profile-card-feature">Messagerie et contrat intégrés</div>
+          <div class="profile-card-feature">Publication guidée étape par étape</div>
+          <div class="profile-card-feature">Profils et documents centralisés</div>
+          <div class="profile-card-feature">Messagerie et accord intégrés</div>
         </div>
         <a class="profile-card-cta" href="/landing-etablissement.html">Découvrir l'espace établissement →</a>
       </div>

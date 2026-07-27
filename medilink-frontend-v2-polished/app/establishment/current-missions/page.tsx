@@ -1016,7 +1016,7 @@ function MissionControlPanel({
             <div className="candidate-current-panel">
               <span>Détails financiers</span>
               <strong>Honoraires nets : {row.agreement ? `${row.agreement.candidateAmount} €` : '—'}</strong>
-              <p>Frais de service MediLink : {row.agreement ? `${row.agreement.platformFee} €` : '—'}</p>
+              <p>Frais de service MédiLink : {row.agreement ? `${row.agreement.platformFee} €` : '—'}</p>
               <small>Montant total payé : {row.agreement ? `${row.agreement.amount} €` : '—'}</small>
             </div>
           </div>
@@ -1097,7 +1097,7 @@ function CandidateDocumentsPanel({
         <div>
           <span>Documents validés</span>
           <strong>Pièces justificatives du candidat</strong>
-          <p>Documents professionnels vérifiés par MediLink pour ce candidat.</p>
+          <p>Documents professionnels vérifiés par MédiLink pour ce candidat.</p>
         </div>
 
         <div className="table-wrap" style={{ marginTop: 14, background: '#fff', padding: 8, borderRadius: 8, border: '1px solid var(--line)' }}>

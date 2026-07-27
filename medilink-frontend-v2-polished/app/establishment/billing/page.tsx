@@ -140,12 +140,12 @@ function agreementNextStepRecruiter(status?: string | null) {
   if (status === 'PAYMENT_RELEASED') return 'Facture disponible';
   if (status === 'REJECTED') return 'Reprendre l’échange';
   if (status === 'CANCELLED' || status === 'EXPIRED') return 'Clôturée';
-  if (status === 'DISPUTED') return 'Suivi MediLink requis';
+  if (status === 'DISPUTED') return 'Suivi MédiLink requis';
   return 'Continuer la discussion';
 }
 
 function statusCopy(row: AccountingRow) {
-  if (row.source === 'MANUAL') return row.hasReceipt ? 'Hors MediLink classable' : 'Facture manquante';
+  if (row.source === 'MANUAL') return row.hasReceipt ? 'Hors MédiLink classable' : 'Facture manquante';
   if (row.agreement?.status === 'PAYMENT_RELEASED') return 'Facture disponible';
   return agreementNextStepRecruiter(row.agreement?.status);
 }
@@ -170,7 +170,7 @@ function buildCsv(rows: AccountingRow[]) {
     row.mission,
     row.amount,
     row.currency,
-    row.source === 'MEDILINK' ? agreementLabelRecruiter(row.agreement?.status) : 'Hors MediLink',
+    row.source === 'MEDILINK' ? agreementLabelRecruiter(row.agreement?.status) : 'Hors MédiLink',
     row.paymentMethod,
     row.hasReceipt ? 'Oui' : 'Non',
     row.notes || '',
@@ -313,11 +313,11 @@ export default function RecruiterBillingPage() {
           source: 'MEDILINK' as const,
           date: agreement?.payment?.releasedAt || agreement?.completedAt || agreement?.startDate || conversation.mission?.startDate,
           remplacant: candidateName(conversation.application),
-          mission: conversation.mission?.title || 'Mission MediLink',
+          mission: conversation.mission?.title || 'Mission MédiLink',
           amount: releasedOrSecured ? amount : 0,
           currency: agreement?.currency || 'EUR',
           status: rowStatusFromAgreement(agreement),
-          paymentMethod: releasedOrSecured ? 'Prélèvement MediLink' : 'À régler',
+          paymentMethod: releasedOrSecured ? 'Prélèvement MédiLink' : 'À régler',
           conversationId: conversation.id,
           agreement,
           hasReceipt: agreement?.status === 'PAYMENT_RELEASED' || Boolean(agreement?.invoices?.some((invoice) => invoice.type === 'RECRUITER_INVOICE')),
@@ -353,7 +353,7 @@ export default function RecruiterBillingPage() {
         id: rowId,
         source: 'MEDILINK' as const,
         date: purchase.date,
-        remplacant: 'MediLink (Plateforme)',
+        remplacant: 'MédiLink (Plateforme)',
         mission: purchase.description,
         amount: purchase.amount,
         currency: 'EUR',
@@ -410,7 +410,7 @@ export default function RecruiterBillingPage() {
       ...yearRows.filter(row => row.source === 'MEDILINK' && row.agreement?.status === 'PAYMENT_REQUIRED').map((row) => ({ tone: 'warning' as const, title: 'Accord candidat à confirmer', row })),
       ...completedRows.map((row) => ({ tone: 'warning' as const, title: 'Mission réalisée, versement à libérer', row })),
       ...unclassifiedRows.slice(0, 4).map((row) => ({ tone: 'success' as const, title: 'Facture disponible à classer', row })),
-      ...missingInvoiceRows.filter((row) => row.source === 'MANUAL').map((row) => ({ tone: 'warning' as const, title: 'Dépense hors MediLink sans justificatif', row })),
+      ...missingInvoiceRows.filter((row) => row.source === 'MANUAL').map((row) => ({ tone: 'warning' as const, title: 'Dépense hors MédiLink sans justificatif', row })),
       ...(budgetProgress >= 85 ? [{ tone: 'warning' as const, title: 'Budget cible annuel presque atteint', row: null }] : []),
     ].slice(0, 8);
 
@@ -818,7 +818,7 @@ function OverviewTab({
           <div className="billing-hero-copy">
             <span>Exercice {selectedYear}</span>
             <h2>{formatMoney(dashboard.totalExpenses)}</h2>
-            <p>Dépenses engagées connues dans MediLink et ajoutées manuellement.</p>
+            <p>Dépenses engagées connues dans MédiLink et ajoutées manuellement.</p>
           </div>
           <div className="billing-overview-kpis">
             <div>
@@ -909,7 +909,7 @@ function MissionsTab({
   const missionRows = rows.filter((row) => row.source === 'MEDILINK' && row.agreement);
 
   if (missionRows.length === 0) {
-    return <EmptyState title="Aucune mission comptable" description="Les accords MediLink apparaîtront ici dès qu'un recrutement sera validé." action={<LinkButton href="/establishment/messages">Ouvrir la messagerie</LinkButton>} />;
+    return <EmptyState title="Aucune mission comptable" description="Les accords MédiLink apparaîtront ici dès qu'un recrutement sera validé." action={<LinkButton href="/establishment/messages">Ouvrir la messagerie</LinkButton>} />;
   }
 
   return (
@@ -994,7 +994,7 @@ function ExpensesTab({
         <div className="toolbar">
           <div>
             <h2>Registre des dépenses</h2>
-            <p className="small">Base exportable avec les factures MediLink et les dépenses hors plateforme.</p>
+            <p className="small">Base exportable avec les factures MédiLink et les dépenses hors plateforme.</p>
           </div>
           <div className="billing-filters">
             <Select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as typeof statusFilter)} aria-label="Filtre statut">
@@ -1003,7 +1003,7 @@ function ExpensesTab({
               <option value="COMPLETED">À valider</option>
               <option value="PENDING">À régler / En cours</option>
               <option value="PROPOSED">Propositions</option>
-              <option value="MANUAL">Hors MediLink</option>
+              <option value="MANUAL">Hors MédiLink</option>
             </Select>
             <Button type="button" variant="light" onClick={onExportFiltered}>Exporter la vue</Button>
           </div>
@@ -1012,7 +1012,7 @@ function ExpensesTab({
         {rows.length === 0 ? (
           <EmptyState
             title="Aucune dépense sur cette vue"
-            description="Ajoutez une dépense hors MediLink ou attendez qu'une mission facturée apparaisse ici."
+            description="Ajoutez une dépense hors MédiLink ou attendez qu'une mission facturée apparaisse ici."
             action={<LinkButton href="/establishment/messages">Voir les échanges</LinkButton>}
           />
         ) : (
@@ -1057,7 +1057,7 @@ function ExpenseTable({
               <td>{formatDate(row.date)}</td>
               <td>
                 <strong>{row.remplacant}</strong>
-                <div className="small">{row.source === 'MEDILINK' ? 'MediLink' : row.paymentMethod}</div>
+                <div className="small">{row.source === 'MEDILINK' ? 'MédiLink' : row.paymentMethod}</div>
               </td>
               <td>
                 <strong>{row.mission}</strong>
@@ -1069,7 +1069,7 @@ function ExpenseTable({
               <td>
                 {row.source === 'MEDILINK'
                   ? <Badge tone={agreementTone(row.agreement?.status)}>{agreementLabelRecruiter(row.agreement?.status)}</Badge>
-                  : <Badge tone={row.hasReceipt ? 'neutral' : 'warning'}>Hors MediLink</Badge>}
+                  : <Badge tone={row.hasReceipt ? 'neutral' : 'warning'}>Hors MédiLink</Badge>}
               </td>
               <td className="actions">
                 {row.conversationId && row.hasReceipt ? (
@@ -1095,7 +1095,7 @@ function ManualExpenseCard({ onAddManual }: { onAddManual: (event: React.FormEve
     <Card className="dashboard-panel billing-manual-card">
       <div className="toolbar compact">
         <div>
-          <h2>Ajouter hors MediLink</h2>
+          <h2>Ajouter hors MédiLink</h2>
           <p className="small">Vacation, remplacement ou garde géré en dehors de la plateforme.</p>
         </div>
       </div>
@@ -1142,7 +1142,7 @@ function DocumentsTab({
       <div className="toolbar">
         <div>
           <h2>Factures et pièces</h2>
-          <p className="small">Coffre des factures MediLink et des pièces justificatives hors plateforme.</p>
+          <p className="small">Coffre des factures MédiLink et des pièces justificatives hors plateforme.</p>
         </div>
       </div>
       {documentRows.length === 0 ? (
@@ -1157,7 +1157,7 @@ function DocumentsTab({
                 <p>{row.remplacant} · {formatDate(row.date)}</p>
               </div>
               <div className="billing-doc-meta">
-                <span>{row.source === 'MEDILINK' ? 'Facture MediLink' : 'Pièce hors MediLink'}</span>
+                <span>{row.source === 'MEDILINK' ? 'Facture MédiLink' : 'Pièce hors MédiLink'}</span>
                 <strong>{row.amount > 0 ? formatMoney(row.amount, row.currency) : 'Montant à régulariser'}</strong>
               </div>
               <div className="actions">
@@ -1260,7 +1260,7 @@ function ExportsTab({
         <div>
           <Badge tone="success">CSV</Badge>
           <h2>Export annuel {selectedYear}</h2>
-          <p>Inclut toutes les dépenses MediLink et hors plateforme validées pour cet exercice.</p>
+          <p>Inclut toutes les dépenses MédiLink et hors plateforme validées pour cet exercice.</p>
         </div>
         <div className="billing-export-stats">
           <div><span>Lignes</span><strong>{yearRows.length}</strong></div>

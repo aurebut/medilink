@@ -127,7 +127,7 @@ export class ProfilesService {
     const profile = await this.ensureProfile(user.id);
     const rpps = this.ansDirectory.normalizeRpps(rppsInput);
     if (rpps.length < 8 || rpps.length > 14) {
-      throw new BadRequestException('Numero RPPS invalide.');
+      throw new BadRequestException('Numéro RPPS invalide.');
     }
 
     if (!this.hasVerifiableName(profile.firstName) || !this.hasVerifiableName(profile.lastName)) {

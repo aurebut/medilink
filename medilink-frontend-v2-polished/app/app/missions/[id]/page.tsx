@@ -337,7 +337,7 @@ export default function CandidateMissionDetailPage() {
         <Card>
           <h3>Lieu & contact</h3>
           <p>{address}</p>
-          <p className="small">{mission?.establishment?.phone || mission?.establishment?.email || 'Contact via la messagerie MediLink'}</p>
+          <p className="small">{mission?.establishment?.phone || mission?.establishment?.email || 'Contact via la messagerie MédiLink'}</p>
         </Card>
       </div>
 

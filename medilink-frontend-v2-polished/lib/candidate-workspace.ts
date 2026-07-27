@@ -49,7 +49,7 @@ export function agreementNextStep(status?: MissionAgreementStatus | null) {
   if (status === 'PAYMENT_RELEASED') return 'Justificatif disponible';
   if (status === 'REJECTED') return 'Reprendre l’échange';
   if (status === 'CANCELLED' || status === 'EXPIRED') return 'Clôturée';
-  if (status === 'DISPUTED') return 'Suivi MediLink requis';
+  if (status === 'DISPUTED') return 'Suivi MédiLink requis';
   return 'Continuer la discussion';
 }
 

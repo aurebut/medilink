@@ -282,10 +282,10 @@ export class AccountingService {
         kind: AccountingEntryKind.REVENUE,
         entryDate: paidAt,
         counterparty: establishment?.name || 'Établissement',
-        missionLabel: mission?.title || 'Mission MediLink',
+        missionLabel: mission?.title || 'Mission MédiLink',
         amountCents: candidateAmountCents,
         currency: agreement.currency,
-        paymentMethod: 'Virement MediLink',
+        paymentMethod: 'Virement MédiLink',
         notes: input.notes?.trim() || (percentage ? `Rétrocession contractuelle de ${percentage}%` : null),
         hasReceipt: false,
         source: AccountingEntrySource.MEDILINK,
@@ -300,10 +300,10 @@ export class AccountingService {
       update: {
         entryDate: paidAt,
         counterparty: establishment?.name || 'Établissement',
-        missionLabel: mission?.title || 'Mission MediLink',
+        missionLabel: mission?.title || 'Mission MédiLink',
         amountCents: candidateAmountCents,
         currency: agreement.currency,
-        paymentMethod: 'Virement MediLink',
+        paymentMethod: 'Virement MédiLink',
         notes: input.notes?.trim() || (percentage ? `Rétrocession contractuelle de ${percentage}%` : null),
         source: AccountingEntrySource.MEDILINK,
         status: AccountingEntryStatus.VALIDATED,
@@ -408,7 +408,7 @@ export class AccountingService {
     const entry = await this.prisma.accountingEntry.findFirst({ where: { id: entryId, workspaceId: workspace.id } });
     if (!entry) throw new NotFoundException('Écriture comptable introuvable.');
     if (entry.source !== AccountingEntrySource.MANUAL) {
-      throw new BadRequestException('Une écriture issue de MediLink ou de la banque doit être corrigée depuis sa source.');
+      throw new BadRequestException('Une écriture issue de MédiLink ou de la banque doit être corrigée depuis sa source.');
     }
     await this.prisma.$transaction([
       this.prisma.accountingClassification.deleteMany({ where: { workspaceId: workspace.id, recordKey: entryId } }),
@@ -530,10 +530,10 @@ export class AccountingService {
         kind: AccountingEntryKind.REVENUE,
         entryDate: paidAt,
         counterparty: establishment?.name || 'Établissement',
-        missionLabel: mission?.title || 'Mission MediLink',
+        missionLabel: mission?.title || 'Mission MédiLink',
         amountCents,
         currency: agreement.currency,
-        paymentMethod: 'Virement MediLink',
+        paymentMethod: 'Virement MédiLink',
         notes: agreement.retrocessionPercentage ? `Rétrocession contractuelle de ${agreement.retrocessionPercentage}%` : null,
         hasReceipt,
         source: AccountingEntrySource.MEDILINK,

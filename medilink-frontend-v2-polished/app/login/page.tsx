@@ -7,6 +7,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input, PasswordInput } from '@/components/ui';
 import { safePostLoginRoute } from '@/lib/routes';
+import { userFacingError } from '@/lib/user-facing';
 
 function LoginForm() {
   const router = useRouter();
@@ -24,8 +25,8 @@ function LoginForm() {
     try {
       const user = await login(email, password);
       router.replace(safePostLoginRoute(search.get('next'), user));
-    } catch (err: any) {
-      setError(err.message || 'Connexion impossible.');
+    } catch (err) {
+      setError(userFacingError(err, 'Connexion impossible. Réessayez dans quelques instants.'));
     } finally {
       setLoading(false);
     }
