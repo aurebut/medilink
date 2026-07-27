@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { Button, Input, Select } from './ui';
 import type { ChoiceOption } from '@/lib/profile-options';
 
@@ -20,13 +20,23 @@ export function SingleChoiceField({
   options,
   onChange,
   required,
+  description,
+  error,
 }: {
   label: string;
   value: string;
   options: ChoiceOption[];
   onChange: (value: string) => void;
   required?: boolean;
+  description?: ReactNode;
+  error?: ReactNode;
 }) {
+  const generatedId = useId();
+  const controlId = `single-choice-${generatedId}`;
+  const customInputId = `${controlId}-custom`;
+  const descriptionId = description ? `${controlId}-description` : undefined;
+  const errorId = error ? `${controlId}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
   const isCustom = Boolean(value) && !options.some((option) => option.value === value);
   const [customOpen, setCustomOpen] = useState(isCustom);
   const [customValue, setCustomValue] = useState(isCustom ? value : '');
@@ -56,8 +66,24 @@ export function SingleChoiceField({
 
   return (
     <div className="field">
-      <span className="label">{label}</span>
-      <Select required={required} value={customOpen || isCustom ? OTHER_VALUE : value} onChange={(e) => selectValue(e.target.value)}>
+      <label className="label" htmlFor={controlId}>
+        {label}
+        {required ? (
+          <>
+            <span className="required-indicator" aria-hidden="true"> *</span>
+            <span className="sr-only"> (requis)</span>
+          </>
+        ) : null}
+      </label>
+      {description ? <div id={descriptionId} className="field-description">{description}</div> : null}
+      <Select
+        id={controlId}
+        required={required}
+        value={customOpen || isCustom ? OTHER_VALUE : value}
+        aria-describedby={describedBy}
+        aria-invalid={error ? true : undefined}
+        onChange={(e) => selectValue(e.target.value)}
+      >
         <option value="">Sélectionner</option>
         {options.map((option) => (
           <option key={option.value} value={option.value}>{option.label}</option>
@@ -66,17 +92,27 @@ export function SingleChoiceField({
       </Select>
       {customOpen ? (
         <div className="custom-choice-row">
-          <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Entrer un texte libre" />
+          <label className="sr-only" htmlFor={customInputId}>Réponse personnalisée pour {label}</label>
+          <Input
+            id={customInputId}
+            required={required}
+            value={customValue}
+            aria-describedby={describedBy}
+            aria-invalid={error ? true : undefined}
+            onChange={(e) => setCustomValue(e.target.value)}
+            placeholder="Entrer un texte libre"
+          />
           <Button type="button" variant="secondary" onClick={applyCustomValue}>Valider</Button>
         </div>
       ) : null}
       {isCustom && !customOpen ? (
         <div className="selected-custom-values">
-          <button type="button" onClick={() => setCustomOpen(true)}>
+          <button type="button" aria-label={`Modifier la réponse ${value}`} onClick={() => setCustomOpen(true)}>
             {value}
           </button>
         </div>
       ) : null}
+      {error ? <div id={errorId} className="field-error" role="alert">{error}</div> : null}
     </div>
   );
 }
@@ -86,12 +122,22 @@ export function MultiChoiceField({
   values,
   options,
   onChange,
+  description,
+  error,
 }: {
   label: string;
   values: string[];
   options: ChoiceOption[];
   onChange: (values: string[]) => void;
+  description?: ReactNode;
+  error?: ReactNode;
 }) {
+  const generatedId = useId();
+  const controlId = `multi-choice-${generatedId}`;
+  const customInputId = `${controlId}-custom`;
+  const descriptionId = description ? `${controlId}-description` : undefined;
+  const errorId = error ? `${controlId}-error` : undefined;
+  const describedBy = [descriptionId, errorId].filter(Boolean).join(' ') || undefined;
   const [selectedValue, setSelectedValue] = useState('');
   const [customValue, setCustomValue] = useState('');
   const [customOpen, setCustomOpen] = useState(false);
@@ -118,27 +164,48 @@ export function MultiChoiceField({
 
   return (
     <div className="field">
-      <span className="label">{label}</span>
-      <Select value={selectedValue} onChange={(e) => addValue(e.target.value)}>
+      <label className="label" htmlFor={controlId}>{label}</label>
+      {description ? <div id={descriptionId} className="field-description">{description}</div> : null}
+      <Select
+        id={controlId}
+        value={selectedValue}
+        aria-describedby={describedBy}
+        aria-invalid={error ? true : undefined}
+        onChange={(e) => addValue(e.target.value)}
+      >
         <option value="">Ajouter une option</option>
         {availableOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         <option value={OTHER_VALUE}>Autre</option>
       </Select>
       {customOpen ? (
         <div className="custom-choice-row">
-          <Input value={customValue} onChange={(e) => setCustomValue(e.target.value)} placeholder="Ajouter une réponse libre" />
+          <label className="sr-only" htmlFor={customInputId}>Réponse personnalisée pour {label}</label>
+          <Input
+            id={customInputId}
+            value={customValue}
+            aria-describedby={describedBy}
+            aria-invalid={error ? true : undefined}
+            onChange={(e) => setCustomValue(e.target.value)}
+            placeholder="Ajouter une réponse libre"
+          />
           <Button type="button" variant="secondary" onClick={addCustomValue}>Ajouter</Button>
         </div>
       ) : null}
       {values.length ? (
         <div className="selected-custom-values">
           {values.map((value) => (
-            <button key={value} type="button" onClick={() => onChange(values.filter((item) => item !== value))}>
+            <button
+              key={value}
+              type="button"
+              aria-label={`Retirer ${optionLabel(options, value)}`}
+              onClick={() => onChange(values.filter((item) => item !== value))}
+            >
               {optionLabel(options, value)} ×
             </button>
           ))}
         </div>
       ) : null}
+      {error ? <div id={errorId} className="field-error" role="alert">{error}</div> : null}
     </div>
   );
 }
@@ -148,11 +215,15 @@ export function MultiChoiceTextField({
   value,
   options,
   onChange,
+  description,
+  error,
 }: {
   label: string;
   value: string;
   options: ChoiceOption[];
   onChange: (value: string) => void;
+  description?: ReactNode;
+  error?: ReactNode;
 }) {
   const values = splitTextChoices(value || '');
 
@@ -161,6 +232,8 @@ export function MultiChoiceTextField({
       label={label}
       values={values}
       options={options}
+      description={description}
+      error={error}
       onChange={(nextValues) => onChange(nextValues.join(', '))}
     />
   );

@@ -213,7 +213,7 @@ export default function AdminMatchingPage() {
 
   async function dispatchMatches() {
     if (!selectedMissionId || !preview) return;
-    if (!confirm(`Envoyer une vague de ${targetCount} recommandation(s) avec un seuil minimum de ${minimumScore}/100 ?`)) return;
+    if (!confirm(`Envoyer ${targetCount} ${targetCount === 1 ? 'recommandation' : 'recommandations'} avec un seuil minimum de ${minimumScore}/100 ?`)) return;
 
     try {
       setError(null);
@@ -223,7 +223,12 @@ export default function AdminMatchingPage() {
         targetCount,
         minimumScore,
       });
-      setSuccess(`${result.sent} recommandation(s) envoyée(s).${result.failed?.length ? ` ${result.failed.length} échec(s).` : ''}`);
+      setSuccess(
+        `${result.sent} ${result.sent === 1 ? 'recommandation envoyée' : 'recommandations envoyées'}.`
+        + (result.failed?.length
+          ? ` ${result.failed.length} ${result.failed.length === 1 ? 'échec' : 'échecs'}.`
+          : ''),
+      );
       await loadPreview(selectedMissionId);
     } catch (e: any) {
       setError(e.message);
@@ -260,7 +265,12 @@ export default function AdminMatchingPage() {
           <div className="matching-command-copy">
             <span className="section-kicker">Mission analysée</span>
             <h2>{selectedMission?.title || 'Sélectionner une mission'}</h2>
-            <p>{publishedMissions.length} mission(s) publiée(s) peuvent être poussées aux candidats.</p>
+            <p>
+              {publishedMissions.length}{' '}
+              {publishedMissions.length === 1
+                ? 'mission publiée peut être recommandée aux candidats.'
+                : 'missions publiées peuvent être recommandées aux candidats.'}
+            </p>
           </div>
           <Badge tone={selectedMission?.status === 'PUBLISHED' ? 'success' : 'warning'}>
             {selectedMission ? statusLabel(selectedMission.status) : 'Aucune mission'}
@@ -325,7 +335,9 @@ export default function AdminMatchingPage() {
             <section className="card matching-stat">
               <span>Candidats pertinents</span>
               <strong>{preview.total}</strong>
-              <small>{pendingCandidates.length} jamais notifié(s)</small>
+              <small>
+                {pendingCandidates.length} {pendingCandidates.length === 1 ? 'jamais notifié' : 'jamais notifiés'}
+              </small>
             </section>
             <section className="card matching-stat">
               <span>Meilleur score</span>
@@ -335,7 +347,9 @@ export default function AdminMatchingPage() {
             <section className="card matching-stat">
               <span>Score moyen</span>
               <strong>{averageScore ? `${averageScore}/100` : '-'}</strong>
-              <small>{notifiedCandidates.length} déjà notifié(s)</small>
+              <small>
+                {notifiedCandidates.length} {notifiedCandidates.length === 1 ? 'déjà notifié' : 'déjà notifiés'}
+              </small>
             </section>
             <section className="card matching-stat">
               <span>Exclus</span>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { FormEvent, ReactNode } from 'react';
+import type { FormEvent, ReactNode, RefObject } from 'react';
 import { MissionShareActions } from '@/components/MissionShareActions';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
@@ -33,20 +33,12 @@ type DraftSummary = {
 };
 
 const steps = [
-  { title: 'Format', helper: 'Format de la mission' },
-  { title: 'Profil', helper: 'Niveaux de profil requis' },
-  { title: 'Besoin', helper: 'Titre et spécialité' },
-  { title: 'Description', helper: 'Description du poste' },
-  { title: 'Contexte', helper: 'Service et logiciel' },
-  { title: 'Secrétariat', helper: 'Secrétariat et patientèle' },
-  { title: 'Cabinet', helper: 'Organisation et équipement' },
-  { title: 'Infos sup', helper: 'Détails sur place' },
-  { title: 'Lieu', helper: 'Ville et adresse' },
-  { title: 'Accès', helper: 'Logement et transports' },
-  { title: 'Planning', helper: 'Dates et horaires' },
-  { title: 'Budget', helper: 'Rémunération et durée' },
-  { title: 'Publication', helper: 'Tags et visibilité' },
-  { title: 'Récap', helper: 'Validation finale' },
+  { title: 'Mission', helper: 'Format, profil recherché et besoin' },
+  { title: 'Contexte', helper: 'Activité, organisation et équipement' },
+  { title: 'Lieu', helper: 'Adresse, accueil et accès' },
+  { title: 'Planning', helper: 'Dates, horaires et rémunération' },
+  { title: 'Publication', helper: 'Visibilité et statut de la mission' },
+  { title: 'Vérification', helper: 'Dernière relecture avant validation' },
 ];
 
 const initialForm = {
@@ -63,7 +55,10 @@ const initialForm = {
 function tomorrowDateInput() {
   const date = new Date();
   date.setDate(date.getDate() + 1);
-  return date.toISOString().slice(0, 10);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function optionalText(value?: unknown) {
@@ -119,69 +114,31 @@ function mergeAccountCreditStatus(
 }
 
 function findStoppedStep(form: any, establishment?: any) {
-  const tomorrow = tomorrowDateInput();
-
-  const isUnchanged = (stepIdx: number): boolean => {
-    switch (stepIdx) {
-      case 2:
-        return (!form.title || form.title === 'Mission sans titre') &&
-               (!form.specialty || form.specialty === 'Specialite a preciser');
-      case 3:
-        return !form.description;
-      case 4:
-        return !form.departmentInfo &&
-               (!form.softwareUsed || (establishment && form.softwareUsed === establishment.softwareUsed));
-      case 5:
-        return (form.hasSecretary === undefined || form.hasSecretary === null || (establishment && form.hasSecretary === establishment.hasSecretary)) &&
-               (!form.secretaryType || (establishment && form.secretaryType === establishment.secretaryType)) &&
-               (!form.patientType || (establishment && form.patientType === establishment.patientType));
-      case 6:
-        return (!form.averagePatientsPerDay || (establishment && String(form.averagePatientsPerDay) === String(establishment.averagePatientsPerDay ?? ''))) &&
-               (form.isMultidisciplinary === undefined || form.isMultidisciplinary === null || (establishment && form.isMultidisciplinary === establishment.isMultidisciplinary)) &&
-               (!form.equipmentAvailable || form.equipmentAvailable.length === 0 || (establishment && JSON.stringify(form.equipmentAvailable) === JSON.stringify(establishment.equipmentAvailable || [])));
-      case 7:
-        return !form.teamInfo && !form.equipmentInfo;
-      case 8:
-        return (!form.city || form.city === 'Ville a preciser' || (establishment && form.city === establishment.city)) &&
-               (!form.sector || (establishment && form.sector === establishment.sector)) &&
-               (!form.location || (establishment && form.location === establishment.address));
-      case 9:
-        return (form.accommodationProvided === undefined || form.accommodationProvided === null) &&
-               (form.parkingAvailable === undefined || form.parkingAvailable === null) &&
-               !form.practicalInfo;
-      case 10:
-        return (!form.startDate || form.startDate === tomorrow) &&
-               !form.endDate &&
-               !form.startTime &&
-               !form.endTime;
-      case 11:
-        return (!form.durationHours || form.durationHours === '8') &&
-               !form.preferredDuration &&
-               (!form.retrocessionPercentage || form.retrocessionPercentage === '70') &&
-               !form.minimumCompensation;
-      case 12:
-        return !form.tagsText &&
-               (!form.acceptedMissionTypes || form.acceptedMissionTypes.length === 0);
-      default:
-        return true;
-    }
-  };
-
-  // Find the first step s from 2 to 12 such that s and all steps after it are unchanged
-  for (let s = 2; s <= 12; s++) {
-    let allUnchangedAfter = true;
-    for (let i = s; i <= 12; i++) {
-      if (!isUnchanged(i)) {
-        allUnchangedAfter = false;
-        break;
-      }
-    }
-    if (allUnchangedAfter) {
-      return s;
-    }
+  if (
+    !form.title ||
+    form.title === 'Mission sans titre' ||
+    !form.specialty ||
+    form.specialty === 'Specialite a preciser' ||
+    !safeArray(form.requiredLevels).length
+  ) {
+    return 0;
   }
 
-  return 12;
+  const contextStarted = Boolean(
+    form.description ||
+    form.practiceSetting ||
+    form.departmentInfo ||
+    form.requiredActs?.length ||
+    form.teamInfo ||
+    form.equipmentInfo ||
+    (form.softwareUsed && form.softwareUsed !== establishment?.softwareUsed),
+  );
+  if (!contextStarted) return 1;
+
+  if (!form.city || form.city === 'Ville a preciser') return 2;
+  if (!form.startDate) return 3;
+  if (!form.tagsText && !safeArray(form.acceptedMissionTypes).length) return 4;
+  return 5;
 }
 
 function missionToWizardForm(mission: any) {
@@ -231,6 +188,81 @@ function missionToWizardForm(mission: any) {
   };
 }
 
+function validateWizardStep(stepIndex: number, form: any): string | null {
+  if (stepIndex === 0) {
+    if (!form.missionType) return 'Choisissez un type de mission.';
+    if (!safeArray(form.requiredLevels).length) return 'Sélectionnez au moins un profil recherché.';
+    if (!optionalText(form.title)) return 'Ajoutez un titre à la mission.';
+    if (!optionalText(form.specialty)) return 'Choisissez une spécialité.';
+  }
+
+  if (stepIndex === 2 && !optionalText(form.city)) {
+    return 'Indiquez au moins la ville de la mission.';
+  }
+
+  if (stepIndex === 3) {
+    const minimumDate = tomorrowDateInput();
+    if (!form.startDate) return 'Choisissez une date de début.';
+    if (form.startDate < minimumDate) return 'La date de début doit être située dans le futur.';
+    if (form.endDate && form.endDate < form.startDate) {
+      return 'La date de fin doit être postérieure ou égale à la date de début.';
+    }
+    if (
+      (!form.endDate || form.endDate === form.startDate) &&
+      form.startTime &&
+      form.endTime &&
+      form.endTime <= form.startTime
+    ) {
+      return "L'heure de fin doit être postérieure à l'heure de début.";
+    }
+
+    const durationHours = Number(form.durationHours);
+    if (!Number.isFinite(durationHours) || durationHours < 1 || durationHours > 72) {
+      return 'Indiquez une durée comprise entre 1 et 72 heures.';
+    }
+
+    const retrocessionPercentage = Number(form.retrocessionPercentage);
+    if (
+      !Number.isFinite(retrocessionPercentage) ||
+      retrocessionPercentage < 1 ||
+      retrocessionPercentage > 100
+    ) {
+      return 'Indiquez un pourcentage de rétrocession compris entre 1 et 100 %.';
+    }
+
+    if (form.minimumCompensation !== '' && form.minimumCompensation != null) {
+      const minimumCompensation = Number(form.minimumCompensation);
+      if (
+        !Number.isFinite(minimumCompensation) ||
+        minimumCompensation < 0 ||
+        minimumCompensation > 100
+      ) {
+        return 'La rémunération minimale doit être comprise entre 0 et 100 %.';
+      }
+    }
+  }
+
+  if (stepIndex === 4 && typeof form.publishNow !== 'boolean') {
+    return 'Choisissez de publier maintenant ou de conserver un brouillon.';
+  }
+
+  if (stepIndex === 5) {
+    for (let candidateStep = 0; candidateStep < 5; candidateStep += 1) {
+      const error = validateWizardStep(candidateStep, form);
+      if (error) return error;
+    }
+  }
+
+  return null;
+}
+
+function firstInvalidWizardStep(form: any) {
+  for (let stepIndex = 0; stepIndex < steps.length - 1; stepIndex += 1) {
+    if (validateWizardStep(stepIndex, form)) return stepIndex;
+  }
+  return null;
+}
+
 export default function NewMissionPage() {
   const { establishments, primary, loading } = useEstablishments();
   const [form, setForm] = useState<any>(initialForm);
@@ -243,6 +275,7 @@ export default function NewMissionPage() {
   const [billingLoading, setBillingLoading] = useState(false);
   const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
+  const [landingIntentNotice, setLandingIntentNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
   const [forceShowPaymentGate, setForceShowPaymentGate] = useState(false);
   const [forceNewMission, setForceNewMission] = useState(false);
@@ -259,6 +292,8 @@ export default function NewMissionPage() {
   const autosaveInFlightRef = useRef(false);
   const hasSubmittedRef = useRef(false);
   const hasFetchedRef = useRef(false);
+  const landingIntentAppliedRef = useRef(false);
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null);
 
   const progress = useMemo(() => Math.round(((step + 1) / steps.length) * 100), [step]);
   const isLastStep = step === steps.length - 1;
@@ -291,6 +326,55 @@ export default function NewMissionPage() {
   }, [primary, selectedEstablishmentId]);
 
   useEffect(() => {
+    if (landingIntentAppliedRef.current || typeof window === 'undefined') return;
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('draftId') || searchParams.get('id')) return;
+
+    let storedIntent: Record<string, unknown> = {};
+    try {
+      storedIntent = JSON.parse(
+        window.sessionStorage.getItem('medilink_establishment_intent') || '{}',
+      );
+    } catch {
+      storedIntent = {};
+    }
+
+    const missionType = String(
+      storedIntent.missionType || searchParams.get('intentType') || '',
+    );
+    const specialty = String(
+      storedIntent.specialty || searchParams.get('intentSpecialty') || '',
+    ).trim();
+    const city = String(
+      storedIntent.city || searchParams.get('intentCity') || '',
+    ).trim();
+    const period = String(
+      storedIntent.period || searchParams.get('intentPeriod') || '',
+    ).trim();
+    if (!missionType && !specialty && !city && !period) return;
+
+    landingIntentAppliedRef.current = true;
+    const supportedMissionType = missionTypeOptions.some(
+      (option) => option.value === missionType,
+    )
+      ? (missionType as MissionType)
+      : undefined;
+    setForm((current: any) => ({
+      ...current,
+      missionType: supportedMissionType || current.missionType,
+      specialty: specialty || current.specialty || '',
+      city: city || current.city || '',
+      description:
+        period && !current.description
+          ? `Période souhaitée : ${period}`
+          : current.description,
+    }));
+    setLandingIntentNotice(
+      'Les informations saisies avant votre inscription ont été reprises. Vérifiez-les avant publication.',
+    );
+  }, []);
+
+  useEffect(() => {
     if (showWizard && billingStatus && billingStatus.availableCredits > 0) {
       setCreditAlertVisible(true);
       setCreditAlertFading(false);
@@ -302,7 +386,7 @@ export default function NewMissionPage() {
       setCreditAlertVisible(false);
       setCreditAlertFading(false);
     }
-  }, [showWizard, billingStatus?.availableCredits]);
+  }, [showWizard, billingStatus]);
 
   useEffect(() => {
     if (creditAlertFading) {
@@ -335,7 +419,7 @@ export default function NewMissionPage() {
 
         const establishment = establishments.find((item) => item.id === (m.establishmentId || primary?.id)) || primary;
 
-        const savedStep = localStorage.getItem(`draft_step_${m.id}`);
+        const savedStep = localStorage.getItem(`draft_step_v2_${m.id}`);
         if (savedStep) {
           const parsedStep = parseInt(savedStep, 10);
           if (!isNaN(parsedStep) && parsedStep >= 0 && parsedStep < steps.length) {
@@ -357,9 +441,16 @@ export default function NewMissionPage() {
 
   useEffect(() => {
     if (draftMissionId) {
-      localStorage.setItem(`draft_step_${draftMissionId}`, String(step));
+      localStorage.setItem(`draft_step_v2_${draftMissionId}`, String(step));
     }
   }, [step, draftMissionId]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      stepHeadingRef.current?.focus();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [step]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -428,7 +519,7 @@ export default function NewMissionPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedEstablishment?.id, billingTrigger, establishmentIdsKey]);
+  }, [selectedEstablishment?.id, billingTrigger, establishmentIdsKey, establishments]);
 
   useEffect(() => {
     if (!selectedEstablishment?.id) {
@@ -499,27 +590,11 @@ export default function NewMissionPage() {
     setForm((p: any) => ({ ...p, [name]: value }));
   }
 
-  function validateCurrentStep() {
-    if (step === 2 && (!form.title || !form.specialty)) {
-      return 'Ajoutez un titre et une spécialité pour continuer.';
-    }
-    if (step === 8 && !form.city) {
-      return 'Indiquez au moins la ville de la mission.';
-    }
-    if (step === 10) {
-      if (!form.startDate) return 'Choisissez une date de début.';
-      if (form.endDate && form.endDate < form.startDate) return 'La date de fin doit être après la date de début.';
-    }
-    if (step === 11 && (form.compensationMode || 'RETROCESSION') === 'RETROCESSION' && !form.retrocessionPercentage) {
-      return 'Indiquez le pourcentage de rétrocession.';
-    }
-    return null;
-  }
+  const currentStepValidationError = validateWizardStep(step, form);
 
   function next() {
-    const validationError = validateCurrentStep();
-    if (validationError) {
-      setError(validationError);
+    if (currentStepValidationError) {
+      setError(currentStepValidationError);
       return;
     }
     setError(null);
@@ -623,23 +698,39 @@ export default function NewMissionPage() {
       return;
     }
 
+    const invalidStep = firstInvalidWizardStep(form);
+    if (invalidStep != null) {
+      setStep(invalidStep);
+      setError(validateWizardStep(invalidStep, form));
+      return;
+    }
+
     setSaving(true);
     setError(null);
     hasSubmittedRef.current = true;
     await waitForAutosave();
 
-    const payload = buildMissionPayload(true);
+    const publishNow = form.publishNow === true;
+    const payload = buildMissionPayload(publishNow);
     delete payload.tagsText;
 
     try {
       if (draftMissionIdRef.current) {
-        await api.patch<Mission>(`/missions/${draftMissionIdRef.current}`, { ...payload, publishNow: undefined });
-        const mission = await api.post<Mission>(`/missions/${draftMissionIdRef.current}/publish`);
-        setCreatedMission(mission);
+        const updatedMission = await api.patch<Mission>(
+          `/missions/${draftMissionIdRef.current}`,
+          { ...payload, publishNow: undefined },
+        );
+        if (publishNow) {
+          const publishedMission = await api.post<Mission>(`/missions/${draftMissionIdRef.current}/publish`);
+          setCreatedMission(publishedMission);
+        } else {
+          setCreatedMission(updatedMission);
+        }
       } else {
         const mission = await api.post<Mission>('/missions', payload);
         setCreatedMission(mission);
       }
+      window.sessionStorage.removeItem('medilink_establishment_intent');
     } catch (e: any) {
       setError(e.message);
       hasSubmittedRef.current = false;
@@ -707,8 +798,14 @@ export default function NewMissionPage() {
         />
         <Card className="card-highlight">
           <h2>{createdMission.title}</h2>
-          <p>Copiez ce lien pour le partager avec un candidat ou dans un message.</p>
-          <MissionShareActions missionId={createdMission.id} showUrl showPublicLink={false} />
+          {createdMission.status === 'PUBLISHED' ? (
+            <>
+              <p>Copiez ce lien pour le partager avec un candidat ou dans un message.</p>
+              <MissionShareActions missionId={createdMission.id} showUrl showPublicLink={false} />
+            </>
+          ) : (
+            <p>Le brouillon reste privé. Vous pourrez le reprendre et le publier depuis la liste de vos missions.</p>
+          )}
           <div className="actions" style={{ marginTop: 12 }}>
             <LinkButton href="/establishment/missions">Voir mes missions</LinkButton>
             <Button type="button" variant="light" onClick={resetWizard}>Créer une autre mission</Button>
@@ -754,6 +851,7 @@ export default function NewMissionPage() {
         {billingNotice ? (
           <Alert type={billingReturnStatus === 'cancelled' ? 'info' : 'success'}>{billingNotice}</Alert>
         ) : null}
+        {landingIntentNotice ? <Alert type="info">{landingIntentNotice}</Alert> : null}
         {billingStatus.hasActiveSubscription ? (
           <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
         ) : creditAlertVisible ? (
@@ -773,25 +871,32 @@ export default function NewMissionPage() {
         <Card className="wizard-panel">
           <div className="wizard-progress">
             <div className="toolbar">
-              <div>
+              <div aria-live="polite" aria-atomic="true">
                 <Badge tone="neutral">Étape {step + 1}/{steps.length}</Badge>
                 <strong className="wizard-current-step">{steps[step].title}</strong>
                 <span className="small">{steps[step].helper}</span>
               </div>
-              <div className="wizard-progress-meta">
+              <div className="wizard-progress-meta" role="status" aria-live="polite">
                 <span className="small">{progress}% complété</span>
                 {draftStatus === 'saving' ? <span className="small">Sauvegarde...</span> : null}
                 {draftStatus === 'saved' ? <span className="small">Brouillon sauvegardé</span> : null}
                 {draftStatus === 'error' ? <span className="small">Brouillon non sauvegardé</span> : null}
               </div>
             </div>
-            <div className="progress" aria-label={`Progression ${progress}%`}>
+            <div
+              className="progress"
+              role="progressbar"
+              aria-label="Progression de la création"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={progress}
+            >
               <span style={{ width: `${progress}%` }} />
             </div>
           </div>
 
           <form className="form wizard-form" onSubmit={submit}>
-            {error ? <Alert type="error">{error}</Alert> : null}
+            {error ? <div role="alert"><Alert type="error">{error}</Alert></div> : null}
             <Field label="Établissement rattaché">
               <Select
                 required
@@ -822,10 +927,26 @@ export default function NewMissionPage() {
                 ))}
               </Select>
             </Field>
-            <StepContent step={step} form={form} set={set} />
+            <StepContent step={step} form={form} set={set} headingRef={stepHeadingRef} />
+            {currentStepValidationError ? (
+              <p className="small" id="mission-step-validation" aria-live="polite">
+                À compléter pour continuer : {currentStepValidationError}
+              </p>
+            ) : null}
             <div className="wizard-actions">
               <Button type="button" variant="light" disabled={step === 0 || saving} onClick={previous}>Retour</Button>
-              <Button disabled={saving}>{isLastStep ? (saving ? 'Création...' : 'Créer la mission') : 'Continuer'}</Button>
+              <Button
+                disabled={saving || Boolean(currentStepValidationError) || !selectedEstablishmentId}
+                aria-describedby={currentStepValidationError ? 'mission-step-validation' : undefined}
+              >
+                {isLastStep
+                  ? saving
+                    ? 'Enregistrement...'
+                    : form.publishNow
+                      ? 'Créer et publier'
+                      : 'Enregistrer le brouillon'
+                  : 'Continuer'}
+              </Button>
             </div>
           </form>
         </Card>
@@ -999,7 +1120,7 @@ function PublicationAccessGate({
                       disabled={deletingId !== null}
                       onClick={() => void handleDelete(draft.id)}
                     >
-                      {deletingId === draft.id ? 'Suppression...' : 'Supprimer & libérer'}
+                      {deletingId === draft.id ? 'Suppression...' : 'Supprimer le brouillon'}
                     </Button>
                   </div>
                 </div>
@@ -1116,13 +1237,29 @@ function formatCents(amount: number, currency = 'EUR') {
   }).format(amount / 100);
 }
 
-function StepContent({ step, form, set }: { step: number; form: any; set: (name: string, value: unknown) => void }) {
+function StepContent({
+  step,
+  form,
+  set,
+  headingRef,
+}: {
+  step: number;
+  form: any;
+  set: (name: string, value: unknown) => void;
+  headingRef: RefObject<HTMLHeadingElement>;
+}) {
+  const headingProps = {
+    id: 'mission-step-heading',
+    ref: headingRef,
+    tabIndex: -1,
+  };
+
   if (step === 0) {
     return (
-      <div className="wizard-step-content">
+      <section className="wizard-step-content" aria-labelledby="mission-step-heading">
         <div>
-          <h2>Quel type de mission voulez-vous publier ?</h2>
-          <p>Choisissez le format de la mission.</p>
+          <h2 {...headingProps}>Définissez l'essentiel de la mission</h2>
+          <p>Le format, le profil recherché et un intitulé clair suffisent pour poser le besoin.</p>
         </div>
         <ChoiceSection title="Type de mission">
           <ChoiceGrid
@@ -1131,20 +1268,9 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             onChange={(value) => set('missionType', value)}
           />
         </ChoiceSection>
-      </div>
-    );
-  }
-
-  if (step === 1) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Types de profils recherchés</h2>
-          <p>Choisissez le niveau attendu pour cadrer la recherche des candidats.</p>
-        </div>
         <ChoiceSection title="Types de profils recherchés">
           <MultiChoiceGrid
-            values={form.requiredLevels || []}
+            values={safeArray(form.requiredLevels)}
             options={requiredLevelOptions}
             onChange={(values) => {
               set('requiredLevels', values);
@@ -1152,240 +1278,328 @@ function StepContent({ step, form, set }: { step: number; form: any; set: (name:
             }}
           />
         </ChoiceSection>
-      </div>
+        <Field label="Titre de la mission">
+          <Input
+            required
+            value={form.title || ''}
+            onChange={(e) => set('title', e.target.value)}
+            placeholder="Remplacement courte durée - journée"
+          />
+        </Field>
+        <SingleChoiceField
+          required
+          label="Spécialité"
+          value={form.specialty || ''}
+          options={specialtyOptions}
+          onChange={(value) => set('specialty', value)}
+        />
+      </section>
+    );
+  }
+
+  if (step === 1) {
+    return (
+      <section className="wizard-step-content" aria-labelledby="mission-step-heading">
+        <div>
+          <h2 {...headingProps}>Présentez le contexte de travail</h2>
+          <p>Commencez par l'activité. Les précisions d'organisation restent disponibles sans alourdir l'écran.</p>
+        </div>
+        <Field label="Description">
+          <Textarea
+            value={form.description || ''}
+            onChange={(e) => set('description', e.target.value)}
+            placeholder="Contexte, équipe sur place, attentes principales..."
+          />
+        </Field>
+        <SingleChoiceField
+          label="Cadre d'exercice"
+          value={form.practiceSetting || ''}
+          options={practiceSettingOptions}
+          onChange={(value) => set('practiceSetting', value)}
+        />
+        <MultiChoiceTextField
+          label="Département / service / type de cabinet"
+          value={form.departmentInfo || ''}
+          options={establishmentDepartmentOptions}
+          onChange={(value) => set('departmentInfo', value)}
+        />
+        <MultiChoiceTextField
+          label="Logiciel utilisé"
+          value={form.softwareUsed || ''}
+          options={softwareOptions}
+          onChange={(value) => set('softwareUsed', value)}
+        />
+        <MultiChoiceField
+          label="Actes attendus"
+          values={safeArray(form.requiredActs)}
+          options={missionActOptions}
+          onChange={(values) => set('requiredActs', values)}
+        />
+
+        <ProgressiveDisclosure title="Organisation et patientèle">
+          <Field label="Présence de secrétaire">
+            <Select
+              value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
+              onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
+            >
+              <option value="">Non précisé</option>
+              <option value="true">Oui</option>
+              <option value="false">Non</option>
+            </Select>
+          </Field>
+          <SingleChoiceField
+            label="Type de secrétariat"
+            value={form.secretaryType || ''}
+            options={secretaryTypeOptions}
+            onChange={(value) => set('secretaryType', value)}
+          />
+          <MultiChoiceTextField
+            label="Type de patientèle"
+            value={form.patientType || ''}
+            options={patientTypeOptions}
+            onChange={(value) => set('patientType', value)}
+          />
+          <div className="form-row">
+            <Field label="Patients par jour en moyenne">
+              <NumberStepper
+                min={0}
+                step={1}
+                value={form.averagePatientsPerDay ?? ''}
+                onChange={(value) => set('averagePatientsPerDay', value)}
+                placeholder="Ex : 25"
+              />
+            </Field>
+            <Field label="Cabinet pluridisciplinaire">
+              <Select
+                value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
+                onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
+              >
+                <option value="">Non précisé</option>
+                <option value="true">Oui</option>
+                <option value="false">Non</option>
+              </Select>
+            </Field>
+          </div>
+        </ProgressiveDisclosure>
+
+        <ProgressiveDisclosure title="Équipe et équipement">
+          <MultiChoiceField
+            label="Matériel disponible"
+            values={safeArray(form.equipmentAvailable)}
+            options={equipmentOptions}
+            onChange={(values) => set('equipmentAvailable', values)}
+          />
+          <Field label="Équipe sur place">
+            <Textarea
+              value={form.teamInfo || ''}
+              onChange={(e) => set('teamInfo', e.target.value)}
+              placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..."
+            />
+          </Field>
+          <Field label="Compléments sur le matériel">
+            <Textarea
+              value={form.equipmentInfo || ''}
+              onChange={(e) => set('equipmentInfo', e.target.value)}
+              placeholder="Échographe, radio, box dédiés, aide opératoire..."
+            />
+          </Field>
+        </ProgressiveDisclosure>
+      </section>
     );
   }
 
   if (step === 2) {
     return (
-      <div className="wizard-step-content">
+      <section className="wizard-step-content" aria-labelledby="mission-step-heading">
         <div>
-          <h2>Résumez le besoin médical</h2>
-          <p>Un titre clair et une spécialité précise aident les bons profils à se projeter.</p>
+          <h2 {...headingProps}>Situez la mission</h2>
+          <p>La ville est publique. L'adresse et les conditions d'accueil peuvent être précisées selon le besoin.</p>
         </div>
-        <Field label="Titre de la mission">
-          <Input required value={form.title || ''} onChange={(e) => set('title', e.target.value)} placeholder="Remplacement courte durée - journée" />
+        <SingleChoiceField
+          required
+          label="Ville"
+          value={form.city || ''}
+          options={cityOptions}
+          onChange={(value) => set('city', value)}
+        />
+        <SingleChoiceField
+          label="Secteur conventionné"
+          value={form.sector || ''}
+          options={sectorOptions}
+          onChange={(value) => set('sector', value)}
+        />
+        <Field label="Lieu précis">
+          <Input
+            value={form.location || ''}
+            onChange={(e) => set('location', e.target.value)}
+            placeholder="Service, adresse ou site"
+          />
         </Field>
-        <SingleChoiceField required label="Spécialité" value={form.specialty || ''} options={specialtyOptions} onChange={(value) => set('specialty', value)} />
-      </div>
+        <ProgressiveDisclosure title="Accueil, hébergement et accès">
+          <ChoiceSection title="Options d'accueil">
+            <BooleanChoice
+              label="Logement proposé"
+              value={form.accommodationProvided}
+              onChange={(value) => set('accommodationProvided', value)}
+            />
+            <BooleanChoice
+              label="Parking disponible"
+              value={form.parkingAvailable}
+              onChange={(value) => set('parkingAvailable', value)}
+            />
+          </ChoiceSection>
+          <Field label="Informations pratiques d'accès">
+            <Textarea
+              value={form.practicalInfo || ''}
+              onChange={(e) => set('practicalInfo', e.target.value)}
+              placeholder="Accès badge, entrée de nuit, transports, contact à l'arrivée..."
+            />
+          </Field>
+        </ProgressiveDisclosure>
+      </section>
     );
   }
 
   if (step === 3) {
+    const minimumDate = tomorrowDateInput();
+    const minimumEndDate = form.startDate && form.startDate > minimumDate ? form.startDate : minimumDate;
     return (
-      <div className="wizard-step-content">
+      <section className="wizard-step-content" aria-labelledby="mission-step-heading">
         <div>
-          <h2>Description de la mission</h2>
-          <p>Précisez les attentes générales ou le type d'activité.</p>
+          <h2 {...headingProps}>Cadrez le planning et la rémunération</h2>
+          <p>Des dates cohérentes et des conditions lisibles évitent les échanges inutiles avant candidature.</p>
         </div>
-        <Field label="Description">
-          <Textarea value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder="Contexte, équipe sur place, attentes principales..." />
-        </Field>
-      </div>
+        <div className="form-row">
+          <Field label="Date de début">
+            <Input
+              type="date"
+              required
+              min={minimumDate}
+              value={form.startDate || ''}
+              onChange={(e) => {
+                const nextStartDate = e.target.value;
+                set('startDate', nextStartDate);
+                if (form.endDate && form.endDate < nextStartDate) set('endDate', '');
+              }}
+            />
+          </Field>
+          <Field label="Date de fin">
+            <Input
+              type="date"
+              min={minimumEndDate}
+              value={form.endDate || ''}
+              onChange={(e) => set('endDate', e.target.value)}
+            />
+          </Field>
+        </div>
+        <div className="form-row">
+          <Field label="Heure de début">
+            <Input type="time" value={form.startTime || ''} onChange={(e) => set('startTime', e.target.value)} />
+          </Field>
+          <Field label="Heure de fin">
+            <Input type="time" value={form.endTime || ''} onChange={(e) => set('endTime', e.target.value)} />
+          </Field>
+        </div>
+        <div className="form-row">
+          <Field label="Durée estimée en heures">
+            <NumberStepper
+              min={1}
+              max={72}
+              step={1}
+              value={form.durationHours || ''}
+              onChange={(value) => set('durationHours', value)}
+            />
+          </Field>
+          <SingleChoiceField
+            label="Format de durée"
+            value={safeArray(form.preferredDurations)[0] || ''}
+            options={durationOptions}
+            onChange={(value) => set('preferredDurations', value ? [value] : [])}
+          />
+        </div>
+        <div className="form-row">
+          <Field label="Pourcentage de rétrocession">
+            <NumberStepper
+              min={1}
+              max={100}
+              step={1}
+              value={form.retrocessionPercentage || ''}
+              onChange={(value) => set('retrocessionPercentage', value)}
+              suffix="%"
+            />
+          </Field>
+          <Field label="Rémunération minimale indicative">
+            <NumberStepper
+              min={0}
+              max={100}
+              step={1}
+              value={form.minimumCompensation ?? ''}
+              onChange={(value) => set('minimumCompensation', value)}
+              placeholder="Ex : 70"
+              suffix="%"
+            />
+          </Field>
+        </div>
+      </section>
     );
   }
 
   if (step === 4) {
     return (
-      <div className="wizard-step-content">
+      <section className="wizard-step-content" aria-labelledby="mission-step-heading">
         <div>
-          <h2>Service et outils</h2>
-          <p>Indiquez le cadre de travail et les logiciels utilisés au quotidien.</p>
+          <h2 {...headingProps}>Choisissez la visibilité</h2>
+          <p>Les tags restent facultatifs. Le statut choisi ici détermine réellement si la mission est publiée ou privée.</p>
         </div>
-        <SingleChoiceField label="Cadre d'exercice" value={form.practiceSetting || ''} options={practiceSettingOptions} onChange={(value) => set('practiceSetting', value)} />
-        <MultiChoiceTextField label="Département / service / type de cabinet" value={form.departmentInfo || ''} options={establishmentDepartmentOptions} onChange={(value) => set('departmentInfo', value)} />
-        <MultiChoiceTextField label="Logiciel utilisé" value={form.softwareUsed || ''} options={softwareOptions} onChange={(value) => set('softwareUsed', value)} />
-        <MultiChoiceField label="Actes attendus" values={safeArray(form.requiredActs)} options={missionActOptions} onChange={(values) => set('requiredActs', values)} />
-      </div>
-    );
-  }
-
-  if (step === 5) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Secrétariat et patientèle</h2>
-          <p>Indiquez la présence de secrétariat et le type de patients.</p>
-        </div>
-        <Field label="Présence de secrétaire">
-          <Select
-            value={form.hasSecretary === true ? 'true' : form.hasSecretary === false ? 'false' : ''}
-            onChange={(e) => set('hasSecretary', e.target.value === '' ? undefined : e.target.value === 'true')}
+        <Field label="Tags, séparés par des virgules">
+          <Input
+            value={form.tagsText || ''}
+            onChange={(e) => set('tagsText', e.target.value)}
+            placeholder="urgent, nuit, week-end"
+          />
+        </Field>
+        <MultiChoiceField
+          label="Types de missions associés"
+          values={safeArray(form.acceptedMissionTypes)}
+          options={acceptedMissionTypeOptions}
+          onChange={(values) => set('acceptedMissionTypes', values)}
+        />
+        <div className="publish-choice" role="group" aria-label="Statut après enregistrement">
+          <button
+            type="button"
+            className={form.publishNow ? 'active' : ''}
+            aria-pressed={form.publishNow === true}
+            onClick={() => set('publishNow', true)}
           >
-            <option value="">Non précisé</option>
-            <option value="true">Oui</option>
-            <option value="false">Non</option>
-          </Select>
-        </Field>
-        <SingleChoiceField label="Type de secretariat" value={form.secretaryType || ''} options={secretaryTypeOptions} onChange={(value) => set('secretaryType', value)} />
-        <MultiChoiceTextField label="Type de patientèle" value={form.patientType || ''} options={patientTypeOptions} onChange={(value) => set('patientType', value)} />
-      </div>
-    );
-  }
-
-  if (step === 6) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Activité et équipement</h2>
-          <p>Indiquez la charge moyenne de travail et le matériel disponible.</p>
-        </div>
-        <div className="form-row">
-          <Field label="Patients par jour en moyenne">
-            <NumberStepper min={0} step={1} value={form.averagePatientsPerDay ?? ''} onChange={(value) => set('averagePatientsPerDay', value)} placeholder="Ex : 25" />
-          </Field>
-          <Field label="Cabinet pluridisciplinaire">
-            <Select
-              value={form.isMultidisciplinary === true ? 'true' : form.isMultidisciplinary === false ? 'false' : ''}
-              onChange={(e) => set('isMultidisciplinary', e.target.value === '' ? undefined : e.target.value === 'true')}
-            >
-              <option value="">Non precise</option>
-              <option value="true">Oui</option>
-              <option value="false">Non</option>
-            </Select>
-          </Field>
-        </div>
-        <MultiChoiceField label="Materiel disponible" values={safeArray(form.equipmentAvailable)} options={equipmentOptions} onChange={(values) => set('equipmentAvailable', values)} />
-      </div>
-    );
-  }
-
-  if (step === 7) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Informations complémentaires</h2>
-          <p>Ajoutez des détails sur l'équipe présente ou le matériel disponible.</p>
-        </div>
-        <Field label="Équipe sur place">
-          <Textarea value={form.teamInfo || ''} onChange={(e) => set('teamInfo', e.target.value)} placeholder="Médecin senior joignable, IDE de nuit, secrétariat présent..." />
-        </Field>
-        <Field label="Matériel disponible">
-          <Textarea value={form.equipmentInfo || ''} onChange={(e) => set('equipmentInfo', e.target.value)} placeholder="Échographe, radio, box dédiés, aide opératoire..." />
-        </Field>
-      </div>
-    );
-  }
-
-  if (step === 8) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Où se déroule la mission ?</h2>
-          <p>La ville est visible publiquement. Le lieu précis peut rester sobre si besoin.</p>
-        </div>
-        <SingleChoiceField required label="Ville" value={form.city || ''} options={cityOptions} onChange={(value) => set('city', value)} />
-        <SingleChoiceField label="Secteur conventionné" value={form.sector || ''} options={sectorOptions} onChange={(value) => set('sector', value)} />
-        <Field label="Lieu précis">
-          <Input value={form.location || ''} onChange={(e) => set('location', e.target.value)} placeholder="Service, adresse ou site" />
-        </Field>
-      </div>
-    );
-  }
-
-  if (step === 9) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Hébergement et accès</h2>
-          <p>Précisez les conditions d'accueil et d'accès pour les candidats.</p>
-        </div>
-        <ChoiceSection title="Options d'accueil">
-          <BooleanChoice
-            label="Logement nécessaire"
-            value={form.accommodationProvided}
-            onChange={(value) => set('accommodationProvided', value)}
-          />
-          <BooleanChoice
-            label="Parking disponible"
-            value={form.parkingAvailable}
-            onChange={(value) => set('parkingAvailable', value)}
-          />
-        </ChoiceSection>
-        <Field label="Infos pratiques d'accès">
-          <Textarea value={form.practicalInfo || ''} onChange={(e) => set('practicalInfo', e.target.value)} placeholder="Accès badge, entrée de nuit, transports, contact à l'arrivée..." />
-        </Field>
-      </div>
-    );
-  }
-
-  if (step === 10) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Quel est le planning ?</h2>
-          <p>Indiquez les dates et horaires utiles pour éviter les allers-retours.</p>
-        </div>
-        <div className="form-row">
-          <Field label="Date début"><Input type="date" required value={form.startDate || ''} onChange={(e) => set('startDate', e.target.value)} /></Field>
-          <Field label="Date fin"><Input type="date" value={form.endDate || ''} onChange={(e) => set('endDate', e.target.value)} /></Field>
-        </div>
-        <div className="form-row">
-          <Field label="Heure début">
-            <Input type="time" value={form.startTime || ''} onChange={(e) => set('startTime', e.target.value)} />
-          </Field>
-          <Field label="Heure fin">
-            <Input type="time" value={form.endTime || ''} onChange={(e) => set('endTime', e.target.value)} />
-          </Field>
-        </div>
-      </div>
-    );
-  }
-
-  if (step === 11) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Durée et rémunération</h2>
-          <p>Indiquez la durée de la mission, le taux de rétrocession et la rémunération minimale en pourcentage.</p>
-        </div>
-        <Field label="Durée estimée en heures">
-          <NumberStepper min={1} max={72} step={1} value={form.durationHours || ''} onChange={(value) => set('durationHours', value)} />
-        </Field>
-        <SingleChoiceField label="Format de durée" value={form.preferredDuration || ''} options={durationOptions} onChange={(value) => set('preferredDuration', value)} />
-        <Field label="Pourcentage de rétrocession">
-          <NumberStepper min={1} max={100} step={1} value={form.retrocessionPercentage || ''} onChange={(value) => set('retrocessionPercentage', value)} suffix="%" />
-        </Field>
-        <Field label="Rémunération minimale indicative (%)">
-          <NumberStepper min={0} max={100} step={1} value={form.minimumCompensation ?? ''} onChange={(value) => set('minimumCompensation', value)} placeholder="Ex : 70" suffix="%" />
-        </Field>
-      </div>
-    );
-  }
-
-  if (step === 12) {
-    return (
-      <div className="wizard-step-content">
-        <div>
-          <h2>Mode de publication</h2>
-          <p>Ajoutez quelques tags de recherche, puis choisissez le statut de publication.</p>
-        </div>
-        <Field label="Tags, séparés par virgule">
-          <Input value={form.tagsText || ''} onChange={(e) => set('tagsText', e.target.value)} placeholder="urgent, nuit, week-end" />
-        </Field>
-        <MultiChoiceField label="Types de missions associés" values={form.acceptedMissionTypes || []} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-        <div className="publish-choice">
-          <button type="button" className={form.publishNow ? 'active' : ''} onClick={() => set('publishNow', true)}>
             <strong>Publier maintenant</strong>
-            <span>La mission sera visible et partageable tout de suite.</span>
+            <span>La mission sera visible et partageable dès la validation.</span>
           </button>
-          <button type="button" className={!form.publishNow ? 'active' : ''} onClick={() => set('publishNow', false)}>
+          <button
+            type="button"
+            className={!form.publishNow ? 'active' : ''}
+            aria-pressed={form.publishNow === false}
+            onClick={() => set('publishNow', false)}
+          >
             <strong>Garder en brouillon</strong>
-            <span>Vous pourrez finaliser avant de la rendre publique.</span>
+            <span>La mission restera privée et aucun appel de publication ne sera effectué.</span>
           </button>
         </div>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="wizard-step-content">
+    <section className="wizard-step-content" aria-labelledby="mission-step-heading">
       <div>
-        <h2>Vérifiez avant publication</h2>
-        <p>Si tout est bon, créez la mission. Le lien partageable sera affiché juste après.</p>
+        <h2 {...headingProps}>Vérifiez avant d'enregistrer</h2>
+        <p>
+          {form.publishNow
+            ? 'La mission sera publiée immédiatement après cette validation.'
+            : 'La mission restera en brouillon privé jusqu’à une publication volontaire.'}
+        </p>
       </div>
       <MissionDraftSummary form={form} compact />
-    </div>
+    </section>
   );
 }
 
@@ -1449,6 +1663,17 @@ function ChoiceSection({ title, children }: { title: string; children: ReactNode
   );
 }
 
+function ProgressiveDisclosure({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="choice-section">
+      <summary className="choice-section-title">{title} (facultatif)</summary>
+      <div className="wizard-step-content" style={{ paddingTop: 12 }}>
+        {children}
+      </div>
+    </details>
+  );
+}
+
 function safeArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 }
@@ -1473,6 +1698,7 @@ function ChoiceGrid({
           key={option.value}
           type="button"
           className={value === option.value ? 'active' : ''}
+          aria-pressed={value === option.value}
           onClick={() => onChange(option.value)}
         >
           {option.label}
@@ -1532,6 +1758,7 @@ function BooleanChoice({
         <button
           type="button"
           className={value === true ? 'active' : ''}
+          aria-pressed={value === true}
           onClick={() => onChange(true)}
         >
           Oui
@@ -1539,6 +1766,7 @@ function BooleanChoice({
         <button
           type="button"
           className={value === false ? 'active' : ''}
+          aria-pressed={value === false}
           onClick={() => onChange(false)}
         >
           Non

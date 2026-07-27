@@ -3,16 +3,14 @@ import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
-  title: 'Médilink — Missions médicales courtes, sécurisées',
+  title: 'Médilink — Missions médicales courtes',
   description:
-    'Médilink centralise les missions courtes, candidatures, documents et paiements sécurisés entre établissements et professionnels de santé.',
+    'Médilink centralise les missions courtes, candidatures, documents et suivi des rétrocessions entre établissements et professionnels de santé.',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

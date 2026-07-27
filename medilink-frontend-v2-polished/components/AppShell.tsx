@@ -2,8 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  canAccessAdminPath,
+  canAccessEstablishmentPath,
+  hasEstablishmentCapability,
+  workspaceHomeForRole,
+} from '@/lib/access-control';
 import { api, getApiCacheSync, primeApiCache, subscribeApiCache } from '@/lib/api';
+import { establishmentDashboardPath } from '@/lib/establishment-context';
 import { formatDateTime } from '@/lib/format';
 import { candidateAreaLabel } from '@/lib/grammar';
 import { roleLabel } from '@/lib/labels';
@@ -21,9 +28,10 @@ import {
   restoreNotificationsCache,
 } from '@/lib/notification-cache';
 import { formatNotificationText } from '@/lib/notification-text';
-import type { CandidateDashboardData, Conversation, Establishment, EstablishmentBillingStatus, EstablishmentDashboardData, Notification, Profile } from '@/lib/types';
+import type { CandidateDashboardData, Conversation, EstablishmentBillingStatus, EstablishmentDashboardData, Notification, Profile, UserRole } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
+import { EstablishmentContextSwitcher, useOptionalEstablishments } from './EstablishmentSelector';
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -52,6 +60,10 @@ const adminNav: NavItem[] = [
   { href: '/admin/establishments', label: 'Établissements', icon: 'E' },
   { href: '/admin/missions', label: 'Missions', icon: 'M' },
   { href: '/admin/matching', label: 'Matching', icon: 'S' },
+];
+
+const supportNav: NavItem[] = [
+  { href: '/admin/account', label: 'Mon compte', icon: 'C' },
 ];
 
 const WARMED_PATH_TTL_MS = 60_000;
@@ -97,14 +109,14 @@ function primeCandidateDashboard(data: CandidateDashboardData) {
   primeNotificationsCache(data.notifications);
 }
 
-function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
+function primeEstablishmentDashboard(data: EstablishmentDashboardData, warmBilling: boolean) {
   if (data.establishment) {
-    primeApiCache('/establishments/me', [data.establishment]);
     primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
     primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
-    warmApi([`/billing/establishments/${data.establishment.id}/status`]);
+    if (warmBilling) {
+      warmApi([`/billing/establishments/${data.establishment.id}/status`]);
+    }
   }
-  primeApiCache('/conversations', data.conversations);
 }
 
 function warmCandidateWorkspace() {
@@ -124,18 +136,24 @@ function warmCandidateWorkspace() {
   ]);
 }
 
-function warmEstablishmentWorkspace() {
-  void api.get<EstablishmentDashboardData>('/establishment/dashboard')
-    .then(primeEstablishmentDashboard)
-    .catch(() => undefined);
-  void api.get<Array<{ id: string }>>('/establishments/me')
-    .then((items) => {
-      items.slice(0, 3).forEach((item) => warmApi([
-        `/billing/establishments/${item.id}/status`,
-        `/missions/mine?establishmentId=${item.id}`,
-      ]));
-    })
-    .catch(() => undefined);
+function warmEstablishmentWorkspace({
+  establishmentId,
+  canViewRecruitment,
+  canManageBilling,
+}: {
+  establishmentId?: string;
+  canViewRecruitment: boolean;
+  canManageBilling: boolean;
+}) {
+  if (establishmentId && canViewRecruitment) {
+    void api.get<EstablishmentDashboardData>(establishmentDashboardPath(establishmentId))
+      .then((data) => primeEstablishmentDashboard(data, canManageBilling))
+      .catch(() => undefined);
+    warmApi([`/missions/mine?establishmentId=${establishmentId}`]);
+  }
+  if (establishmentId && canManageBilling) {
+    warmApi([`/billing/establishments/${establishmentId}/status`]);
+  }
   void api.get<Conversation[]>('/conversations')
     .then((items) => items.slice(0, 3).forEach((item) => api.preload(`/conversations/${item.id}/messages`)))
     .catch(() => undefined);
@@ -146,7 +164,11 @@ function warmEstablishmentWorkspace() {
   ]);
 }
 
-function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: string) {
+function warmPathsForRoute(
+  area: 'candidate' | 'establishment' | 'admin',
+  href: string,
+  establishmentId?: string,
+) {
   if (area === 'candidate') {
     if (href === '/app/dashboard') return ['/me/dashboard'];
     if (href === '/app/search') return ['/missions?limit=50'];
@@ -159,8 +181,11 @@ function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: 
   }
 
   if (area === 'establishment') {
-    if (href === '/establishment/dashboard') return ['/establishment/dashboard'];
-    if (href === '/establishment/missions/new') return ['/establishment/dashboard', '/establishments/me'];
+    const dashboardPath = establishmentId ? establishmentDashboardPath(establishmentId) : null;
+    if (href === '/establishment/dashboard') return dashboardPath ? [dashboardPath] : ['/establishments/me'];
+    if (href === '/establishment/missions/new') {
+      return dashboardPath ? [dashboardPath, '/establishments/me'] : ['/establishments/me'];
+    }
     if (href === '/establishment/notifications') return ['/notifications'];
     if (href === '/establishment/messages') return ['/conversations'];
     if (
@@ -170,16 +195,21 @@ function warmPathsForRoute(area: 'candidate' | 'establishment' | 'admin', href: 
       href === '/establishment/billing' ||
       href === '/establishment/onboarding'
     ) {
-      return ['/establishment/dashboard', '/conversations'];
+      return dashboardPath ? [dashboardPath, '/conversations'] : ['/establishments/me', '/conversations'];
     }
   }
 
   return [];
 }
 
-function areaLabel(area: 'candidate' | 'establishment' | 'admin', profile?: Pick<Profile, 'candidateGender'> | null) {
+function areaLabel(
+  area: 'candidate' | 'establishment' | 'admin',
+  profile?: Pick<Profile, 'candidateGender'> | null,
+  role?: UserRole,
+) {
   if (area === 'candidate') return candidateAreaLabel(profile);
   if (area === 'establishment') return 'Espace établissement';
+  if (role === 'MEDILINK_SUPPORT') return 'Support Médilink';
   return 'Administration';
 }
 
@@ -188,10 +218,14 @@ function initials(email?: string) {
   return email.slice(0, 1).toUpperCase();
 }
 
-function profileHref(area: 'candidate' | 'establishment' | 'admin') {
+function profileHref(area: 'candidate' | 'establishment' | 'admin', role?: UserRole) {
   if (area === 'candidate') return '/app/profile';
-  if (area === 'establishment') return '/establishment/onboarding';
-  return '/admin/users';
+  if (area === 'establishment') {
+    return hasEstablishmentCapability(role, 'manage_establishment')
+      ? '/establishment/onboarding'
+      : null;
+  }
+  return role === 'MEDILINK_ADMIN' ? '/admin/users' : null;
 }
 
 function accountHref(area: 'candidate' | 'establishment' | 'admin') {
@@ -200,13 +234,16 @@ function accountHref(area: 'candidate' | 'establishment' | 'admin') {
   return '/admin/account';
 }
 
-function homeHref(area: 'candidate' | 'establishment' | 'admin') {
+function homeHref(area: 'candidate' | 'establishment' | 'admin', role?: UserRole) {
   if (area === 'candidate') return '/app/dashboard';
-  if (area === 'establishment') return '/establishment/dashboard';
-  return '/admin/dashboard';
+  return workspaceHomeForRole(role);
 }
 
-function getNotificationLink(notification: Notification, area: 'candidate' | 'establishment' | 'admin') {
+function getNotificationLink(
+  notification: Notification,
+  area: 'candidate' | 'establishment' | 'admin',
+  role?: UserRole,
+) {
   if (!notification.data) return null;
   const data = notification.data as Record<string, any>;
   if (data.conversationId) {
@@ -215,7 +252,9 @@ function getNotificationLink(notification: Notification, area: 'candidate' | 'es
   }
   if (data.missionId) {
     if (area === 'candidate') return getCandidateMissionPath(String(data.missionId));
-    if (area === 'establishment') return '/establishment/missions?tab=applications';
+    if (area === 'establishment' && hasEstablishmentCapability(role, 'view_recruitment')) {
+      return '/establishment/missions?tab=applications';
+    }
   }
   return null;
 }
@@ -266,6 +305,12 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const establishmentContext = useOptionalEstablishments();
+  const selectedEstablishment = establishmentContext?.primary || null;
+  const selectedEstablishmentId = selectedEstablishment?.id;
+  const canViewRecruitment = hasEstablishmentCapability(user?.role, 'view_recruitment');
+  const canCreateMission = hasEstablishmentCapability(user?.role, 'create_mission');
+  const canManageBilling = hasEstablishmentCapability(user?.role, 'manage_billing');
   const [candidateProfile, setCandidateProfile] = useState<Profile | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -279,10 +324,17 @@ export function AppShell({
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const notificationsRef = useRef<HTMLDivElement | null>(null);
   const creditsRef = useRef<HTMLDivElement | null>(null);
-  const nav = area === 'candidate' ? candidateNav : area === 'establishment' ? establishmentNav : adminNav;
-  const userProfileHref = profileHref(area);
+  const nav = useMemo(() => {
+    if (area === 'candidate') return candidateNav;
+    if (area === 'establishment') {
+      return establishmentNav.filter((item) => canAccessEstablishmentPath(user?.role, item.href));
+    }
+    if (user?.role === 'MEDILINK_SUPPORT') return supportNav;
+    return adminNav.filter((item) => canAccessAdminPath(user?.role, item.href));
+  }, [area, user?.role]);
+  const userProfileHref = profileHref(area, user?.role);
   const userAccountHref = accountHref(area);
-  const userHomeHref = homeHref(area);
+  const userHomeHref = homeHref(area, user?.role);
   const unreadNotifications = notifications.filter((notification) => !notification.readAt).length;
 
   const [resendingEmail, setResendingEmail] = useState(false);
@@ -370,41 +422,38 @@ export function AppShell({
 
   function warmRoute(href: string) {
     router.prefetch(href);
-    warmApi(warmPathsForRoute(area, href));
+    warmApi(warmPathsForRoute(area, href, selectedEstablishmentId));
     if (area === 'candidate') warmCandidateWorkspace();
-    if (area === 'establishment') warmEstablishmentWorkspace();
+    if (area === 'establishment') {
+      warmEstablishmentWorkspace({
+        establishmentId: selectedEstablishmentId,
+        canViewRecruitment,
+        canManageBilling,
+      });
+    }
   }
 
   async function loadPublicationCredits(options: { reload?: boolean } = {}) {
-    if (area !== 'establishment') {
+    if (area !== 'establishment' || !selectedEstablishment || !canManageBilling) {
       setPublicationCredits({ available: 0, establishments: [] });
       return;
     }
 
     try {
-      const establishments = options.reload
-        ? await api.reload<Establishment[]>('/establishments/me')
-        : await api.get<Establishment[]>('/establishments/me');
-
-      const statuses = await Promise.all(
-        establishments.map(async (establishment) => {
-          const path = `/billing/establishments/${establishment.id}/status`;
-          const cached = getApiCacheSync<EstablishmentBillingStatus>(path);
-          const status = cached || (options.reload
-            ? await api.reload<EstablishmentBillingStatus>(path)
-            : await api.get<EstablishmentBillingStatus>(path));
-
-          return {
-            id: establishment.id,
-            name: establishment.name,
+      const path = `/billing/establishments/${selectedEstablishment.id}/status`;
+      const cached = getApiCacheSync<EstablishmentBillingStatus>(path);
+      const status = options.reload
+        ? await api.reload<EstablishmentBillingStatus>(path)
+        : cached || await api.get<EstablishmentBillingStatus>(path);
+      const visibleCredits = status.availableCredits > 0
+        ? [{
+            id: selectedEstablishment.id,
+            name: selectedEstablishment.name,
             availableCredits: status.availableCredits,
-          };
-        }),
-      );
-
-      const visibleCredits = statuses.filter((status) => status.availableCredits > 0);
+          }]
+        : [];
       setPublicationCredits({
-        available: visibleCredits.reduce((sum, status) => sum + status.availableCredits, 0),
+        available: status.availableCredits,
         establishments: visibleCredits,
       });
     } catch {
@@ -427,6 +476,7 @@ export function AppShell({
 
     function onEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        setMobileNavOpen(false);
         setAccountMenuOpen(false);
         setNotificationsOpen(false);
         setCreditsOpen(false);
@@ -465,14 +515,14 @@ export function AppShell({
   }, [area]);
 
   useEffect(() => {
-    if (area !== 'establishment' || !user) {
+    if (area !== 'establishment' || !user || !selectedEstablishment || !canManageBilling) {
       setCreditsOpen(false);
       setPublicationCredits({ available: 0, establishments: [] });
       return;
     }
 
     void loadPublicationCredits();
-  }, [area, user]);
+  }, [area, canManageBilling, selectedEstablishmentId, user]);
 
   useAutoRefresh(async () => {
     if (area === 'admin') return;
@@ -482,7 +532,7 @@ export function AppShell({
     ]);
     primeNotificationsCache(nextNotifications);
     setConversations(nextConversations);
-    if (area === 'establishment') void loadPublicationCredits({ reload: true });
+    if (area === 'establishment' && canManageBilling) void loadPublicationCredits({ reload: true });
   }, { enabled: Boolean(user) && area !== 'admin' });
 
   useEffect(() => {
@@ -537,9 +587,29 @@ export function AppShell({
       return idleWarm(['/me/dashboard', '/missions?limit=50', '/me/profile', '/me/documents', '/me/applications', '/conversations', '/notifications']);
     }
 
-    prefetchRoutes(router, [...establishmentNav.map((item) => item.href), '/establishment/missions/new']);
-    return idleWarm(['/establishment/dashboard', '/establishments/me', '/conversations', '/notifications']);
-  }, [area, router, user]);
+    const establishmentRoutes = canCreateMission
+      ? [...nav.map((item) => item.href), '/establishment/missions/new']
+      : nav.map((item) => item.href);
+    prefetchRoutes(router, establishmentRoutes);
+
+    const paths = ['/establishments/me', '/conversations', '/notifications'];
+    if (selectedEstablishmentId && canViewRecruitment) {
+      paths.push(establishmentDashboardPath(selectedEstablishmentId));
+    }
+    if (selectedEstablishmentId && canManageBilling) {
+      paths.push(`/billing/establishments/${selectedEstablishmentId}/status`);
+    }
+    return idleWarm(paths);
+  }, [
+    area,
+    canCreateMission,
+    canManageBilling,
+    canViewRecruitment,
+    nav,
+    router,
+    selectedEstablishmentId,
+    user,
+  ]);
 
   useEffect(() => {
     if (!user || area === 'admin') return;
@@ -550,13 +620,17 @@ export function AppShell({
         return;
       }
 
-      warmEstablishmentWorkspace();
+      warmEstablishmentWorkspace({
+        establishmentId: selectedEstablishmentId,
+        canViewRecruitment,
+        canManageBilling,
+      });
     };
 
     if (typeof window === 'undefined') return;
     const id = window.setTimeout(warm, 150);
     return () => window.clearTimeout(id);
-  }, [area, user]);
+  }, [area, canManageBilling, canViewRecruitment, selectedEstablishmentId, user]);
 
   return (
     <div className="shell">
@@ -584,6 +658,7 @@ export function AppShell({
                 key={item.href}
                 href={item.href}
                 className={`sidebar-link ${active ? 'active' : ''}`}
+                aria-current={active ? 'page' : undefined}
                 onFocus={() => warmRoute(item.href)}
                 onMouseEnter={() => warmRoute(item.href)}
                 onClick={() => setMobileNavOpen(false)}
@@ -596,6 +671,8 @@ export function AppShell({
             );
           })}
 
+          {area === 'establishment' ? <EstablishmentContextSwitcher mobile /> : null}
+
           <div className="mobile-menu-account">
             <div className="mobile-menu-user">
               <span className="avatar">{initials(user?.email)}</span>
@@ -606,16 +683,18 @@ export function AppShell({
               </span>
             </div>
             <div className="mobile-menu-actions">
-              <Link
-                href={userProfileHref}
-                className="account-menu-item"
-                onFocus={() => warmRoute(userProfileHref)}
-                onMouseEnter={() => warmRoute(userProfileHref)}
-                onClick={() => setMobileNavOpen(false)}
-              >
-                <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
-                <span className="menu-arrow">&gt;</span>
-              </Link>
+              {userProfileHref ? (
+                <Link
+                  href={userProfileHref}
+                  className="account-menu-item"
+                  onFocus={() => warmRoute(userProfileHref)}
+                  onMouseEnter={() => warmRoute(userProfileHref)}
+                  onClick={() => setMobileNavOpen(false)}
+                >
+                  <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
+                  <span className="menu-arrow">&gt;</span>
+                </Link>
+              ) : null}
               <Link
                 href={userAccountHref}
                 className="account-menu-item"
@@ -642,7 +721,8 @@ export function AppShell({
 
         {area !== 'admin' ? (
           <div className="sidebar-quick-actions">
-          {area === 'establishment' && publicationCredits.available > 0 ? (
+          {area === 'establishment' ? <EstablishmentContextSwitcher /> : null}
+          {area === 'establishment' && canCreateMission && publicationCredits.available > 0 ? (
             <div className="publication-credit-menu-wrap" ref={creditsRef}>
               {creditsOpen ? (
                 <div className="notification-menu publication-credit-menu" role="dialog" aria-label="Credits de publication disponibles">
@@ -741,7 +821,7 @@ export function AppShell({
                     <div className="notification-menu-empty">Aucune notification.</div>
                   ) : (
                     notifications.slice(0, 5).map((notification) => {
-                      const notificationLink = getNotificationLink(notification, area);
+                      const notificationLink = getNotificationLink(notification, area, user?.role);
                       return (
                         <div key={notification.id} className={`notification-menu-item ${notification.readAt ? '' : 'unread'}`}>
                           <div className="notification-menu-item-head">
@@ -837,17 +917,19 @@ export function AppShell({
                 </span>
               </div>
               <div className="account-menu-section">
-                <Link
-                  href={userProfileHref}
-                  className="account-menu-item"
-                  role="menuitem"
-                  onFocus={() => warmRoute(userProfileHref)}
-                  onMouseEnter={() => warmRoute(userProfileHref)}
-                  onClick={() => setAccountMenuOpen(false)}
-                >
-                  <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
-                  <span className="menu-arrow">&gt;</span>
-                </Link>
+                {userProfileHref ? (
+                  <Link
+                    href={userProfileHref}
+                    className="account-menu-item"
+                    role="menuitem"
+                    onFocus={() => warmRoute(userProfileHref)}
+                    onMouseEnter={() => warmRoute(userProfileHref)}
+                    onClick={() => setAccountMenuOpen(false)}
+                  >
+                    <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
+                    <span className="menu-arrow">&gt;</span>
+                  </Link>
+                ) : null}
                 <Link
                   href={userAccountHref}
                   className="account-menu-item"
@@ -906,7 +988,7 @@ export function AppShell({
         {area === 'admin' ? (
           <header className="topbar">
             <div className="topbar-title">
-              <strong>{areaLabel(area, candidateProfile)}</strong>
+              <strong>{areaLabel(area, candidateProfile, user?.role)}</strong>
               <div className="small">Plateforme MediLink</div>
             </div>
           </header>

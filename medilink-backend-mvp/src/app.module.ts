@@ -19,6 +19,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { ProfilesModule } from './modules/profiles/profiles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UsersModule } from './modules/users/users.module';
+import { WorkspaceNotesModule } from './modules/workspace-notes/workspace-notes.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { UsersModule } from './modules/users/users.module';
     ConversationsModule,
     DashboardModule,
     AdminModule,
+    WorkspaceNotesModule,
   ],
   providers: [
     {

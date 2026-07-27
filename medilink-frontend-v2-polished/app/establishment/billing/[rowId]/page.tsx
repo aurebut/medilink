@@ -91,10 +91,10 @@ function buildMissionRows(conversations: Conversation[], classifiedIds: string[]
 function agreementLabelRecruiter(status?: string | null) {
   const labels: Record<string, string> = {
     PROPOSED: 'Proposition envoyée',
-    PAYMENT_REQUIRED: 'Règlement requis',
-    FUNDS_SECURED: 'Fonds sécurisés',
+    PAYMENT_REQUIRED: 'Accord à confirmer',
+    FUNDS_SECURED: 'Mission confirmée',
     COMPLETED: 'Mission terminée',
-    PAYMENT_RELEASED: 'Versement libéré',
+    PAYMENT_RELEASED: 'Rétrocession validée',
     REJECTED: 'Proposition refusée',
     CANCELLED: 'Annulée',
     DISPUTED: 'Litige',
@@ -105,9 +105,9 @@ function agreementLabelRecruiter(status?: string | null) {
 
 function agreementNextStepRecruiter(status?: string | null) {
   if (status === 'PROPOSED') return 'Attente réponse candidat';
-  if (status === 'PAYMENT_REQUIRED') return 'Procéder au paiement';
+  if (status === 'PAYMENT_REQUIRED') return 'Confirmer la mission';
   if (status === 'FUNDS_SECURED') return 'Mission en cours / à réaliser';
-  if (status === 'COMPLETED') return 'Valider et libérer le versement';
+  if (status === 'COMPLETED') return 'Valider la rétrocession déclarée';
   if (status === 'PAYMENT_RELEASED') return 'Facture disponible';
   if (status === 'REJECTED') return 'Reprendre l’échange';
   if (status === 'CANCELLED' || status === 'EXPIRED') return 'Clôturée';
@@ -125,7 +125,7 @@ function timelineSteps(row: AccountingRow) {
   return [
     { key: 'proposal', label: 'Proposition', done: Boolean(status), active: status === 'PROPOSED' },
     { key: 'agreement', label: 'Accord', done: Boolean(status && !['PROPOSED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(status)), active: status === 'PAYMENT_REQUIRED' },
-    { key: 'confirmed', label: 'Sécurisée', done: Boolean(status && ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'FUNDS_SECURED' },
+    { key: 'confirmed', label: 'Confirmée', done: Boolean(status && ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'FUNDS_SECURED' },
     { key: 'completed', label: 'Réalisée', done: Boolean(status && ['COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'COMPLETED' },
     { key: 'released', label: 'Versement', done: status === 'PAYMENT_RELEASED', active: false },
     { key: 'classified', label: 'Classée', done: row.classified, active: row.hasReceipt && !row.classified },

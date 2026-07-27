@@ -15,16 +15,23 @@ import {
   candidateMedicalStatusOptions,
   cityOptions,
   countryOptions,
+  durationOptions,
+  hospitalOrFacultyOptions,
   missionActOptions,
+  mobilityRangeOptions,
   mobilityOptions,
   noticeOptions,
   patientTypeOptions,
+  pressureLevelOptions,
   practiceSettingOptions,
+  refusedScheduleOptions,
   softwareOptions,
+  specialtyOptions,
   timeSlotOptions,
   weekdayOptions,
 } from '@/lib/profile-options';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { userFacingError } from '@/lib/user-facing';
 
 type UploadResponse = {
   documentId: string;
@@ -67,19 +74,55 @@ export default function ProfilePage() {
   }
 
   async function loadProfile(options: { reload?: boolean } = {}) {
-    const p = options.reload
-      ? await api.reload<Profile>('/me/profile')
-      : await api.get<Profile>('/me/profile');
-    applyProfile(p);
+    try {
+      const p = options.reload
+        ? await api.reload<Profile>('/me/profile')
+        : await api.get<Profile>('/me/profile');
+      applyProfile(p);
+      setError(null);
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible de charger votre profil.'));
+      throw caught;
+    }
   }
 
   useEffect(() => {
-    loadProfile().finally(() => setLoading(false));
+    loadProfile()
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
   }, []);
 
-  useAutoRefresh(() => loadProfile({ reload: true }), { enabled: !loading && !formDirty && !saving && !uploadingAvatar && !verifyingHealth });
+  useAutoRefresh(
+    () => loadProfile({ reload: true }).catch(() => undefined),
+    { enabled: !loading && !formDirty && !saving && !uploadingAvatar && !verifyingHealth },
+  );
 
-  if (loading || !profile) return <LoadingCard />;
+  if (loading) return <LoadingCard />;
+  if (!profile) {
+    return (
+      <>
+        <PageHeader
+          title="Mon profil"
+          description="Retrouvez vos informations professionnelles et vos préférences."
+        />
+        <Alert type="error">
+          {error || 'Impossible de charger votre profil.'}{' '}
+          <Button
+            type="button"
+            variant="light"
+            onClick={() => {
+              setLoading(true);
+              void loadProfile()
+                .catch(() => undefined)
+                .finally(() => setLoading(false));
+            }}
+          >
+            Réessayer
+          </Button>
+        </Alert>
+      </>
+    );
+  }
 
   function set(name: string, value: unknown) {
     setFormDirty(true);
@@ -100,7 +143,9 @@ export default function ProfilePage() {
       country: form.country || undefined,
       medicalStatus: form.medicalStatus || undefined,
       medicalStatusOther: form.medicalStatus === 'OTHER' ? form.medicalStatusOther || undefined : undefined,
+      specialty: form.specialty || undefined,
       orientation: buildOrientationValue(form),
+      hospitalOrFaculty: form.hospitalOrFaculty || undefined,
       bio: form.bio || undefined,
       experienceYears: form.experienceYears === '' || form.experienceYears == null ? undefined : Number(form.experienceYears),
       actsPerformed: normalizeCandidateSkills(form.actsPerformed),
@@ -111,18 +156,24 @@ export default function ProfilePage() {
       acceptedWeekdays: cleanArray(form.acceptedWeekdays),
       acceptedTimeSlots: cleanArray(form.acceptedTimeSlots),
       minimumNoticeHours: form.minimumNoticeHours === '' || form.minimumNoticeHours == null ? undefined : Number(form.minimumNoticeHours),
+      mobilityRangeType: form.mobilityRangeType || undefined,
+      housingRequiredBeyondKm: form.housingRequiredBeyondKm === '' || form.housingRequiredBeyondKm == null ? undefined : Number(form.housingRequiredBeyondKm),
       acceptedPracticeSettings: cleanArray(form.acceptedPracticeSettings),
       acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
       minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
+      preferredDurations: cleanArray(form.preferredDurations),
+      refusedSchedules: cleanArray(form.refusedSchedules),
       knownSoftware: cleanArray(form.knownSoftware),
       acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
       refusedPatientTypes: cleanArray(form.refusedPatientTypes),
+      maxPatientsPerDay: form.maxPatientsPerDay === '' || form.maxPatientsPerDay == null ? undefined : Number(form.maxPatientsPerDay),
       parkingRequired: form.parkingRequired,
       acceptedActs: cleanArray(form.acceptedActs),
       refusedActs: cleanArray(form.refusedActs),
       secretaryRequired: form.secretaryRequired,
       accommodationRequired: form.accommodationRequired,
       fastPaymentImportant: form.fastPaymentImportant,
+      acceptedPressureLevel: form.acceptedPressureLevel || undefined,
     };
 
     try {
@@ -205,6 +256,7 @@ export default function ProfilePage() {
     .map((part) => part[0])
     .join('')
     .toUpperCase() || 'ML';
+  const missingPriorities = profileCompletionPriorities(form);
 
   return (
     <>
@@ -249,7 +301,12 @@ export default function ProfilePage() {
               <span>Plus votre profil est complet, plus vos candidatures sont lisibles pour les établissements.</span>
             </div>
             <div className="divider" />
-            <p className="small">À renseigner en priorité : ville, statut médical, spécialité, mobilité, missions acceptées et CV.</p>
+            <p className="small">
+              {missingPriorities.length
+                ? `À renseigner en priorité : ${missingPriorities.slice(0, 5).join(', ')}.`
+                : 'Les informations essentielles du profil sont renseignées.'}{' '}
+              Un CV validé reste nécessaire pour postuler.
+            </p>
           </Card>
         </div>
 
@@ -373,6 +430,21 @@ export default function ProfilePage() {
                     ) : null}
 
                     <div className="form-row">
+                      <SingleChoiceField
+                        label="Spécialité"
+                        value={form.specialty || ''}
+                        options={specialtyOptions}
+                        onChange={(value) => set('specialty', value)}
+                      />
+                      <SingleChoiceField
+                        label="Structure ou faculté principale"
+                        value={form.hospitalOrFaculty || ''}
+                        options={hospitalOrFacultyOptions}
+                        onChange={(value) => set('hospitalOrFaculty', value)}
+                      />
+                    </div>
+
+                    <div className="form-row">
                       <BooleanPreference label="DES médecin généraliste" value={readOrientationFlag(form.orientation, 'DES médecin généraliste')} onChange={(value) => set('orientation', setOrientationFlag(form.orientation, 'DES médecin généraliste', value))} />
                       <MultiChoiceTextField label="Formation supplémentaire" value={orientationTrainingsValue(form.orientation)} options={additionalTrainingOptions} onChange={(value) => set('orientation', setOrientationTrainings(form.orientation, value))} />
                     </div>
@@ -413,9 +485,29 @@ export default function ProfilePage() {
 
                     <MultiChoiceField label="Mobilité" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
                     <div className="form-row">
+                      <SingleChoiceField
+                        label="Périmètre de mobilité"
+                        value={form.mobilityRangeType || ''}
+                        options={mobilityRangeOptions}
+                        onChange={(value) => set('mobilityRangeType', value)}
+                      />
+                      <Field label="Logement nécessaire au-delà de (km)">
+                        <Input
+                          type="number"
+                          min={0}
+                          max={1000}
+                          value={form.housingRequiredBeyondKm ?? ''}
+                          onChange={(event) => set('housingRequiredBeyondKm', event.target.value)}
+                          placeholder="Ex : 80"
+                        />
+                      </Field>
+                    </div>
+                    <div className="form-row">
                       <BooleanPreference label="Logement nécessaire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
                     </div>
                     <MultiChoiceField label="Types de missions acceptées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
+                    <MultiChoiceField label="Durées préférées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
+                    <MultiChoiceField label="Horaires refusés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
                     <MultiChoiceField label="Cadres d'exercice acceptés" values={safeArray(form.acceptedPracticeSettings)} options={practiceSettingOptions} onChange={(values) => set('acceptedPracticeSettings', values)} />
                     <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
                     <MultiChoiceField label="Patientèle acceptée" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
@@ -425,6 +517,23 @@ export default function ProfilePage() {
                        <h3>Actes et charge de travail</h3>
                        <MultiChoiceField label="Actes acceptés" values={safeArray(form.acceptedActs)} options={missionActOptions} onChange={(values) => set('acceptedActs', values)} />
                        <MultiChoiceField label="Actes refusés" values={safeArray(form.refusedActs)} options={missionActOptions} onChange={(values) => set('refusedActs', values)} />
+                       <div className="form-row">
+                         <Field label="Patients par jour maximum">
+                           <Input
+                             type="number"
+                             min={0}
+                             max={300}
+                             value={form.maxPatientsPerDay ?? ''}
+                             onChange={(event) => set('maxPatientsPerDay', event.target.value)}
+                           />
+                         </Field>
+                         <SingleChoiceField
+                           label="Rythme de travail accepté"
+                           value={form.acceptedPressureLevel || ''}
+                           options={pressureLevelOptions}
+                           onChange={(value) => set('acceptedPressureLevel', value)}
+                         />
+                       </div>
                     </div>
 
                     <div className="form-row">
@@ -479,6 +588,33 @@ function healthVerificationMessage(status?: HealthVerificationStatus | null) {
   if (status === 'NOT_FOUND') return 'Aucun professionnel actif trouvé pour ce RPPS.';
   if (status === 'MISMATCH') return 'RPPS trouvé, mais le nom ou le prénom ne correspond pas au profil.';
   return 'Vérification RPPS terminée.';
+}
+
+function profileCompletionPriorities(form: Record<string, unknown>) {
+  const fields: Array<[string, unknown]> = [
+    ['prénom', form.firstName],
+    ['nom', form.lastName],
+    ['accord grammatical', form.candidateGender],
+    ['ville', form.city],
+    ['statut médical', form.medicalStatus],
+    ['spécialité', form.specialty],
+    ['structure principale', form.hospitalOrFaculty],
+    ['présentation', form.bio],
+    ['disponibilités', form.availabilityNotes],
+    ['villes acceptées', form.preferredCities],
+    ['mobilité', form.mobilityOptions],
+    ['jours acceptés', form.acceptedWeekdays],
+    ['créneaux acceptés', form.acceptedTimeSlots],
+    ['types de missions', form.acceptedMissionTypes],
+  ];
+
+  return fields
+    .filter(([, value]) =>
+      Array.isArray(value)
+        ? value.length === 0
+        : value === null || value === undefined || String(value).trim() === '',
+    )
+    .map(([label]) => label);
 }
 
 function safeArray(value: unknown): string[] {
@@ -570,7 +706,7 @@ function StructuredAvailabilityField({
         </div>
         <div className="availability-counter">
           <strong>{weekdays.length}</strong>
-          <span>jour(s)</span>
+          <span>{weekdays.length === 1 ? 'jour' : 'jours'}</span>
         </div>
       </div>
 

@@ -9,8 +9,9 @@ import { statusLabel } from '@/lib/labels';
 import { getCandidateConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
-import { Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -58,20 +59,16 @@ export default function CandidateAgendaPage() {
   const [calendarAnimation, setCalendarAnimation] = useState<'next' | 'prev' | 'jump'>('jump');
   const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
   const [detailOpen, setDetailOpen] = useState(false);
-  const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
   const [noteEditing, setNoteEditing] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [loading, setLoading] = useState(!(cachedApplications && cachedConversations));
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem('medilink_candidate_agenda_notes');
-      if (stored) setNotes(JSON.parse(stored));
-    } catch {
-      setNotes({});
-    }
-  }, []);
+  const {
+    notes,
+    error: notesError,
+    savingKey,
+    save: persistNote,
+  } = useWorkspaceNotes({ prefix: 'agenda:' });
 
   useEffect(() => {
     const savedNote = notes[selectedDay] || '';
@@ -151,21 +148,18 @@ export default function CandidateAgendaPage() {
   const selectedEvents = eventsByDay.get(selectedDay) || [];
   const selectedDate = selectedDay === 'undated' ? null : new Date(`${selectedDay}T12:00:00`);
 
-  function saveNote() {
-    const next = { ...notes, [selectedDay]: draftNote.trim() };
-    if (!next[selectedDay]) delete next[selectedDay];
-    setNotes(next);
-    setNoteEditing(!next[selectedDay]);
-    window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
+  async function saveNote() {
+    const value = draftNote.trim();
+    if (await persistNote(selectedDay, value)) {
+      setNoteEditing(!value);
+    }
   }
 
-  function clearNote() {
-    const next = { ...notes };
-    delete next[selectedDay];
-    setDraftNote('');
-    setNotes(next);
-    setNoteEditing(true);
-    window.localStorage.setItem('medilink_candidate_agenda_notes', JSON.stringify(next));
+  async function clearNote() {
+    if (await persistNote(selectedDay, '')) {
+      setDraftNote('');
+      setNoteEditing(true);
+    }
   }
 
   function goToMonth(offset: number) {
@@ -199,6 +193,7 @@ export default function CandidateAgendaPage() {
         title="Agenda"
         description="Vue opérationnelle des missions, propositions et disponibilités déclarées."
       />
+      {notesError ? <Alert type="error">{notesError}</Alert> : null}
 
       <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Navigation de l'agenda" style={{ marginBottom: 18 }}>
         {agendaSections.map((section) => (
@@ -323,7 +318,7 @@ export default function CandidateAgendaPage() {
                   <div className="agenda-popover-head">
                     <div>
                       <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</strong>
-                      <span>{selectedEvents.length} événement(s)</span>
+                      <span>{selectedEvents.length} {selectedEvents.length === 1 ? 'événement' : 'événements'}</span>
                     </div>
                     <button type="button" className="agenda-popover-close" aria-label="Fermer" onClick={() => setDetailOpen(false)}>×</button>
                   </div>
@@ -360,7 +355,7 @@ export default function CandidateAgendaPage() {
                         </div>
                         <div className="actions">
                           <Button type="button" variant="light" onClick={() => setNoteEditing(true)}>Modifier</Button>
-                          <Button type="button" variant="light" onClick={clearNote}>Effacer</Button>
+                          <Button type="button" variant="light" onClick={() => void clearNote()} disabled={savingKey === selectedDay}>Effacer</Button>
                         </div>
                       </div>
                     ) : (
@@ -374,7 +369,9 @@ export default function CandidateAgendaPage() {
                           />
                         </label>
                         <div className="actions">
-                          <Button type="button" onClick={saveNote}>Enregistrer</Button>
+                          <Button type="button" onClick={() => void saveNote()} disabled={savingKey === selectedDay}>
+                            {savingKey === selectedDay ? 'Enregistrement…' : 'Enregistrer'}
+                          </Button>
                           {notes[selectedDay] ? <Button type="button" variant="light" onClick={() => { setDraftNote(notes[selectedDay]); setNoteEditing(false); }}>Annuler</Button> : null}
                         </div>
                       </>
@@ -389,7 +386,11 @@ export default function CandidateAgendaPage() {
             <div className="toolbar">
               <div>
                 <h2>Missions à venir</h2>
-                <p className="small">Vos {upcomingEvents.length} prochaine(s) mission(s) ou proposition(s) de mission.</p>
+                <p className="small">
+                  {upcomingEvents.length === 1
+                    ? 'Votre prochain événement de mission.'
+                    : `Vos ${upcomingEvents.length} prochains événements de mission.`}
+                </p>
               </div>
             </div>
 

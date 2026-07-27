@@ -102,6 +102,9 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
   const paymentReleased = Boolean(status === 'PAYMENT_RELEASED' || agreement?.payment?.releasedAt);
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
+  const isRetrocession =
+    agreement?.compensationMode === 'RETROCESSION'
+    || application.mission?.compensationMode === 'RETROCESSION';
 
   const startDate = missionStart(application, agreement);
 
@@ -117,7 +120,34 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
     { key: 'ended', label: 'Fin de mission', helper: scheduleEnded ? 'La date de fin de mission est passée.' : 'Cette étape se validera à la date de fin de mission.', status: scheduleEnded ? 'Terminée' : 'À venir', dateLabel: endLabel, active: active, done: scheduleEnded },
     { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant la mission.', status: scheduleEnded ? 'À finaliser' : scheduleStarted ? 'À préparer' : 'À venir', active: scheduleEnded && !completed, done: completed },
     { key: 'completed', label: 'Validation de mission', helper: completed ? 'La mission a été validée.' : scheduleEnded ? 'La mission est terminée, en attente de validation.' : 'Cette étape suivra la fin de mission et les documents.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Règlement', helper: paymentReleased ? 'Le paiement candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    {
+      key: 'payment',
+      label: isRetrocession ? 'Rétrocession' : 'Règlement',
+      helper: isRetrocession
+        ? paymentReleased
+          ? 'La rétrocession déclarée a été validée.'
+          : paymentSecured
+            ? 'La mission est confirmée. Le règlement reste à suivre entre les parties.'
+            : 'Les conditions de rétrocession restent à confirmer.'
+        : paymentReleased
+          ? 'Le paiement candidat est libéré.'
+          : paymentSecured
+            ? 'Paiement sécurisé, libération après validation.'
+            : 'Paiement en attente de confirmation.',
+      status: isRetrocession
+        ? paymentReleased
+          ? 'Validée'
+          : paymentSecured
+            ? 'Mission confirmée'
+            : 'À confirmer'
+        : paymentReleased
+          ? 'Libéré'
+          : paymentSecured
+            ? 'Sécurisé'
+            : 'En attente',
+      active: completed && !paymentReleased,
+      done: paymentReleased,
+    },
   ];
 }
 
@@ -590,7 +620,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
         ...current,
         [day.key]: [],
       }));
-      setMessage(`${files.length} fichier(s) ajouté(s) pour ${day.label.toLowerCase()} - ${day.dateLabel}.`);
+      setMessage(`${files.length} ${files.length === 1 ? 'fichier ajouté' : 'fichiers ajoutés'} pour ${day.label.toLowerCase()} - ${day.dateLabel}.`);
     } catch (e: any) {
       setError(e.message || 'Upload impossible.');
     } finally {
@@ -629,7 +659,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
                     <span>{day.label}</span>
                     <strong>{day.dateLabel}</strong>
                   </div>
-                  <small>{files.length ? `${files.length} fichier(s)` : 'Aucun fichier'}</small>
+                  <small>{files.length ? `${files.length} ${files.length === 1 ? 'fichier' : 'fichiers'}` : 'Aucun fichier'}</small>
                 </div>
 
                 <label className="candidate-current-dropzone">
@@ -638,7 +668,7 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
                     multiple
                     onChange={(event) => setDayFiles(day.key, Array.from(event.target.files || []))}
                   />
-                  <strong>{files.length ? `${files.length} fichier(s) sélectionné(s)` : 'Sélectionner les documents du jour'}</strong>
+                  <strong>{files.length ? `${files.length} ${files.length === 1 ? 'fichier sélectionné' : 'fichiers sélectionnés'}` : 'Sélectionner les documents du jour'}</strong>
                   <span>Compte rendu, feuilles de soin, justificatifs ou pièces utiles produits ce jour-là.</span>
                 </label>
 

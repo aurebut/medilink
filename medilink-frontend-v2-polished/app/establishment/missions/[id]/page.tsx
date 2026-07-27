@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionShareActions } from '@/components/MissionShareActions';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { api } from '@/lib/api';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
@@ -151,7 +152,12 @@ export default function EstablishmentMissionDetailPage() {
           <>
             <LinkButton variant="light" href="/establishment/missions">Toutes les missions</LinkButton>
             {mission.status === 'DRAFT' ? (
-              <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+              <EstablishmentCapabilityGate
+                capability="create_mission"
+                fallback={<LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>}
+              >
+                <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+              </EstablishmentCapabilityGate>
             ) : (
               <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
             )}
@@ -243,7 +249,12 @@ export default function EstablishmentMissionDetailPage() {
           <div className="establishment-action-stack">
             <LinkButton href="/establishment/missions?tab=applications" variant="secondary">Voir les candidatures</LinkButton>
             {mission.status === 'DRAFT' ? (
-              <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+              <EstablishmentCapabilityGate
+                capability="create_mission"
+                fallback={<LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>}
+              >
+                <LinkButton href={`/establishment/missions/new?draftId=${mission.id}`}>Reprendre le brouillon</LinkButton>
+              </EstablishmentCapabilityGate>
             ) : (
               <LinkButton href={`/establishment/missions/${mission.id}/edit`}>Modifier l'annonce</LinkButton>
             )}

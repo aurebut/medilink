@@ -206,7 +206,9 @@ export function DocumentSection() {
           <span className="small">{approvedRequiredCount}/{requiredDocumentTypes.length} documents essentiels validés</span>
         </div>
         <div className="documents-summary-stats">
-          <Badge tone={missingRequiredCount ? 'warning' : 'success'}>{missingRequiredCount} manquant(s)</Badge>
+          <Badge tone={missingRequiredCount ? 'warning' : 'success'}>
+            {missingRequiredCount} {missingRequiredCount === 1 ? 'manquant' : 'manquants'}
+          </Badge>
           <Badge tone={pendingCount ? 'warning' : 'neutral'}>{pendingCount} en vérification</Badge>
           <Badge tone={rejectedCount ? 'danger' : 'neutral'}>{rejectedCount} à corriger</Badge>
         </div>

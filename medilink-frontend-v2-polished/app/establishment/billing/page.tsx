@@ -120,10 +120,10 @@ function rowStatusFromAgreement(agreement?: MissionAgreement | null): Accounting
 function agreementLabelRecruiter(status?: string | null) {
   const labels: Record<string, string> = {
     PROPOSED: 'Proposition envoyée',
-    PAYMENT_REQUIRED: 'Règlement requis',
-    FUNDS_SECURED: 'Fonds sécurisés',
+    PAYMENT_REQUIRED: 'Accord à confirmer',
+    FUNDS_SECURED: 'Mission confirmée',
     COMPLETED: 'Mission terminée',
-    PAYMENT_RELEASED: 'Versement libéré',
+    PAYMENT_RELEASED: 'Rétrocession validée',
     REJECTED: 'Proposition refusée',
     CANCELLED: 'Annulée',
     DISPUTED: 'Litige',
@@ -134,9 +134,9 @@ function agreementLabelRecruiter(status?: string | null) {
 
 function agreementNextStepRecruiter(status?: string | null) {
   if (status === 'PROPOSED') return 'Attente réponse candidat';
-  if (status === 'PAYMENT_REQUIRED') return 'Procéder au paiement';
+  if (status === 'PAYMENT_REQUIRED') return 'Confirmer la mission';
   if (status === 'FUNDS_SECURED') return 'Mission en cours / à réaliser';
-  if (status === 'COMPLETED') return 'Valider et libérer le versement';
+  if (status === 'COMPLETED') return 'Valider la rétrocession déclarée';
   if (status === 'PAYMENT_RELEASED') return 'Facture disponible';
   if (status === 'REJECTED') return 'Reprendre l’échange';
   if (status === 'CANCELLED' || status === 'EXPIRED') return 'Clôturée';
@@ -193,7 +193,7 @@ function timelineSteps(row: AccountingRow) {
   return [
     { key: 'proposal', label: 'Proposition', done: Boolean(status), active: status === 'PROPOSED' },
     { key: 'agreement', label: 'Accord', done: Boolean(status && !['PROPOSED', 'REJECTED', 'CANCELLED', 'EXPIRED'].includes(status)), active: status === 'PAYMENT_REQUIRED' },
-    { key: 'confirmed', label: 'Sécurisée', done: Boolean(status && ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'FUNDS_SECURED' },
+    { key: 'confirmed', label: 'Confirmée', done: Boolean(status && ['FUNDS_SECURED', 'COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'FUNDS_SECURED' },
     { key: 'completed', label: 'Réalisée', done: Boolean(status && ['COMPLETED', 'PAYMENT_RELEASED'].includes(status)), active: status === 'COMPLETED' },
     { key: 'released', label: 'Versement', done: status === 'PAYMENT_RELEASED', active: false },
     { key: 'classified', label: 'Classée', done: row.classified, active: row.hasReceipt && !row.classified },
@@ -407,7 +407,7 @@ export default function RecruiterBillingPage() {
     const remainingBudget = Math.max(0, budgetLimit - totalExpenses);
     
     const alerts = [
-      ...yearRows.filter(row => row.source === 'MEDILINK' && row.agreement?.status === 'PAYMENT_REQUIRED').map((row) => ({ tone: 'danger' as const, title: 'Règlement requis pour confirmer l’accord', row })),
+      ...yearRows.filter(row => row.source === 'MEDILINK' && row.agreement?.status === 'PAYMENT_REQUIRED').map((row) => ({ tone: 'warning' as const, title: 'Accord candidat à confirmer', row })),
       ...completedRows.map((row) => ({ tone: 'warning' as const, title: 'Mission réalisée, versement à libérer', row })),
       ...unclassifiedRows.slice(0, 4).map((row) => ({ tone: 'success' as const, title: 'Facture disponible à classer', row })),
       ...missingInvoiceRows.filter((row) => row.source === 'MANUAL').map((row) => ({ tone: 'warning' as const, title: 'Dépense hors MediLink sans justificatif', row })),
@@ -1299,7 +1299,7 @@ function ChecklistCard() {
         <div><Badge tone="warning">Déclaratif</Badge><strong>Déclarations DSN / URSSAF</strong><span>Déclarer les vacations et remplacements de candidats selon la réglementation en vigueur.</span></div>
         <div><Badge tone="neutral">Légal</Badge><strong>Contrats & Justificatifs</strong><span>Vérifier la conformité des pièces d'identité et des RPPS des remplaçants.</span></div>
         <div><Badge tone="neutral">Comptabilité</Badge><strong>Factures tiers</strong><span>Intégrer les factures établissement dans votre livre journal d'achats comptables.</span></div>
-        <div><Badge tone="success">Continu</Badge><strong>Règlements sécurisés</strong><span>MediLink garantit le blocage des fonds en séquestre jusqu'à validation de fin.</span></div>
+        <div><Badge tone="success">Continu</Badge><strong>Rétrocessions suivies</strong><span>Les conditions, la clôture et le statut déclaré du règlement restent rattachés à chaque mission.</span></div>
       </div>
     </Card>
   );

@@ -1,11 +1,10 @@
 import type { CurrentUser } from './types';
+import { workspaceHomeForRole } from './access-control';
 
 export function defaultRouteForUser(user?: CurrentUser | null) {
   if (!user) return '/login';
   if (user.status !== 'ACTIVE' || !user.emailVerified) return '/verify-email';
-  if (user.role === 'MEDILINK_ADMIN' || user.role === 'MEDILINK_SUPPORT') return '/admin/dashboard';
-  if (user.role.startsWith('ESTABLISHMENT')) return '/establishment/dashboard';
-  return '/app/dashboard';
+  return workspaceHomeForRole(user.role);
 }
 
 export function safePostLoginRoute(candidate: string | null, user?: CurrentUser | null) {

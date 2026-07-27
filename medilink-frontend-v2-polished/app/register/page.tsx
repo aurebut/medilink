@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
-import { Alert, Button, Field, Input, Select } from '@/components/ui';
+import { Alert, Button, Field, Input, PasswordInput, Select } from '@/components/ui';
 import { defaultRouteForUser } from '@/lib/routes';
 import type { CandidateGender } from '@/lib/types';
 
@@ -64,19 +64,37 @@ export default function RegisterPage() {
     >
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Type de compte">
-          <Select value={accountType} onChange={(e) => setAccountType(e.target.value as any)}>
+          <Select name="accountType" value={accountType} onChange={(e) => setAccountType(e.target.value as any)}>
             <option value="candidate">Candidat médical</option>
             <option value="establishment">Établissement / recruteur</option>
           </Select>
         </Field>
         <div className="form-row">
-          <Field label="Prénom"><Input required={accountType === 'candidate'} minLength={2} value={firstName} onChange={(e) => setFirstName(e.target.value)} /></Field>
-          <Field label="Nom"><Input required={accountType === 'candidate'} minLength={2} value={lastName} onChange={(e) => setLastName(e.target.value)} /></Field>
+          <Field label="Prénom">
+            <Input
+              name="firstName"
+              autoComplete="given-name"
+              required={accountType === 'candidate'}
+              minLength={2}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </Field>
+          <Field label="Nom">
+            <Input
+              name="lastName"
+              autoComplete="family-name"
+              required={accountType === 'candidate'}
+              minLength={2}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </Field>
         </div>
         {accountType === 'candidate' ? (
           <>
             <Field label="Sexe / accord grammatical">
-              <Select value={candidateGender} onChange={(e) => setCandidateGender(e.target.value as CandidateGender | '')}>
+              <Select name="candidateGender" value={candidateGender} onChange={(e) => setCandidateGender(e.target.value as CandidateGender | '')}>
                 <option value="">Sélectionner</option>
                 <option value="FEMININE">Féminin</option>
                 <option value="MASCULINE">Masculin</option>
@@ -84,7 +102,9 @@ export default function RegisterPage() {
             </Field>
             <Field label="Numero RPPS (facultatif)">
               <Input
+                name="rpps"
                 inputMode="numeric"
+                autoComplete="off"
                 value={rpps}
                 onChange={(e) => setRpps(e.target.value)}
                 placeholder="Ex : 10001234567"
@@ -92,9 +112,42 @@ export default function RegisterPage() {
             </Field>
           </>
         ) : null}
-        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
-        <Field label="Téléphone"><Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>
-        <Field label="Mot de passe"><Input type="password" required minLength={12} maxLength={128} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="12 caractères minimum" /></Field>
+        <Field label="Email">
+          <Input
+            type="email"
+            name="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="vous@example.com"
+          />
+        </Field>
+        <Field label="Téléphone">
+          <Input
+            type="tel"
+            name="phone"
+            autoComplete="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="06 12 34 56 78"
+          />
+        </Field>
+        <Field label="Mot de passe" description="Utilisez au moins 12 caractères.">
+          <PasswordInput
+            name="password"
+            autoComplete="new-password"
+            required
+            minLength={12}
+            maxLength={128}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="12 caractères minimum"
+          />
+        </Field>
         <Button block disabled={loading}>{loading ? 'Création...' : 'Créer le compte'}</Button>
     </AuthPage>
   );

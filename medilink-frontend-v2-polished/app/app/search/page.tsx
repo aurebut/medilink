@@ -11,6 +11,9 @@ import { MissionCard } from '@/components/MissionCard';
 import { establishmentDepartmentOptions, patientTypeOptions, sectorOptions, softwareOptions } from '@/lib/profile-options';
 import { getCandidateConversationPath, getCandidateMissionPath, getMissionApplyPath } from '@/lib/mission-links';
 import { formatDateTime } from '@/lib/format';
+import { plural, userFacingError } from '@/lib/user-facing';
+
+const PAGE_SIZE = 12;
 
 const emptyFilters = {
   q: '',
@@ -115,12 +118,13 @@ function scoreMissionForProfile(mission: Mission, profile: Profile | null, appli
 }
 
 export default function SearchMissionsPage() {
-  const cachedMissions = api.getSync<Paginated<Mission>>('/missions?limit=50');
+  const cachedMissions = api.getSync<Paginated<Mission>>(`/missions?limit=${PAGE_SIZE}&offset=0`);
   const cachedApplications = api.getSync<Application[]>('/me/applications');
   const cachedProfile = api.getSync<Profile>('/me/profile');
   const [activeTab, setActiveTab] = useState<SearchTab>('recommended');
   const [items, setItems] = useState<Mission[]>(cachedMissions?.items || []);
   const [total, setTotal] = useState(cachedMissions?.total || 0);
+  const [page, setPage] = useState(1);
   const [profile, setProfile] = useState<Profile | null>(cachedProfile || null);
   const [filters, setFilters] = useState(emptyFilters);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -153,12 +157,17 @@ export default function SearchMissionsPage() {
       .slice(0, 8);
   }, [appliedMissionIds, items, profile]);
 
-  async function loadMissions(currentFilters = filters, options: { silent?: boolean; reload?: boolean } = {}) {
+  async function loadMissions(
+    currentFilters = filters,
+    currentPage = page,
+    options: { silent?: boolean; reload?: boolean } = {},
+  ) {
     if (!options.silent) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
     Object.entries(currentFilters).forEach(([k, v]) => { if (v) params.set(k, v); });
-    params.set('limit', '50');
+    params.set('limit', String(PAGE_SIZE));
+    params.set('offset', String((currentPage - 1) * PAGE_SIZE));
 
     try {
       const path = `/missions?${params}`;
@@ -167,8 +176,8 @@ export default function SearchMissionsPage() {
         : await api.get<Paginated<Mission>>(path);
       setItems(result.items);
       setTotal(result.total);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible de charger les missions.'));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -189,7 +198,8 @@ export default function SearchMissionsPage() {
         });
         if (changed) {
           setFilters(updated);
-          void loadMissions(updated);
+          setPage(1);
+          void loadMissions(updated, 1);
         }
       }
       return next;
@@ -207,14 +217,16 @@ export default function SearchMissionsPage() {
     });
     if (changed) {
       setFilters(updated);
-      void loadMissions(updated);
+      setPage(1);
+      void loadMissions(updated, 1);
     }
   };
 
   const resetAllFilters = () => {
     setFilters(emptyFilters);
     setExtraFiltersOpen(false);
-    void loadMissions(emptyFilters);
+    setPage(1);
+    void loadMissions(emptyFilters, 1);
   };
 
   async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
@@ -224,8 +236,8 @@ export default function SearchMissionsPage() {
       setApplications(options.reload
         ? await api.reload<Application[]>('/me/applications')
         : await api.get<Application[]>('/me/applications'));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible de charger vos candidatures.'));
     } finally {
       if (!options.silent) setApplicationsLoading(false);
     }
@@ -247,11 +259,12 @@ export default function SearchMissionsPage() {
 
   useEffect(() => {
     if (activeTab === 'recommended') {
-      void loadMissions(emptyFilters);
+      setPage(1);
+      void loadMissions(emptyFilters, 1);
       void loadApplications({ silent: true });
       void loadProfile();
     } else if (activeTab === 'search') {
-      void loadMissions();
+      void loadMissions(filters, page);
     } else {
       void loadApplications();
     }
@@ -259,10 +272,10 @@ export default function SearchMissionsPage() {
 
   useAutoRefresh(() => {
     if (activeTab === 'recommended') {
-      return loadMissions(emptyFilters, { silent: true, reload: true });
+      return loadMissions(emptyFilters, 1, { silent: true, reload: true });
     }
     if (activeTab === 'search') {
-      return loadMissions(filters, { silent: true, reload: true });
+      return loadMissions(filters, page, { silent: true, reload: true });
     }
     return loadApplications({ silent: true, reload: true });
   }, { enabled: activeTab === 'applications' ? !applicationsLoading : !loading });
@@ -274,8 +287,22 @@ export default function SearchMissionsPage() {
   function submit(e: FormEvent) {
     e.preventDefault();
     setFiltersOpen(false);
-    void loadMissions();
+    setPage(1);
+    void loadMissions(filters, 1);
   }
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    void loadMissions(filters, nextPage);
+    document.querySelector('.search-results')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+      block: 'start',
+    });
+  }
+
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   async function withdraw(id: string) {
     if (!confirm('Retirer cette candidature ?')) return;
@@ -331,7 +358,7 @@ export default function SearchMissionsPage() {
                 <div>
                   <strong>Missions pour vous</strong>
                   <div className="small">
-                    {recommendedMissions.length} mission(s) publiée(s) priorisée(s) selon votre profil.
+                    {plural(recommendedMissions.length, 'mission publiée', 'missions publiées')} selon votre profil.
                   </div>
                 </div>
                 <Button type="button" variant="light" onClick={() => setActiveTab('search')}>Recherche avancée</Button>
@@ -354,7 +381,11 @@ export default function SearchMissionsPage() {
               <div>
                 <h2>Filtres</h2>
                 <p>
-                  {activeFilters > 0 ? <span className="search-filters-count">{activeFilters} actif(s)</span> : 'Affinez les annonces'}
+                  {activeFilters > 0 ? (
+                    <span className="search-filters-count">
+                      {activeFilters} {activeFilters === 1 ? 'filtre actif' : 'filtres actifs'}
+                    </span>
+                  ) : 'Affinez les annonces'}
                 </p>
               </div>
               <Button
@@ -454,7 +485,12 @@ export default function SearchMissionsPage() {
                     </Select>
                   </Field>
                   <Field label="À partir du">
-                    <Input type="date" value={filters.dateFrom} onChange={(e) => set('dateFrom', e.target.value)} />
+                    <Input
+                      type="date"
+                      min={new Date().toISOString().slice(0, 10)}
+                      value={filters.dateFrom}
+                      onChange={(e) => set('dateFrom', e.target.value)}
+                    />
                   </Field>
                   <div className="form-row">
                     <Field label="Rétrocession minimum">
@@ -504,14 +540,27 @@ export default function SearchMissionsPage() {
           </Card>
 
           <div className="grid search-results">
-            {error ? <Alert type="error">{error}</Alert> : null}
+            {error ? (
+              <Alert type="error">
+                {error}{' '}
+                <button
+                  type="button"
+                  className="link-button"
+                  onClick={() =>
+                    void loadMissions(filters, page, { reload: true })
+                  }
+                >
+                  Réessayer
+                </button>
+              </Alert>
+            ) : null}
             {loading ? (
               <LoadingCard label="Chargement des missions..." />
-            ) : (
+            ) : error && items.length === 0 ? null : (
               <>
                 <div className="toolbar">
                   <div>
-                    <strong>{total} résultat(s)</strong>
+                    <strong>{plural(total, 'résultat')}</strong>
                     <div className="small">Missions publiées disponibles</div>
                   </div>
                 </div>
@@ -524,6 +573,27 @@ export default function SearchMissionsPage() {
                   />
                 ))}
                 {!loading && items.length === 0 ? <Card><p>Aucune mission publiée ne correspond aux filtres.</p></Card> : null}
+                {pageCount > 1 ? (
+                  <nav className="pagination" aria-label="Pagination des missions">
+                    <Button
+                      type="button"
+                      variant="light"
+                      disabled={page <= 1 || loading}
+                      onClick={() => goToPage(page - 1)}
+                    >
+                      Précédente
+                    </Button>
+                    <span aria-live="polite">Page {page} sur {pageCount}</span>
+                    <Button
+                      type="button"
+                      variant="light"
+                      disabled={page >= pageCount || loading}
+                      onClick={() => goToPage(page + 1)}
+                    >
+                      Suivante
+                    </Button>
+                  </nav>
+                ) : null}
               </>
             )}
           </div>
@@ -622,18 +692,18 @@ function ApplicationSection({
           <tbody>
             {applications.length > 0 ? applications.map((a) => (
               <tr key={a.id}>
-                <td>
+                <td data-label="Mission">
                   <strong>{a.mission?.title}</strong>
                   <div className="small">{a.mission?.city}</div>
                 </td>
-                <td>{a.mission?.establishment?.name || '—'}</td>
-                <td>
+                <td data-label="Établissement">{a.mission?.establishment?.name || '—'}</td>
+                <td data-label="Statut">
                   <Badge tone={applicationTone(a.status) as any}>
                     {statusLabel(a.status)}
                   </Badge>
                 </td>
-                <td>{formatDateTime(a.createdAt)}</td>
-                <td className="actions application-icon-actions">
+                <td data-label="Date">{formatDateTime(a.createdAt)}</td>
+                <td data-label="Actions" className="actions application-icon-actions">
                   {a.conversation ? (
                     <Link
                       className="application-icon-action"

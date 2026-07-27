@@ -10,6 +10,7 @@ import { candidateNoun } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionCard } from '@/components/MissionCard';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 
 type AnnouncementTab = 'missions' | 'applications' | 'drafts';
@@ -155,9 +156,13 @@ export default function EstablishmentMissionsPage() {
         description="Publiez vos missions et traitez les candidatures reçues depuis le même espace."
         actions={
           primary ? (
-            <LinkButton href="/establishment/missions/new">Créer mission</LinkButton>
+            <EstablishmentCapabilityGate capability="create_mission">
+              <LinkButton href="/establishment/missions/new">Créer mission</LinkButton>
+            </EstablishmentCapabilityGate>
           ) : (
-            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+            <EstablishmentCapabilityGate capability="create_establishment">
+              <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+            </EstablishmentCapabilityGate>
           )
         }
       />
@@ -182,7 +187,9 @@ export default function EstablishmentMissionsPage() {
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
           <p>Créez d'abord un établissement pour pouvoir publier une mission et pré-remplir les informations de lieu.</p>
-          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          <EstablishmentCapabilityGate capability="create_establishment">
+            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          </EstablishmentCapabilityGate>
         </Card>
       ) : activeTab === 'missions' ? (
         <MissionsTab
@@ -218,7 +225,9 @@ function MissionsTab({
       <Card>
         <h2>Aucune mission</h2>
         <p>Créez une mission pour la publier, la partager ou la gérer depuis cet espace.</p>
-        <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+        <EstablishmentCapabilityGate capability="create_mission">
+          <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+        </EstablishmentCapabilityGate>
       </Card>
     );
   }
@@ -250,7 +259,9 @@ function DraftsTab({
       <Card>
         <h2>Aucun brouillon</h2>
         <p>Les missions gardées en brouillon apparaîtront ici avant publication.</p>
-        <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+        <EstablishmentCapabilityGate capability="create_mission">
+          <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+        </EstablishmentCapabilityGate>
       </Card>
     );
   }
@@ -369,17 +380,17 @@ function ApplicationSection({
 
             return (
               <tr key={application.id}>
-                <td>
+                <td data-label="Candidat">
                   <strong>{application.candidate?.profile?.firstName} {application.candidate?.profile?.lastName}</strong>
                   <div className="small">{application.candidate?.email}</div>
                 </td>
-                <td>
+                <td data-label="Mission">
                   {application.mission?.title}
                   <div className="small">{application.mission?.city}</div>
                 </td>
-                <td><Badge tone={applicationTone(application.status) as any}>{statusLabel(application.status)}</Badge></td>
-                <td>{formatDateTime(application.createdAt)}</td>
-                <td className="actions">
+                <td data-label="Statut"><Badge tone={applicationTone(application.status) as any}>{statusLabel(application.status)}</Badge></td>
+                <td data-label="Date">{formatDateTime(application.createdAt)}</td>
+                <td data-label="Actions" className="actions">
                   <LinkButton variant="light" href={`/establishment/candidates/${application.id}`}>
                     Voir profil {candidateNoun(application.candidate?.profile)}
                   </LinkButton>

@@ -6,11 +6,15 @@ import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
-import type { Application, Conversation, Establishment, EstablishmentDashboardData, Mission } from '@/lib/types';
+import type { Application, Conversation, EstablishmentDashboardData, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { buildCalendarEventWeeks, buildWeekCarousel, dateKey, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { buildEstablishmentAgendaRows, establishmentMissionTone, establishmentMissionLabel } from '@/lib/establishment-agenda';
+import { establishmentDashboardPath } from '@/lib/establishment-context';
+import { useEstablishments } from '@/components/EstablishmentSelector';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
+import { plural, userFacingError } from '@/lib/user-facing';
 
 function dayNumber(value: Date) {
   return new Intl.DateTimeFormat('fr-FR', { day: 'numeric' }).format(value);
@@ -49,43 +53,99 @@ function messagePreview(body?: string | null) {
 }
 
 export default function EstablishmentDashboardPage() {
-  const cachedDashboard = api.getSync<EstablishmentDashboardData>('/establishment/dashboard');
-  const [primary, setPrimary] = useState<Establishment | null>(cachedDashboard?.establishment || null);
+  const {
+    primary,
+    loading: establishmentsLoading,
+    error: establishmentsError,
+    reload: reloadEstablishments,
+  } = useEstablishments();
+  const dashboardPath = primary ? establishmentDashboardPath(primary.id) : null;
+  const cachedDashboard = dashboardPath
+    ? api.getSync<EstablishmentDashboardData>(dashboardPath)
+    : null;
   const [applications, setApplications] = useState<Application[]>(cachedDashboard?.applications || []);
   const [missions, setMissions] = useState<Mission[]>(cachedDashboard?.missions || []);
   const [conversations, setConversations] = useState<Conversation[]>(cachedDashboard?.conversations || []);
-  const [dashboardLoading, setDashboardLoading] = useState(!cachedDashboard);
+  const [loadedEstablishmentId, setLoadedEstablishmentId] = useState<string | null>(
+    cachedDashboard?.establishment?.id || null,
+  );
+  const [dashboardLoading, setDashboardLoading] = useState(Boolean(dashboardPath && !cachedDashboard));
+  const [error, setError] = useState<string | null>(null);
 
   function applyDashboardData(data: EstablishmentDashboardData) {
-    setPrimary(data.establishment);
+    setLoadedEstablishmentId(data.establishment?.id || null);
     setApplications(data.applications);
     setMissions(data.missions);
     setConversations(data.conversations);
     if (data.establishment) {
-      primeApiCache('/establishments/me', [data.establishment]);
       primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
       primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
-      api.preload(`/billing/establishments/${data.establishment.id}/status`);
     }
-    primeApiCache('/conversations', data.conversations);
   }
 
   useEffect(() => {
-    const unsubscribe = subscribeApiCache<EstablishmentDashboardData>('/establishment/dashboard', applyDashboardData);
-    setDashboardLoading(true);
-    api.get<EstablishmentDashboardData>('/establishment/dashboard').then(applyDashboardData).catch(() => {
-      setPrimary(null);
+    if (!dashboardPath) {
+      setLoadedEstablishmentId(null);
       setApplications([]);
       setMissions([]);
       setConversations([]);
-    }).finally(() => setDashboardLoading(false));
+      setDashboardLoading(false);
+      setError(null);
+      return;
+    }
+
+    const cached = api.getSync<EstablishmentDashboardData>(dashboardPath);
+    if (cached) {
+      applyDashboardData(cached);
+      setDashboardLoading(false);
+    } else {
+      setApplications([]);
+      setMissions([]);
+      setConversations([]);
+      setDashboardLoading(true);
+    }
+
+    setError(null);
+    const unsubscribe = subscribeApiCache<EstablishmentDashboardData>(dashboardPath, applyDashboardData);
+    api.get<EstablishmentDashboardData>(dashboardPath)
+      .then(applyDashboardData)
+      .catch((caught) => {
+        setLoadedEstablishmentId(primary?.id || null);
+        setError(userFacingError(caught, 'Impossible de charger ce tableau de bord.'));
+      })
+      .finally(() => setDashboardLoading(false));
 
     return unsubscribe;
-  }, []);
+  }, [dashboardPath, primary?.id]);
 
   useAutoRefresh(async () => {
-    applyDashboardData(await api.reload<EstablishmentDashboardData>('/establishment/dashboard'));
-  }, { enabled: !dashboardLoading });
+    if (!dashboardPath) return;
+    try {
+      applyDashboardData(await api.reload<EstablishmentDashboardData>(dashboardPath));
+      setError(null);
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible d’actualiser ce tableau de bord.'));
+    }
+  }, { enabled: Boolean(dashboardPath) && !dashboardLoading });
+
+  async function retryDashboard() {
+    if (!dashboardPath) {
+      await reloadEstablishments({ reload: true });
+      return;
+    }
+    setDashboardLoading(true);
+    setError(null);
+    try {
+      applyDashboardData(
+        await api.reload<EstablishmentDashboardData>(dashboardPath),
+      );
+    } catch (caught) {
+      setLoadedEstablishmentId(primary?.id || null);
+      setError(userFacingError(caught, 'Impossible de charger ce tableau de bord.'));
+    } finally {
+      setDashboardLoading(false);
+    }
+  }
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {
@@ -155,17 +215,34 @@ export default function EstablishmentDashboardPage() {
     };
   }, [applications, conversations, missions]);
 
-  if (dashboardLoading) return <LoadingCard label="Chargement..." />;
+  if (
+    establishmentsLoading
+    || dashboardLoading
+    || (primary && loadedEstablishmentId !== primary.id)
+  ) {
+    return <LoadingCard label="Chargement..." />;
+  }
 
   if (!primary) {
     return (
       <>
         <PageHeader title="Dashboard établissement" description="Commencez par créer votre établissement pour publier des missions." />
-        <Card className="card-highlight">
-          <h2>Aucun établissement rattaché</h2>
-          <p>Créez une fiche établissement pour publier des missions et recevoir des candidatures.</p>
-          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
-        </Card>
+        {establishmentsError ? (
+          <Alert type="error">
+            {userFacingError(new Error(establishmentsError))}{' '}
+            <Button type="button" variant="light" onClick={() => void retryDashboard()}>
+              Réessayer
+            </Button>
+          </Alert>
+        ) : (
+          <Card className="card-highlight">
+            <h2>Aucun établissement rattaché</h2>
+            <p>Créez une fiche établissement pour publier des missions et recevoir des candidatures.</p>
+            <EstablishmentCapabilityGate capability="create_establishment">
+              <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+            </EstablishmentCapabilityGate>
+          </Card>
+        )}
       </>
     );
   }
@@ -178,6 +255,14 @@ export default function EstablishmentDashboardPage() {
         title={primary.name}
         description="Votre cockpit recruteur pour prioriser les candidatures, maintenir les missions ouvertes et garder votre fiche établissement solide."
       />
+      {error ? (
+        <Alert type="error">
+          {error}{' '}
+          <Button type="button" variant="light" onClick={() => void retryDashboard()}>
+            Réessayer
+          </Button>
+        </Alert>
+      ) : null}
 
       <div className="establishment-dashboard candidate-dashboard">
         <Card className="dashboard-week-card">
@@ -346,11 +431,16 @@ export default function EstablishmentDashboardPage() {
             <div className="dashboard-finance-status is-info">
               <div className="finance-status-header">
                 <span className="status-dot" />
-                <span>{dashboard.draftMissions.length} brouillon(s)</span>
+                <span>{plural(dashboard.draftMissions.length, 'brouillon')}</span>
               </div>
-              <strong>{missions.length} mission(s)</strong>
-              <p>{dashboard.publishedMissions.length} publiée(s), {dashboard.upcomingMissions.length} à venir dans votre planning.</p>
-              <LinkButton href="/establishment/missions/new" variant="secondary">Nouvelle mission</LinkButton>
+              <strong>{plural(missions.length, 'mission')}</strong>
+              <p>
+                {plural(dashboard.publishedMissions.length, 'mission publiée', 'missions publiées')},{' '}
+                {plural(dashboard.upcomingMissions.length, 'mission à venir', 'missions à venir')} dans votre planning.
+              </p>
+              <EstablishmentCapabilityGate capability="create_mission">
+                <LinkButton href="/establishment/missions/new" variant="secondary">Nouvelle mission</LinkButton>
+              </EstablishmentCapabilityGate>
             </div>
           </Card>
         </section>

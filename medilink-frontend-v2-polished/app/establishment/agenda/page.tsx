@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -16,6 +17,7 @@ import { formatDate } from '@/lib/format';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -43,10 +45,6 @@ function addMonths(date: Date, count: number) {
   return new Date(date.getFullYear(), date.getMonth() + count, 1);
 }
 
-function notesStorageKey(establishmentId: string) {
-  return `medilink_establishment_agenda_notes_${establishmentId}`;
-}
-
 type AgendaSection = 'calendar' | 'history';
 
 const agendaSections: Array<{ id: AgendaSection; label: string }> = [
@@ -64,26 +62,21 @@ export default function EstablishmentAgendaPage() {
   const [calendarAnimation, setCalendarAnimation] = useState<'next' | 'prev' | 'jump'>('jump');
   const [selectedDay, setSelectedDay] = useState(() => dateKey(new Date()));
   const [detailOpen, setDetailOpen] = useState(false);
-  const [notes, setNotes] = useState<Record<string, string>>({});
   const [draftNote, setDraftNote] = useState('');
   const [noteEditing, setNoteEditing] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!primary) {
-      setNotes({});
-      return;
-    }
-
-    try {
-      const stored = window.localStorage.getItem(notesStorageKey(primary.id));
-      setNotes(stored ? JSON.parse(stored) : {});
-    } catch {
-      setNotes({});
-    }
-  }, [primary]);
+  const {
+    notes,
+    error: notesError,
+    savingKey,
+    save: persistNote,
+  } = useWorkspaceNotes({
+    prefix: 'agenda:',
+    establishmentId: primary?.id,
+    enabled: Boolean(primary),
+  });
 
   useEffect(() => {
     const savedNote = notes[selectedDay] || '';
@@ -180,26 +173,18 @@ export default function EstablishmentAgendaPage() {
   const selectedRows = rowsByDay.get(selectedDay) || [];
   const selectedDate = selectedDay === 'undated' ? null : new Date(`${selectedDay}T12:00:00`);
 
-  function persistNotes(next: Record<string, string>) {
-    setNotes(next);
-    if (primary) {
-      window.localStorage.setItem(notesStorageKey(primary.id), JSON.stringify(next));
+  async function saveNote() {
+    const value = draftNote.trim();
+    if (await persistNote(selectedDay, value)) {
+      setNoteEditing(!value);
     }
   }
 
-  function saveNote() {
-    const next = { ...notes, [selectedDay]: draftNote.trim() };
-    if (!next[selectedDay]) delete next[selectedDay];
-    persistNotes(next);
-    setNoteEditing(!next[selectedDay]);
-  }
-
-  function clearNote() {
-    const next = { ...notes };
-    delete next[selectedDay];
-    setDraftNote('');
-    persistNotes(next);
-    setNoteEditing(true);
+  async function clearNote() {
+    if (await persistNote(selectedDay, '')) {
+      setDraftNote('');
+      setNoteEditing(true);
+    }
   }
 
   function goToMonth(offset: number) {
@@ -234,12 +219,17 @@ export default function EstablishmentAgendaPage() {
         description="Vue opérationnelle des missions publiées, pourvues et confirmées de votre établissement."
         actions={
           primary ? (
-            <LinkButton href="/establishment/missions/new" variant="light">Créer une mission</LinkButton>
+            <EstablishmentCapabilityGate capability="create_mission">
+              <LinkButton href="/establishment/missions/new" variant="light">Créer une mission</LinkButton>
+            </EstablishmentCapabilityGate>
           ) : (
-            <LinkButton href="/establishment/onboarding" variant="light">Créer mon établissement</LinkButton>
+            <EstablishmentCapabilityGate capability="create_establishment">
+              <LinkButton href="/establishment/onboarding" variant="light">Créer mon établissement</LinkButton>
+            </EstablishmentCapabilityGate>
           )
         }
       />
+      {notesError ? <Alert type="error">{notesError}</Alert> : null}
 
       {error ? <Alert type="error">{error}</Alert> : null}
 
@@ -247,7 +237,9 @@ export default function EstablishmentAgendaPage() {
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
           <p>Créez votre fiche établissement pour publier des missions puis les retrouver dans l'agenda.</p>
-          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          <EstablishmentCapabilityGate capability="create_establishment">
+            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          </EstablishmentCapabilityGate>
         </Card>
       ) : (
         <>
@@ -372,7 +364,7 @@ export default function EstablishmentAgendaPage() {
                       <div className="agenda-popover-head">
                         <div>
                           <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</strong>
-                          <span>{selectedRows.length} événement(s)</span>
+                          <span>{selectedRows.length} {selectedRows.length === 1 ? 'événement' : 'événements'}</span>
                         </div>
                         <button type="button" className="agenda-popover-close" aria-label="Fermer" onClick={() => setDetailOpen(false)}>x</button>
                       </div>
@@ -409,7 +401,7 @@ export default function EstablishmentAgendaPage() {
                             </div>
                             <div className="actions">
                               <Button type="button" variant="light" onClick={() => setNoteEditing(true)}>Modifier</Button>
-                              <Button type="button" variant="light" onClick={clearNote}>Effacer</Button>
+                              <Button type="button" variant="light" onClick={() => void clearNote()} disabled={savingKey === selectedDay}>Effacer</Button>
                             </div>
                           </div>
                         ) : (
@@ -423,7 +415,9 @@ export default function EstablishmentAgendaPage() {
                               />
                             </label>
                             <div className="actions">
-                              <Button type="button" onClick={saveNote}>Enregistrer</Button>
+                              <Button type="button" onClick={() => void saveNote()} disabled={savingKey === selectedDay}>
+                                {savingKey === selectedDay ? 'Enregistrement…' : 'Enregistrer'}
+                              </Button>
                               {notes[selectedDay] ? <Button type="button" variant="light" onClick={() => { setDraftNote(notes[selectedDay]); setNoteEditing(false); }}>Annuler</Button> : null}
                             </div>
                           </>
@@ -438,7 +432,11 @@ export default function EstablishmentAgendaPage() {
                 <div className="toolbar">
                   <div>
                     <h2>Missions à venir</h2>
-                    <p className="small">Vos {upcomingEvents.length} prochaine(s) mission(s) ou proposition(s) de mission.</p>
+                    <p className="small">
+                      {upcomingEvents.length === 1
+                        ? 'Votre prochain événement de mission.'
+                        : `Vos ${upcomingEvents.length} prochains événements de mission.`}
+                    </p>
                   </div>
                 </div>
 

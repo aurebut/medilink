@@ -7,6 +7,8 @@ import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels
 import { MissionDeleteButton } from './MissionDeleteButton';
 import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
+import { useAuth } from './AuthProvider';
+import { hasEstablishmentCapability } from '@/lib/access-control';
 
 function sectorLabel(value?: string | null) {
   const labels: Record<string, string> = {
@@ -32,7 +34,10 @@ export function MissionCard({
   canDelete?: boolean;
   onDeleted?: (missionId: string) => void;
 }) {
-  const isDraftManager = mission.status === 'DRAFT' && canDelete;
+  const { user } = useAuth();
+  const isDraftManager = mission.status === 'DRAFT'
+    && canDelete
+    && hasEstablishmentCapability(user?.role, 'create_mission');
   const missionDetailHref = isDraftManager
     ? `/establishment/missions/new?draftId=${mission.id}`
     : (detailHref || `/missions/${mission.id}`);

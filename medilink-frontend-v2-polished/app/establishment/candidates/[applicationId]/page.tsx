@@ -167,7 +167,7 @@ export default function EstablishmentCandidateProfilePage() {
           <h2>Informations professionnelles</h2>
           <div className="info-list">
             <div><span>Formations</span><strong>{profile?.orientation || '—'}</strong></div>
-            <div><span>Expérience</span><strong>{profile?.experienceYears != null ? `${profile.experienceYears} an(s)` : '—'}</strong></div>
+            <div><span>Expérience</span><strong>{profile?.experienceYears != null ? `${profile.experienceYears} ${profile.experienceYears === 1 ? 'an' : 'ans'}` : '—'}</strong></div>
             <div><span>Disponibilités</span><strong>{profile?.availabilityNotes || '—'}</strong></div>
           </div>
 
@@ -211,7 +211,7 @@ export default function EstablishmentCandidateProfilePage() {
             <h2>Documents validés</h2>
             <p className="muted">Documents consultables car {candidateIsLabel} en candidature sur une mission de votre établissement.</p>
           </div>
-          <Badge tone="success">{documents.length} document(s)</Badge>
+          <Badge tone="success">{documents.length} {documents.length === 1 ? 'document' : 'documents'}</Badge>
         </div>
 
         <div className="table-wrap" style={{ marginTop: 14 }}>

@@ -46,30 +46,31 @@ export default function AdminUsersPage() {
     <>
       <PageHeader title="Utilisateurs" description="Liste des comptes et suspension simple." />
       {error ? <Alert type="error">{error}</Alert> : null}
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
+          <caption className="sr-only">Liste des utilisateurs</caption>
           <thead>
             <tr>
-              <th>Utilisateur</th>
-              <th>Rôle</th>
-              <th>Statut</th>
-              <th>Email</th>
-              <th>Création</th>
-              <th>Action</th>
+              <th scope="col">Utilisateur</th>
+              <th scope="col">Rôle</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Email</th>
+              <th scope="col">Création</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
               <tr key={u.id}>
-                <td>
+                <td data-label="Utilisateur">
                   <strong>{u.profile?.firstName} {u.profile?.lastName}</strong>
                   <div className="small">{u.id}</div>
                 </td>
-                <td>{roleLabel(u.role)}</td>
-                <td><Badge tone={u.status === 'ACTIVE' ? 'success' : u.status === 'SUSPENDED' ? 'danger' : 'warning'}>{statusLabel(u.status)}</Badge></td>
-                <td>{u.email}<div className="small">{u.emailVerified ? 'email vérifié' : 'email non vérifié'}</div></td>
-                <td>{formatDateTime(u.createdAt)}</td>
-                <td><Button variant="danger" disabled={u.status === 'SUSPENDED'} onClick={() => suspend(u.id)}>Suspendre</Button></td>
+                <td data-label="Rôle">{roleLabel(u.role)}</td>
+                <td data-label="Statut"><Badge tone={u.status === 'ACTIVE' ? 'success' : u.status === 'SUSPENDED' ? 'danger' : 'warning'}>{statusLabel(u.status)}</Badge></td>
+                <td data-label="Email">{u.email}<div className="small">{u.emailVerified ? 'email vérifié' : 'email non vérifié'}</div></td>
+                <td data-label="Création">{formatDateTime(u.createdAt)}</td>
+                <td data-label="Action"><Button variant="danger" disabled={u.status === 'SUSPENDED'} onClick={() => suspend(u.id)}>Suspendre</Button></td>
               </tr>
             ))}
           </tbody>

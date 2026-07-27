@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { LoadingCard, PlatformSplash } from './ui';
-import type { CandidateDashboardData, Conversation, CurrentUser, EstablishmentDashboardData, UserRole } from '@/lib/types';
+import type { CandidateDashboardData, Conversation, CurrentUser, Establishment, EstablishmentDashboardData, UserRole } from '@/lib/types';
 import { defaultRouteForUser } from '@/lib/routes';
 import { api, primeApiCache } from '@/lib/api';
 import { primeNotificationsCache } from '@/lib/notification-cache';
 import { splashSeenKey } from '@/lib/startup-splash';
+import { hasEstablishmentCapability } from '@/lib/access-control';
+import { establishmentDashboardPath, readActiveEstablishmentId } from '@/lib/establishment-context';
 
 const PLATFORM_SPLASH_MIN_MS = 900;
 
@@ -45,12 +47,9 @@ function primeCandidateDashboard(data: CandidateDashboardData) {
 
 function primeEstablishmentDashboard(data: EstablishmentDashboardData) {
   if (data.establishment) {
-    primeApiCache('/establishments/me', [data.establishment]);
     primeApiCache(`/establishment/applications?establishmentId=${data.establishment.id}`, data.applications);
     primeApiCache(`/missions/mine?establishmentId=${data.establishment.id}`, data.missions);
-    api.preload(`/billing/establishments/${data.establishment.id}/status`);
   }
-  primeApiCache('/conversations', data.conversations);
 }
 
 async function preloadConversationMessages(conversations: Conversation[]) {
@@ -76,15 +75,27 @@ async function warmStartupData(user: CurrentUser | null) {
   }
 
   if (user.role.startsWith('ESTABLISHMENT_')) {
-    const [dashboardResult] = await Promise.allSettled([
-      api.get<EstablishmentDashboardData>('/establishment/dashboard'),
+    const [establishmentsResult] = await Promise.allSettled([
+      api.get<Establishment[]>('/establishments/me'),
       api.get('/notifications'),
     ]);
 
-    if (dashboardResult.status === 'fulfilled') {
-      primeEstablishmentDashboard(dashboardResult.value);
-      await preloadConversationMessages(dashboardResult.value.conversations);
-    }
+    if (
+      establishmentsResult.status !== 'fulfilled'
+      || !hasEstablishmentCapability(user.role, 'view_recruitment')
+    ) return;
+
+    const storedId = readActiveEstablishmentId(user.id);
+    const selectedId = storedId && establishmentsResult.value.some((item) => item.id === storedId)
+      ? storedId
+      : establishmentsResult.value.length === 1
+        ? establishmentsResult.value[0].id
+        : null;
+    if (!selectedId) return;
+
+    const dashboard = await api.get<EstablishmentDashboardData>(establishmentDashboardPath(selectedId));
+    primeEstablishmentDashboard(dashboard);
+    await preloadConversationMessages(dashboard.conversations);
   }
 }
 

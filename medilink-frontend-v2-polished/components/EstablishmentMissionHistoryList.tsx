@@ -9,6 +9,7 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, statusLabel } from '@/lib/labels';
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
+import { EstablishmentCapabilityGate } from './EstablishmentCapability';
 
 function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'billing' }) {
   if (type === 'message') {
@@ -51,7 +52,11 @@ export function EstablishmentMissionHistoryList({
       <EmptyState
         title="Aucune mission validée dans l'agenda"
         description="Publiez une mission pour la retrouver dans le calendrier et suivre les candidatures."
-        action={<LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>}
+        action={(
+          <EstablishmentCapabilityGate capability="create_mission">
+            <LinkButton href="/establishment/missions/new">Créer une mission</LinkButton>
+          </EstablishmentCapabilityGate>
+        )}
       />
     );
   }

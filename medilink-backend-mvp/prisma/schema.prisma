@@ -308,6 +308,7 @@ model User {
   emailEvents     EmailEvent[]
   auditLogs       AuditLog[] @relation("ActorAuditLogs")
   agreementEvents AgreementEvent[] @relation("AgreementEventActor")
+  workspaceNotes  WorkspaceNote[]
 }
 
 model Session {
@@ -488,6 +489,7 @@ model Establishment {
   billingCustomer BillingCustomer?
   subscription  EstablishmentSubscription?
   publicationCredits PublicationCredit[]
+  workspaceNotes WorkspaceNote[]
 
   @@index([sector])
   @@index([patientType])
@@ -594,6 +596,26 @@ model Mission {
   @@index([patientType])
   @@index([softwareUsed])
   @@index([startDate])
+}
+
+model WorkspaceNote {
+  id              String   @id @default(uuid())
+  key             String
+  content         String
+  ownerUserId     String?
+  establishmentId String?
+  updatedById     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  ownerUser     User?          @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  establishment Establishment? @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerUserId, key])
+  @@unique([establishmentId, key])
+  @@index([ownerUserId])
+  @@index([establishmentId])
+  @@index([key])
 }
 
 model MissionCandidateMatch {

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { Alert, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -87,7 +88,9 @@ export default function EstablishmentMissionHistoryPage() {
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
           <p>Créez votre fiche établissement pour publier des missions puis les suivre ici.</p>
-          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          <EstablishmentCapabilityGate capability="create_establishment">
+            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          </EstablishmentCapabilityGate>
         </Card>
       ) : (
         <EstablishmentMissionHistoryList rows={rows} />

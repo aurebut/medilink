@@ -7,6 +7,7 @@ import type { Establishment, EstablishmentType } from '@/lib/types';
 import { establishmentTypeOptions } from '@/lib/labels';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManager';
+import { EstablishmentTeamManager } from '@/components/EstablishmentTeamManager';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
 import {
@@ -120,6 +121,11 @@ export default function EditEstablishmentPage() {
             onChanged={reload}
           />
         </Card>
+
+        <EstablishmentTeamManager
+          establishment={establishment}
+          onChanged={() => reload({ reload: true })}
+        />
 
         <Card>
           <h2>Informations générales</h2>

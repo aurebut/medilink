@@ -364,8 +364,8 @@ function OverviewTab({ summary, year, settlements, openTransactions, openSettlem
             <p>Recettes encaissées moins dépenses professionnelles connues.</p>
           </div>
           <div className="billing-overview-kpis">
-            <div><span>Recettes</span><strong>{formatMoney(summary.revenue)}</strong><small>{summary.revenueEntries.length} écriture(s)</small></div>
-            <div><span>Dépenses</span><strong>{formatMoney(summary.expenses)}</strong><small>{summary.expenseEntries.length} écriture(s)</small></div>
+            <div><span>Recettes</span><strong>{formatMoney(summary.revenue)}</strong><small>{summary.revenueEntries.length} {summary.revenueEntries.length === 1 ? 'écriture' : 'écritures'}</small></div>
+            <div><span>Dépenses</span><strong>{formatMoney(summary.expenses)}</strong><small>{summary.expenseEntries.length} {summary.expenseEntries.length === 1 ? 'écriture' : 'écritures'}</small></div>
             <div><span>Disponible prudent</span><strong>{formatMoney(summary.available)}</strong><small>Après réserve indicative</small></div>
           </div>
         </div>

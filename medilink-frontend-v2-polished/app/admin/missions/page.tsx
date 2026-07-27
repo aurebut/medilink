@@ -50,27 +50,28 @@ export default function AdminMissionsPage() {
     <>
       <PageHeader title="Missions" description="Modération simple des missions." />
       {error ? <Alert type="error">{error}</Alert> : null}
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
+          <caption className="sr-only">Liste des missions</caption>
           <thead>
             <tr>
-              <th>Mission</th>
-              <th>Établissement</th>
-              <th>Type</th>
-              <th>Date</th>
-              <th>Statut</th>
-              <th>Action</th>
+              <th scope="col">Mission</th>
+              <th scope="col">Établissement</th>
+              <th scope="col">Type</th>
+              <th scope="col">Date</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             {items.map((m) => (
               <tr key={m.id}>
-                <td><strong>{m.title}</strong><div className="small">{m.city}</div></td>
-                <td>{m.establishment?.name || '—'}</td>
-                <td>{missionTypeLabel(m.missionType)}</td>
-                <td>{formatDate(m.startDate)}</td>
-                <td><Badge tone={tone(m.status) as any}>{statusLabel(m.status)}</Badge></td>
-                <td><Button variant="danger" disabled={m.status !== 'PUBLISHED'} onClick={() => unpublish(m.id)}>Dépublier</Button></td>
+                <td data-label="Mission"><strong>{m.title}</strong><div className="small">{m.city}</div></td>
+                <td data-label="Établissement">{m.establishment?.name || '—'}</td>
+                <td data-label="Type">{missionTypeLabel(m.missionType)}</td>
+                <td data-label="Date">{formatDate(m.startDate)}</td>
+                <td data-label="Statut"><Badge tone={tone(m.status) as any}>{statusLabel(m.status)}</Badge></td>
+                <td data-label="Action"><Button variant="danger" disabled={m.status !== 'PUBLISHED'} onClick={() => unpublish(m.id)}>Dépublier</Button></td>
               </tr>
             ))}
           </tbody>

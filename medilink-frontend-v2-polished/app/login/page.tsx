@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { AuthPage } from '@/components/AuthPage';
-import { Alert, Button, Field, Input } from '@/components/ui';
+import { Alert, Button, Field, Input, PasswordInput } from '@/components/ui';
 import { safePostLoginRoute } from '@/lib/routes';
 
 function LoginForm() {
@@ -45,8 +45,31 @@ function LoginForm() {
       )}
     >
         {error ? <Alert type="error">{error}</Alert> : null}
-        <Field label="Email"><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="vous@example.com" /></Field>
-        <Field label="Mot de passe"><Input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Votre mot de passe" /></Field>
+        <Field label="Email">
+          <Input
+            type="email"
+            name="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            spellCheck={false}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="vous@example.com"
+          />
+        </Field>
+        <Field label="Mot de passe">
+          <PasswordInput
+            name="password"
+            autoComplete="current-password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Votre mot de passe"
+          />
+        </Field>
         <Button block disabled={loading}>{loading ? 'Connexion...' : 'Se connecter'}</Button>
     </AuthPage>
   );

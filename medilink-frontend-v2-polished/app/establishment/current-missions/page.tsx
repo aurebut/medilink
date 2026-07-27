@@ -8,13 +8,13 @@ import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelL
 import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
-type NotesByApplication = Record<string, string>;
-
 type MissionStep = {
   key: string;
   label: string;
@@ -115,10 +115,6 @@ function missionSchedule(mission?: Mission) {
   return hours ? `${dates} - ${hours}` : dates;
 }
 
-function notesStorageKey(establishmentId: string) {
-  return `medilink_current_mission_notes_${establishmentId}`;
-}
-
 function readableList(values?: string[] | null, mapper?: (val: string) => string) {
   if (!values?.length) return null;
   return mapper ? values.map(mapper).join(', ') : values.join(', ');
@@ -173,6 +169,9 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
   const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
   const paymentReleased = Boolean(status === 'PAYMENT_RELEASED' || agreement?.payment?.releasedAt);
   const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
+  const isRetrocession =
+    agreement?.compensationMode === 'RETROCESSION'
+    || application.mission?.compensationMode === 'RETROCESSION';
   const startDate = missionStart(application, agreement);
   const endDate = missionEnd(application, agreement);
   const startLabel = startDate ? formatDate(startDate) : 'Date à confirmer';
@@ -184,7 +183,34 @@ function missionProgress(application: Application, agreement?: MissionAgreement 
     { key: 'ended', label: 'Fin de mission', helper: scheduleEnded ? 'La date de fin de mission est passée.' : 'Cette étape se validera à la date de fin de mission.', status: scheduleEnded ? 'Terminée' : 'À venir', dateLabel: endLabel, active: active, done: scheduleEnded },
     { key: 'documents', label: 'Documents de mission', helper: 'Le candidat doit déposer les fichiers générés pendant la mission.', status: scheduleEnded ? 'À finaliser' : scheduleStarted ? 'À préparer' : 'À venir', active: scheduleEnded && !completed, done: completed },
     { key: 'completed', label: 'Validation de mission', helper: completed ? 'La mission a été validée.' : scheduleEnded ? 'La mission est terminée, en attente de validation.' : 'Cette étape suivra la fin de mission et les documents.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'payment', label: 'Règlement', helper: paymentReleased ? 'Le paiement du candidat est libéré.' : paymentSecured ? 'Paiement sécurisé, libération après validation.' : 'Paiement en attente de confirmation.', status: paymentReleased ? 'Libéré' : paymentSecured ? 'Sécurisé' : 'En attente', active: completed && !paymentReleased, done: paymentReleased },
+    {
+      key: 'payment',
+      label: isRetrocession ? 'Rétrocession' : 'Règlement',
+      helper: isRetrocession
+        ? paymentReleased
+          ? 'La rétrocession déclarée a été validée.'
+          : paymentSecured
+            ? 'La mission est confirmée. Le règlement reste à suivre entre les parties.'
+            : 'Les conditions de rétrocession restent à confirmer.'
+        : paymentReleased
+          ? 'Le paiement du candidat est libéré.'
+          : paymentSecured
+            ? 'Paiement sécurisé, libération après validation.'
+            : 'Paiement en attente de confirmation.',
+      status: isRetrocession
+        ? paymentReleased
+          ? 'Validée'
+          : paymentSecured
+            ? 'Mission confirmée'
+            : 'À confirmer'
+        : paymentReleased
+          ? 'Libéré'
+          : paymentSecured
+            ? 'Sécurisé'
+            : 'En attente',
+      active: completed && !paymentReleased,
+      done: paymentReleased,
+    },
   ];
 }
 
@@ -194,7 +220,16 @@ export default function EstablishmentCurrentMissionsPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [missionsLoading, setMissionsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notes, setNotes] = useState<NotesByApplication>({});
+  const {
+    notes,
+    error: notesError,
+    savingKey: savingNoteKey,
+    save: saveMissionNote,
+  } = useWorkspaceNotes({
+    establishmentId: primary?.id,
+    prefix: 'mission:',
+    enabled: Boolean(primary),
+  });
 
   const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -250,16 +285,6 @@ export default function EstablishmentCurrentMissionsPage() {
     setApplications(nextApplications);
     setConversations(nextConversations);
   }, { enabled: Boolean(primary) && !missionsLoading });
-
-  useEffect(() => {
-    if (!primary || typeof window === 'undefined') return;
-    try {
-      const stored = window.localStorage.getItem(notesStorageKey(primary.id));
-      setNotes(stored ? JSON.parse(stored) : {});
-    } catch {
-      setNotes({});
-    }
-  }, [primary]);
 
   const currentApplications = useMemo(() => {
     return applications
@@ -323,14 +348,6 @@ export default function EstablishmentCurrentMissionsPage() {
       .finally(() => setLoadingDetails(false));
   }, [selectedApplicationId, currentApplications]);
 
-  function updateNote(missionId: string, value: string) {
-    const next = { ...notes, [missionId]: value };
-    setNotes(next);
-    if (primary && typeof window !== 'undefined') {
-      window.localStorage.setItem(notesStorageKey(primary.id), JSON.stringify(next));
-    }
-  }
-
   function updateLocalMission(missionId: string, updatedFields: Partial<Mission>) {
     setApplications((current) =>
       current.map((app) => {
@@ -387,12 +404,15 @@ export default function EstablishmentCurrentMissionsPage() {
       />
 
       {error ? <Alert type="error">{error}</Alert> : null}
+      {notesError ? <Alert type="error">{notesError}</Alert> : null}
 
       {!primary ? (
         <Card className="card-highlight">
           <h2>Aucun établissement rattaché</h2>
           <p>Créez votre fiche établissement pour publier des missions puis suivre les missions confirmées ici.</p>
-          <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          <EstablishmentCapabilityGate capability="create_establishment">
+            <LinkButton href="/establishment/onboarding">Créer mon établissement</LinkButton>
+          </EstablishmentCapabilityGate>
         </Card>
       ) : currentApplications.length === 0 ? (
         <Card className="card-highlight current-missions-empty">
@@ -400,7 +420,9 @@ export default function EstablishmentCurrentMissionsPage() {
           <p>Les missions apparaissent ici dès qu'une candidature est acceptée. Vous pourrez ensuite suivre le planning, contacter le candidat et ajouter vos notes terrain.</p>
           <div className="actions">
             <LinkButton href="/establishment/missions?tab=applications">Traiter les candidatures</LinkButton>
-            <LinkButton variant="light" href="/establishment/missions/new">Créer une mission</LinkButton>
+            <EstablishmentCapabilityGate capability="create_mission">
+              <LinkButton variant="light" href="/establishment/missions/new">Créer une mission</LinkButton>
+            </EstablishmentCapabilityGate>
           </div>
         </Card>
       ) : (
@@ -515,8 +537,9 @@ export default function EstablishmentCurrentMissionsPage() {
                       <MissionControlPanel
                         row={selectedRow}
                         activeSection={activeSection}
-                        notes={notes}
-                        updateNote={updateNote}
+                        note={notes[selectedRow.application.mission?.id || ''] || ''}
+                        noteSaving={savingNoteKey === selectedRow.application.mission?.id}
+                        saveNote={saveMissionNote}
                         candidateProfile={candidateProfile}
                         profileLoading={loadingDetails}
                         setError={setError}
@@ -585,8 +608,9 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
 function MissionControlPanel({
   row,
   activeSection,
-  notes,
-  updateNote,
+  note,
+  noteSaving,
+  saveNote,
   candidateProfile,
   profileLoading,
   setError,
@@ -594,8 +618,9 @@ function MissionControlPanel({
 }: {
   row: MissionRow;
   activeSection: MissionSection;
-  notes: NotesByApplication;
-  updateNote: (missionId: string, val: string) => void;
+  note: string;
+  noteSaving: boolean;
+  saveNote: (missionId: string, value: string) => Promise<boolean>;
   candidateProfile: CandidateProfileForApplication | null;
   profileLoading: boolean;
   setError: (err: string | null) => void;
@@ -612,10 +637,15 @@ function MissionControlPanel({
   const [editPracticalInfo, setEditPracticalInfo] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [savingBrief, setSavingBrief] = useState(false);
+  const [internalNote, setInternalNote] = useState(note);
 
   useEffect(() => {
     setIsEditingBrief(false);
   }, [row.application.id]);
+
+  useEffect(() => {
+    setInternalNote(note);
+  }, [mission?.id, note]);
 
   const [practicalInfoValue, setPracticalInfoValue] = useState(mission?.practicalInfo || '');
 
@@ -846,15 +876,20 @@ function MissionControlPanel({
                     onChange={(e) => setEditPracticalInfo(e.target.value)}
                   />
                 </div>
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Notes internes (privées à l'établissement)</h3>
+                <label className="field" style={{ display: 'grid', gap: 6 }}>
+                  <span className="label">Notes internes (privées à l'établissement)</span>
                   <Textarea
-                    value={notes[mission?.id || ''] || ''}
+                    value={internalNote}
                     rows={5}
                     placeholder="Ex: code d'entrée, contact sur place, code parking, documents à vérifier..."
-                    onChange={(event) => updateNote(mission?.id || '', event.target.value)}
+                    onChange={(event) => setInternalNote(event.target.value)}
+                    onBlur={() => {
+                      if (mission?.id && internalNote !== note) void saveNote(mission.id, internalNote);
+                    }}
+                    disabled={noteSaving}
                   />
-                </div>
+                  <small aria-live="polite">{noteSaving ? 'Enregistrement…' : 'Enregistré automatiquement après modification.'}</small>
+                </label>
               </div>
             </div>
           ) : (
@@ -885,15 +920,20 @@ function MissionControlPanel({
                     onBlur={(e) => void savePracticalInfo(e.target.value)}
                   />
                 </div>
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <h3 style={{ fontSize: 16, margin: 0, color: 'var(--heading)' }}>Notes internes (privées)</h3>
+                <label className="field" style={{ display: 'grid', gap: 6 }}>
+                  <span className="label">Notes internes (privées)</span>
                   <Textarea
-                    value={notes[mission?.id || ''] || ''}
+                    value={internalNote}
                     rows={5}
                     placeholder="Ex: code d'entrée, contact sur place, code parking, documents à vérifier..."
-                    onChange={(event) => updateNote(mission?.id || '', event.target.value)}
+                    onChange={(event) => setInternalNote(event.target.value)}
+                    onBlur={() => {
+                      if (mission?.id && internalNote !== note) void saveNote(mission.id, internalNote);
+                    }}
+                    disabled={noteSaving}
                   />
-                </div>
+                  <small aria-live="polite">{noteSaving ? 'Enregistrement…' : 'Enregistré automatiquement après modification.'}</small>
+                </label>
               </div>
 
               {detailItems.length > 0 ? (

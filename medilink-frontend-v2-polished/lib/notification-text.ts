@@ -6,9 +6,9 @@ const exactNotificationText: Record<string, string> = {
   'Proposition finale envoyee': 'Proposition finale envoyée',
   'Proposition acceptee, paiement requis': 'Proposition acceptée, paiement requis',
   'Proposition refusee': 'Proposition refusée',
-  'Paiement securise': 'Paiement sécurisé',
+  'Paiement securise': 'Mission confirmée',
   'Mission terminee': 'Mission terminée',
-  'Paiement libere': 'Paiement libéré',
+  'Paiement libere': 'Rétrocession validée',
   'Factures generees': 'Factures générées',
   'Mise a jour de la mission': 'Mise à jour de la mission',
 };

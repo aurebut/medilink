@@ -97,32 +97,33 @@ export default function AdminDocumentsPage() {
 
       {error ? <Alert type="error">{error}</Alert> : null}
 
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
+          <caption className="sr-only">Liste des documents à vérifier</caption>
           <thead>
             <tr>
-              <th>Propriétaire</th>
-              <th>Document</th>
-              <th>Statut</th>
-              <th>Date</th>
-              <th>Actions</th>
+              <th scope="col">Propriétaire</th>
+              <th scope="col">Document</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Date</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
             {docs.map((d) => (
               <tr key={d.id}>
-                <td>
+                <td data-label="Propriétaire">
                   <strong>{d.owner?.email}</strong>
                   <div className="small">{d.owner?.profile?.firstName} {d.owner?.profile?.lastName}</div>
                 </td>
-                <td>
+                <td data-label="Document">
                   <strong>{documentTypeLabel(d.documentType)}</strong>
                   <div className="small">{d.fileName}</div>
                   {d.rejectionReason ? <div className="small">Motif : {d.rejectionReason}</div> : null}
                 </td>
-                <td><Badge tone={tone(d.verificationStatus) as any}>{statusLabel(d.verificationStatus)}</Badge></td>
-                <td>{formatDateTime(d.createdAt)}</td>
-                <td className="actions">
+                <td data-label="Statut"><Badge tone={tone(d.verificationStatus) as any}>{statusLabel(d.verificationStatus)}</Badge></td>
+                <td data-label="Date">{formatDateTime(d.createdAt)}</td>
+                <td className="actions" data-label="Actions">
                   <Button variant="light" onClick={() => view(d.id)}>Voir</Button>
                   <Button variant="success" disabled={d.verificationStatus === 'APPROVED'} onClick={() => approve(d.id)}>Valider</Button>
                   <Button variant="danger" disabled={d.verificationStatus === 'REJECTED'} onClick={() => reject(d.id)}>Refuser</Button>
@@ -131,7 +132,7 @@ export default function AdminDocumentsPage() {
             ))}
             {docs.length === 0 ? (
               <tr>
-                <td colSpan={5}>Aucun document.</td>
+                <td colSpan={5} data-label="">Aucun document.</td>
               </tr>
             ) : null}
           </tbody>

@@ -79,6 +79,20 @@ export class ApplicationsService {
 
     await this.profiles.assertMinimumCompletion(user.id, 40);
 
+    const approvedCv = await this.prisma.document.findFirst({
+      where: {
+        userId: user.id,
+        documentType: DocumentType.CV,
+        verificationStatus: DocumentVerificationStatus.APPROVED,
+      },
+      select: { id: true },
+    });
+    if (!approvedCv) {
+      throw new BadRequestException(
+        'Un CV validé est requis avant de pouvoir postuler.',
+      );
+    }
+
     const existing = await this.prisma.application.findUnique({
       where: {
         missionId_candidateUserId: {

@@ -299,11 +299,11 @@ export class NotificationsService {
       const payload = JSON.parse(body.slice(WORKFLOW_PREFIX.length));
       const labels: Record<string, string> = {
         FINAL_PROPOSAL: 'Proposition finale envoyée',
-        PAYMENT_REQUIRED: 'Proposition acceptée, paiement requis',
+        PAYMENT_REQUIRED: 'Proposition acceptée, confirmation requise',
         PROPOSAL_REJECTED: 'Proposition refusée',
-        FUNDS_SECURED: 'Paiement sécurisé',
+        FUNDS_SECURED: 'Mission confirmée',
         MISSION_COMPLETED: 'Mission terminée',
-        PAYMENT_RELEASED: 'Paiement libéré',
+        PAYMENT_RELEASED: 'Rétrocession validée',
         INVOICES_GENERATED: 'Factures générées',
       };
       return labels[payload.kind] || 'Mise à jour de la mission';

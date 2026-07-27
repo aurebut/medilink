@@ -12,7 +12,8 @@ import { confirmNotificationRead, normalizeNotifications, primeNotificationsCach
 import { formatNotificationText } from '@/lib/notification-text';
 import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Badge, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { userFacingError } from '@/lib/user-facing';
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -97,6 +98,7 @@ export default function CandidateDashboardPage() {
     cachedDashboard?.notifications ? normalizeNotifications(cachedDashboard.notifications) : [],
   );
   const [loading, setLoading] = useState(!cachedDashboard);
+  const [error, setError] = useState<string | null>(null);
 
   function applyDashboardData(data: CandidateDashboardData) {
     primeApiCache('/me/profile', data.profile);
@@ -113,16 +115,37 @@ export default function CandidateDashboardPage() {
 
   useEffect(() => {
     const unsubscribe = subscribeApiCache<CandidateDashboardData>('/me/dashboard', applyDashboardData);
+    setError(null);
     api.get<CandidateDashboardData>('/me/dashboard')
       .then(applyDashboardData)
+      .catch((caught) => {
+        setError(userFacingError(caught, 'Impossible de charger votre tableau de bord.'));
+      })
       .finally(() => setLoading(false));
 
     return unsubscribe;
   }, []);
 
   useAutoRefresh(async () => {
-    applyDashboardData(await api.reload<CandidateDashboardData>('/me/dashboard'));
+    try {
+      applyDashboardData(await api.reload<CandidateDashboardData>('/me/dashboard'));
+      setError(null);
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible d’actualiser votre tableau de bord.'));
+    }
   }, { enabled: !loading });
+
+  async function retryDashboard() {
+    setLoading(true);
+    setError(null);
+    try {
+      applyDashboardData(await api.reload<CandidateDashboardData>('/me/dashboard'));
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible de charger votre tableau de bord.'));
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const dashboard = useMemo(() => {
     const sortedApplications = [...applications].sort((a, b) => {
@@ -228,7 +251,7 @@ export default function CandidateDashboardPage() {
       tone = 'info';
       label = 'Mission en attente';
       amountLabel = `${dashboard.billingPending.length} en attente`;
-      description = 'Les missions validées entreront dans le registre après paiement libéré.';
+      description = 'Les missions validées entreront dans le registre après validation de la rétrocession déclarée.';
       buttonText = 'Voir ma compta';
       buttonHref = '/app/billing';
       buttonVariant = 'light';
@@ -253,6 +276,14 @@ export default function CandidateDashboardPage() {
         title={`Bonjour ${firstName}`}
         description={`Votre espace ${gendered(profile, 'connecté', 'connectée')} pour prioriser les missions, garder un dossier solide et suivre les réponses.`}
       />
+      {error ? (
+        <Alert type="error">
+          {error}{' '}
+          <Button type="button" variant="light" onClick={() => void retryDashboard()}>
+            Réessayer
+          </Button>
+        </Alert>
+      ) : null}
 
       <div className="candidate-dashboard">
         <Card className="dashboard-week-card">

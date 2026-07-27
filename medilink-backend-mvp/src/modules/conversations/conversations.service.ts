@@ -171,7 +171,6 @@ export class ConversationsService {
   }
 
   async sendProposal(user: RequestUser, conversationId: string, dto: SendProposalDto) {
-    this.assertEscrowWorkflowAvailable();
     const conversation = await this.ensureRecruiterForConversation(user, conversationId);
     if (dto.compensationMode && dto.compensationMode !== CompensationMode.RETROCESSION) {
       throw new BadRequestException("Seule la retrocession d'honoraires est autorisee pour une proposition.");
@@ -238,9 +237,9 @@ export class ConversationsService {
   }
 
   async acceptProposal(user: RequestUser, conversationId: string) {
-    this.assertEscrowWorkflowAvailable();
     const conversation = await this.ensureCandidateForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PROPOSED);
+    this.assertPaymentWorkflowAvailable(agreement.compensationMode);
 
     const message = await this.prisma.$transaction(async (tx) => {
       const now = new Date();
@@ -398,9 +397,9 @@ export class ConversationsService {
   }
 
   async securePayment(user: RequestUser, conversationId: string) {
-    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_REQUIRED);
+    this.assertPaymentWorkflowAvailable(agreement.compensationMode);
 
     const message = await this.prisma.$transaction(async (tx) => {
       const updatedAgreement = await tx.missionAgreement.update({
@@ -410,7 +409,10 @@ export class ConversationsService {
           payment: {
             update: {
               status: EscrowPaymentStatus.SECURED,
-              providerRef: `mock_${Date.now()}`,
+              providerRef:
+                agreement.compensationMode === CompensationMode.RETROCESSION
+                  ? undefined
+                  : `mock_${Date.now()}`,
               securedAt: new Date(),
             },
           },
@@ -439,9 +441,9 @@ export class ConversationsService {
   }
 
   async markCompleted(user: RequestUser, conversationId: string) {
-    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.FUNDS_SECURED);
+    this.assertPaymentWorkflowAvailable(agreement.compensationMode);
 
     const message = await this.prisma.$transaction(async (tx) => {
       const updatedAgreement = await tx.missionAgreement.update({
@@ -474,9 +476,9 @@ export class ConversationsService {
   }
 
   async releasePayment(user: RequestUser, conversationId: string, dto: ReleasePaymentDto) {
-    this.assertEscrowWorkflowAvailable();
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.COMPLETED);
+    this.assertPaymentWorkflowAvailable(agreement.compensationMode);
 
     const message = await this.prisma.$transaction(async (tx) => {
       const paidAt = new Date();
@@ -529,9 +531,9 @@ export class ConversationsService {
   }
 
   async generateInvoices(user: RequestUser, conversationId: string) {
-    this.assertEscrowWorkflowAvailable();
     await this.permissions.ensureConversationParticipant(user.id, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.PAYMENT_RELEASED);
+    this.assertPaymentWorkflowAvailable(agreement.compensationMode);
 
     const message = await this.prisma.$transaction(async (tx) => {
       const invoices = await this.ensureInvoicesTx(tx, agreement);
@@ -680,7 +682,11 @@ export class ConversationsService {
     return conversation;
   }
 
-  private assertEscrowWorkflowAvailable() {
+  private assertPaymentWorkflowAvailable(compensationMode?: CompensationMode | null) {
+    if (compensationMode === CompensationMode.RETROCESSION) {
+      return;
+    }
+
     const provider = (this.config.get<string>('ESCROW_PROVIDER') || 'mock').toLowerCase();
     const isProduction = this.config.get<string>('NODE_ENV') === 'production';
 

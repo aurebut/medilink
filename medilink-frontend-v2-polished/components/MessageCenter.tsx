@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api, getApiCacheValue, getApiEventUrl, getApiUrl, subscribeApiCache } from '@/lib/api';
 import type { Conversation, Message, Profile } from '@/lib/types';
@@ -104,7 +104,9 @@ function parseWorkflow(message: Message): WorkflowPayload | null {
 }
 
 function isRecruiterRole(role?: string) {
-  return Boolean(role && role !== 'CANDIDATE');
+  return role === 'ESTABLISHMENT_OWNER'
+    || role === 'ESTABLISHMENT_ADMIN'
+    || role === 'ESTABLISHMENT_RECRUITER';
 }
 
 function createClientRequestId() {
@@ -151,7 +153,7 @@ function workflowLabel(kind: WorkflowKind) {
   return labels[kind];
 }
 
-export function MessageCenter() {
+export function MessageCenter({ establishmentId }: { establishmentId?: string }) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
   const conversationIdParam = searchParams.get('id');
@@ -185,7 +187,16 @@ export function MessageCenter() {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const activeIdRef = useRef<string | null>(null);
   const sendingMessageRef = useRef(0);
+  const composerId = useId();
+  const composerHelpId = `${composerId}-help`;
+  const conversationTitleId = useId();
   activeIdRef.current = activeId;
+
+  function scopeConversations(data: ConversationWithLast[]) {
+    return establishmentId
+      ? data.filter((conversation) => conversation.establishmentId === establishmentId)
+      : data;
+  }
 
   const active = useMemo(() => conversations.find((c) => c.id === activeId) || null, [conversations, activeId]);
   const visibleConversations = useMemo(() => {
@@ -245,12 +256,16 @@ export function MessageCenter() {
       const data = options.reload
         ? await api.reload<ConversationWithLast[]>('/conversations')
         : await api.get<ConversationWithLast[]>('/conversations');
-      setConversations(data);
-      const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
+      const scopedData = scopeConversations(data);
+      setConversations(scopedData);
+      const requestedId = conversationIdParam && scopedData.some((item) => item.id === conversationIdParam)
+        ? conversationIdParam
+        : null;
+      const initialActiveId = requestedId || (scopedData[0] && !isMobile ? scopedData[0].id : null);
       if (initialActiveId) {
         setActiveId(initialActiveId);
       }
-      data.slice(0, 3).forEach((conversation) => {
+      scopedData.slice(0, 3).forEach((conversation) => {
         if (conversation.id !== activeIdRef.current) {
           api.preload(`/conversations/${conversation.id}/messages`);
         }
@@ -293,10 +308,14 @@ export function MessageCenter() {
   }, [isMobile, activeId, conversations, conversationIdParam]);
   useEffect(() => {
     const unsubscribe = subscribeApiCache<ConversationWithLast[]>('/conversations', (data) => {
-      setConversations(data);
-      const initialActiveId = conversationIdParam || (data[0] && !isMobile ? data[0].id : null);
+      const scopedData = scopeConversations(data);
+      setConversations(scopedData);
+      const requestedId = conversationIdParam && scopedData.some((item) => item.id === conversationIdParam)
+        ? conversationIdParam
+        : null;
+      const initialActiveId = requestedId || (scopedData[0] && !isMobile ? scopedData[0].id : null);
       if (!activeIdRef.current && initialActiveId) setActiveId(initialActiveId);
-      data.slice(0, 3).forEach((conversation) => {
+      scopedData.slice(0, 3).forEach((conversation) => {
         if (conversation.id !== activeIdRef.current) {
           api.preload(`/conversations/${conversation.id}/messages`);
         }
@@ -307,10 +326,12 @@ export function MessageCenter() {
     return unsubscribe;
   }, []);
   useEffect(() => {
-    if (conversationIdParam) {
+    if (conversationIdParam && conversations.some((item) => item.id === conversationIdParam)) {
       setActiveId(conversationIdParam);
+    } else if (conversationIdParam && !loading) {
+      setActiveId(null);
     }
-  }, [conversationIdParam]);
+  }, [conversationIdParam, conversations, loading]);
   useEffect(() => {
     if (!activeId) return;
     setMobileOptionsOpen(false);
@@ -417,7 +438,7 @@ export function MessageCenter() {
         }
 
         api.get<ConversationWithLast[]>('/conversations')
-          .then(setConversations)
+          .then((data) => setConversations(scopeConversations(data)))
           .catch((e: any) => setError(e.message));
       } catch {
         // Ignore malformed realtime payloads; the next focus refresh will recover state.
@@ -779,7 +800,9 @@ export function MessageCenter() {
         <div className="toolbar">
           <div>
             <h2>Conversations</h2>
-            <div className="small">{conversations.length} échange(s)</div>
+            <div className="small">
+              {conversations.length} {conversations.length === 1 ? 'échange' : 'échanges'}
+            </div>
           </div>
         </div>
         {isMobile ? (
@@ -851,7 +874,7 @@ export function MessageCenter() {
                 </button>
               ) : null}
               <div className="conversation-title-meta">
-                <h2>{active?.mission?.title || 'Conversation'}</h2>
+                <h2 id={conversationTitleId}>{active?.mission?.title || 'Conversation'}</h2>
                 <div className="conversation-subtitle">{active?.establishment?.name} • {active?.mission?.city}</div>
               </div>
             </div>
@@ -909,6 +932,8 @@ export function MessageCenter() {
           />
         ) : null}
 
+        {!showConversationList && error ? <Alert type="error">{error}</Alert> : null}
+
         {!isMobile && desktopTimelineOpen ? (
           <DesktopWorkflowTimeline
             steps={workflowTimelineSteps}
@@ -933,50 +958,69 @@ export function MessageCenter() {
             />
           ) : null}
 
-          {messages.map((m) => {
-            const workflow = parseWorkflow(m);
-            if (workflow) {
-              return (
-                <WorkflowMessageCard
-                  key={m.id}
-                  workflow={workflow}
-                  createdAt={m.createdAt}
-                  active={active}
-                  candidateProfile={activeCandidateProfile}
-                  candidateCanAnswer={candidate && workflow.kind === 'FINAL_PROPOSAL' && !state.paymentRequired && !state.fundsSecured && !state.rejected}
-                  recruiterCanSecure={recruiter && workflow.kind === 'PAYMENT_REQUIRED' && !state.fundsSecured}
-                  recruiterCanComplete={recruiter && workflow.kind === 'FUNDS_SECURED' && !state.completed}
-                  recruiterCanPay={recruiter && workflow.kind === 'MISSION_COMPLETED' && !state.released}
-                  canGenerateInvoices={workflow.kind === 'PAYMENT_RELEASED' && !state.invoices}
-                  canDownloadInvoices={workflow.kind === 'INVOICES_GENERATED'}
-                  busyAction={busyAction}
-                  onAccept={() => runAction('accept', '/proposal/accept')}
-                  onReject={() => runAction('reject', '/proposal/reject')}
-                  onSecure={() => runAction('secure', '/payment/secure')}
-                  onComplete={() => runAction('complete', '/mission/complete')}
-                  onPay={(payload) => runAction('pay', '/payment/release', payload)}
-                  onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
-                  onDownloadRecruiter={() => void downloadInvoice('recruiter')}
-                  onDownloadCandidate={() => void downloadInvoice('candidate')}
-                />
-              );
-            }
+          <div
+            className="message-log"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions text"
+            aria-labelledby={conversationTitleId}
+          >
+            {messages.map((m) => {
+              const workflow = parseWorkflow(m);
+              if (workflow) {
+                return (
+                  <WorkflowMessageCard
+                    key={m.id}
+                    workflow={workflow}
+                    createdAt={m.createdAt}
+                    active={active}
+                    candidateProfile={activeCandidateProfile}
+                    candidateCanAnswer={candidate && workflow.kind === 'FINAL_PROPOSAL' && !state.paymentRequired && !state.fundsSecured && !state.rejected}
+                    recruiterCanSecure={recruiter && workflow.kind === 'PAYMENT_REQUIRED' && !state.fundsSecured}
+                    recruiterCanComplete={recruiter && workflow.kind === 'FUNDS_SECURED' && !state.completed}
+                    recruiterCanPay={recruiter && workflow.kind === 'MISSION_COMPLETED' && !state.released}
+                    canGenerateInvoices={workflow.kind === 'PAYMENT_RELEASED' && !state.invoices}
+                    canDownloadInvoices={workflow.kind === 'INVOICES_GENERATED'}
+                    busyAction={busyAction}
+                    onAccept={() => runAction('accept', '/proposal/accept')}
+                    onReject={() => runAction('reject', '/proposal/reject')}
+                    onSecure={() => runAction('secure', '/payment/secure')}
+                    onComplete={() => runAction('complete', '/mission/complete')}
+                    onPay={(payload) => runAction('pay', '/payment/release', payload)}
+                    onGenerateInvoices={() => runAction('invoices', '/invoices/generate')}
+                    onDownloadRecruiter={() => void downloadInvoice('recruiter')}
+                    onDownloadCandidate={() => void downloadInvoice('candidate')}
+                  />
+                );
+              }
 
-            const mine = m.senderUserId === user?.id;
-            const system = m.messageType === 'SYSTEM';
-            return (
-              <div key={m.id} className={`message ${mine ? 'mine' : ''} ${system ? 'system' : ''} ${m.localStatus === 'pending' ? 'pending' : ''}`}>
-                <div>{m.body}</div>
-                <div className="small">{m.localStatus === 'pending' ? 'Envoi...' : formatDateTime(m.createdAt)}</div>
-              </div>
-            );
-          })}
-          <div ref={messagesEndRef} aria-hidden="true" />
+              const mine = m.senderUserId === user?.id;
+              const system = m.messageType === 'SYSTEM';
+              return (
+                <div key={m.id} className={`message ${mine ? 'mine' : ''} ${system ? 'system' : ''} ${m.localStatus === 'pending' ? 'pending' : ''}`}>
+                  <div>{m.body}</div>
+                  <div className="small">{m.localStatus === 'pending' ? 'Envoi...' : formatDateTime(m.createdAt)}</div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} aria-hidden="true" />
+          </div>
         </div>
 
-        <form className="message-form" onSubmit={send}>
-          <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Écrire un message..." />
-          <Button disabled={!body.trim()}>Envoyer</Button>
+        <form className="message-form" onSubmit={send} aria-busy={sendingMessage}>
+          <label className="sr-only" htmlFor={composerId}>Message</label>
+          <Textarea
+            id={composerId}
+            name="message"
+            value={body}
+            aria-describedby={composerHelpId}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="Écrire un message..."
+          />
+          <span id={composerHelpId} className="sr-only">Saisissez votre message, puis activez Envoyer.</span>
+          <Button disabled={!body.trim() || sendingMessage}>
+            {sendingMessage ? 'Envoi...' : 'Envoyer'}
+          </Button>
         </form>
       </Card> : null}
     </div>

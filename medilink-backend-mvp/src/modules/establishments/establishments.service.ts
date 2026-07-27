@@ -97,7 +97,25 @@ export class EstablishmentsService {
   async listMine(userId: string) {
     const establishments = await this.prisma.establishment.findMany({
       where: { members: { some: { userId } } },
-      include: { members: true, photos: this.photoInclude },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                status: true,
+                emailVerified: true,
+                phone: true,
+                createdAt: true,
+              },
+            },
+          },
+          orderBy: [{ role: 'asc' }, { createdAt: 'asc' }],
+        },
+        photos: this.photoInclude,
+      },
       orderBy: { createdAt: 'desc' },
     });
 
@@ -234,13 +252,22 @@ export class EstablishmentsService {
   }
 
   async addMember(user: RequestUser, establishmentId: string, dto: AddMemberDto) {
-    await this.permissions.ensureEstablishmentMember(user.id, establishmentId, [
-      EstablishmentMemberRole.OWNER,
-      EstablishmentMemberRole.ADMIN,
-    ]);
+    const actorMembership = await this.permissions.ensureEstablishmentMember(
+      user.id,
+      establishmentId,
+      [EstablishmentMemberRole.OWNER, EstablishmentMemberRole.ADMIN],
+    );
 
     if (dto.role === EstablishmentMemberRole.OWNER) {
       throw new ForbiddenException('Impossible d’ajouter un propriétaire via cette route.');
+    }
+    if (
+      actorMembership.role === EstablishmentMemberRole.ADMIN &&
+      dto.role === EstablishmentMemberRole.ADMIN
+    ) {
+      throw new ForbiddenException(
+        'Seul le propriétaire peut nommer un autre administrateur.',
+      );
     }
 
     const memberUser = await this.prisma.user.findUnique({
@@ -296,6 +323,46 @@ export class EstablishmentsService {
     });
 
     return member;
+  }
+
+  async removeMember(user: RequestUser, establishmentId: string, memberId: string) {
+    const actorMembership = await this.permissions.ensureEstablishmentMember(
+      user.id,
+      establishmentId,
+      [EstablishmentMemberRole.OWNER, EstablishmentMemberRole.ADMIN],
+    );
+    const member = await this.prisma.establishmentMember.findFirst({
+      where: { id: memberId, establishmentId },
+    });
+
+    if (!member) {
+      throw new NotFoundException('Membre introuvable.');
+    }
+    if (member.role === EstablishmentMemberRole.OWNER) {
+      throw new ForbiddenException('Le propriétaire ne peut pas être retiré de son établissement.');
+    }
+    if (
+      actorMembership.role === EstablishmentMemberRole.ADMIN &&
+      member.role === EstablishmentMemberRole.ADMIN
+    ) {
+      throw new ForbiddenException('Seul le propriétaire peut retirer un administrateur.');
+    }
+    if (member.userId === user.id) {
+      throw new BadRequestException(
+        'Vous ne pouvez pas retirer votre propre accès depuis cet écran.',
+      );
+    }
+
+    await this.prisma.establishmentMember.delete({ where: { id: member.id } });
+    await this.audit.log({
+      actorUserId: user.id,
+      action: 'establishment.member_removed',
+      entityType: 'establishment',
+      entityId: establishmentId,
+      metadata: { memberUserId: member.userId, role: member.role },
+    });
+
+    return { removed: true };
   }
 
   async listPhotos(user: RequestUser, establishmentId: string) {

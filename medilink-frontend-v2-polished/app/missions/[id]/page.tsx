@@ -16,6 +16,7 @@ import { defaultRouteForUser, isEstablishmentRole } from '@/lib/routes';
 import type { Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { PhotoCarousel } from '@/components/PhotoCarousel';
+import { userFacingError } from '@/lib/user-facing';
 
 function sectorLabel(value?: string | null) {
   const labels: Record<string, string> = {
@@ -64,9 +65,9 @@ export default function MissionPage() {
       }
 
       setMission(await read<Mission>(`/missions/${id}`));
-    } catch (e: any) {
+    } catch (caught) {
       setMission(null);
-      setError(e.message);
+      setError(userFacingError(caught, 'Impossible de charger cette mission.'));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -80,9 +81,6 @@ export default function MissionPage() {
 
   const applyPath = useMemo(() => getMissionApplyPath(id), [id]);
   const homeHref = !authLoading && user ? defaultRouteForUser(user) : '/';
-  const applyHref = user?.role === 'CANDIDATE'
-    ? applyPath
-    : `/login?next=${encodeURIComponent(applyPath)}`;
   const hasContextDetails = Boolean(
     mission?.sector ||
     mission?.patientType ||
@@ -116,7 +114,18 @@ export default function MissionPage() {
         </nav>
 
         {loading || authLoading ? <LoadingCard label="Chargement de la mission..." /> : null}
-        {error ? <Alert type="error">{error}</Alert> : null}
+        {error ? (
+          <Alert type="error">
+            {error}{' '}
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => void loadMission({ reload: true })}
+            >
+              Réessayer
+            </button>
+          </Alert>
+        ) : null}
 
         {!loading && !authLoading && mission ? (
           <>
@@ -142,9 +151,13 @@ export default function MissionPage() {
                       />
                     </>
                   ) : (
-                    <>
-                      <LinkButton href={applyHref}>{user?.role === 'CANDIDATE' ? 'Postuler' : 'Se connecter pour postuler'}</LinkButton>
-                    </>
+                    user?.role === 'CANDIDATE' ? (
+                      <LinkButton href={applyPath}>Postuler</LinkButton>
+                    ) : user ? (
+                      <LinkButton href={defaultRouteForUser(user)}>Retour à mon espace</LinkButton>
+                    ) : (
+                      <LinkButton href={`/login?next=${encodeURIComponent(applyPath)}`}>Se connecter pour postuler</LinkButton>
+                    )
                   )}
                 </div>
               </div>

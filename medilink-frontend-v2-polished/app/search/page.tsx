@@ -2,11 +2,16 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/components/AuthProvider';
 import { api } from '@/lib/api';
-import type { Mission, MissionType, Paginated } from '@/lib/types';
+import type { CurrentUser, Mission, MissionType, Paginated } from '@/lib/types';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, missionTypeOptions, requiredLevelLabel } from '@/lib/labels';
 import { Alert, Badge, Button, Card, Field, Input, LoadingCard, Select } from '@/components/ui';
+import { defaultRouteForUser } from '@/lib/routes';
+import { plural, userFacingError } from '@/lib/user-facing';
+
+const PAGE_SIZE = 12;
 
 const emptyFilters = {
   q: '',
@@ -15,9 +20,11 @@ const emptyFilters = {
 };
 
 export default function PublicSearchPage() {
+  const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState<Mission[]>([]);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState(emptyFilters);
+  const [page, setPage] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,17 +33,24 @@ export default function PublicSearchPage() {
     const q = params.get('q') || '';
     const city = params.get('city') || '';
     const mt = params.get('missionType') || '';
+    const initialPage = Math.max(1, Number(params.get('page')) || 1);
     const initialFilters = { q, city, missionType: (missionTypeOptions.find((o) => o.value === mt) ? mt : '') as MissionType | '' };
     setFilters(initialFilters);
-    void loadMissions(initialFilters);
+    setPage(initialPage);
+    void loadMissions(initialFilters, initialPage);
   }, []);
 
-  async function loadMissions(currentFilters = filters, options: { silent?: boolean; reload?: boolean } = {}) {
+  async function loadMissions(
+    currentFilters = filters,
+    currentPage = page,
+    options: { silent?: boolean; reload?: boolean; syncUrl?: boolean } = {},
+  ) {
     if (!options.silent) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
     Object.entries(currentFilters).forEach(([k, v]) => { if (v) params.set(k, v); });
-    params.set('limit', '50');
+    params.set('limit', String(PAGE_SIZE));
+    params.set('offset', String((currentPage - 1) * PAGE_SIZE));
 
     try {
       const result = options.reload
@@ -44,8 +58,17 @@ export default function PublicSearchPage() {
         : await api.get<Paginated<Mission>>(`/missions?${params}`);
       setItems(result.items);
       setTotal(result.total);
-    } catch (e: any) {
-      setError(e.message);
+      if (options.syncUrl) {
+        const visibleParams = new URLSearchParams();
+        Object.entries(currentFilters).forEach(([key, value]) => {
+          if (value) visibleParams.set(key, value);
+        });
+        if (currentPage > 1) visibleParams.set('page', String(currentPage));
+        const query = visibleParams.toString();
+        window.history.replaceState(null, '', query ? `/search?${query}` : '/search');
+      }
+    } catch (caught) {
+      setError(userFacingError(caught, 'Impossible de charger les missions.'));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -57,8 +80,22 @@ export default function PublicSearchPage() {
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    void loadMissions();
+    setPage(1);
+    void loadMissions(filters, 1, { syncUrl: true });
   }
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage);
+    void loadMissions(filters, nextPage, { syncUrl: true });
+    document.querySelector('.public-search-results')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+      block: 'start',
+    });
+  }
+
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <main className="landing-page public-mission-page">
@@ -68,8 +105,14 @@ export default function PublicSearchPage() {
             <span>Médi<em style={{ fontStyle: 'italic' }}>Link</em></span>
           </Link>
           <div className="nav-actions">
-            <Link className="btn btn-light" href="/login">Connexion</Link>
-            <Link className="btn btn-primary" href="/register">Créer un compte</Link>
+            {authLoading ? null : user ? (
+              <Link className="btn btn-primary" href={defaultRouteForUser(user)}>Mon espace</Link>
+            ) : (
+              <>
+                <Link className="btn btn-light" href="/login">Connexion</Link>
+                <Link className="btn btn-primary" href="/register">Créer un compte</Link>
+              </>
+            )}
           </div>
         </nav>
 
@@ -101,25 +144,57 @@ export default function PublicSearchPage() {
         </section>
 
         <section className="public-search-results">
-          {error ? <Alert type="error">{error}</Alert> : null}
+          {error ? (
+            <Alert type="error">
+              <span>{error}</span>{' '}
+              <button
+                type="button"
+                className="link-button"
+                onClick={() => void loadMissions(filters, page, { reload: true })}
+              >
+                Réessayer
+              </button>
+            </Alert>
+          ) : null}
 
           {loading ? (
             <LoadingCard label="Recherche des missions..." />
-          ) : (
+          ) : error && items.length === 0 ? null : (
             <>
               <div className="toolbar">
                 <div>
-                  <strong style={{ fontSize: 18 }}>{total} résultat(s)</strong>
+                  <strong style={{ fontSize: 18 }}>{plural(total, 'résultat')}</strong>
                   <div className="small">Missions publiées disponibles</div>
                 </div>
               </div>
               <div className="grid">
                 {items.length > 0 ? items.map((mission) => (
-                  <PublicMissionCard key={mission.id} mission={mission} />
+                  <PublicMissionCard key={mission.id} mission={mission} user={user} />
                 )) : (
                   <Card><p>Aucune mission publiée ne correspond à votre recherche.</p></Card>
                 )}
               </div>
+              {pageCount > 1 ? (
+                <nav className="pagination" aria-label="Pagination des missions">
+                  <Button
+                    type="button"
+                    variant="light"
+                    disabled={page <= 1 || loading}
+                    onClick={() => goToPage(page - 1)}
+                  >
+                    Précédente
+                  </Button>
+                  <span aria-live="polite">Page {page} sur {pageCount}</span>
+                  <Button
+                    type="button"
+                    variant="light"
+                    disabled={page >= pageCount || loading}
+                    onClick={() => goToPage(page + 1)}
+                  >
+                    Suivante
+                  </Button>
+                </nav>
+              ) : null}
             </>
           )}
         </section>
@@ -128,8 +203,15 @@ export default function PublicSearchPage() {
   );
 }
 
-function PublicMissionCard({ mission }: { mission: Mission }) {
+function PublicMissionCard({
+  mission,
+  user,
+}: {
+  mission: Mission;
+  user: CurrentUser | null;
+}) {
   const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
+  const applyPath = `/app/missions/${mission.id}/apply`;
 
   return (
     <Card className={`mission-card${establishmentPhoto ? ' mission-card--with-image' : ''}`}>
@@ -179,7 +261,13 @@ function PublicMissionCard({ mission }: { mission: Mission }) {
 
       <div className="actions">
         <Link className="btn btn-light" href={`/missions/${mission.id}`}>Voir détail</Link>
-        <Link className="btn btn-primary" href={`/login?next=${encodeURIComponent(`/missions/${mission.id}`)}`}>Se connecter pour postuler</Link>
+        {user?.role === 'CANDIDATE' ? (
+          <Link className="btn btn-primary" href={applyPath}>Postuler</Link>
+        ) : user ? (
+          <Link className="btn btn-primary" href={defaultRouteForUser(user)}>Mon espace</Link>
+        ) : (
+          <Link className="btn btn-primary" href={`/login?next=${encodeURIComponent(applyPath)}`}>Se connecter pour postuler</Link>
+        )}
       </div>
     </Card>
   );

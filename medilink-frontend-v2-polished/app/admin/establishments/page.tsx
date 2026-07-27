@@ -42,27 +42,28 @@ export default function AdminEstablishmentsPage() {
     <>
       <PageHeader title="Établissements" description="Validation des établissements recruteurs." />
       {error ? <Alert type="error">{error}</Alert> : null}
-      <div className="table-wrap">
+      <div className="table-wrap admin-table-wrap">
         <table>
+          <caption className="sr-only">Liste des établissements</caption>
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Type</th>
-              <th>Ville</th>
-              <th>Statut</th>
-              <th>Membres</th>
-              <th>Action</th>
+              <th scope="col">Nom</th>
+              <th scope="col">Type</th>
+              <th scope="col">Ville</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Membres</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
             {items.map((e) => (
               <tr key={e.id}>
-                <td><strong>{e.name}</strong><div className="small">{e.email}</div></td>
-                <td>{establishmentTypeLabel(e.type)}</td>
-                <td>{e.city || '—'}</td>
-                <td><Badge tone={e.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>{statusLabel(e.verificationStatus)}</Badge></td>
-                <td>{e.members?.length || 0}</td>
-                <td><Button variant="success" disabled={e.verificationStatus === 'VERIFIED'} onClick={() => verify(e.id)}>Vérifier</Button></td>
+                <td data-label="Nom"><strong>{e.name}</strong><div className="small">{e.email}</div></td>
+                <td data-label="Type">{establishmentTypeLabel(e.type)}</td>
+                <td data-label="Ville">{e.city || '—'}</td>
+                <td data-label="Statut"><Badge tone={e.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>{statusLabel(e.verificationStatus)}</Badge></td>
+                <td data-label="Membres">{e.members?.length || 0}</td>
+                <td data-label="Action"><Button variant="success" disabled={e.verificationStatus === 'VERIFIED'} onClick={() => verify(e.id)}>Vérifier</Button></td>
               </tr>
             ))}
           </tbody>

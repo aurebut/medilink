@@ -40,6 +40,15 @@ export class EstablishmentsController {
     return this.establishments.addMember(user, id, dto);
   }
 
+  @Delete(':id/members/:memberId')
+  removeMember(
+    @CurrentUser() user: RequestUser,
+    @Param('id') id: string,
+    @Param('memberId') memberId: string,
+  ) {
+    return this.establishments.removeMember(user, id, memberId);
+  }
+
   @Get(':id/photos')
   listPhotos(@CurrentUser() user: RequestUser, @Param('id') id: string) {
     return this.establishments.listPhotos(user, id);

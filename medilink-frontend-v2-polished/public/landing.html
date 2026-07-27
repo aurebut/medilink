@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>MédiLink — La plateforme de remplacement en médecine générale</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
@@ -19,6 +19,7 @@
 }
 html{scroll-behavior:smooth;touch-action:pan-x pan-y}
 body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:pan-x pan-y}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 
 /* NAV */
 nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0;transition:all .35s cubic-bezier(.22,1,.36,1)}
@@ -241,7 +242,7 @@ section,footer,.search-section{position:relative;z-index:1;}
 .tag-teal{background:#E0F5F2;color:var(--teal)}
 .tag-amber{background:#FDF3E0;color:#8A6010}
 .tag-slate{background:var(--gray-1);color:var(--gray-5)}
-.mc-apply{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:500;background:var(--navy);color:#C8DFF5;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;transition:all .2s cubic-bezier(.22,1,.36,1)}
+.mc-apply{margin-left:auto;font-family:var(--sans);font-size:12px;font-weight:500;background:var(--navy);color:#C8DFF5;border:none;border-radius:7px;padding:6px 14px;cursor:pointer;text-decoration:none;transition:all .2s cubic-bezier(.22,1,.36,1)}
 .mc-apply:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 12px rgba(11,25,41,.2)}
 .mc-apply:active{transform:scale(.96);transition-duration:.06s}
 
@@ -342,7 +343,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .nav-right .btn{justify-content:center;font-size:12px;padding:8px 13px;border-radius:8px}
   .nav-right .btn-ghost{background:var(--gray-1);color:var(--text-2)}
   .nav-right .btn-primary{box-shadow:none}
-  .hero{display:flex;flex-direction:column;height:100dvh;padding:52px 18px 0;overflow:hidden}
+  .hero{display:flex;flex-direction:column;min-height:calc(100svh - 60px);height:auto;padding:52px 18px 24px;overflow:visible}
   .hero-layout{flex:1;display:flex;align-items:center}
   .hero-h{font-size:clamp(34px,10vw,46px);line-height:1.08;margin-bottom:18px}
   .hero-h br{display:none}
@@ -351,7 +352,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .hero-stat-num{font-size:26px}
   .hero-stat-label{font-size:11px;line-height:1.35}
   .hero-blob{filter:blur(60px);opacity:.14}
-  .search-section{position:relative;left:auto;right:auto;bottom:auto;width:100%;max-width:520px;margin:auto auto 80px;padding-bottom:0}
+  .search-section{position:relative;left:auto;right:auto;bottom:auto;width:100%;max-width:520px;margin:28px auto 0;padding-bottom:0}
   .search-bar-wrap{display:grid;grid-template-columns:1fr;padding:10px;border-radius:18px;gap:6px;border:none;box-shadow:none}
   .search-bar-wrap:focus-within{border:none;box-shadow:none;transform:none}
   .search-field{border-right:none;border-bottom:none;padding:12px 10px;min-width:0}
@@ -421,6 +422,12 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .dash-card-wide{grid-column:auto}
   .dash-card,.dash-card[style]{grid-row:auto!important}
 }
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-zoom,.stagger-child{opacity:1!important;transform:none!important}
+}
 </style>
 </head>
 <body>
@@ -453,32 +460,35 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Je suis un établissement</a>
       </div>
       <div class="hero-stats fade-up fade-up-4" style="justify-content:center">
-        <div><div class="hero-stat-num" data-count="2800" data-suffix="+">0</div><div class="hero-stat-label">Missions publiées</div></div>
-        <div><div class="hero-stat-num" data-count="1200" data-suffix="">0</div><div class="hero-stat-label">Médecins remplaçants</div></div>
-        <div><div class="hero-stat-num" data-count="640" data-suffix="">0</div><div class="hero-stat-label">Cabinets partenaires</div></div>
+        <div><div class="hero-stat-num">Recherche</div><div class="hero-stat-label">Filtres adaptés au terrain</div></div>
+        <div><div class="hero-stat-num">Dossier</div><div class="hero-stat-label">Profil et documents réunis</div></div>
+        <div><div class="hero-stat-num">Suivi</div><div class="hero-stat-label">Étapes et échanges centralisés</div></div>
       </div>
     </div>
   </div>
   <!-- SEARCH BAR -->
   <div class="search-section">
-    <div class="search-bar-wrap">
+    <form class="search-bar-wrap" action="/search" method="get" role="search" aria-label="Rechercher une mission">
       <div class="search-field" style="flex:1.5">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <input id="search-q" type="text" placeholder="Spécialité, établissement…"/>
+        <label class="sr-only" for="search-q">Spécialité ou établissement</label>
+        <input id="search-q" name="q" type="search" autocomplete="off" placeholder="Spécialité, établissement…"/>
       </div>
       <div class="search-field">
         <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <input id="search-city" type="text" placeholder="Ville, département"/>
+        <label class="sr-only" for="search-city">Ville ou département</label>
+        <input id="search-city" name="city" type="search" autocomplete="address-level2" placeholder="Ville, département"/>
       </div>
       <div class="search-field">
         <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <select id="search-type"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="AIDE_OP">Aide opératoire</option></select>
+        <label class="sr-only" for="search-type">Type de mission</label>
+        <select id="search-type" name="missionType"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="AIDE_OP">Aide opératoire</option></select>
       </div>
-      <button class="search-btn" onclick="doSearch()">
+      <button class="search-btn" type="submit">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
         Rechercher
       </button>
-    </div>
+    </form>
   </div>
 </section>
 
@@ -581,8 +591,8 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <h3>Conçu avec des médecins</h3>
         <p>Chaque fonctionnalité a été imaginée avec des généralistes remplaçants et installés pour répondre aux vrais besoins du terrain.</p>
         <div class="profile-card-features">
-          <div class="profile-card-feature">Zéro commission sur les honoraires</div>
-          <div class="profile-card-feature">Données médicales 100% sécurisées</div>
+          <div class="profile-card-feature">Conditions visibles avant candidature</div>
+          <div class="profile-card-feature">Documents centralisés dans le dossier</div>
           <div class="profile-card-feature">Support dédié aux médecins</div>
           <div class="profile-card-feature">Mises à jour guidées par les retours terrain</div>
         </div>
@@ -597,8 +607,8 @@ footer{background:var(--navy);padding:60px 40px 32px}
   <div class="missions-inner">
     <div class="missions-header">
       <div>
-        <h2 class="section-h">Missions à la une</h2>
-        <p class="section-sub">Publiées cette semaine</p>
+        <h2 class="section-h">Exemples de missions</h2>
+        <p class="section-sub">Aperçus illustratifs — les offres réellement disponibles sont dans la recherche.</p>
       </div>
       <a class="btn btn-outline" href="/search">Voir toutes les missions →</a>
     </div>
@@ -608,14 +618,14 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="mc-title">Garde de nuit — Soins intensifs</div>
         <div class="mc-remun">480 €</div>
         <div class="mc-meta">
-          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>CHU Pitié-Salpêtrière</span>
-          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Paris 13e</span>
-          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>15 avr. · Nuit 20h–8h</span>
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Exemple de centre hospitalier</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Paris</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Exemple · Nuit 20h–8h</span>
         </div>
         <div class="mc-footer">
           <span class="tag tag-blue">Interne</span>
           <span class="tag tag-teal">Encadrée</span>
-          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
+          <a class="mc-apply" href="/search">Voir les offres →</a>
         </div>
       </div>
       <div class="mission-card">
@@ -623,13 +633,13 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="mc-title">Remplacement cabinet libéral</div>
         <div class="mc-remun">340 €</div>
         <div class="mc-meta">
-          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Cabinet Dr. Moreau</span>
-          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Versailles (78)</span>
-          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>20 avr. · 1 journée</span>
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Exemple de cabinet de groupe</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Île-de-France</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Exemple · 1 journée</span>
         </div>
         <div class="mc-footer">
           <span class="tag tag-blue">Interne</span>
-          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
+          <a class="mc-apply" href="/search">Voir les offres →</a>
         </div>
       </div>
       <div class="mission-card">
@@ -637,13 +647,13 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="mc-title">Remplacement journée complète</div>
         <div class="mc-remun">520 €</div>
         <div class="mc-meta">
-          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Maison de santé des Lilas</span>
-          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Montreuil (93)</span>
-          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>22 avr. · Nuit 20h–8h</span>
+          <span><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Exemple de maison de santé</span>
+          <span><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Métropole lilloise</span>
+          <span><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Exemple · Nuit 20h–8h</span>
         </div>
         <div class="mc-footer">
           <span class="tag tag-blue">Médecin thésé</span>
-          <button class="mc-apply" onclick="location.href='/search'">Voir →</button>
+          <a class="mc-apply" href="/search">Voir les offres →</a>
         </div>
       </div>
     </div>
@@ -653,36 +663,35 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <!-- TRUST -->
 <section class="trust">
   <div class="trust-inner">
-    <h2>Des médecins qui nous font confiance</h2>
-    <p class="trust-sub">Plus de 640 cabinets de médecine générale utilisent MédiLink pour trouver leurs remplaçants. Des généralistes qui nous ont aidé à construire la plateforme depuis le premier jour.</p>
+    <h2>Un parcours lisible des deux côtés</h2>
+    <p class="trust-sub">Les fonctionnalités ci-dessous décrivent ce que la plateforme centralise, sans chiffres d’usage ni témoignages non vérifiés.</p>
     <div class="trust-logos stagger-container">
-      <span class="trust-logo stagger-child">URPS MG Île-de-France</span>
-      <span class="trust-logo stagger-child">CSMF</span>
-      <span class="trust-logo stagger-child">Maison de santé des Lilas</span>
-      <span class="trust-logo stagger-child">SML</span>
-      <span class="trust-logo stagger-child">REAGJIR</span>
-      <span class="trust-logo stagger-child">ReAGJIR Île-de-France</span>
+      <span class="trust-logo stagger-child">Profil professionnel</span>
+      <span class="trust-logo stagger-child">Recherche ciblée</span>
+      <span class="trust-logo stagger-child">Candidature contextualisée</span>
+      <span class="trust-logo stagger-child">Messagerie dédiée</span>
+      <span class="trust-logo stagger-child">Agenda partagé</span>
     </div>
     <div class="trust-testimonials">
       <div class="testimonial">
-        <div class="testimonial-text">« En tant que remplaçante, MédiLink m'a changé la vie. Je trouve des missions qualifiées sans passer des heures au téléphone. »</div>
+        <div class="testimonial-text">Comparez les dates, horaires, lieux, niveaux requis et conditions renseignées avant de candidater.</div>
         <div class="testimonial-author">
-          <div class="testimonial-av">CL</div>
-          <div><div class="testimonial-name">Camille L.</div><div class="testimonial-role">Médecin remplaçante · Paris</div></div>
+          <div class="testimonial-av" aria-hidden="true">01</div>
+          <div><div class="testimonial-name">Décider avec le contexte</div><div class="testimonial-role">Fonctionnalité de recherche</div></div>
         </div>
       </div>
       <div class="testimonial">
-        <div class="testimonial-text">« J'ai publié mon besoin de remplacement un mardi matin, le candidat était confirmé le soir même. Impressionnant. »</div>
+        <div class="testimonial-text">Retrouvez le profil, les documents autorisés et les échanges au même endroit pour chaque candidature.</div>
         <div class="testimonial-author">
-          <div class="testimonial-av">TM</div>
-          <div><div class="testimonial-name">Thomas M.</div><div class="testimonial-role">Médecin installé · Lyon</div></div>
+          <div class="testimonial-av" aria-hidden="true">02</div>
+          <div><div class="testimonial-name">Garder un dossier commun</div><div class="testimonial-role">Candidature et messagerie</div></div>
         </div>
       </div>
       <div class="testimonial">
-        <div class="testimonial-text">« La plateforme a clairement été pensée par des gens qui connaissent le terrain. Rien de superflu, tout ce qu'il faut. »</div>
+        <div class="testimonial-text">Suivez les conditions convenues, les échéances de mission et la rétrocession déclarée par les parties.</div>
         <div class="testimonial-author">
-          <div class="testimonial-av">SR</div>
-          <div><div class="testimonial-name">Sophie R.</div><div class="testimonial-role">Médecin remplaçante · Bordeaux</div></div>
+          <div class="testimonial-av" aria-hidden="true">03</div>
+          <div><div class="testimonial-name">Suivre la mission</div><div class="testimonial-role">Agenda et clôture</div></div>
         </div>
       </div>
     </div>
@@ -693,7 +702,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <section class="cta-band">
   <div class="cta-band-inner">
     <h2>Rejoignez la communauté MédiLink</h2>
-    <p>Remplaçant ou cabinet, inscrivez-vous gratuitement et accédez à des centaines de missions de médecine générale vérifiées partout en France.</p>
+    <p>Remplaçant ou établissement, créez votre espace pour consulter les missions publiées et gérer vos démarches au même endroit.</p>
     <div class="cta-band-btns">
       <a class="btn btn-primary btn-lg" href="/register">Je crée mon compte</a>
       <a class="btn btn-ghost btn-lg" href="/login">J'ai déjà un compte</a>
@@ -707,7 +716,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
     <div class="faq-header reveal">
       <div class="faq-kicker">Questions fréquentes</div>
       <h2 class="section-h">Ce qu'il faut savoir avant d'organiser une mission</h2>
-      <p class="section-sub">MédiLink centralise les missions courtes de santé, de la candidature jusqu'au paiement sécurisé et aux documents de fin de mission.</p>
+      <p class="section-sub">MédiLink centralise les missions courtes de santé, de la candidature au suivi des conditions et de la rétrocession convenue entre les parties.</p>
     </div>
     <div class="faq-list">
       <details class="faq-item reveal">
@@ -727,12 +736,12 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="faq-answer">L'établissement publie une mission, le candidat postule avec son profil et ses documents, puis les deux parties échangent dans le chat. Le recruteur peut ensuite envoyer une proposition finale claire avec montant, dates, horaires et conditions.</div>
       </details>
       <details class="faq-item reveal reveal-delay-4">
-        <summary>Comment le paiement est-il sécurisé ?</summary>
-        <div class="faq-answer">Après acceptation de la proposition, le recruteur paie pour confirmer la mission. MédiLink conserve les fonds jusqu'à la fin de mission, puis le paiement est libéré au candidat après validation par l'établissement.</div>
+        <summary>Comment la rémunération est-elle suivie ?</summary>
+        <div class="faq-answer">La proposition finale consigne le montant ou les conditions de rétrocession convenues. MédiLink en suit les statuts dans le dossier de mission, mais ne présente pas ce suivi comme un service de séquestre ou de conservation des fonds.</div>
       </details>
       <details class="faq-item reveal reveal-delay-5">
         <summary>Les documents et justificatifs sont-ils centralisés ?</summary>
-        <div class="faq-answer">Oui. Les candidats peuvent déposer leurs documents, les établissements les consultent dans le cadre d'une candidature, et la plateforme prépare les factures, reçus et justificatifs liés à la mission.</div>
+        <div class="faq-answer">Oui. Les candidats peuvent déposer leurs documents et les établissements les consultent dans le cadre d'une candidature. Les éléments de suivi liés à la mission restent rattachés au même dossier.</div>
       </details>
     </div>
   </div>
@@ -750,103 +759,69 @@ footer{background:var(--navy);padding:60px 40px 32px}
       </div>
       <div class="footer-col">
         <h4>Candidats</h4>
-        <a href="#">Comment ça marche</a>
+        <a href="#how-it-works">Comment ça marche</a>
         <a href="/search">Rechercher une mission</a>
         <a href="/register">Créer un profil</a>
-        <a href="#">Guide du remplaçant</a>
+        <a href="/landing-medecin.html#faq">Questions des professionnels</a>
       </div>
       <div class="footer-col">
         <h4>Cabinets</h4>
-        <a href="#">Publier une offre</a>
-        <a href="#">Trouver un remplaçant</a>
-        <a href="#">Solutions MSP</a>
-        <a href="#">Nous contacter</a>
+        <a href="/register?type=establishment">Publier une offre</a>
+        <a href="/landing-etablissement.html#parcours">Organiser un remplacement</a>
+        <a href="/landing-etablissement.html#pilotage">Découvrir le suivi</a>
+        <a href="/landing-etablissement.html#faq">Questions des établissements</a>
       </div>
       <div class="footer-col">
         <h4>MédiLink</h4>
-        <a href="#">À propos</a>
-        <a href="#">Blog</a>
-        <a href="#">Mentions légales</a>
-        <a href="#">Politique de confidentialité</a>
+        <a href="/landing.html#how-it-works">À propos du parcours</a>
+        <a href="/landing.html#faq">Questions fréquentes</a>
+        <a href="/landing-medecin.html">Espace professionnels</a>
+        <a href="/landing-etablissement.html">Espace établissements</a>
       </div>
     </div>
     <div class="footer-bottom">
-      <span class="footer-copy">© 2025 MédiLink. Tous droits réservés.</span>
+      <span class="footer-copy">© 2026 MédiLink. Tous droits réservés.</span>
       <div class="footer-links">
-        <a href="#">CGU</a>
-        <a href="#">Confidentialité</a>
-        <a href="#">Cookies</a>
+        <a href="#faq">FAQ</a>
+        <a href="/landing.html">Accueil</a>
+        <a href="/login">Connexion</a>
       </div>
     </div>
   </div>
 </footer>
 <script>
-// Prevent mobile pinch, gesture and double-tap zoom on this landing page.
-let lastTouchEnd = 0;
-document.addEventListener('touchmove', (event) => {
-  if (event.touches.length > 1) event.preventDefault();
-}, { passive: false });
-document.addEventListener('touchend', (event) => {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) event.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
-['gesturestart', 'gesturechange', 'gestureend'].forEach((eventName) => {
-  document.addEventListener(eventName, (event) => event.preventDefault(), { passive: false });
-});
-
 // ── Scroll reveal with all variants ──
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      revealObserver.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-zoom, .stagger-child').forEach(el => revealObserver.observe(el));
-
-// ── Stagger children in grids ──
-const staggerObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const children = e.target.querySelectorAll('.stagger-child');
-      children.forEach((child, i) => {
-        setTimeout(() => child.classList.add('visible'), i * 100);
-      });
-      staggerObserver.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1 });
-document.querySelectorAll('.profiles-grid, .missions-grid, .trust-testimonials').forEach(el => staggerObserver.observe(el));
-
-// ── Counter animation ──
-function animateCounter(el, target, suffix, duration) {
-  const start = 0;
-  const startTime = performance.now();
-  function update(currentTime) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = Math.floor(start + (target - start) * eased);
-    el.textContent = current.toLocaleString('fr-FR') + suffix;
-    if (progress < 1) requestAnimationFrame(update);
-  }
-  requestAnimationFrame(update);
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const revealTargets = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-zoom, .stagger-child');
+if (reducedMotion || !('IntersectionObserver' in window)) {
+  revealTargets.forEach(el => el.classList.add('visible'));
+} else {
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealTargets.forEach(el => revealObserver.observe(el));
 }
 
-const counterObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const el = e.target;
-      const target = parseInt(el.dataset.count, 10);
-      const suffix = el.dataset.suffix || '';
-      animateCounter(el, target, suffix, 1800);
-      counterObserver.unobserve(el);
-    }
-  });
-}, { threshold: 0.5 });
-document.querySelectorAll('[data-count]').forEach(el => counterObserver.observe(el));
+// ── Stagger children in grids ──
+if (!reducedMotion && 'IntersectionObserver' in window) {
+  const staggerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const children = e.target.querySelectorAll('.stagger-child');
+        children.forEach((child, i) => {
+          setTimeout(() => child.classList.add('visible'), i * 100);
+        });
+        staggerObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.profiles-grid, .missions-grid, .trust-testimonials').forEach(el => staggerObserver.observe(el));
+}
 
 // ── Parallax on hero blobs ──
 const blobs = document.querySelectorAll('.hero-blob');
@@ -862,9 +837,11 @@ function onParallax() {
   });
   ticking = false;
 }
-window.addEventListener('scroll', () => {
-  if (!ticking) { requestAnimationFrame(onParallax); ticking = true; }
-}, { passive: true });
+if (!reducedMotion) {
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(onParallax); ticking = true; }
+  }, { passive: true });
+}
 
 // ── Nav scroll effect ──
 const navEl = document.querySelector('nav');
@@ -880,19 +857,6 @@ function onNavScroll() {
 window.addEventListener('scroll', () => {
   if (!navTicking) { requestAnimationFrame(onNavScroll); navTicking = true; }
 }, { passive: true });
-
-// ── Search ──
-function doSearch() {
-  const q = document.getElementById('search-q').value;
-  const city = document.getElementById('search-city').value;
-  const missionType = document.getElementById('search-type').value;
-  const params = new URLSearchParams();
-  if (q) params.set('q', q);
-  if (city) params.set('city', city);
-  if (missionType) params.set('missionType', missionType);
-  const qs = params.toString();
-  location.href = '/search' + (qs ? '?' + qs : '');
-}
 
 // ── Button ripple (follows cursor) ──
 document.querySelectorAll('.btn').forEach(btn => {

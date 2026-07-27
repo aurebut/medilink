@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { ApiError, api } from '@/lib/api';
 import type { Establishment, EstablishmentBillingStatus, EstablishmentType } from '@/lib/types';
 import { formatDate } from '@/lib/format';
 import { establishmentTypeLabel, establishmentTypeOptions, statusLabel } from '@/lib/labels';
@@ -18,6 +18,8 @@ import {
   softwareOptions,
 } from '@/lib/profile-options';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { hasEstablishmentCapability } from '@/lib/access-control';
+import { useAuth } from '@/components/AuthProvider';
 
 type EstablishmentInfoTab = 'establishments' | 'create' | 'billing';
 
@@ -38,7 +40,11 @@ function booleanLabel(value?: boolean | null) {
 }
 
 export default function EstablishmentOnboardingPage() {
+  const { user } = useAuth();
   const { establishments, loading, reload } = useEstablishments();
+  const canCreateEstablishment = hasEstablishmentCapability(user?.role, 'create_establishment');
+  const canDeleteEstablishment = hasEstablishmentCapability(user?.role, 'delete_establishment');
+  const visibleInfoTabs = infoTabs.filter((tab) => tab.id !== 'create' || canCreateEstablishment);
   const [form, setForm] = useState<any>({ type: 'HOSPITAL', country: 'France' });
   const [activeTab, setActiveTab] = useState<EstablishmentInfoTab>('establishments');
   const [billingByEstablishment, setBillingByEstablishment] = useState<Record<string, EstablishmentBillingStatus>>({});
@@ -71,8 +77,15 @@ export default function EstablishmentOnboardingPage() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const queryTab = new URLSearchParams(window.location.search).get('tab');
-    if (queryTab === 'create' || queryTab === 'billing') setActiveTab(queryTab);
-  }, []);
+    if (queryTab === 'create' && canCreateEstablishment) setActiveTab(queryTab);
+    if (queryTab === 'billing') setActiveTab(queryTab);
+  }, [canCreateEstablishment]);
+
+  useEffect(() => {
+    if (activeTab === 'create' && !canCreateEstablishment) {
+      selectTab('establishments');
+    }
+  }, [activeTab, canCreateEstablishment]);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,7 +135,7 @@ export default function EstablishmentOnboardingPage() {
   }
 
   async function remove(establishment: Establishment) {
-    if (!confirm(`Supprimer définitivement l'établissement "${establishment.name}" ? Les missions, candidatures et conversations liées seront aussi supprimées.`)) {
+    if (!confirm(`Supprimer définitivement l'établissement "${establishment.name}" ? Cette opération n'est possible que s'il ne possède encore aucun historique de mission, de conversation ou de facturation.`)) {
       return;
     }
 
@@ -134,8 +147,14 @@ export default function EstablishmentOnboardingPage() {
       await api.delete(`/establishments/${establishment.id}`);
       setMessage('Établissement supprimé.');
       await reload();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (caught) {
+      setError(
+        caught instanceof ApiError && caught.status === 409
+          ? 'Cet établissement possède déjà un historique opérationnel ou financier et ne peut plus être supprimé.'
+          : caught instanceof Error
+            ? caught.message
+            : 'Impossible de supprimer cet établissement.',
+      );
     } finally {
       setDeletingId(null);
     }
@@ -178,7 +197,7 @@ export default function EstablishmentOnboardingPage() {
     <>
       <PageHeader title="Établissement" description="Créez ou consultez votre établissement recruteur." />
       <div className="candidate-page-tabs billing-tabs" role="tablist" aria-label="Sections établissement" style={{ marginBottom: 18 }}>
-        {infoTabs.map((tab) => (
+        {visibleInfoTabs.map((tab) => (
           <button
             key={tab.id}
             type="button"
@@ -221,15 +240,17 @@ export default function EstablishmentOnboardingPage() {
                     <Badge tone={establishment.verificationStatus === 'VERIFIED' ? 'success' : 'warning'}>
                       {statusLabel(establishment.verificationStatus)}
                     </Badge>
-                    <Button
-                      type="button"
-                      variant="danger"
-                      disabled={deletingId === establishment.id}
-                      onClick={() => void remove(establishment)}
-                      style={{ padding: '6px 12px', fontSize: '13px' }}
-                    >
-                      {deletingId === establishment.id ? 'Suppression...' : 'Supprimer'}
-                    </Button>
+                    {canDeleteEstablishment ? (
+                      <Button
+                        type="button"
+                        variant="danger"
+                        disabled={deletingId === establishment.id}
+                        onClick={() => void remove(establishment)}
+                        style={{ padding: '6px 12px', fontSize: '13px' }}
+                      >
+                        {deletingId === establishment.id ? 'Suppression...' : 'Supprimer'}
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
 
@@ -263,7 +284,7 @@ export default function EstablishmentOnboardingPage() {
         </div>
       ) : null}
 
-      {activeTab === 'create' ? (
+      {activeTab === 'create' && canCreateEstablishment ? (
         <Card>
           <h2>Créer un établissement</h2>
           <form className="form" onSubmit={submit}>
