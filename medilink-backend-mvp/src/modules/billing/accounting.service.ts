@@ -456,15 +456,16 @@ export class AccountingService {
       const releasedAt = agreement.payment?.releasedAt || undefined;
       const inferredAmountCents = agreement.candidateAmount > 0 ? agreement.candidateAmount * 100 : undefined;
       const hasReceipt = agreement.invoices.some((invoice) => invoice.type === InvoiceType.CANDIDATE_RECEIPT);
+      const existingSettlement = await this.prisma.retrocessionSettlement.findUnique({
+        where: { agreementId: agreement.id },
+      });
+      const finalAmountCents = inferredAmountCents ?? existingSettlement?.finalAmountCents ?? undefined;
       const status = agreement.status === MissionAgreementStatus.PAYMENT_RELEASED
-        ? inferredAmountCents ? RetrocessionSettlementStatus.PAID : RetrocessionSettlementStatus.TO_VALIDATE
+        ? finalAmountCents ? RetrocessionSettlementStatus.PAID : RetrocessionSettlementStatus.TO_VALIDATE
         : agreement.status === MissionAgreementStatus.COMPLETED
           ? RetrocessionSettlementStatus.TO_VALIDATE
           : RetrocessionSettlementStatus.EXPECTED;
 
-      const existingSettlement = await this.prisma.retrocessionSettlement.findUnique({
-        where: { agreementId: agreement.id },
-      });
       if (!existingSettlement) {
         await this.prisma.retrocessionSettlement.create({
           data: {
@@ -472,7 +473,7 @@ export class AccountingService {
             agreementId: agreement.id,
             status,
             rateBasisPoints: agreement.retrocessionPercentage ? agreement.retrocessionPercentage * 100 : null,
-            finalAmountCents: inferredAmountCents,
+            finalAmountCents,
             currency: agreement.currency,
             validatedAt: releasedAt,
             paidAt: releasedAt,
@@ -490,7 +491,7 @@ export class AccountingService {
             ...(!preserveWorkflowStatus ? {
               status,
               ...(releasedAt ? {
-                finalAmountCents: inferredAmountCents,
+                finalAmountCents,
                 validatedAt: releasedAt,
                 paidAt: releasedAt,
               } : {}),
@@ -499,8 +500,8 @@ export class AccountingService {
         });
       }
 
-      if (releasedAt && inferredAmountCents) {
-        await this.materializeLegacyReleasedAgreement(agreement, workspaceId, inferredAmountCents, releasedAt, hasReceipt);
+      if (releasedAt && finalAmountCents) {
+        await this.materializeLegacyReleasedAgreement(agreement, workspaceId, finalAmountCents, releasedAt, hasReceipt);
       }
     }
   }
