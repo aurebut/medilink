@@ -3386,6 +3386,14 @@ button { touch-action: manipulation; }
 .agenda-day.muted {
   background: #F8FAFC;
 }
+.agenda-day.weekend {
+  background:
+    linear-gradient(180deg, rgba(183,110,0,.055), rgba(255,255,255,.94)),
+    #fff;
+}
+.agenda-day.weekend .agenda-day-number {
+  color: var(--warning);
+}
 
 .agenda-day-outside {
   min-height: 104px;

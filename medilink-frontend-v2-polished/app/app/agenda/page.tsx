@@ -29,6 +29,7 @@ function buildCalendarDays(anchor: Date) {
       key: dateKey(date),
       inMonth: date.getMonth() === anchor.getMonth(),
       isToday: date.toDateString() === new Date().toDateString(),
+      isWeekend: date.getDay() === 0 || date.getDay() === 6,
     });
   }
   return days;
@@ -325,7 +326,7 @@ export default function CandidateAgendaPage() {
                             key={day.key}
                             type="button"
                             data-day-key={day.key}
-                            className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
+                            className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${day.isWeekend ? 'weekend' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
                             onClick={() => {
                               if (selectedDay === day.key) {
                                 setDetailOpen((open) => !open);
@@ -341,6 +342,7 @@ export default function CandidateAgendaPage() {
                                 <span
                                   key={event.application.id}
                                   className={`agenda-event-dot is-${agreementTone(event.agreement?.status)}`}
+                                  title={`${event.application.mission?.title || 'Mission'}${event.application.mission?.startTime ? ` • ${event.application.mission.startTime}` : ''}\n${event.application.mission?.establishment?.name || event.application.mission?.city || 'Établissement à confirmer'}\n${event.agreement ? agreementLabel(event.agreement.status) : statusLabel(event.application.status)}`}
                                   aria-hidden="true"
                                 />
                               ))}
@@ -391,19 +393,26 @@ export default function CandidateAgendaPage() {
 
                   {selectedEvents.length > 0 ? (
                     <div className="agenda-detail-events">
-                      {selectedEvents.map(({ application, agreement, conversation }) => (
-                        <div key={application.id} className="agenda-detail-event">
-                          <div>
-                            <strong>{application.mission?.title || 'Mission'}</strong>
-                            <span>{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
+                      {selectedEvents.map(({ application, agreement, conversation }) => {
+                        const time = application.mission?.startTime || agreement?.startTime;
+                        const endTime = application.mission?.endTime || agreement?.endTime;
+                        return (
+                          <div key={application.id} className="agenda-detail-event">
+                            <div>
+                              <strong>{application.mission?.title || 'Mission'}</strong>
+                              <span>
+                                {application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}
+                                {time ? ` • ${time}${endTime ? ` – ${endTime}` : ''}` : ''}
+                              </span>
+                            </div>
+                            <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
+                            <div className="actions">
+                              {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Messagerie</LinkButton> : null}
+                              {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
+                            </div>
                           </div>
-                          <Badge tone={agreementTone(agreement?.status)}>{agreement ? agreementLabel(agreement.status) : statusLabel(application.status)}</Badge>
-                          <div className="actions">
-                            {conversation ? <LinkButton href={getCandidateConversationPath(conversation.id)} variant="light">Messagerie</LinkButton> : null}
-                            {application.missionId ? <LinkButton href={`/app/missions/${application.missionId}`} variant="secondary">Mission</LinkButton> : null}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="dashboard-empty compact">
