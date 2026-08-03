@@ -3312,6 +3312,7 @@ button { touch-action: manipulation; }
   display: grid;
   gap: 18px;
   overflow: visible;
+  position: relative;
 }
 .agenda-calendar {
   overflow: visible;

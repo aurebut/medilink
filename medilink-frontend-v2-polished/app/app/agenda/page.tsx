@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { agreementLabel, agreementTone, buildCalendarEventWeeks, conversationForApplication, dateKey, dateRangeKeys, isCandidateAgendaApplication, latestAgreement, missionDateValue, missionEndDateValue, sortByMissionDate, weekDayLabels } from '@/lib/candidate-workspace';
 import { buildCandidateMissionHistoryRows } from '@/lib/candidate-mission-history';
@@ -91,6 +91,64 @@ export default function CandidateAgendaPage() {
   }, []);
 
   useAutoRefresh(() => load({ reload: true }), { enabled: !loading });
+
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+
+  const positionPopover = useCallback(() => {
+    const pop = popoverRef.current;
+    const card = pop?.closest<HTMLElement>('.agenda-calendar-card');
+    if (!pop || !card || window.matchMedia('(max-width: 620px)').matches) return;
+    const day = card.querySelector<HTMLElement>(`.agenda-day[data-day-key="${selectedDay}"]`);
+    if (!day) return;
+    const dayRect = day.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+    const edge = 10;
+    const gap = 10;
+    let top = dayRect.bottom - cardRect.top + gap;
+    if (top + pop.offsetHeight > window.innerHeight - edge) {
+      top = dayRect.top - cardRect.top - gap - pop.offsetHeight;
+    }
+    if (top < edge) top = edge;
+    let left = dayRect.left - cardRect.left;
+    if (left + pop.offsetWidth > window.innerWidth - edge) {
+      left = window.innerWidth - edge - pop.offsetWidth;
+    }
+    if (left < edge) left = edge;
+    pop.style.top = `${top}px`;
+    pop.style.left = `${left}px`;
+    pop.style.right = 'auto';
+  }, [selectedDay]);
+
+  useLayoutEffect(() => {
+    if (!detailOpen) return;
+    positionPopover();
+  }, [detailOpen, positionPopover]);
+
+  useEffect(() => {
+    if (!detailOpen) return;
+    const onResize = () => positionPopover();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [detailOpen, positionPopover]);
+
+  useEffect(() => {
+    if (!detailOpen) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setDetailOpen(false);
+    }
+    function onPointerDown(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node;
+      if (popoverRef.current?.contains(target)) return;
+      if (target instanceof Element && target.closest('.agenda-day, .agenda-span-event')) return;
+      setDetailOpen(false);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [detailOpen]);
 
   const events = useMemo(() => {
     const now = new Date();
@@ -242,6 +300,9 @@ export default function CandidateAgendaPage() {
               <div
                 key={`${dateKey(calendarMonth)}-${calendarAnimation}`}
                 className={`agenda-calendar agenda-calendar-${calendarAnimation}`}
+                onAnimationEnd={() => {
+                  if (detailOpen) positionPopover();
+                }}
                 onTouchStart={(event) => setTouchStartX(event.touches[0]?.clientX ?? null)}
                 onTouchEnd={(event) => onCalendarTouchEnd(event.changedTouches[0]?.clientX ?? touchStartX ?? 0)}
               >
@@ -263,10 +324,15 @@ export default function CandidateAgendaPage() {
                           <button
                             key={day.key}
                             type="button"
+                            data-day-key={day.key}
                             className={`agenda-day ${day.inMonth ? '' : 'muted'} ${day.isToday ? 'today' : ''} ${selectedDay === day.key ? 'selected' : ''}`}
                             onClick={() => {
-                              setSelectedDay(day.key);
-                              setDetailOpen(true);
+                              if (selectedDay === day.key) {
+                                setDetailOpen((open) => !open);
+                              } else {
+                                setSelectedDay(day.key);
+                                setDetailOpen(true);
+                              }
                             }}
                           >
                             <div className="agenda-day-number">{day.date.getDate()}</div>
@@ -314,7 +380,7 @@ export default function CandidateAgendaPage() {
               </div>
 
               {detailOpen ? (
-                <div className="agenda-day-popover" role="dialog" aria-label="Détails du jour">
+                <div className="agenda-day-popover" role="dialog" aria-label="Détails du jour" ref={popoverRef}>
                   <div className="agenda-popover-head">
                     <div>
                       <strong>{selectedDate ? formatDate(selectedDate.toISOString()) : 'Jour sélectionné'}</strong>
