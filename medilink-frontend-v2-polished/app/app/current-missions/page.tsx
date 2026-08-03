@@ -32,7 +32,7 @@ type MissionRow = {
 type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'compta';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
-  { id: 'pilotage', label: 'Pilotage' },
+  { id: 'pilotage', label: 'Vue d'ensemble' },
   { id: 'brief', label: 'Brief' },
   { id: 'lieu', label: 'Lieu & contact' },
   { id: 'documents', label: 'Documents de mission' },
