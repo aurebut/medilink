@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { api, subscribeApiCache } from '@/lib/api';
 import {
   activeEstablishmentStorageKey,
@@ -10,7 +9,6 @@ import {
 } from '@/lib/establishment-context';
 import type { Establishment } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { workspaceHomeForRole } from '@/lib/access-control';
 import { useAuth } from './AuthProvider';
 import { Button, Card, LoadingCard } from './ui';
 
@@ -159,46 +157,6 @@ export function useEstablishments() {
     throw new Error('useEstablishments doit être utilisé dans EstablishmentProvider');
   }
   return context;
-}
-
-export function EstablishmentContextSwitcher({
-  mobile = false,
-}: {
-  mobile?: boolean;
-}) {
-  const {
-    establishments,
-    primary,
-    loading,
-    setActiveEstablishmentId,
-  } = useEstablishments();
-  const { user } = useAuth();
-  const router = useRouter();
-
-  if (!loading && establishments.length === 0) return null;
-
-  return (
-    <label className={`establishment-context-switcher ${mobile ? 'is-mobile' : 'is-desktop'}`}>
-      <span className="establishment-context-label">Établissement</span>
-      <select
-        className="select establishment-context-select"
-        aria-label="Établissement actif"
-        value={primary?.id || ''}
-        disabled={loading}
-        onChange={(event) => {
-          setActiveEstablishmentId(event.target.value);
-          router.push(workspaceHomeForRole(user?.role));
-        }}
-      >
-        <option value="" disabled>{loading ? 'Chargement...' : 'Choisir un établissement'}</option>
-        {establishments.map((establishment) => (
-          <option key={establishment.id} value={establishment.id}>
-            {establishment.name}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
 }
 
 export function EstablishmentSelectionGate({ children }: { children: React.ReactNode }) {

@@ -31,7 +31,7 @@ import { formatNotificationText } from '@/lib/notification-text';
 import type { CandidateDashboardData, Conversation, EstablishmentBillingStatus, EstablishmentDashboardData, Notification, Profile, UserRole } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
-import { EstablishmentContextSwitcher, useOptionalEstablishments } from './EstablishmentSelector';
+import { useOptionalEstablishments } from './EstablishmentSelector';
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -671,8 +671,6 @@ export function AppShell({
             );
           })}
 
-          {area === 'establishment' ? <EstablishmentContextSwitcher mobile /> : null}
-
           <div className="mobile-menu-account">
             <div className="mobile-menu-user">
               <span className="avatar">{initials(user?.email)}</span>
@@ -721,7 +719,6 @@ export function AppShell({
 
         {area !== 'admin' ? (
           <div className="sidebar-quick-actions">
-          {area === 'establishment' ? <EstablishmentContextSwitcher /> : null}
           {area === 'establishment' && canCreateMission && publicationCredits.available > 0 ? (
             <div className="publication-credit-menu-wrap" ref={creditsRef}>
               {creditsOpen ? (
