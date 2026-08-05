@@ -287,6 +287,7 @@ export default function NewMissionPage() {
   const [loadingDraft, setLoadingDraft] = useState(false);
   const [creditAlertVisible, setCreditAlertVisible] = useState(false);
   const [creditAlertFading, setCreditAlertFading] = useState(false);
+  const creditAlertShownRef = useRef(false);
   const draftMissionIdRef = useRef<string | null>(null);
   const draftDirtyRef = useRef(false);
   const autosaveInFlightRef = useRef(false);
@@ -376,6 +377,8 @@ export default function NewMissionPage() {
 
   useEffect(() => {
     if (showWizard && billingStatus && billingStatus.availableCredits > 0) {
+      if (creditAlertShownRef.current) return;
+      creditAlertShownRef.current = true;
       setCreditAlertVisible(true);
       setCreditAlertFading(false);
       const timer = setTimeout(() => {
@@ -658,7 +661,7 @@ export default function NewMissionPage() {
 
     try {
       const mission = draftMissionIdRef.current
-        ? await api.patchSilent<Mission>(`/missions/${draftMissionIdRef.current}`, { ...payload, publishNow: undefined })
+        ? await api.patchSilent<Mission>(`/missions/${draftMissionIdRef.current}`, { ...payload, establishmentId: undefined, publishNow: undefined })
         : await api.postSilent<Mission>('/missions', payload);
 
       draftMissionIdRef.current = mission.id;
@@ -718,7 +721,7 @@ export default function NewMissionPage() {
       if (draftMissionIdRef.current) {
         const updatedMission = await api.patch<Mission>(
           `/missions/${draftMissionIdRef.current}`,
-          { ...payload, publishNow: undefined },
+          { ...payload, establishmentId: undefined, publishNow: undefined },
         );
         if (publishNow) {
           const publishedMission = await api.post<Mission>(`/missions/${draftMissionIdRef.current}/publish`);
