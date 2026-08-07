@@ -2,7 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#F8F7F3"/>
 <title>MédiLink — La plateforme de remplacement en médecine générale</title>
+<meta name="description" content="MédiLink connecte les médecins remplaçants et les établissements de santé : trouvez une mission courte ou publiez votre besoin, du matching à la confirmation."/>
+<meta property="og:title" content="MédiLink — La plateforme de remplacement en médecine générale"/>
+<meta property="og:description" content="Trouvez une mission médicale courte ou publiez votre besoin : candidature, échanges et confirmation réunis au même endroit."/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="MédiLink"/>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
 <style>
@@ -17,7 +24,7 @@
   --serif:'Instrument Serif',Georgia,serif;
   --sans:'DM Sans',sans-serif;
 }
-html{scroll-behavior:smooth;touch-action:pan-x pan-y}
+html{scroll-behavior:smooth;touch-action:pan-x pan-y;scroll-padding-top:76px}
 body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:pan-x pan-y}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 
@@ -32,6 +39,7 @@ nav.nav-scrolled{background:rgba(248,247,243,.97);box-shadow:0 4px 24px rgba(11,
 .nav-link:hover{color:var(--navy);background:var(--gray-1);transform:translateY(-1px)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--sans);font-size:13px;font-weight:500;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;text-decoration:none;transition:all .15s;white-space:nowrap}
+:focus-visible{outline:2px solid var(--blue-lt);outline-offset:2px;border-radius:6px}
 .btn-ghost{background:transparent;color:var(--text-2)}
 .btn-ghost:hover{background:var(--gray-1);color:var(--navy)}
 .btn-primary{background:var(--navy);color:#C8DFF5}
@@ -439,6 +447,12 @@ footer{background:var(--navy);padding:60px 40px 32px}
   <a class="nav-logo" href="/">
     <span class="nav-name">Médi<em>Link</em></span>
   </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#how-it-works">Comment ça marche</a>
+    <a class="nav-link" href="#profiles">Profils</a>
+    <a class="nav-link" href="#missions">Missions</a>
+    <a class="nav-link" href="#faq">FAQ</a>
+  </div>
   <div class="nav-right">
     <a class="btn btn-ghost" href="/login">Se connecter</a>
     <a class="btn btn-primary" href="/register">Créer un compte</a>
@@ -557,7 +571,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
 </section>
 
 <!-- PROFILE TYPES -->
-<section class="profiles">
+<section class="profiles" id="profiles">
   <div class="profiles-inner">
     <div class="profiles-header">
       <h2 class="section-h">Une plateforme pensée<br><em style="font-family:var(--serif);font-style:italic">par des généralistes</em></h2>
@@ -605,7 +619,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
 </section>
 
 <!-- MISSIONS PREVIEW -->
-<section class="missions-preview">
+<section class="missions-preview" id="missions">
   <div class="missions-inner">
     <div class="missions-header">
       <div>
