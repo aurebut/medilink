@@ -6,9 +6,10 @@ import type { Document, DocumentVerificationStatus } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, LoadingCard, PageHeader, Select } from '@/components/ui';
+import { Alert, Badge, Button, LoadingCard, PageHeader, Select, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
-function tone(status: string) {
+function tone(status: string): BadgeTone {
   if (status === 'APPROVED') return 'success';
   if (status === 'REJECTED') return 'danger';
   if (status === 'PENDING_VERIFICATION') return 'warning';
@@ -30,8 +31,8 @@ export default function AdminDocumentsPage() {
         ? await api.reload<Document[]>(`/admin/documents${query}`)
         : await api.get<Document[]>(`/admin/documents${query}`);
       setDocs(data);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -44,8 +45,8 @@ export default function AdminDocumentsPage() {
     try {
       await api.post(`/admin/documents/${id}/approve`, {});
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -56,8 +57,8 @@ export default function AdminDocumentsPage() {
     try {
       await api.post(`/admin/documents/${id}/reject`, { reason });
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -72,9 +73,9 @@ export default function AdminDocumentsPage() {
         return;
       }
       showDocumentInPreview(res.downloadUrl, previewWindow);
-    } catch (e: any) {
+    } catch (e) {
       previewWindow?.close();
-      setError(e.message);
+      setError(errorMessage(e));
     }
   }
 
@@ -121,7 +122,7 @@ export default function AdminDocumentsPage() {
                   <div className="small">{d.fileName}</div>
                   {d.rejectionReason ? <div className="small">Motif : {d.rejectionReason}</div> : null}
                 </td>
-                <td data-label="Statut"><Badge tone={tone(d.verificationStatus) as any}>{statusLabel(d.verificationStatus)}</Badge></td>
+                <td data-label="Statut"><Badge tone={tone(d.verificationStatus)}>{statusLabel(d.verificationStatus)}</Badge></td>
                 <td data-label="Date">{formatDateTime(d.createdAt)}</td>
                 <td className="actions" data-label="Actions">
                   <Button variant="light" onClick={() => view(d.id)}>Voir</Button>

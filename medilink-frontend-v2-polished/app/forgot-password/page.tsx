@@ -5,6 +5,7 @@ import { FormEvent, useState } from 'react';
 import { api } from '@/lib/api';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, Input } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -20,8 +21,8 @@ export default function ForgotPasswordPage() {
     try {
       const res = await api.post<{ message: string }>('/auth/forgot-password', { email });
       setMessage(res.message);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setLoading(false);
     }

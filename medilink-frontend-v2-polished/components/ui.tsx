@@ -185,7 +185,9 @@ export function Alert({ children, type = 'info' }: { children: ReactNode; type?:
   );
 }
 
-export function Badge({ children, tone = 'neutral' }: { children: ReactNode; tone?: 'neutral' | 'success' | 'warning' | 'danger' }) {
+export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger';
+
+export function Badge({ children, tone = 'neutral' }: { children: ReactNode; tone?: BadgeTone }) {
   return <span className={`badge ${tone}`}>{children}</span>;
 }
 

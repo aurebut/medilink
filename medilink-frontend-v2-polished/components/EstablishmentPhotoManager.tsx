@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { api, isMockStorageUrl } from '@/lib/api';
 import type { EstablishmentPhoto } from '@/lib/types';
 import { Alert, Badge, Button, Field } from './ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type UploadResponse = {
   photoId: string;
@@ -54,8 +55,8 @@ export function EstablishmentPhotoManager({
       setFile(null);
       setInputKey((key) => key + 1);
       await onChanged();
-    } catch (e: any) {
-      setError(e.message || 'Erreur upload photo.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Erreur upload photo.');
     } finally {
       setBusy(false);
     }
@@ -67,8 +68,8 @@ export function EstablishmentPhotoManager({
     try {
       await api.patch(`/establishments/${establishmentId}/photos/${photoId}/primary`, {});
       await onChanged();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -81,8 +82,8 @@ export function EstablishmentPhotoManager({
     try {
       await api.delete(`/establishments/${establishmentId}/photos/${photoId}`);
       await onChanged();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusy(false);
     }

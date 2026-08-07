@@ -13,7 +13,8 @@ import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels
 import { getMissionPublicPath } from '@/lib/mission-links';
 import { getDepartmentLabel, getPatientTypeLabel, getSectorLabel, getSoftwareLabel, getSpecialtyLabel } from '@/lib/profile-options';
 import type { Application, ApplicationStatus, Mission } from '@/lib/types';
-import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { errorMessage } from '@/lib/user-facing';
 
 function applicationTone(status: ApplicationStatus) {
   if (status === 'ACCEPTED') return 'success';
@@ -90,8 +91,8 @@ export default function EstablishmentMissionDetailPage() {
       } catch {
         setApplications([]);
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
       setMission(null);
     } finally {
       if (!options.silent) setLoading(false);
@@ -121,8 +122,8 @@ export default function EstablishmentMissionDetailPage() {
       await api.post(`/missions/${id}/${action}`, {});
       await load();
       setSuccess(action === 'publish' ? 'Mission publiée.' : action === 'pause' ? 'Mission mise en pause.' : 'Mission archivée.');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setStatusBusy(null);
     }

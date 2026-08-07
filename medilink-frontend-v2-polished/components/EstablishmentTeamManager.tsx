@@ -8,6 +8,7 @@ import type {
 } from '@/lib/types';
 import { useAuth } from './AuthProvider';
 import { Alert, Badge, Button, Card, Field, Input, Select } from './ui';
+import { errorMessage } from '@/lib/user-facing';
 
 const roleLabels: Record<EstablishmentMemberRole, string> = {
   OWNER: 'Propriétaire',
@@ -81,7 +82,7 @@ export function EstablishmentTeamManager({
       } else {
         setError(
           caught instanceof Error
-            ? caught.message
+            ? errorMessage(caught)
             : 'Impossible de modifier cet accès.',
         );
       }
@@ -107,7 +108,7 @@ export function EstablishmentTeamManager({
     } catch (caught) {
       setError(
         caught instanceof Error
-          ? caught.message
+          ? errorMessage(caught)
           : 'Impossible de modifier ce rôle.',
       );
     } finally {
@@ -129,7 +130,7 @@ export function EstablishmentTeamManager({
     } catch (caught) {
       setError(
         caught instanceof Error
-          ? caught.message
+          ? errorMessage(caught)
           : 'Impossible de retirer cet accès.',
       );
     } finally {

@@ -65,7 +65,7 @@ export default function RegisterPage() {
     >
         {error ? <Alert type="error">{error}</Alert> : null}
         <Field label="Type de compte">
-          <Select name="accountType" value={accountType} onChange={(e) => setAccountType(e.target.value as any)}>
+          <Select name="accountType" value={accountType} onChange={(e) => setAccountType(e.target.value as 'candidate' | 'establishment')}>
             <option value="candidate">Candidat médical</option>
             <option value="establishment">Établissement / recruteur</option>
           </Select>

@@ -6,7 +6,8 @@ import type { CurrentUser, Profile } from '@/lib/types';
 import { formatDateTime } from '@/lib/format';
 import { roleLabel, statusLabel } from '@/lib/labels';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type AdminUser = CurrentUser & { profile?: Profile | null };
 
@@ -20,8 +21,8 @@ export default function AdminUsersPage() {
       setUsers(options.reload
         ? await api.reload<AdminUser[]>('/admin/users')
         : await api.get<AdminUser[]>('/admin/users'));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -35,8 +36,8 @@ export default function AdminUsersPage() {
     try {
       await api.patch(`/admin/users/${id}/suspend`, {});
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 

@@ -1,5 +1,9 @@
 import { ApiError } from './api';
 
+export function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : '';
+}
+
 export function plural(
   count: number,
   singular: string,

@@ -8,7 +8,8 @@ import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
+import { Alert, Badge, Button, Card, Field, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type ApplyResult = {
   application: Application;
@@ -121,7 +122,7 @@ export default function ApplyMissionPage() {
 
   useEffect(() => {
     loadApplicationContext()
-      .catch((e) => setError(e.message))
+      .catch((e) => setError(errorMessage(e)))
       .finally(() => setLoading(false));
   }, [loadApplicationContext]);
 
@@ -151,8 +152,8 @@ export default function ApplyMissionPage() {
         coverMessage: coverMessage.trim() || undefined,
       });
       setSuccess(result);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setSubmitting(false);
     }

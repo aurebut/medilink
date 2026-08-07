@@ -5,12 +5,13 @@ import { useParams } from 'next/navigation';
 import { api, getApiUrl } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
-import type { Conversation, MissionAgreement } from '@/lib/types';
+import type { Application, Conversation, MissionAgreement } from '@/lib/types';
 import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
-import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { errorMessage } from '@/lib/user-facing';
 
 type AccountingRow = {
   id: string;
@@ -49,7 +50,7 @@ function latestAgreement(conversation?: Conversation | null) {
   return conversation?.agreements?.[0] || null;
 }
 
-function candidateName(application?: any) {
+function candidateName(application?: Application | null) {
   if (!application) return 'Candidat';
   const name = [application.candidate?.profile?.firstName, application.candidate?.profile?.lastName].filter(Boolean).join(' ');
   return name || application.candidate?.email || `${candidateNounCapitalized(application.candidate?.profile)} à identifier`;
@@ -177,7 +178,7 @@ export default function RecruiterBillingMissionDetailPage() {
 
   useEffect(() => {
     Promise.all([loadConversations(), loadAccounting()])
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setLoading(false));
   }, [loadConversations, loadAccounting]);
 
@@ -203,8 +204,8 @@ export default function RecruiterBillingMissionDetailPage() {
       link.download = match?.[1] || 'facture-etablissement.pdf';
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -220,8 +221,8 @@ export default function RecruiterBillingMissionDetailPage() {
         classified: !classifiedIds.includes(id),
       });
       setClassifiedIds(workspace.classifiedIds);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }

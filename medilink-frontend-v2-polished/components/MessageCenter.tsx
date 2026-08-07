@@ -8,7 +8,8 @@ import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './AuthProvider';
+import { errorMessage } from '@/lib/user-facing';
 
 
 const WORKFLOW_PREFIX = '__MEDILINK_WORKFLOW__';
@@ -270,8 +271,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
           api.preload(`/conversations/${conversation.id}/messages`);
         }
       });
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -287,8 +288,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
         setMessages((prev) => mergeMessages(prev, data));
       }
       await api.postSilent(`/conversations/${id}/read`, {});
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -442,7 +443,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
 
         api.get<ConversationWithLast[]>('/conversations')
           .then((data) => setConversations(scopeConversations(data)))
-          .catch((e: any) => setError(e.message));
+          .catch((e: Error) => setError(errorMessage(e)));
       } catch {
         // Ignore malformed realtime payloads; the next focus refresh will recover state.
       }
@@ -486,10 +487,10 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
         setMessages((prev) => mergeMessages(prev, [created]));
       }
       await loadConversations();
-    } catch (e: any) {
+    } catch (e) {
       setMessages((prev) => prev.filter((message) => message.clientRequestId !== clientRequestId));
       if (activeIdRef.current === conversationId) setBody(messageBody);
-      setError(e.message);
+      setError(errorMessage(e));
     } finally {
       sendingMessageRef.current = Math.max(0, sendingMessageRef.current - 1);
       setSendingMessage(sendingMessageRef.current > 0);
@@ -515,8 +516,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       });
       setProposalOpen(false);
       await refresh();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyAction(null);
     }
@@ -529,8 +530,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
     try {
       await api.post(`/conversations/${activeId}${path}`, payload);
       await refresh();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyAction(null);
     }
@@ -554,8 +555,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
     try {
       await api.post(`/applications/${appId}/withdraw`, {});
       await refresh();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyAction(null);
     }
@@ -580,8 +581,8 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       link.download = match?.[1] || (kind === 'recruiter' ? 'facture-etablissement.pdf' : 'justificatif-candidat.pdf');
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyAction(null);
     }

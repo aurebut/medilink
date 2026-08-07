@@ -10,6 +10,7 @@ import { EstablishmentPhotoManager } from '@/components/EstablishmentPhotoManage
 import { EstablishmentTeamManager } from '@/components/EstablishmentTeamManager';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 import {
   cityOptions,
   countryOptions,
@@ -20,10 +21,32 @@ import {
   softwareOptions,
 } from '@/lib/profile-options';
 
+type EstablishmentForm = {
+  name: string;
+  type: EstablishmentType;
+  city: string;
+  country: string;
+  sector: string;
+  patientType: string;
+  softwareUsed: string;
+  hasSecretary?: boolean | null;
+  secretaryType: string;
+  averagePatientsPerDay: string | number;
+  isMultidisciplinary?: boolean | null;
+  equipmentAvailable: string[];
+  acceptedPatientTypes: string[];
+  knownSoftware: string[];
+  address: string;
+  email: string;
+  phone: string;
+  website: string;
+  description: string;
+};
+
 export default function EditEstablishmentPage() {
   const { id } = useParams<{ id: string }>();
   const { establishments, loading, reload } = useEstablishments();
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<EstablishmentForm | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -56,8 +79,8 @@ export default function EditEstablishmentPage() {
     }
   }, [establishment, form]);
 
-  function set(name: string, value: unknown) {
-    setForm((p: any) => ({ ...p, [name]: value }));
+  function set<K extends keyof EstablishmentForm>(name: K, value: EstablishmentForm[K]) {
+    setForm((p) => ({ ...(p as EstablishmentForm), [name]: value }));
   }
 
   async function submit(e: FormEvent) {
@@ -76,8 +99,8 @@ export default function EditEstablishmentPage() {
       });
       setMessage('Établissement modifié avec succès.');
       await reload();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setSaving(false);
     }

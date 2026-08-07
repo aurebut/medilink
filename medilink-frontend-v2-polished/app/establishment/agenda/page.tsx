@@ -18,6 +18,7 @@ import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
+import { errorMessage } from '@/lib/user-facing';
 
 function buildCalendarDays(anchor: Date) {
   const firstOfMonth = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
@@ -120,8 +121,8 @@ export default function EstablishmentAgendaPage() {
       setMissions(m);
       setApplications(a);
       setConversations(c);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }

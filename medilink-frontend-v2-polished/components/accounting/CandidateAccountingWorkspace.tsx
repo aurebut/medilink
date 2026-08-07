@@ -18,7 +18,8 @@ import {
 import { formatDate, formatMoney } from '@/lib/format';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LinkButton, LoadingCard, PageHeader, Select } from '@/components/ui';
-import { MonthlyBarChart } from '@/components/MonthlyBarChart';
+import { MonthlyBarChart } from '@/components/MonthlyBarChart';
+import { errorMessage } from '@/lib/user-facing';
 
 type AccountingTab = 'overview' | 'transactions' | 'settlements' | 'documents' | 'tax' | 'exports';
 type EntryFilter = 'ALL' | AccountingEntryKind;
@@ -128,7 +129,7 @@ export function CandidateAccountingWorkspace() {
   }, [applyWorkspace]);
 
   useEffect(() => {
-    loadAccounting().catch((e: any) => setError(e.message)).finally(() => setLoading(false));
+    loadAccounting().catch((e: Error) => setError(errorMessage(e))).finally(() => setLoading(false));
   }, [loadAccounting]);
 
   useAutoRefresh(() => loadAccounting({ reload: true }).then(() => undefined), { enabled: !loading && !busyId });
@@ -138,7 +139,7 @@ export function CandidateAccountingWorkspace() {
     const timeout = window.setTimeout(() => {
       void api.patch<AccountingWorkspacePayload>('/billing/accounting/candidate/settings', { provisionRate })
         .then(applyWorkspace)
-        .catch((e: any) => setError(e.message));
+        .catch((e: Error) => setError(errorMessage(e)));
     }, 600);
     return () => window.clearTimeout(timeout);
   }, [applyWorkspace, provisionRate, settingsReady]);
@@ -210,8 +211,8 @@ export function CandidateAccountingWorkspace() {
       applyWorkspace(next);
       event.currentTarget.reset();
       setManualKind('EXPENSE');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -223,8 +224,8 @@ export function CandidateAccountingWorkspace() {
     setError(null);
     try {
       applyWorkspace(await api.delete<AccountingWorkspacePayload>(`/billing/accounting/candidate/entries/${encodeURIComponent(id)}`));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -238,8 +239,8 @@ export function CandidateAccountingWorkspace() {
         recordKey: entry.id,
         classified: !(workspace?.classifiedIds || []).includes(entry.id),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -259,8 +260,8 @@ export function CandidateAccountingWorkspace() {
         activityStartDate: profile.activityStartDate || undefined,
         onboardingCompleted: true,
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -281,8 +282,8 @@ export function CandidateAccountingWorkspace() {
       link.download = `justificatif-retrocession-${settlement.agreementId}.pdf`;
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }

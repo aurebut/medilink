@@ -9,16 +9,17 @@ import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateIs, candidateNoun } from '@/lib/grammar';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, ProgressBar, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
-function applicationTone(status: string) {
+function applicationTone(status: string): BadgeTone {
   if (status === 'ACCEPTED') return 'success';
   if (status === 'REJECTED') return 'danger';
   if (status === 'VIEWED') return 'warning';
   return 'neutral';
 }
 
-function docTone(status: string) {
+function docTone(status: string): BadgeTone {
   if (status === 'APPROVED') return 'success';
   if (status === 'REJECTED') return 'danger';
   if (status === 'PENDING_VERIFICATION') return 'warning';
@@ -47,7 +48,7 @@ export default function EstablishmentCandidateProfilePage() {
 
   useEffect(() => {
     loadData()
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setLoading(false));
   }, [loadData]);
 
@@ -66,9 +67,9 @@ export default function EstablishmentCandidateProfilePage() {
       }
 
       showDocumentInPreview(res.downloadUrl, previewWindow);
-    } catch (e: any) {
+    } catch (e) {
       previewWindow?.close();
-      setError(e.message);
+      setError(errorMessage(e));
     }
   }
 
@@ -100,7 +101,7 @@ export default function EstablishmentCandidateProfilePage() {
       <div className="grid-main">
         <Card className="card-highlight">
           <div className="actions" style={{ justifyContent: 'space-between' }}>
-            <Badge tone={applicationTone(data.application.status) as any}>
+            <Badge tone={applicationTone(data.application.status)}>
               Candidature {statusLabel(data.application.status)}
             </Badge>
             <span className="small">Reçue le {formatDateTime(data.application.createdAt)}</span>
@@ -230,7 +231,7 @@ export default function EstablishmentCandidateProfilePage() {
                 <tr key={doc.id}>
                   <td>{documentTypeLabel(doc.documentType)}</td>
                   <td>{doc.fileName}</td>
-                  <td><Badge tone={docTone(doc.verificationStatus) as any}>{statusLabel(doc.verificationStatus)}</Badge></td>
+                  <td><Badge tone={docTone(doc.verificationStatus)}>{statusLabel(doc.verificationStatus)}</Badge></td>
                   <td>{formatDateTime(doc.createdAt)}</td>
                   <td><Button variant="light" onClick={() => void openDocument(doc)}>Voir</Button></td>
                 </tr>

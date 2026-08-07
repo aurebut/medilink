@@ -11,7 +11,8 @@ import { useEstablishments } from '@/components/EstablishmentSelector';
 import { MonthlyBarChart } from '@/components/MonthlyBarChart';
 import { candidateNounCapitalized } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
-import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { errorMessage } from '@/lib/user-facing';
 
 type ManualExpense = {
   id: string;
@@ -272,13 +273,13 @@ export default function RecruiterBillingPage() {
     if (queryTab === 'subscription') setActiveTab('subscription');
 
     Promise.all([loadConversations(), loadAccounting()])
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setLoading(false));
   }, [loadConversations, loadAccounting]);
 
   useEffect(() => {
     loadBillingStatus({ reload: true })
-      .catch((e: any) => setError(e.message));
+      .catch((e: Error) => setError(errorMessage(e)));
   }, [loadBillingStatus]);
 
   useAutoRefresh(async () => {
@@ -293,7 +294,7 @@ export default function RecruiterBillingPage() {
     if (!settingsReady || !primary) return;
     const timeout = window.setTimeout(() => {
       void api.patch<AccountingWorkspacePayload>(`/billing/accounting/establishments/${primary.id}/settings`, { budgetLimit })
-        .catch((e: any) => setError(e.message));
+        .catch((e: Error) => setError(errorMessage(e)));
     }, 500);
     return () => window.clearTimeout(timeout);
   }, [budgetLimit, primary, settingsReady]);
@@ -447,8 +448,8 @@ export default function RecruiterBillingPage() {
       link.download = match?.[1] || 'facture-etablissement.pdf';
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -483,8 +484,8 @@ export default function RecruiterBillingPage() {
       });
       applyWorkspace(workspace);
       event.currentTarget.reset();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -496,8 +497,8 @@ export default function RecruiterBillingPage() {
     setError(null);
     try {
       applyWorkspace(await api.delete<AccountingWorkspacePayload>(`/billing/accounting/establishments/${primary.id}/entries/${encodeURIComponent(id)}`));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -512,8 +513,8 @@ export default function RecruiterBillingPage() {
         recordKey: id,
         classified: !classifiedIds.includes(id),
       }));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -532,8 +533,8 @@ export default function RecruiterBillingPage() {
     try {
       const response = await api.post<{ url: string }>('/billing/portal', { establishmentId: primary.id });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -546,8 +547,8 @@ export default function RecruiterBillingPage() {
     try {
       const response = await api.post<{ url: string }>('/billing/checkout/subscription', { establishmentId: primary.id });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -560,8 +561,8 @@ export default function RecruiterBillingPage() {
     try {
       const response = await api.post<{ url: string }>('/billing/checkout/publication-credit', { establishmentId: primary.id });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }

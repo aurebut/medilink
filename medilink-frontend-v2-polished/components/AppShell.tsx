@@ -32,6 +32,7 @@ import type { CandidateDashboardData, Conversation, EstablishmentBillingStatus, 
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
 import { useOptionalEstablishments } from './EstablishmentSelector';
+import { errorMessage } from '@/lib/user-facing';
 
 type NavItem = { href: string; label: string; icon: string };
 
@@ -348,8 +349,8 @@ export function AppShell({
     try {
       const result = await api.post<{ message: string }>('/auth/resend-verification', {});
       setVerificationMessage(result.message);
-    } catch (err: any) {
-      setVerificationError(err.message || 'Impossible de renvoyer le mail.');
+    } catch (err) {
+      setVerificationError(errorMessage(err) || 'Impossible de renvoyer le mail.');
     } finally {
       setResendingEmail(false);
     }
@@ -373,8 +374,8 @@ export function AppShell({
       setNotifications(normalizeNotifications(options.reload
         ? await api.reload<Notification[]>('/notifications')
         : await api.get<Notification[]>('/notifications')));
-    } catch (e: any) {
-      setNotificationsError(e.message);
+    } catch (e) {
+      setNotificationsError(errorMessage(e));
     } finally {
       if (!options.silent) setNotificationsLoading(false);
     }
@@ -389,11 +390,11 @@ export function AppShell({
 
     try {
       await confirmNotificationDelete(id);
-    } catch (e: any) {
+    } catch (e) {
       if (deletedNotification) {
         restoreNotificationInCache(deletedNotification, deletedIndex);
       }
-      setNotificationsError(e.message);
+      setNotificationsError(errorMessage(e));
     }
   }
 
@@ -404,9 +405,9 @@ export function AppShell({
 
     try {
       await confirmNotificationsClear();
-    } catch (e: any) {
+    } catch (e) {
       restoreNotificationsCache(backupNotifications);
-      setNotificationsError(e.message);
+      setNotificationsError(errorMessage(e));
     }
   }
 

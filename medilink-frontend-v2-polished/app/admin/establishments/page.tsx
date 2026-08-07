@@ -5,7 +5,8 @@ import { api } from '@/lib/api';
 import type { Establishment } from '@/lib/types';
 import { establishmentTypeLabel, statusLabel } from '@/lib/labels';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 export default function AdminEstablishmentsPage() {
   const [items, setItems] = useState<Establishment[]>([]);
@@ -17,8 +18,8 @@ export default function AdminEstablishmentsPage() {
       setItems(options.reload
         ? await api.reload<Establishment[]>('/admin/establishments')
         : await api.get<Establishment[]>('/admin/establishments'));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -31,8 +32,8 @@ export default function AdminEstablishmentsPage() {
     try {
       await api.post(`/admin/establishments/${id}/verify`, {});
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 

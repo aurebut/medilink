@@ -6,12 +6,12 @@ import { api } from '@/lib/api';
 import type { Application, ApplicationStatus, Mission, MissionType, Paginated, Profile, RequiredLevel } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { missionTypeOptions, requiredLevelOptions, statusLabel } from '@/lib/labels';
-import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, PageHeader, Select, type BadgeTone } from '@/components/ui';
 import { MissionCard } from '@/components/MissionCard';
 import { establishmentDepartmentOptions, patientTypeOptions, sectorOptions, softwareOptions } from '@/lib/profile-options';
 import { getCandidateConversationPath, getCandidateMissionPath, getMissionApplyPath } from '@/lib/mission-links';
 import { formatDateTime } from '@/lib/format';
-import { plural, userFacingError } from '@/lib/user-facing';
+import { errorMessage, plural, userFacingError } from '@/lib/user-facing';
 
 const PAGE_SIZE = 12;
 
@@ -39,7 +39,7 @@ const tabs: Array<{ id: SearchTab; label: string }> = [
   { id: 'applications', label: 'Candidatures' },
 ];
 
-function applicationTone(status: string) {
+function applicationTone(status: string): BadgeTone {
   if (status === 'ACCEPTED') return 'success';
   if (status === 'REJECTED' || status === 'WITHDRAWN') return 'danger';
   if (status === 'VIEWED') return 'warning';
@@ -78,7 +78,7 @@ function ApplicationActionIcon({ type }: { type: 'message' | 'mission' | 'withdr
   );
 }
 
-const secondaryFilterKeys = [
+const secondaryFilterKeys: Array<keyof typeof emptyFilters> = [
   'missionType',
   'requiredLevel',
   'sector',
@@ -199,8 +199,8 @@ export default function SearchMissionsPage() {
         const updated = { ...filters };
         let changed = false;
         secondaryFilterKeys.forEach((key) => {
-          if (updated[key as keyof typeof filters] !== '') {
-            (updated as any)[key] = '';
+          if (updated[key] !== '') {
+            updated[key] = '';
             changed = true;
           }
         });
@@ -218,8 +218,8 @@ export default function SearchMissionsPage() {
     const updated = { ...filters };
     let changed = false;
     secondaryFilterKeys.forEach((key) => {
-      if (updated[key as keyof typeof filters] !== '') {
-        (updated as any)[key] = '';
+      if (updated[key] !== '') {
+        updated[key] = '';
         changed = true;
       }
     });
@@ -317,8 +317,8 @@ export default function SearchMissionsPage() {
     try {
       await api.post(`/applications/${id}/withdraw`, {});
       await loadApplications();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -706,7 +706,7 @@ function ApplicationSection({
                 </td>
                 <td data-label="Établissement">{a.mission?.establishment?.name || '—'}</td>
                 <td data-label="Statut">
-                  <Badge tone={applicationTone(a.status) as any}>
+                  <Badge tone={applicationTone(a.status)}>
                     {statusLabel(a.status)}
                   </Badge>
                 </td>

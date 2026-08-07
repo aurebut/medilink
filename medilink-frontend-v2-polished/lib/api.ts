@@ -128,11 +128,14 @@ export function clearLegacyAuthToken() {
   window.localStorage.removeItem(LEGACY_AUTH_TOKEN_KEY);
 }
 
-function normalizeError(payload: any): string {
-  if (!payload) return 'Erreur API.';
-  if (typeof payload.message === 'string') return payload.message;
-  if (Array.isArray(payload.message)) return payload.message.join('\n');
-  if (typeof payload.error === 'string') return payload.error;
+function normalizeError(payload: unknown): string {
+  if (!payload || typeof payload !== 'object') return 'Erreur API.';
+  const data = payload as Record<string, unknown>;
+  if (typeof data.message === 'string') return data.message;
+  if (Array.isArray(data.message) && data.message.every((entry) => typeof entry === 'string')) {
+    return (data.message as string[]).join('\n');
+  }
+  if (typeof data.error === 'string') return data.error;
   return 'Erreur API.';
 }
 
@@ -168,7 +171,7 @@ export async function apiFetch<T>(path: string, options: ApiOptions = {}): Promi
     if (response.status === 204) return undefined as T;
 
     const text = await response.text();
-    let payload: any = null;
+    let payload: unknown = null;
     try { payload = text ? JSON.parse(text) : null; } catch { payload = text ? { message: text } : null; }
 
     if (!response.ok) {

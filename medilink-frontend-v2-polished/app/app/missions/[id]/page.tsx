@@ -16,7 +16,8 @@ import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissio
 import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel, getSpecialtyLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type MissionContext = {
   application: Application;
@@ -187,8 +188,8 @@ export default function CandidateMissionDetailPage() {
       setApplications(nextApplications);
       setConversations(nextConversations);
       setPublicMission(nextMission);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -222,8 +223,8 @@ export default function CandidateMissionDetailPage() {
     try {
       await api.post(`/applications/${appId}/withdraw`, {});
       void load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 

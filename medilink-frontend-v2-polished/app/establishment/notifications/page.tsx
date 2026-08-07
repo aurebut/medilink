@@ -8,6 +8,7 @@ import type { Notification } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatDateTime } from '@/lib/format';
 import { Alert, Badge, Button, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 function getNotificationLink(notification: Notification) {
   if (!notification.data) return null;
@@ -44,8 +45,8 @@ export default function RecruiterNotificationsPage() {
       setItems(normalizeNotifications(options.reload
         ? await api.reload<Notification[]>('/notifications')
         : await api.get<Notification[]>('/notifications')));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }

@@ -8,7 +8,8 @@ import { Alert, Card, LinkButton, LoadingCard, PageHeader } from '@/components/u
 import { api } from '@/lib/api';
 import { buildEstablishmentAgendaRows } from '@/lib/establishment-agenda';
 import type { Application, Conversation, Mission } from '@/lib/types';
-import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { errorMessage } from '@/lib/user-facing';
 
 export default function EstablishmentMissionHistoryPage() {
   const { primary, loading: establishmentsLoading } = useEstablishments();
@@ -54,8 +55,8 @@ export default function EstablishmentMissionHistoryPage() {
       setMissions(m);
       setApplications(a);
       setConversations(c);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }

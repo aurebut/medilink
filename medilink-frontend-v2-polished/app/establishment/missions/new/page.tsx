@@ -23,13 +23,58 @@ import {
   softwareOptions,
   specialtyOptions,
 } from '@/lib/profile-options';
-import type { Establishment, EstablishmentBillingStatus, Mission, MissionType, RequiredLevel } from '@/lib/types';
+import type { Establishment, EstablishmentBillingStatus, Mission, MissionType, RequiredLevel } from '@/lib/types';
+import { errorMessage } from '@/lib/user-facing';
 
 type DraftSummary = {
   id: string;
   title: string;
   specialty: string;
   startDate: string;
+};
+
+type WizardForm = {
+  missionType: MissionType;
+  requiredLevel: RequiredLevel;
+  requiredLevels: RequiredLevel[];
+  compensationMode: string;
+  compensationCurrency: string;
+  durationHours: string;
+  retrocessionPercentage: string;
+  publishNow: boolean;
+  title: string;
+  specialty: string;
+  description: string;
+  practiceSetting: string;
+  requiredActs: string[];
+  departmentInfo: string;
+  softwareUsed: string;
+  hasSecretary?: boolean | null;
+  secretaryType: string;
+  patientType: string;
+  averagePatientsPerDay: string;
+  isMultidisciplinary?: boolean | null;
+  equipmentAvailable: string[];
+  teamInfo: string;
+  equipmentInfo: string;
+  city: string;
+  sector: string;
+  location: string;
+  accommodationProvided?: boolean | null;
+  parkingAvailable?: boolean | null;
+  practicalInfo: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  mobilityOptions: string[];
+  preferredDurations: string[];
+  refusedSchedules: string[];
+  acceptedPatientTypes: string[];
+  knownSoftware: string[];
+  minimumCompensation: string;
+  tagsText?: string;
+  acceptedMissionTypes: string[];
 };
 
 const steps = [
@@ -41,15 +86,44 @@ const steps = [
   { title: 'Vérification', helper: 'Dernière relecture avant validation' },
 ];
 
-const initialForm = {
-  missionType: 'REMPLACEMENT' as MissionType,
-  requiredLevel: 'INTERN' as RequiredLevel,
-  requiredLevels: ['INTERN'] as RequiredLevel[],
+const initialForm: WizardForm = {
+  missionType: 'REMPLACEMENT',
+  requiredLevel: 'INTERN',
+  requiredLevels: ['INTERN'],
   compensationMode: 'RETROCESSION',
   compensationCurrency: 'EUR',
   durationHours: '8',
   retrocessionPercentage: '70',
   publishNow: true,
+  title: '',
+  specialty: '',
+  description: '',
+  practiceSetting: '',
+  requiredActs: [],
+  departmentInfo: '',
+  softwareUsed: '',
+  secretaryType: '',
+  patientType: '',
+  averagePatientsPerDay: '',
+  equipmentAvailable: [],
+  teamInfo: '',
+  equipmentInfo: '',
+  city: '',
+  sector: '',
+  location: '',
+  practicalInfo: '',
+  startDate: '',
+  endDate: '',
+  startTime: '',
+  endTime: '',
+  mobilityOptions: [],
+  preferredDurations: [],
+  refusedSchedules: [],
+  acceptedPatientTypes: [],
+  knownSoftware: [],
+  minimumCompensation: '',
+  tagsText: '',
+  acceptedMissionTypes: [],
 };
 
 function tomorrowDateInput() {
@@ -113,7 +187,7 @@ function mergeAccountCreditStatus(
   };
 }
 
-function findStoppedStep(form: any, establishment?: any) {
+function findStoppedStep(form: WizardForm, establishment?: Establishment) {
   if (
     !form.title ||
     form.title === 'Mission sans titre' ||
@@ -141,12 +215,12 @@ function findStoppedStep(form: any, establishment?: any) {
   return 5;
 }
 
-function missionToWizardForm(mission: any) {
-  const tagsText = mission.tags?.map((tag: any) => tag.tag).join(', ') || '';
+function missionToWizardForm(mission: Mission): WizardForm {
+  const tagsText = mission.tags?.map((tag) => tag.tag).join(', ') || '';
   return {
     missionType: mission.missionType || 'REMPLACEMENT',
     requiredLevel: mission.requiredLevels?.[0] || mission.requiredLevel || 'INTERN',
-    requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean),
+    requiredLevels: mission.requiredLevels?.length ? mission.requiredLevels : [mission.requiredLevel].filter(Boolean) as RequiredLevel[],
     compensationMode: mission.compensationMode || 'RETROCESSION',
     compensationCurrency: mission.compensationCurrency || 'EUR',
     durationHours: mission.durationHours != null ? String(mission.durationHours) : '8',
@@ -188,7 +262,7 @@ function missionToWizardForm(mission: any) {
   };
 }
 
-function validateWizardStep(stepIndex: number, form: any): string | null {
+function validateWizardStep(stepIndex: number, form: WizardForm): string | null {
   if (stepIndex === 0) {
     if (!form.missionType) return 'Choisissez un type de mission.';
     if (!safeArray(form.requiredLevels).length) return 'Sélectionnez au moins un profil recherché.';
@@ -256,7 +330,7 @@ function validateWizardStep(stepIndex: number, form: any): string | null {
   return null;
 }
 
-function firstInvalidWizardStep(form: any) {
+function firstInvalidWizardStep(form: WizardForm) {
   for (let stepIndex = 0; stepIndex < steps.length - 1; stepIndex += 1) {
     if (validateWizardStep(stepIndex, form)) return stepIndex;
   }
@@ -265,7 +339,7 @@ function firstInvalidWizardStep(form: any) {
 
 export default function NewMissionPage() {
   const { establishments, primary, loading } = useEstablishments();
-  const [form, setForm] = useState<any>(initialForm);
+  const [form, setForm] = useState<WizardForm>(initialForm);
   const [selectedEstablishmentId, setSelectedEstablishmentId] = useState('');
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -360,7 +434,7 @@ export default function NewMissionPage() {
     )
       ? (missionType as MissionType)
       : undefined;
-    setForm((current: any) => ({
+    setForm((current: WizardForm) => ({
       ...current,
       missionType: supportedMissionType || current.missionType,
       specialty: specialty || current.specialty || '',
@@ -410,7 +484,7 @@ export default function NewMissionPage() {
 
     hasFetchedRef.current = true;
     setLoadingDraft(true);
-    api.get<any>(`/missions/mine/${draftId}`)
+    api.get<Mission>(`/missions/mine/${draftId}`)
       .then((m) => {
         const parsedForm = missionToWizardForm(m);
         setForm(parsedForm);
@@ -428,14 +502,14 @@ export default function NewMissionPage() {
           if (!isNaN(parsedStep) && parsedStep >= 0 && parsedStep < steps.length) {
             setStep(parsedStep);
           } else {
-            setStep(findStoppedStep(parsedForm, establishment));
+            setStep(findStoppedStep(parsedForm, establishment ?? undefined));
           }
         } else {
-          setStep(findStoppedStep(parsedForm, establishment));
+          setStep(findStoppedStep(parsedForm, establishment ?? undefined));
         }
       })
       .catch((err) => {
-        setError("Impossible de charger le brouillon : " + err.message);
+        setError("Impossible de charger le brouillon : " + errorMessage(err));
       })
       .finally(() => {
         setLoadingDraft(false);
@@ -513,9 +587,9 @@ export default function NewMissionPage() {
         setBillingStatus(mergeAccountCreditStatus(selectedStatus, accountStatuses));
         setBillingLoading(false);
       })
-      .catch((e: any) => {
+      .catch((e: Error) => {
         if (cancelled) return;
-        setError(e.message);
+        setError(errorMessage(e));
         setBillingLoading(false);
       });
 
@@ -556,9 +630,9 @@ export default function NewMissionPage() {
             .map(missionToDraftSummary),
         );
       })
-      .catch((e: any) => {
+      .catch((e: Error) => {
         if (cancelled) return;
-        setError(e.message);
+        setError(errorMessage(e));
         setExistingDrafts([]);
       })
       .finally(() => {
@@ -573,7 +647,7 @@ export default function NewMissionPage() {
   useEffect(() => {
     if (!selectedEstablishment) return;
 
-    setForm((current: any) => ({
+    setForm((current: WizardForm) => ({
       ...current,
       city: current.city || selectedEstablishment.city || '',
       location: current.location || selectedEstablishment.address || '',
@@ -588,9 +662,9 @@ export default function NewMissionPage() {
     }));
   }, [selectedEstablishment]);
 
-  function set(name: string, value: unknown) {
+  function set<K extends keyof WizardForm>(name: K, value: WizardForm[K]) {
     draftDirtyRef.current = true;
-    setForm((p: any) => ({ ...p, [name]: value }));
+    setForm((p) => ({ ...p, [name]: value }));
   }
 
   const currentStepValidationError = validateWizardStep(step, form);
@@ -737,8 +811,8 @@ export default function NewMissionPage() {
         setCreatedMission(mission);
       }
       window.sessionStorage.removeItem('medilink_establishment_intent');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
       hasSubmittedRef.current = false;
     } finally {
       setSaving(false);
@@ -770,8 +844,8 @@ export default function NewMissionPage() {
         : '/billing/checkout/publication-credit';
       const response = await api.post<{ url: string }>(endpoint, { establishmentId: selectedEstablishment.id });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBillingBusy(null);
     }
@@ -911,7 +985,7 @@ export default function NewMissionPage() {
                   const next = establishments.find((item) => item.id === e.target.value);
                   draftDirtyRef.current = true;
                   setSelectedEstablishmentId(e.target.value);
-                  setForm((current: any) => ({
+    setForm((current: WizardForm) => ({
                     ...current,
                     city: next?.city || current.city || '',
                     location: next?.address || current.location || '',
@@ -920,7 +994,7 @@ export default function NewMissionPage() {
                     softwareUsed: next?.softwareUsed || '',
                     hasSecretary: next?.hasSecretary,
                     secretaryType: next?.secretaryType || '',
-                    averagePatientsPerDay: next?.averagePatientsPerDay ?? '',
+                    averagePatientsPerDay: next?.averagePatientsPerDay != null ? String(next.averagePatientsPerDay) : '',
                     isMultidisciplinary: next?.isMultidisciplinary,
                     equipmentAvailable: next?.equipmentAvailable || [],
                   }));
@@ -1004,8 +1078,8 @@ function PublicationAccessGate({
       await api.delete(`/missions/${draftId}`);
       clearApiCache('/establishment/dashboard');
       onDeleted(draftId);
-    } catch (err: any) {
-      setDeleteError(err.message || "Impossible de supprimer le brouillon.");
+    } catch (err) {
+      setDeleteError(errorMessage(err) || "Impossible de supprimer le brouillon.");
     } finally {
       setDeletingId(null);
     }
@@ -1250,8 +1324,8 @@ function StepContent({
   headingRef,
 }: {
   step: number;
-  form: any;
-  set: (name: string, value: unknown) => void;
+  form: WizardForm;
+  set: <K extends keyof WizardForm>(name: K, value: WizardForm[K]) => void;
   headingRef: RefObject<HTMLHeadingElement>;
 }) {
   const headingProps = {
@@ -1271,7 +1345,7 @@ function StepContent({
           <ChoiceGrid
             value={form.missionType}
             options={missionTypeOptions}
-            onChange={(value) => set('missionType', value)}
+            onChange={(value) => set('missionType', value as MissionType)}
           />
         </ChoiceSection>
         <ChoiceSection title="Types de profils recherchés">
@@ -1279,8 +1353,8 @@ function StepContent({
             values={safeArray(form.requiredLevels)}
             options={requiredLevelOptions}
             onChange={(values) => {
-              set('requiredLevels', values);
-              set('requiredLevel', values[0]);
+              set('requiredLevels', values as RequiredLevel[]);
+              set('requiredLevel', values[0] as RequiredLevel);
             }}
           />
         </ChoiceSection>
@@ -1754,7 +1828,7 @@ function BooleanChoice({
   onChange,
 }: {
   label: string;
-  value?: boolean;
+  value?: boolean | null;
   onChange: (value: boolean) => void;
 }) {
   return (
@@ -1782,7 +1856,7 @@ function BooleanChoice({
   );
 }
 
-function MissionDraftSummary({ form, compact = false }: { form: any; compact?: boolean }) {
+function MissionDraftSummary({ form, compact = false }: { form: WizardForm; compact?: boolean }) {
   const tags = String(form.tagsText || '').split(',').map((x) => x.trim()).filter(Boolean);
 
   return (

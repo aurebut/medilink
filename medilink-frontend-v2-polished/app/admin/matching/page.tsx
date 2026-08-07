@@ -5,7 +5,8 @@ import { api } from '@/lib/api';
 import { formatDateTime } from '@/lib/format';
 import { medicalStatusLabel, missionTypeLabel, statusLabel } from '@/lib/labels';
 import type { MedicalStatus, Mission } from '@/lib/types';
-import { Alert, Badge, Button, Field, Input, LoadingCard, PageHeader, Select } from '@/components/ui';
+import { Alert, Badge, Button, Field, Input, LoadingCard, PageHeader, Select, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type MatchTier = {
   label: string;
@@ -83,14 +84,14 @@ const breakdownLabels: Record<string, string> = {
   accommodation: 'Logement',
 };
 
-function tierTone(tier: string) {
+function tierTone(tier: string): BadgeTone {
   if (tier === 'excellent') return 'success';
   if (tier === 'strong' || tier === 'good') return 'warning';
   if (tier === 'excluded') return 'danger';
   return 'neutral';
 }
 
-function scoreTone(score: number) {
+function scoreTone(score: number): BadgeTone {
   if (score >= 85) return 'success';
   if (score >= 65) return 'warning';
   return 'neutral';
@@ -105,7 +106,7 @@ function decisionLabel(candidate: MatchCandidate) {
   return 'Sous seuil';
 }
 
-function decisionTone(candidate: MatchCandidate) {
+function decisionTone(candidate: MatchCandidate): BadgeTone {
   if (!candidate.eligible) return 'danger';
   if (candidate.alreadyNotified) return 'success';
   return scoreTone(candidate.score);
@@ -187,8 +188,8 @@ export default function AdminMatchingPage() {
       setMissions(items);
       const firstPublished = items.find((mission) => mission.status === 'PUBLISHED');
       setSelectedMissionId((current) => current || firstPublished?.id || '');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -204,8 +205,8 @@ export default function AdminMatchingPage() {
       const nextPreview = await api.reload<MatchPreview>(`/admin/matching/missions/${id}/preview?limit=100`);
       setPreview(nextPreview);
       setSelectedCandidateId(nextPreview.items[0]?.candidateUserId || nextPreview.excluded[0]?.candidateUserId || '');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setPreviewLoading(false);
     }
@@ -230,8 +231,8 @@ export default function AdminMatchingPage() {
           : ''),
       );
       await loadPreview(selectedMissionId);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setDispatching(false);
     }
@@ -413,7 +414,7 @@ export default function AdminMatchingPage() {
                       <small>{candidateSpecialty(candidate)} · {candidate.profile.city || 'Ville non renseignée'}</small>
                     </span>
                     <span className="candidate-row-meta">
-                      <Badge tone={decisionTone(candidate) as any}>{decisionLabel(candidate)}</Badge>
+                      <Badge tone={decisionTone(candidate)}>{decisionLabel(candidate)}</Badge>
                       <small>{medicalStatusLabel(candidate.profile.medicalStatus)}</small>
                     </span>
                   </button>
@@ -432,7 +433,7 @@ export default function AdminMatchingPage() {
                         <h3>{selectedCandidate.displayName}</h3>
                         <p>{selectedCandidate.email}</p>
                       </div>
-                      <Badge tone={decisionTone(selectedCandidate) as any}>{decisionLabel(selectedCandidate)}</Badge>
+                      <Badge tone={decisionTone(selectedCandidate)}>{decisionLabel(selectedCandidate)}</Badge>
                     </div>
 
                     <div className="matching-profile-grid">

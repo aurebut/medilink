@@ -6,9 +6,10 @@ import type { Mission } from '@/lib/types';
 import { formatDate } from '@/lib/format';
 import { missionTypeLabel, statusLabel } from '@/lib/labels';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, LoadingCard, PageHeader, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
-function tone(status: string) {
+function tone(status: string): BadgeTone {
   if (status === 'PUBLISHED') return 'success';
   if (status === 'PAUSED' || status === 'ARCHIVED') return 'warning';
   return 'neutral';
@@ -24,8 +25,8 @@ export default function AdminMissionsPage() {
       setItems(options.reload
         ? await api.reload<Mission[]>('/admin/missions')
         : await api.get<Mission[]>('/admin/missions'));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -39,8 +40,8 @@ export default function AdminMissionsPage() {
     try {
       await api.post(`/admin/missions/${id}/unpublish`, {});
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -70,7 +71,7 @@ export default function AdminMissionsPage() {
                 <td data-label="Établissement">{m.establishment?.name || '—'}</td>
                 <td data-label="Type">{missionTypeLabel(m.missionType)}</td>
                 <td data-label="Date">{formatDate(m.startDate)}</td>
-                <td data-label="Statut"><Badge tone={tone(m.status) as any}>{statusLabel(m.status)}</Badge></td>
+                <td data-label="Statut"><Badge tone={tone(m.status)}>{statusLabel(m.status)}</Badge></td>
                 <td data-label="Action"><Button variant="danger" disabled={m.status !== 'PUBLISHED'} onClick={() => unpublish(m.id)}>Dépublier</Button></td>
               </tr>
             ))}

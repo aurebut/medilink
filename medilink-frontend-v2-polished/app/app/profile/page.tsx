@@ -31,7 +31,7 @@ import {
   weekdayOptions,
 } from '@/lib/profile-options';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { userFacingError } from '@/lib/user-facing';
+import { errorMessage, userFacingError } from '@/lib/user-facing';
 
 type UploadResponse = {
   documentId: string;
@@ -45,6 +45,53 @@ type UploadResponse = {
 
 type ProfileTab = 'identity' | 'professional' | 'missions' | 'documents';
 
+type ProfileForm = {
+  actsPerformedText: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  candidateGender?: CandidateGender | null;
+  city?: string | null;
+  country?: string | null;
+  medicalStatus?: MedicalStatus | null;
+  medicalStatusOther?: string | null;
+  specialty?: string | null;
+  orientation?: string | null;
+  hospitalOrFaculty?: string | null;
+  bio?: string | null;
+  experienceYears?: number | string | null;
+  actsPerformed?: string[];
+  availabilityNotes?: string | null;
+  preferredCities?: string[];
+  maxTravelRadiusKm?: number | string | null;
+  mobilityOptions?: string[];
+  acceptedWeekdays?: string[];
+  acceptedTimeSlots?: string[];
+  minimumNoticeHours?: number | string | null;
+  mobilityRangeType?: string | null;
+  housingRequiredBeyondKm?: number | string | null;
+  acceptedPracticeSettings?: string[];
+  acceptedMissionTypes?: string[];
+  minimumCompensation?: number | string | null;
+  preferredDurations?: string[];
+  refusedSchedules?: string[];
+  knownSoftware?: string[];
+  acceptedPatientTypes?: string[];
+  refusedPatientTypes?: string[];
+  maxPatientsPerDay?: number | string | null;
+  parkingRequired?: boolean | null;
+  acceptedActs?: string[];
+  refusedActs?: string[];
+  secretaryRequired?: boolean | null;
+  accommodationRequired?: boolean | null;
+  fastPaymentImportant?: boolean | null;
+  acceptedPressureLevel?: string | null;
+  rpps?: string | null;
+};
+
+const emptyProfileForm: ProfileForm = {
+  actsPerformedText: '',
+};
+
 const profileTabs: Array<{ id: ProfileTab; label: string }> = [
   { id: 'identity', label: 'Identité' },
   { id: 'professional', label: 'Professionnel' },
@@ -55,7 +102,7 @@ const profileTabs: Array<{ id: ProfileTab; label: string }> = [
 export default function ProfilePage() {
   const cachedProfile = api.getSync<Profile>('/me/profile');
   const [profile, setProfile] = useState<Profile | null>(cachedProfile || null);
-  const [form, setForm] = useState<any>(cachedProfile ? { ...cachedProfile, actsPerformedText: (cachedProfile.actsPerformed || []).join(', ') } : {});
+  const [form, setForm] = useState<ProfileForm>(cachedProfile ? { ...cachedProfile, actsPerformedText: (cachedProfile.actsPerformed || []).join(', ') } : emptyProfileForm);
   const [activeTab, setActiveTab] = useState<ProfileTab>('identity');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarInputKey, setAvatarInputKey] = useState(0);
@@ -124,9 +171,9 @@ export default function ProfilePage() {
     );
   }
 
-  function set(name: string, value: unknown) {
+  function set<K extends keyof ProfileForm>(name: K, value: ProfileForm[K]) {
     setFormDirty(true);
-    setForm((prev: any) => ({ ...prev, [name]: value }));
+    setForm((prev) => ({ ...prev, [name]: value }));
   }
 
   async function submit(e: FormEvent) {
@@ -180,8 +227,8 @@ export default function ProfilePage() {
       const updated = await api.patch<Profile>('/me/profile', payload);
       applyProfile(updated);
       setMessage(`Profil ${gendered(updated, 'mis à jour', 'mise à jour')}.`);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -218,8 +265,8 @@ export default function ProfilePage() {
       setAvatarFile(null);
       setAvatarInputKey((key) => key + 1);
       setMessage('Photo de profil mise à jour.');
-    } catch (e: any) {
-      setError(e.message || 'Erreur lors du téléversement de la photo.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Erreur lors du téléversement de la photo.');
     } finally {
       setUploadingAvatar(false);
     }
@@ -236,8 +283,8 @@ export default function ProfilePage() {
       });
       applyProfile(updated);
       setMessage(healthVerificationMessage(updated.healthVerificationStatus));
-    } catch (e: any) {
-      setError(e.message || 'Vérification RPPS impossible.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Vérification RPPS impossible.');
       try {
         const refreshed = await api.get<Profile>('/me/profile');
         applyProfile(refreshed);
@@ -656,7 +703,7 @@ function setOrientationTrainings(value: unknown, trainings: string) {
   return [...parts, ...orientationParts(trainings)].join(', ');
 }
 
-function buildOrientationValue(form: any) {
+function buildOrientationValue(form: Pick<ProfileForm, 'orientation'>) {
   return orientationParts(form.orientation).filter((item) => {
     if (ADDITIONAL_TRAINING_VALUES.has(item)) return true;
     return ORIENTATION_FLAGS.some((label) => item === `${label}: Oui` || item === `${label}: Non`);

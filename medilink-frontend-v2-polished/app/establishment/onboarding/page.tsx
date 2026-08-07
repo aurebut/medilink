@@ -20,6 +20,7 @@ import {
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { hasEstablishmentCapability } from '@/lib/access-control';
 import { useAuth } from '@/components/AuthProvider';
+import { errorMessage } from '@/lib/user-facing';
 
 type EstablishmentInfoTab = 'establishments' | 'create' | 'billing';
 
@@ -39,13 +40,35 @@ function booleanLabel(value?: boolean | null) {
   return 'Secrétariat non renseigné';
 }
 
+type OnboardingForm = {
+  name: string;
+  type: EstablishmentType;
+  address: string;
+  city: string;
+  country: string;
+  sector: string;
+  patientType: string;
+  softwareUsed: string;
+  hasSecretary?: boolean;
+  secretaryType: string;
+  averagePatientsPerDay: string;
+  isMultidisciplinary?: boolean;
+  equipmentAvailable: string[];
+  acceptedPatientTypes: string[];
+  knownSoftware: string[];
+  phone: string;
+  email: string;
+  website: string;
+  description: string;
+};
+
 export default function EstablishmentOnboardingPage() {
   const { user } = useAuth();
   const { establishments, loading, reload } = useEstablishments();
   const canCreateEstablishment = hasEstablishmentCapability(user?.role, 'create_establishment');
   const canDeleteEstablishment = hasEstablishmentCapability(user?.role, 'delete_establishment');
   const visibleInfoTabs = infoTabs.filter((tab) => tab.id !== 'create' || canCreateEstablishment);
-  const [form, setForm] = useState<any>({ type: 'HOSPITAL', country: 'France' });
+  const [form, setForm] = useState<OnboardingForm>({ type: 'HOSPITAL', country: 'France', name: '', address: '', city: '', sector: '', patientType: '', softwareUsed: '', secretaryType: '', averagePatientsPerDay: '', equipmentAvailable: [], acceptedPatientTypes: [], knownSoftware: [], phone: '', email: '', website: '', description: '' });
   const [activeTab, setActiveTab] = useState<EstablishmentInfoTab>('establishments');
   const [billingByEstablishment, setBillingByEstablishment] = useState<Record<string, EstablishmentBillingStatus>>({});
   const [billingLoadingIds, setBillingLoadingIds] = useState<Record<string, boolean>>({});
@@ -70,8 +93,8 @@ export default function EstablishmentOnboardingPage() {
     }));
   }, [establishments]);
 
-  function set(name: string, value: unknown) {
-    setForm((p: any) => ({ ...p, [name]: value }));
+  function set<K extends keyof OnboardingForm>(name: K, value: OnboardingForm[K]) {
+    setForm((p) => ({ ...p, [name]: value }));
   }
 
   useEffect(() => {
@@ -127,8 +150,8 @@ export default function EstablishmentOnboardingPage() {
       setMessage('Établissement créé.');
       await reload();
       setActiveTab('establishments');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -152,7 +175,7 @@ export default function EstablishmentOnboardingPage() {
         caught instanceof ApiError && caught.status === 409
           ? 'Cet établissement possède déjà un historique opérationnel ou financier et ne peut plus être supprimé.'
           : caught instanceof Error
-            ? caught.message
+            ? errorMessage(caught)
             : 'Impossible de supprimer cet établissement.',
       );
     } finally {
@@ -170,8 +193,8 @@ export default function EstablishmentOnboardingPage() {
         : '/billing/checkout/publication-credit';
       const response = await api.post<{ url: string }>(endpoint, { establishmentId });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBillingBusyId(null);
     }
@@ -184,8 +207,8 @@ export default function EstablishmentOnboardingPage() {
     try {
       const response = await api.post<{ url: string }>('/billing/portal', { establishmentId });
       window.location.href = response.url;
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBillingBusyId(null);
     }

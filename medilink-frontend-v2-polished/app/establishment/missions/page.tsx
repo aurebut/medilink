@@ -11,7 +11,8 @@ import { statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionCard } from '@/components/MissionCard';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
-import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type AnnouncementTab = 'missions' | 'applications' | 'drafts';
 
@@ -21,7 +22,7 @@ const tabs: Array<{ id: AnnouncementTab; label: string }> = [
   { id: 'drafts', label: 'Brouillons' },
 ];
 
-function applicationTone(status: string) {
+function applicationTone(status: string): BadgeTone {
   if (status === 'ACCEPTED') return 'success';
   if (status === 'REJECTED') return 'danger';
   if (status === 'VIEWED') return 'warning';
@@ -75,8 +76,8 @@ export default function EstablishmentMissionsPage() {
       setMissions(options.reload
         ? await api.reload<Mission[]>(path)
         : await api.get<Mission[]>(path));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setMissionsLoading(false);
     }
@@ -101,8 +102,8 @@ export default function EstablishmentMissionsPage() {
         ? await api.reload<Application[]>(path)
         : await api.get<Application[]>(path);
       setApplications(data);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setApplicationsLoading(false);
     }
@@ -133,8 +134,8 @@ export default function EstablishmentMissionsPage() {
       setUpdatingId(id);
       await api.patch(`/applications/${id}/status`, { status });
       await loadApplications();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setUpdatingId(null);
     }
@@ -388,7 +389,7 @@ function ApplicationSection({
                   {application.mission?.title}
                   <div className="small">{application.mission?.city}</div>
                 </td>
-                <td data-label="Statut"><Badge tone={applicationTone(application.status) as any}>{statusLabel(application.status)}</Badge></td>
+                <td data-label="Statut"><Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge></td>
                 <td data-label="Date">{formatDateTime(application.createdAt)}</td>
                 <td data-label="Actions" className="actions">
                   <LinkButton variant="light" href={`/establishment/candidates/${application.id}`}>

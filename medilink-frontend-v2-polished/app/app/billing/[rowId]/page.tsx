@@ -8,7 +8,8 @@ import type { AccountingEntry, AccountingWorkspacePayload } from '@/lib/accounti
 import { formatDate, formatMoney } from '@/lib/format';
 import type { Conversation, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, EmptyState, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type AccountingRow = {
   id: string;
@@ -137,7 +138,7 @@ export default function BillingMissionDetailPage() {
 
   useEffect(() => {
     Promise.all([loadConversations(), loadAccounting()])
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setLoading(false));
   }, []);
 
@@ -166,8 +167,8 @@ export default function BillingMissionDetailPage() {
       link.download = match?.[1] || 'justificatif-candidat.pdf';
       link.click();
       URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }
@@ -182,8 +183,8 @@ export default function BillingMissionDetailPage() {
         classified: !classifiedIds.includes(id),
       });
       setClassifiedIds(workspace.classifiedIds);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setBusyId(null);
     }

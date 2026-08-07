@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import type { Mission } from '@/lib/types';
-import { Button } from './ui';
+import { Button } from './ui';
+import { errorMessage } from '@/lib/user-facing';
 
 export function MissionDeleteButton({
   mission,
@@ -31,8 +32,8 @@ export function MissionDeleteButton({
       setDeleting(true);
       await api.delete(`/missions/${mission.id}`);
       onDeleted?.(mission.id);
-    } catch (e: any) {
-      alert(e.message || 'Impossible de supprimer cette mission.');
+    } catch (e) {
+      alert(errorMessage(e) || 'Impossible de supprimer cette mission.');
     } finally {
       setDeleting(false);
     }

@@ -9,7 +9,8 @@ import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/
 import { getDepartmentLabel, getEquipmentLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type MissionStep = {
   key: string;
@@ -251,8 +252,8 @@ export default function CandidateCurrentMissionsPage() {
     ]).then(([nextApplications, nextConversations]) => {
       setApplications(nextApplications);
       setConversations(nextConversations);
-    }).catch((e: any) => {
-      setError(e.message);
+    }).catch((e: Error) => {
+      setError(errorMessage(e));
     }).finally(() => setLoading(false));
 
     return () => {
@@ -621,8 +622,8 @@ function MissionDocumentsPanel({ row }: { row: MissionRow }) {
         [day.key]: [],
       }));
       setMessage(`${files.length} ${files.length === 1 ? 'fichier ajouté' : 'fichiers ajoutés'} pour ${day.label.toLowerCase()} - ${day.dateLabel}.`);
-    } catch (e: any) {
-      setError(e.message || 'Upload impossible.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Upload impossible.');
     } finally {
       setSubmittingDay(null);
     }

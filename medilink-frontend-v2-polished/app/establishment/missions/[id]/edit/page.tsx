@@ -21,7 +21,8 @@ import {
   specialtyOptions,
 } from '@/lib/profile-options';
 import type { Mission, MissionType, RequiredLevel } from '@/lib/types';
-import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { useAutoRefresh } from '@/lib/use-auto-refresh';
+import { errorMessage } from '@/lib/user-facing';
 
 function safeArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
@@ -30,6 +31,45 @@ function safeArray(value: unknown): string[] {
 function cleanArray(value: unknown): string[] {
   return safeArray(value).map((item) => item.trim()).filter(Boolean);
 }
+
+type EditMissionForm = {
+  title: string;
+  description: string;
+  missionType: MissionType;
+  specialty: string;
+  requiredLevel: RequiredLevel;
+  requiredLevels: RequiredLevel[];
+  practiceSetting: string;
+  requiredActs: string[];
+  city: string;
+  location: string;
+  sector: string;
+  patientType: string;
+  softwareUsed: string;
+  hasSecretary?: boolean | null;
+  secretaryType: string;
+  averagePatientsPerDay: string | number;
+  isMultidisciplinary?: boolean | null;
+  equipmentAvailable: string[];
+  acceptedMissionTypes: string[];
+  minimumCompensation: string | number;
+  acceptedPatientTypes: string[];
+  knownSoftware: string[];
+  departmentInfo: string;
+  teamInfo: string;
+  equipmentInfo: string;
+  practicalInfo: string;
+  accommodationProvided?: boolean | null;
+  parkingAvailable?: boolean | null;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  durationHours: string | number;
+  compensationCurrency: string;
+  retrocessionPercentage: string | number;
+  tagsText: string;
+};
 
 function dateInput(value?: string | null) {
   return value?.slice(0, 10) || '';
@@ -46,7 +86,7 @@ function booleanSelectValue(value?: boolean | null) {
   return '';
 }
 
-function missionToForm(mission: Mission) {
+function missionToForm(mission: Mission): EditMissionForm {
   return {
     title: mission.title || '',
     description: mission.description || '',
@@ -87,7 +127,7 @@ function missionToForm(mission: Mission) {
   };
 }
 
-function buildPayload(form: any) {
+function buildPayload(form: EditMissionForm) {
   return {
     title: form.title.trim(),
     description: optionalText(form.description),
@@ -134,7 +174,7 @@ export default function EditMissionPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [mission, setMission] = useState<Mission | null>(null);
-  const [form, setForm] = useState<any>(null);
+  const [form, setForm] = useState<EditMissionForm | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formDirty, setFormDirty] = useState(false);
@@ -155,8 +195,8 @@ export default function EditMissionPage() {
         ? await api.reload<Mission>(`/missions/mine/${id}`)
         : await api.get<Mission>(`/missions/mine/${id}`);
       applyMission(nextMission);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -168,9 +208,9 @@ export default function EditMissionPage() {
 
   useAutoRefresh(() => loadMission({ silent: true, reload: true }), { enabled: !loading && !formDirty && !saving });
 
-  function set(name: string, value: unknown) {
+  function set<K extends keyof EditMissionForm>(name: K, value: EditMissionForm[K]) {
     setFormDirty(true);
-    setForm((current: any) => ({ ...current, [name]: value }));
+    setForm((current) => ({ ...(current as EditMissionForm), [name]: value }));
   }
 
   function validate() {
@@ -196,11 +236,11 @@ export default function EditMissionPage() {
     setSuccess(null);
 
     try {
-      const updated = await api.patch<Mission>(`/missions/${id}`, buildPayload(form));
+      const updated = await api.patch<Mission>(`/missions/${id}`, buildPayload(form as EditMissionForm));
       applyMission(updated);
       setSuccess('Annonce mise à jour.');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -264,8 +304,8 @@ export default function EditMissionPage() {
                   values={safeArray(form.requiredLevels)}
                   options={requiredLevelOptions}
                   onChange={(values) => {
-                    set('requiredLevels', values);
-                    set('requiredLevel', values[0]);
+                    set('requiredLevels', values as RequiredLevel[]);
+                    set('requiredLevel', values[0] as RequiredLevel);
                   }}
                 />
               </div>

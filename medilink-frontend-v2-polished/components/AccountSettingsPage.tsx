@@ -5,7 +5,8 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import { roleLabel } from '@/lib/labels';
 import { api } from '@/lib/api';
 import { Alert, Badge, Button, Card, Field, Input, PageHeader } from './ui';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './AuthProvider';
+import { errorMessage } from '@/lib/user-facing';
 
 export function AccountSettingsPage() {
   const router = useRouter();
@@ -126,8 +127,8 @@ export function AccountSettingsPage() {
     try {
       const result = await api.post<{ message: string }>('/auth/resend-verification', {});
       setMessage(result.message);
-    } catch (err: any) {
-      setError(err.message || 'Impossible de renvoyer le mail.');
+    } catch (err) {
+      setError(errorMessage(err) || 'Impossible de renvoyer le mail.');
     } finally {
       setResendingEmail(false);
     }
@@ -142,8 +143,8 @@ export function AccountSettingsPage() {
     try {
       const result = await api.post<{ message: string }>('/auth/forgot-password', { email: email || user?.email });
       setMessage(result.message);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(errorMessage(err));
     } finally {
       setSendingReset(false);
     }
@@ -169,8 +170,8 @@ export function AccountSettingsPage() {
       await api.delete('/auth/me');
       await logout();
       router.push('/login');
-    } catch (err: any) {
-      setDeleteError(err.message || 'Une erreur est survenue lors de la suppression du compte.');
+    } catch (err) {
+      setDeleteError(errorMessage(err) || 'Une erreur est survenue lors de la suppression du compte.');
       deletingRef.current = false;
       setDeleting(false);
     }

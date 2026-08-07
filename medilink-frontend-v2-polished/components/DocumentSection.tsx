@@ -6,7 +6,8 @@ import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
 import { formatDateTime } from '@/lib/format';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, LoadingInline, ProgressBar } from './ui';
+import { Alert, Badge, Button, Card, LoadingInline, ProgressBar, type BadgeTone } from './ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type UploadResponse = {
   documentId: string;
@@ -24,7 +25,7 @@ const requiredDocumentTypes: DocumentType[] = ['CV', 'DIPLOMA', 'IDENTITY_DOCUME
 const recommendedDocumentTypes: DocumentType[] = ['ATTESTATION', 'CONVENTION'];
 const checklistDocumentTypes: DocumentType[] = [...requiredDocumentTypes, ...recommendedDocumentTypes];
 
-function statusTone(status: string) {
+function statusTone(status: string): BadgeTone {
   if (status === 'APPROVED') return 'success';
   if (status === 'REJECTED' || status === 'EXPIRED') return 'danger';
   if (status === 'PENDING_VERIFICATION' || status === 'UPLOAD_PENDING') return 'warning';
@@ -69,7 +70,7 @@ function checklistStatusLabel(doc?: Document) {
   return doc ? statusLabel(doc.verificationStatus) : 'Manquant';
 }
 
-function checklistStatusTone(doc?: Document) {
+function checklistStatusTone(doc?: Document): BadgeTone {
   return doc ? statusTone(doc.verificationStatus) : 'neutral';
 }
 
@@ -91,8 +92,8 @@ export function DocumentSection() {
       setDocuments(options.reload
         ? await api.reload<Document[]>('/me/documents')
         : await api.get<Document[]>('/me/documents'));
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
@@ -148,8 +149,8 @@ export function DocumentSection() {
       setFileInputKey((key) => key + 1);
       setMessage('Document envoyé. Il passe en vérification si nécessaire.');
       await load();
-    } catch (e: any) {
-      setError(e.message || 'Erreur lors du téléversement.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Erreur lors du téléversement.');
     } finally {
       setSubmitting(false);
     }
@@ -166,9 +167,9 @@ export function DocumentSection() {
         return;
       }
       showDocumentInPreview(result.downloadUrl, previewWindow);
-    } catch (e: any) {
+    } catch (e) {
       previewWindow?.close();
-      setError(e.message);
+      setError(errorMessage(e));
     }
   }
 
@@ -177,8 +178,8 @@ export function DocumentSection() {
     try {
       await api.delete(`/documents/${documentId}`);
       await load();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     }
   }
 
@@ -224,7 +225,7 @@ export function DocumentSection() {
                     <span>{required ? 'Essentiel' : 'Recommandé'}</span>
                     <strong>{documentTypeLabel(type)}</strong>
                   </div>
-                  <Badge tone={checklistStatusTone(document) as any}>{checklistStatusLabel(document)}</Badge>
+                  <Badge tone={checklistStatusTone(document)}>{checklistStatusLabel(document)}</Badge>
                 </div>
                 <p>{checklistCopy(type, document)}</p>
                 {document ? (
@@ -282,7 +283,7 @@ export function DocumentSection() {
                 {visibleDocuments.map((doc) => <tr key={doc.id}>
                   <td>{documentTypeLabel(doc.documentType)}</td>
                   <td><strong>{doc.fileName}</strong>{doc.rejectionReason ? <div className="small">Motif : {doc.rejectionReason}</div> : null}</td>
-                  <td><Badge tone={statusTone(doc.verificationStatus) as any}>{statusLabel(doc.verificationStatus)}</Badge></td>
+                  <td><Badge tone={statusTone(doc.verificationStatus)}>{statusLabel(doc.verificationStatus)}</Badge></td>
                   <td>{formatDateTime(doc.createdAt)}</td>
                   <td className="actions"><Button variant="light" onClick={() => openDocument(doc.id)}>Voir</Button><Button variant="danger" onClick={() => remove(doc.id)}>Supprimer</Button></td>
                 </tr>)}

@@ -6,7 +6,8 @@ import { useAuth } from '@/components/AuthProvider';
 import { Alert, LinkButton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { defaultRouteForUser } from '@/lib/routes';
-import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
+import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
+import { errorMessage } from '@/lib/user-facing';
 
 function VerifyEmailStatus() {
   const { token, ready } = useOneTimeUrlToken();
@@ -30,7 +31,7 @@ function VerifyEmailStatus() {
         setVerified(true);
         setMessage(result.message);
       })
-      .catch((requestError) => setError(requestError.message));
+      .catch((requestError) => setError(errorMessage(requestError)));
   }, [ready, refresh, token]);
 
   async function resend() {
@@ -39,8 +40,8 @@ function VerifyEmailStatus() {
     try {
       const result = await api.post<{ message: string }>('/auth/resend-verification');
       setMessage(result.message);
-    } catch (requestError: any) {
-      setError(requestError.message);
+    } catch (requestError) {
+      setError(errorMessage(requestError));
     } finally {
       setResending(false);
     }

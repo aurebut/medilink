@@ -12,7 +12,8 @@ import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
 import { useEstablishments } from '@/components/EstablishmentSelector';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
-import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input } from '@/components/ui';
+import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input, type BadgeTone } from '@/components/ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type MissionStep = {
@@ -79,7 +80,7 @@ function momentLabel(moment: MissionMoment) {
   return labels[moment];
 }
 
-function momentTone(moment: MissionMoment) {
+function momentTone(moment: MissionMoment): BadgeTone {
   if (moment === 'active') return 'success';
   if (moment === 'today') return 'warning';
   if (moment === 'done') return 'neutral';
@@ -266,7 +267,7 @@ export default function EstablishmentCurrentMissionsPage() {
         setApplications(nextApplications);
         setConversations(nextConversations);
       })
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setMissionsLoading(false));
 
     return () => {
@@ -317,7 +318,7 @@ export default function EstablishmentCurrentMissionsPage() {
     if (!app) return;
 
     const profilePath = `/establishment/applications/${selectedApplicationId}/candidate-profile`;
-    const promises: Promise<any>[] = [];
+    const promises: Promise<unknown>[] = [];
     const cachedProfile = getApiCacheValue<CandidateProfileForApplication>(profilePath);
     if (cachedProfile) {
       void cachedProfile.then(setCandidateProfile);
@@ -338,13 +339,15 @@ export default function EstablishmentCurrentMissionsPage() {
 
     setLoadingDetails(!cachedProfile && !(convId && getApiCacheValue<Conversation>(`/conversations/${convId}`)));
     Promise.all(promises)
-      .then(([profileRes, convRes]) => {
-        setCandidateProfile(profileRes);
+      .then((results) => {
+        const profileRes = results[0] as CandidateProfileForApplication | undefined;
+        const convRes = results[1] as Conversation | undefined;
+        setCandidateProfile(profileRes ?? null);
         if (convRes) {
           setSelectedConversation(convRes);
         }
       })
-      .catch((e: any) => setError(e.message))
+      .catch((e: Error) => setError(errorMessage(e)))
       .finally(() => setLoadingDetails(false));
   }, [selectedApplicationId, currentApplications]);
 
@@ -664,8 +667,8 @@ function MissionControlPanel({
         clearApiCache(`/missions/mine?establishmentId=${row.application.mission.establishmentId}`);
       }
       updateLocalMission(mission.id, { practicalInfo: newValue });
-    } catch (e: any) {
-      setError(e.message || 'Impossible de sauvegarder les consignes.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Impossible de sauvegarder les consignes.');
     }
   };
 
@@ -703,8 +706,8 @@ function MissionControlPanel({
       });
 
       setIsEditingBrief(false);
-    } catch (e: any) {
-      setError(e.message || 'Impossible de sauvegarder le brief.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Impossible de sauvegarder le brief.');
     } finally {
       setSavingBrief(false);
     }
@@ -734,9 +737,9 @@ function MissionControlPanel({
         return;
       }
       showDocumentInPreview(res.downloadUrl, previewWindow);
-    } catch (e: any) {
+    } catch (e) {
       previewWindow?.close();
-      setError(e.message);
+      setError(errorMessage(e));
     }
   }
 
@@ -759,8 +762,8 @@ function MissionControlPanel({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (e: any) {
-      setError(e.message || 'Erreur lors du téléchargement.');
+    } catch (e) {
+      setError(errorMessage(e) || 'Erreur lors du téléchargement.');
     }
   }
 

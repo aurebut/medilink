@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from './api';
+import { errorMessage } from '@/lib/user-facing';
 
 export type WorkspaceNote = {
   key: string;
@@ -47,8 +48,8 @@ export function useWorkspaceNotes({
         ? await api.reload<WorkspaceNote[]>(listPath)
         : await api.get<WorkspaceNote[]>(listPath);
       setNotes(Object.fromEntries(rows.map((row) => [row.key.slice(prefix.length), row.content])));
-    } catch (caught: any) {
-      setError(caught?.message || 'Impossible de charger les notes.');
+    } catch (caught) {
+      setError(errorMessage(caught) || 'Impossible de charger les notes.');
     } finally {
       setLoading(false);
     }
@@ -76,14 +77,14 @@ export function useWorkspaceNotes({
         ...(establishmentId ? { establishmentId } : {}),
       });
       return true;
-    } catch (caught: any) {
+    } catch (caught) {
       setNotes((current) => {
         const next = { ...current };
         if (previous) next[key] = previous;
         else delete next[key];
         return next;
       });
-      setError(caught?.message || 'Impossible d’enregistrer la note.');
+      setError(errorMessage(caught) || 'Impossible d’enregistrer la note.');
       return false;
     } finally {
       setSavingKey(null);

@@ -5,7 +5,8 @@ import { FormEvent, Suspense, useState } from 'react';
 import { api } from '@/lib/api';
 import { AuthPage } from '@/components/AuthPage';
 import { Alert, Button, Field, PasswordInput, LinkButton } from '@/components/ui';
-import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
+import { useOneTimeUrlToken } from '@/lib/useOneTimeUrlToken';
+import { errorMessage } from '@/lib/user-facing';
 
 function ResetPasswordForm() {
   const { token, ready } = useOneTimeUrlToken();
@@ -37,8 +38,8 @@ function ResetPasswordForm() {
         newPassword,
       });
       setMessage(res.message);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       setLoading(false);
     }

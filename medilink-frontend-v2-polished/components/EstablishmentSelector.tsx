@@ -11,6 +11,7 @@ import type { Establishment } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
 import { Button, Card, LoadingCard } from './ui';
+import { errorMessage } from '@/lib/user-facing';
 
 type LoadOptions = { silent?: boolean; reload?: boolean };
 
@@ -67,8 +68,8 @@ export function EstablishmentProvider({ children }: { children: React.ReactNode 
         ? await api.reload<Establishment[]>('/establishments/me')
         : await api.get<Establishment[]>('/establishments/me');
       applyEstablishments(items);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e) {
+      setError(errorMessage(e));
     } finally {
       if (!options.silent) setLoading(false);
     }
