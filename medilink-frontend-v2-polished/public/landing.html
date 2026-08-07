@@ -254,6 +254,44 @@ section,footer,.search-section{position:relative;z-index:1;}
 .mc-apply:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 4px 12px rgba(11,25,41,.2)}
 .mc-apply:active{transform:scale(.96);transition-duration:.06s}
 
+/* TRANSACTION */
+.transaction{padding:0 40px 100px}
+.transaction-inner{max-width:1100px;margin:0 auto}
+.transaction-header{text-align:center;max-width:760px;margin:0 auto 52px}
+.transaction-panel{position:relative;background:linear-gradient(135deg,var(--navy),var(--navy-3));border-radius:26px;padding:40px 38px 42px;color:#fff;overflow:hidden;box-shadow:0 28px 70px rgba(11,25,41,.18)}
+.transaction-panel::before{content:'';position:absolute;width:420px;height:420px;border-radius:50%;background:rgba(26,82,160,.35);filter:blur(70px);top:-180px;right:-120px;pointer-events:none}
+.transaction-panel::after{content:'';position:absolute;width:360px;height:360px;border-radius:50%;background:rgba(14,138,122,.3);filter:blur(70px);bottom:-180px;left:-120px;pointer-events:none}
+.tx-kicker{position:relative;display:inline-flex;align-items:center;gap:8px;color:#6DD7C8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.13em;margin-bottom:16px}
+.tx-kicker::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--teal-lt);box-shadow:0 0 0 6px rgba(20,168,150,.14)}
+.tx-headline{position:relative;font-family:var(--serif);font-size:clamp(26px,3vw,38px);font-weight:400;line-height:1.12;letter-spacing:0;margin-bottom:14px}
+.tx-sub{position:relative;font-size:14px;color:#A8C0D8;line-height:1.7;max-width:640px;margin-bottom:34px}
+.tx-flow{position:relative;display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin-bottom:38px}
+.tx-flow-item{position:relative;flex:1 1 118px;min-width:0;display:flex;flex-direction:column;gap:9px;padding:14px 12px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);min-height:110px;transition:all .3s cubic-bezier(.22,1,.36,1)}
+.tx-flow-item:hover{background:rgba(255,255,255,.12);transform:translateY(-3px)}
+.tx-flow-item .tx-num{font-family:var(--serif);font-size:15px;color:#6DD7C8}
+.tx-flow-item strong{font-size:12px;font-weight:500;color:#fff;line-height:1.3}
+.tx-flow-item span{font-size:10px;color:#8FB0CB;line-height:1.4}
+.tx-flow-arrow{position:relative;flex:0 0 16px;display:flex;align-items:center;justify-content:center;color:#3E6EA8}
+.tx-flow-arrow svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tx-highlight{position:relative;background:rgba(20,168,150,.14);border-color:rgba(110,215,200,.42)}
+.tx-highlight strong{color:#6DD7C8}
+.tx-legend{position:relative;display:flex;gap:20px;flex-wrap:wrap;font-size:11px;color:#8FB0CB;margin-bottom:34px}
+.tx-legend-item{display:inline-flex;align-items:center;gap:8px}
+.tx-legend-item::before{content:'';width:10px;height:10px;border-radius:3px;background:rgba(20,168,150,.5);flex-shrink:0}
+.tx-legend-item.held::before{background:var(--teal-lt)}
+.tx-cta{position:relative;display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-size:13px;font-weight:500;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 17px;transition:all .25s cubic-bezier(.22,1,.36,1)}
+.tx-cta:hover{background:rgba(255,255,255,.22);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.transaction-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:30px}
+.tx-card{background:var(--white);border:1px solid var(--gray-2);border-radius:18px;padding:26px 24px;position:relative;transition:all .3s cubic-bezier(.22,1,.36,1)}
+.tx-card:hover{border-color:#7AAAD8;box-shadow:0 14px 40px rgba(11,25,41,.1);transform:translateY(-4px)}
+.tx-card-icon{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;background:#EAF0FC;border:1px solid rgba(26,82,160,.12)}
+.tx-card-icon svg{width:19px;height:19px;stroke:var(--blue);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tx-card:nth-child(2) .tx-card-icon{background:#E0F5F2;border-color:rgba(14,138,122,.14)}
+.tx-card:nth-child(2) .tx-card-icon svg{stroke:var(--teal)}
+.tx-card h3{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--navy);margin-bottom:9px;letter-spacing:0;line-height:1.2}
+.tx-card p{font-size:13px;color:var(--text-3);line-height:1.68;margin-bottom:15px}
+.tx-card-chip{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;background:#E0F5F2;color:var(--teal);border:1px solid rgba(14,138,122,.14)}
+
 /* TRUST */
 .trust{background:var(--navy);padding:80px 40px;text-align:center}
 .trust-inner{max-width:900px;margin:0 auto}
@@ -327,7 +365,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .hero-sub{margin-left:auto;margin-right:auto}
   .search-section{left:24px;right:24px;bottom:18px}
   .how,.mockup-section,.trust,.cta-band,.faq,footer{padding-left:24px;padding-right:24px}
-  .profiles,.missions-preview{padding-left:24px;padding-right:24px}
+  .profiles,.missions-preview,.transaction{padding-left:24px;padding-right:24px}
   .how-header{max-width:720px;margin-bottom:42px}
   .how-step{width:calc(50% - 44px)}
   .how-step::before{width:32px}
@@ -337,6 +375,10 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .how-step:nth-child(even) .how-step-num{left:-68px}
   .how-panel{grid-template-columns:1fr;gap:18px}
   .profiles-grid,.missions-grid,.trust-testimonials{grid-template-columns:1fr 1fr}
+  .transaction-panel{padding:34px 26px 36px}
+  .tx-flow-item{flex-basis:22%}
+  .tx-flow-arrow{display:none}
+  .transaction-grid{grid-template-columns:1fr 1fr}
   .missions-header{align-items:flex-start;gap:16px}
   .footer-top{grid-template-columns:1fr 1fr;gap:32px}
 }
@@ -402,6 +444,19 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .missions-header .btn{justify-content:center;width:100%}
   .mc-footer{flex-wrap:wrap}
   .mc-apply{width:100%;margin:8px 0 0;padding:9px 14px}
+  .transaction{padding:0 18px 64px}
+  .transaction-header{margin-bottom:30px}
+  .transaction-panel{padding:26px 20px 28px;border-radius:20px}
+  .tx-headline{font-size:26px}
+  .tx-sub{margin-bottom:26px}
+  .tx-flow{flex-direction:column;gap:8px;margin-bottom:28px}
+  .tx-flow-item{flex:1 1 auto;flex-direction:row;align-items:center;min-height:auto;padding:12px 14px}
+  .tx-flow-item .tx-num{min-width:34px}
+  .tx-flow-arrow{display:none}
+  .tx-legend{margin-bottom:26px;gap:12px}
+  .transaction-grid{grid-template-columns:1fr;gap:14px;margin-top:24px}
+  .tx-card{padding:22px 20px;border-radius:14px}
+  .tx-card h3{font-size:21px}
   .trust{padding:58px 18px}
   .trust-sub{margin-bottom:32px;line-height:1.6}
   .trust-logos{gap:16px;margin-bottom:32px}
@@ -449,7 +504,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
   </a>
   <div class="nav-links">
     <a class="nav-link" href="#how-it-works">Comment ça marche</a>
-    <a class="nav-link" href="#profiles">Profils</a>
+    <a class="nav-link" href="#transaction">Paiement sécurisé</a>
     <a class="nav-link" href="#missions">Missions</a>
     <a class="nav-link" href="#faq">FAQ</a>
   </div>
@@ -676,6 +731,96 @@ footer{background:var(--navy);padding:60px 40px 32px}
   </div>
 </section>
 
+<!-- TRANSACTION -->
+<section class="transaction" id="transaction">
+  <div class="transaction-inner">
+    <div class="transaction-header reveal">
+      <div>
+        <div class="how-kicker">Bien plus qu'une bourse aux annonces</div>
+        <h2 class="section-h">De la publication au paiement libéré, un seul parcours.</h2>
+      </div>
+      <p class="section-sub">MédiLink n'arrête pas à la mise en relation : le paiement reste sécurisé jusqu'à la fin de mission, puis la somme est libérée et les justificatifs générés.</p>
+    </div>
+
+    <div class="transaction-panel reveal-scale">
+      <div class="tx-kicker">Le cycle de la mission</div>
+      <h3 class="tx-headline">Un tiers de confiance entre le recruteur et le professionnel.</h3>
+      <p class="tx-sub">Le recruteur sécurise le paiement avant la mission. MédiLink conserve les fonds jusqu'à la validation de fin de mission, puis le paiement est libéré au candidat et les documents sont émis.</p>
+
+      <div class="tx-flow" role="list" aria-label="Parcours transactionnel d'une mission">
+        <div class="tx-flow-item" role="listitem">
+          <span class="tx-num">01</span>
+          <strong>Mission publiée</strong>
+          <span>Besoin structuré par le recruteur</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item" role="listitem">
+          <span class="tx-num">02</span>
+          <strong>Candidature</strong>
+          <span>Profil et documents réunis</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item" role="listitem">
+          <span class="tx-num">03</span>
+          <strong>Proposition</strong>
+          <span>Montant, dates et conditions</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item tx-highlight" role="listitem">
+          <span class="tx-num">04</span>
+          <strong>Paiement sécurisé</strong>
+          <span>Fonds conservés par MédiLink</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item" role="listitem">
+          <span class="tx-num">05</span>
+          <strong>Mission réalisée</strong>
+          <span>Validation de fin de mission</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item tx-highlight" role="listitem">
+          <span class="tx-num">06</span>
+          <strong>Paiement libéré</strong>
+          <span>Versement au candidat</span>
+        </div>
+        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div class="tx-flow-item" role="listitem">
+          <span class="tx-num">07</span>
+          <strong>Factures &amp; justificatifs</strong>
+          <span>Documents générés</span>
+        </div>
+      </div>
+
+      <div class="tx-legend">
+        <span class="tx-legend-item held">Fonds sécurisés par MédiLink entre l'accord et la fin de mission</span>
+      </div>
+
+      <a class="tx-cta" href="/register">Créer mon compte →</a>
+    </div>
+
+    <div class="transaction-grid">
+      <div class="tx-card reveal">
+        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <h3>Paiement sécurisé</h3>
+        <p>Le recruteur sécurise le paiement avant la mission. Les fonds sont conservés par MédiLink, puis libérés uniquement après validation de fin de mission.</p>
+        <span class="tx-card-chip">Tiers de confiance</span>
+      </div>
+      <div class="tx-card reveal reveal-delay-1">
+        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>Fin de mission encadrée</h3>
+        <p>Le recruteur valide que la mission est terminée. Le statut passe à « mission terminée » et le paiement est libéré au candidat dans un cadre clair.</p>
+        <span class="tx-card-chip">Validation explicite</span>
+      </div>
+      <div class="tx-card reveal reveal-delay-2">
+        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <h3>Factures &amp; justificatifs</h3>
+        <p>Facture côté recruteur, justificatif ou reçu côté candidat : les documents administratifs sont générés et restent accessibles depuis le dossier de mission.</p>
+        <span class="tx-card-chip">Documents émis</span>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- TRUST -->
 <section class="trust">
   <div class="trust-inner">
@@ -752,8 +897,8 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <div class="faq-answer">L'établissement publie une mission, le candidat postule avec son profil et ses documents, puis les deux parties échangent dans le chat. Le recruteur peut ensuite envoyer une proposition finale claire avec montant, dates, horaires et conditions.</div>
       </details>
       <details class="faq-item reveal reveal-delay-4">
-        <summary>Comment la rémunération est-elle suivie ?</summary>
-        <div class="faq-answer">La proposition finale consigne le montant ou les conditions de rétrocession convenues. MédiLink en suit les statuts dans le dossier de mission, mais ne présente pas ce suivi comme un service de séquestre ou de conservation des fonds.</div>
+        <summary>Comment la rémunération est-elle sécurisée ?</summary>
+        <div class="faq-answer">Après l'acceptation de la proposition, le recruteur sécurise le paiement avant la mission. MédiLink conserve les fonds jusqu'à la validation de fin de mission, puis le paiement est libéré au candidat. Les factures et justificatifs sont ensuite générés depuis le dossier de mission.</div>
       </details>
       <details class="faq-item reveal reveal-delay-5">
         <summary>Les documents et justificatifs sont-ils centralisés ?</summary>
