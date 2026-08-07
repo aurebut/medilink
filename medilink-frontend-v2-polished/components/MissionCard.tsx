@@ -47,6 +47,7 @@ export function MissionCard({
     <Card className={`mission-card${establishmentPhoto ? ' mission-card--with-image' : ''}`}>
       {establishmentPhoto ? (
         <Link className="mission-card-image" href={missionDetailHref} aria-label={`Voir ${mission.title}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS */}
           <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
         </Link>
       ) : null}

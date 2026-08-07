@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { ApiError, api } from '@/lib/api';
 import type { Establishment, EstablishmentBillingStatus, EstablishmentType } from '@/lib/types';
 import { formatDate } from '@/lib/format';
@@ -55,7 +55,7 @@ export default function EstablishmentOnboardingPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [billingBusyId, setBillingBusyId] = useState<string | null>(null);
 
-  async function loadBillingStatuses(options: { reload?: boolean } = {}) {
+  const loadBillingStatuses = useCallback(async (options: { reload?: boolean } = {}) => {
     await Promise.allSettled(establishments.map(async (establishment) => {
       setBillingLoadingIds((current) => ({ ...current, [establishment.id]: true }));
       try {
@@ -68,7 +68,7 @@ export default function EstablishmentOnboardingPage() {
         setBillingLoadingIds((current) => ({ ...current, [establishment.id]: false }));
       }
     }));
-  }
+  }, [establishments]);
 
   function set(name: string, value: unknown) {
     setForm((p: any) => ({ ...p, [name]: value }));
@@ -95,7 +95,7 @@ export default function EstablishmentOnboardingPage() {
     return () => {
       cancelled = true;
     };
-  }, [establishments]);
+  }, [loadBillingStatuses]);
 
   useAutoRefresh(() => loadBillingStatuses({ reload: true }), { enabled: !loading && establishments.length > 0 && !saving && !deletingId && !billingBusyId });
 

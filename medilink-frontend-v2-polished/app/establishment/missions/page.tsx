@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Application, ApplicationStatus, Mission } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -57,7 +57,7 @@ export default function EstablishmentMissionsPage() {
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
   }
 
-  async function loadMissions(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadMissions = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!primary) return;
 
     const path = `/missions/mine?establishmentId=${primary.id}`;
@@ -80,9 +80,9 @@ export default function EstablishmentMissionsPage() {
     } finally {
       if (!options.silent) setMissionsLoading(false);
     }
-  }
+  }, [primary]);
 
-  async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadApplications = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!primary) return;
 
     const path = `/establishment/applications?establishmentId=${primary.id}`;
@@ -106,7 +106,7 @@ export default function EstablishmentMissionsPage() {
     } finally {
       if (!options.silent) setApplicationsLoading(false);
     }
-  }
+  }, [primary]);
 
   useEffect(() => {
     if (!primary) {
@@ -117,7 +117,7 @@ export default function EstablishmentMissionsPage() {
 
     void loadMissions();
     void loadApplications();
-  }, [primary]);
+  }, [loadApplications, loadMissions, primary]);
 
   useAutoRefresh(async () => {
     if (activeTab === 'missions' || activeTab === 'drafts') {

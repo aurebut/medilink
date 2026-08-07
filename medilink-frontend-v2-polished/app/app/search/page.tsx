@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import type { Application, ApplicationStatus, Mission, MissionType, Paginated, Profile, RequiredLevel } from '@/lib/types';
@@ -127,6 +127,14 @@ export default function SearchMissionsPage() {
   const [page, setPage] = useState(1);
   const [profile, setProfile] = useState<Profile | null>(cachedProfile || null);
   const [filters, setFilters] = useState(emptyFilters);
+  const filtersRef = useRef(filters);
+  const pageRef = useRef(page);
+  useEffect(() => {
+    filtersRef.current = filters;
+  }, [filters]);
+  useEffect(() => {
+    pageRef.current = page;
+  }, [page]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [extraFiltersOpen, setExtraFiltersOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,11 +165,11 @@ export default function SearchMissionsPage() {
       .slice(0, 8);
   }, [appliedMissionIds, items, profile]);
 
-  async function loadMissions(
-    currentFilters = filters,
-    currentPage = page,
+  const loadMissions = useCallback(async (
+    currentFilters: typeof emptyFilters,
+    currentPage: number,
     options: { silent?: boolean; reload?: boolean } = {},
-  ) {
+  ) => {
     if (!options.silent) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
@@ -181,7 +189,7 @@ export default function SearchMissionsPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, []);
 
   const toggleExtraFilters = () => {
     setExtraFiltersOpen((prev) => {
@@ -229,7 +237,7 @@ export default function SearchMissionsPage() {
     void loadMissions(emptyFilters, 1);
   };
 
-  async function loadApplications(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadApplications = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!options.silent) setApplicationsLoading(true);
     setError(null);
     try {
@@ -241,15 +249,15 @@ export default function SearchMissionsPage() {
     } finally {
       if (!options.silent) setApplicationsLoading(false);
     }
-  }
+  }, []);
 
-  async function loadProfile() {
+  const loadProfile = useCallback(async () => {
     try {
       setProfile(await api.get<Profile>('/me/profile'));
     } catch {
       setProfile(null);
     }
-  }
+  }, []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -264,11 +272,11 @@ export default function SearchMissionsPage() {
       void loadApplications({ silent: true });
       void loadProfile();
     } else if (activeTab === 'search') {
-      void loadMissions(filters, page);
+      void loadMissions(filtersRef.current, pageRef.current);
     } else {
       void loadApplications();
     }
-  }, [activeTab]);
+  }, [activeTab, loadApplications, loadMissions, loadProfile]);
 
   useAutoRefresh(() => {
     if (activeTab === 'recommended') {

@@ -18,6 +18,7 @@ export function PhotoCarousel({
     const photo = photos[0];
     return (
       <div className="public-mission-photo">
+        {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS */}
         <img src={photo.url} alt={alt} />
       </div>
     );
@@ -37,6 +38,7 @@ export function PhotoCarousel({
         <div className="carousel-track" style={{ transform: `translateX(-${index * 100}%)` }}>
           {photos.map((photo, i) => (
             <div key={photo.id} className="carousel-slide">
+              {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS */}
               <img src={photo.url} alt={`${alt} - ${i + 1}`} />
             </div>
           ))}

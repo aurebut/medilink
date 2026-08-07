@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { useEstablishments } from '@/components/EstablishmentSelector';
@@ -84,7 +84,7 @@ export default function EstablishmentAgendaPage() {
     setNoteEditing(!savedNote);
   }, [notes, selectedDay]);
 
-  async function loadData(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadData = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (establishmentsLoading) return;
     if (!primary) {
       setMissions([]);
@@ -125,11 +125,11 @@ export default function EstablishmentAgendaPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [establishmentsLoading, primary]);
 
   useEffect(() => {
     void loadData();
-  }, [establishmentsLoading, primary]);
+  }, [loadData]);
 
   useAutoRefresh(() => loadData({ silent: true, reload: true }), { enabled: !establishmentsLoading && !loading });
 

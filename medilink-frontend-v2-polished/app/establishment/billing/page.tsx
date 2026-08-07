@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api, getApiUrl } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
 import { formatDate, formatMoney } from '@/lib/format';
@@ -218,14 +218,14 @@ export default function RecruiterBillingPage() {
   const [error, setError] = useState<string | null>(null);
   const [settingsReady, setSettingsReady] = useState(false);
 
-  async function loadConversations(options: { reload?: boolean } = {}) {
+  const loadConversations = useCallback(async (options: { reload?: boolean } = {}) => {
     const data = options.reload
       ? await api.reload<Conversation[]>('/conversations')
       : await api.get<Conversation[]>('/conversations');
     setConversations(primary ? data.filter((c) => c.establishmentId === primary.id) : []);
-  }
+  }, [primary]);
 
-  async function loadBillingStatus(options: { reload?: boolean } = {}) {
+  const loadBillingStatus = useCallback(async (options: { reload?: boolean } = {}) => {
     if (!primary) {
       setBillingStatus(null);
       return;
@@ -235,9 +235,9 @@ export default function RecruiterBillingPage() {
     setBillingStatus(options.reload
       ? await api.reload<EstablishmentBillingStatus>(path)
       : await api.get<EstablishmentBillingStatus>(path));
-  }
+  }, [primary]);
 
-  function applyWorkspace(workspace: AccountingWorkspacePayload) {
+  const applyWorkspace = useCallback((workspace: AccountingWorkspacePayload) => {
     setManualRows(workspace.entries.filter((entry) => entry.kind === 'EXPENSE').map((entry) => ({
       id: entry.id,
       date: entry.date,
@@ -251,9 +251,9 @@ export default function RecruiterBillingPage() {
     setClassifiedIds(workspace.classifiedIds);
     setBudgetLimit(workspace.settings.budgetLimit ?? DEFAULT_BUDGET_LIMIT);
     setSettingsReady(true);
-  }
+  }, []);
 
-  async function loadAccounting(options: { reload?: boolean } = {}) {
+  const loadAccounting = useCallback(async (options: { reload?: boolean } = {}) => {
     if (!primary) {
       setManualRows([]);
       setClassifiedIds([]);
@@ -265,7 +265,7 @@ export default function RecruiterBillingPage() {
       ? await api.reload<AccountingWorkspacePayload>(path)
       : await api.get<AccountingWorkspacePayload>(path);
     applyWorkspace(workspace);
-  }
+  }, [applyWorkspace, primary]);
 
   useEffect(() => {
     const queryTab = new URLSearchParams(window.location.search).get('tab');
@@ -274,12 +274,12 @@ export default function RecruiterBillingPage() {
     Promise.all([loadConversations(), loadAccounting()])
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [primary]);
+  }, [loadConversations, loadAccounting]);
 
   useEffect(() => {
     loadBillingStatus({ reload: true })
       .catch((e: any) => setError(e.message));
-  }, [primary]);
+  }, [loadBillingStatus]);
 
   useAutoRefresh(async () => {
     await Promise.all([
@@ -296,7 +296,7 @@ export default function RecruiterBillingPage() {
         .catch((e: any) => setError(e.message));
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [budgetLimit, primary?.id, settingsReady]);
+  }, [budgetLimit, primary, settingsReady]);
 
   const accountingRows = useMemo<AccountingRow[]>(() => {
     const medilinkRowMap = new Map<string, AccountingRow>();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import { Alert, Badge, Button, Card, Field, Input, LinkButton, LoadingCard, PageHeader, Select, Textarea } from '@/components/ui';
@@ -141,13 +141,13 @@ export default function EditMissionPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  function applyMission(nextMission: Mission) {
+  const applyMission = useCallback((nextMission: Mission) => {
     setMission(nextMission);
     setForm(missionToForm(nextMission));
     setFormDirty(false);
-  }
+  }, []);
 
-  async function loadMission(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadMission = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!options.silent) setLoading(true);
     setError(null);
     try {
@@ -160,11 +160,11 @@ export default function EditMissionPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [applyMission, id]);
 
   useEffect(() => {
     void loadMission();
-  }, [id]);
+  }, [loadMission]);
 
   useAutoRefresh(() => loadMission({ silent: true, reload: true }), { enabled: !loading && !formDirty && !saving });
 

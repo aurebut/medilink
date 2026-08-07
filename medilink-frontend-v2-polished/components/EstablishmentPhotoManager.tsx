@@ -112,7 +112,10 @@ export function EstablishmentPhotoManager({
         <div className="establishment-photo-grid">
           {photos.map((photo) => (
             <div key={photo.id} className="establishment-photo-item">
-              {photo.url ? <img src={photo.url} alt={photo.fileName} /> : null}
+              {photo.url
+                // eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS
+                ? <img src={photo.url} alt={photo.fileName} />
+                : null}
               <div className="establishment-photo-actions">
                 {photo.isPrimary ? <Badge tone="success">Principale</Badge> : (
                   <Button type="button" variant="light" disabled={busy} onClick={() => setPrimary(photo.id)}>Principale</Button>

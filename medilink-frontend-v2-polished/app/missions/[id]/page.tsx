@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionShareActions } from '@/components/MissionShareActions';
@@ -37,7 +37,7 @@ export default function MissionPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(!cachedMission);
 
-  async function loadMission(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadMission = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (authLoading) return;
     if (!options.silent) {
       const nextCachedMission = options.reload ? null : api.getSync<Mission>(`/missions/${id}`);
@@ -71,11 +71,11 @@ export default function MissionPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [authLoading, id, user]);
 
   useEffect(() => {
     void loadMission();
-  }, [authLoading, id, user?.role]);
+  }, [loadMission]);
 
   useAutoRefresh(() => loadMission({ silent: true, reload: true }), { enabled: !authLoading && !loading });
 

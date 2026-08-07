@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionShareActions } from '@/components/MissionShareActions';
@@ -61,7 +61,7 @@ export default function EstablishmentMissionDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+  const load = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!options.silent) {
       const nextCachedMission = options.reload ? null : api.getSync<Mission>(`/missions/mine/${id}`);
       const nextCachedApplications = nextCachedMission && !options.reload
@@ -96,11 +96,11 @@ export default function EstablishmentMissionDetailPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [id, setMission]);
 
   useEffect(() => {
     void load();
-  }, [id]);
+  }, [load]);
 
   useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading && !statusBusy });
 

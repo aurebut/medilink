@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { api, isMockStorageUrl } from '@/lib/api';
 import type { CandidateGender, HealthVerificationStatus, MedicalStatus, Profile } from '@/lib/types';
 import { gendered } from '@/lib/grammar';
@@ -67,13 +67,13 @@ export default function ProfilePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  function applyProfile(p: Profile) {
+  const applyProfile = useCallback((p: Profile) => {
     setProfile(p);
     setForm({ ...p, actsPerformedText: (p.actsPerformed || []).join(', ') });
     setFormDirty(false);
-  }
+  }, []);
 
-  async function loadProfile(options: { reload?: boolean } = {}) {
+  const loadProfile = useCallback(async (options: { reload?: boolean } = {}) => {
     try {
       const p = options.reload
         ? await api.reload<Profile>('/me/profile')
@@ -84,13 +84,13 @@ export default function ProfilePage() {
       setError(userFacingError(caught, 'Impossible de charger votre profil.'));
       throw caught;
     }
-  }
+  }, [applyProfile]);
 
   useEffect(() => {
     loadProfile()
       .catch(() => undefined)
       .finally(() => setLoading(false));
-  }, []);
+  }, [loadProfile]);
 
   useAutoRefresh(
     () => loadProfile({ reload: true }).catch(() => undefined),
@@ -271,6 +271,7 @@ export default function ProfilePage() {
             <div className="profile-photo-panel">
               <div className="profile-photo-preview">
                 {profile.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS
                   <img src={profile.avatarUrl} alt="Photo de profil" />
                 ) : (
                   <span>{initials}</span>

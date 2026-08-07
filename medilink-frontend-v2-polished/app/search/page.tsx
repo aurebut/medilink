@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { api } from '@/lib/api';
@@ -28,23 +28,11 @@ export default function PublicSearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q') || '';
-    const city = params.get('city') || '';
-    const mt = params.get('missionType') || '';
-    const initialPage = Math.max(1, Number(params.get('page')) || 1);
-    const initialFilters = { q, city, missionType: (missionTypeOptions.find((o) => o.value === mt) ? mt : '') as MissionType | '' };
-    setFilters(initialFilters);
-    setPage(initialPage);
-    void loadMissions(initialFilters, initialPage);
-  }, []);
-
-  async function loadMissions(
-    currentFilters = filters,
-    currentPage = page,
+  const loadMissions = useCallback(async (
+    currentFilters: typeof emptyFilters,
+    currentPage: number,
     options: { silent?: boolean; reload?: boolean; syncUrl?: boolean } = {},
-  ) {
+  ) => {
     if (!options.silent) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
@@ -72,7 +60,19 @@ export default function PublicSearchPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q') || '';
+    const city = params.get('city') || '';
+    const mt = params.get('missionType') || '';
+    const initialPage = Math.max(1, Number(params.get('page')) || 1);
+    const initialFilters = { q, city, missionType: (missionTypeOptions.find((o) => o.value === mt) ? mt : '') as MissionType | '' };
+    setFilters(initialFilters);
+    setPage(initialPage);
+    void loadMissions(initialFilters, initialPage);
+  }, [loadMissions]);
 
   function set(name: string, value: string) {
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -217,6 +217,7 @@ function PublicMissionCard({
     <Card className={`mission-card${establishmentPhoto ? ' mission-card--with-image' : ''}`}>
       {establishmentPhoto ? (
         <Link className="mission-card-image" href={`/missions/${mission.id}`} aria-label={`Voir ${mission.title}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS */}
           <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
         </Link>
       ) : null}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api, getApiUrl } from '@/lib/api';
 import { agreementTone } from '@/lib/candidate-workspace';
@@ -156,14 +156,14 @@ export default function RecruiterBillingMissionDetailPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadConversations(options: { reload?: boolean } = {}) {
+  const loadConversations = useCallback(async (options: { reload?: boolean } = {}) => {
     const data = options.reload
       ? await api.reload<Conversation[]>('/conversations')
       : await api.get<Conversation[]>('/conversations');
     setConversations(primary ? data.filter((c) => c.establishmentId === primary.id) : []);
-  }
+  }, [primary]);
 
-  async function loadAccounting(options: { reload?: boolean } = {}) {
+  const loadAccounting = useCallback(async (options: { reload?: boolean } = {}) => {
     if (!primary) {
       setClassifiedIds([]);
       return;
@@ -173,13 +173,13 @@ export default function RecruiterBillingMissionDetailPage() {
       ? await api.reload<{ classifiedIds: string[] }>(path)
       : await api.get<{ classifiedIds: string[] }>(path);
     setClassifiedIds(workspace.classifiedIds);
-  }
+  }, [primary]);
 
   useEffect(() => {
     Promise.all([loadConversations(), loadAccounting()])
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [primary]);
+  }, [loadConversations, loadAccounting]);
 
   useAutoRefresh(() => Promise.all([loadConversations({ reload: true }), loadAccounting({ reload: true })]).then(() => undefined), { enabled: !establishmentLoading && !loading && !busyId });
 

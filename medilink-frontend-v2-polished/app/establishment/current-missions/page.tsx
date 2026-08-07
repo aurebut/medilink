@@ -651,7 +651,7 @@ function MissionControlPanel({
 
   useEffect(() => {
     setPracticalInfoValue(mission?.practicalInfo || '');
-  }, [mission?.id]);
+  }, [mission?.id, mission?.practicalInfo]);
 
   const savePracticalInfo = async (newValue: string) => {
     if (!mission?.id) return;

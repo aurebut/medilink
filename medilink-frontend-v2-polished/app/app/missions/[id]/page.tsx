@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import {
@@ -163,7 +163,7 @@ export default function CandidateMissionDetailPage() {
   const [loading, setLoading] = useState(!(cachedApplications && cachedConversations));
   const [error, setError] = useState<string | null>(null);
 
-  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+  const load = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!options.silent) {
       const nextCachedApplications = options.reload ? null : api.getSync<Application[]>('/me/applications');
       const nextCachedConversations = options.reload ? null : api.getSync<Conversation[]>('/conversations');
@@ -192,11 +192,11 @@ export default function CandidateMissionDetailPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [id]);
 
   useEffect(() => {
     void load();
-  }, [id]);
+  }, [load]);
 
   useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 

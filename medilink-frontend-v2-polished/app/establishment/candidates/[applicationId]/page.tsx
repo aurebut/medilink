@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { CandidateProfileForApplication, Document } from '@/lib/types';
@@ -37,19 +37,19 @@ export default function EstablishmentCandidateProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadData(options: { reload?: boolean } = {}) {
+  const loadData = useCallback(async (options: { reload?: boolean } = {}) => {
     if (!applicationId) return;
 
     setData(options.reload
       ? await api.reload<CandidateProfileForApplication>(`/establishment/applications/${applicationId}/candidate-profile`)
       : await api.get<CandidateProfileForApplication>(`/establishment/applications/${applicationId}/candidate-profile`));
-  }
+  }, [applicationId]);
 
   useEffect(() => {
     loadData()
       .catch((e: any) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [applicationId]);
+  }, [loadData]);
 
   useAutoRefresh(() => loadData({ reload: true }), { enabled: !loading });
 

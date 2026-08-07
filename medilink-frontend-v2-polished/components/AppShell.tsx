@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   canAccessAdminPath,
   canAccessEstablishmentPath,
@@ -364,7 +364,7 @@ export function AppShell({
     router.push('/login');
   }
 
-  async function loadNotifications(options: { silent?: boolean; reload?: boolean } = {}) {
+  const loadNotifications = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (area === 'admin') return;
 
     if (!options.silent) setNotificationsLoading(true);
@@ -378,7 +378,7 @@ export function AppShell({
     } finally {
       if (!options.silent) setNotificationsLoading(false);
     }
-  }
+  }, [area]);
 
   async function deleteNotification(id: string) {
     const deletedNotification = notifications.find((notification) => notification.id === id);
@@ -433,7 +433,7 @@ export function AppShell({
     }
   }
 
-  async function loadPublicationCredits(options: { reload?: boolean } = {}) {
+  const loadPublicationCredits = useCallback(async (options: { reload?: boolean } = {}) => {
     if (area !== 'establishment' || !selectedEstablishment || !canManageBilling) {
       setPublicationCredits({ available: 0, establishments: [] });
       return;
@@ -459,7 +459,7 @@ export function AppShell({
     } catch {
       setPublicationCredits({ available: 0, establishments: [] });
     }
-  }
+  }, [area, canManageBilling, selectedEstablishment]);
 
   useEffect(() => {
     function onDocumentClick(event: MouseEvent) {
@@ -512,17 +512,17 @@ export function AppShell({
     api.get<Conversation[]>('/conversations')
       .then(setConversations)
       .catch(() => {});
-  }, [area]);
+  }, [area, loadNotifications]);
 
   useEffect(() => {
-    if (area !== 'establishment' || !user || !selectedEstablishment || !canManageBilling) {
+    if (area !== 'establishment' || !user || !selectedEstablishmentId || !canManageBilling) {
       setCreditsOpen(false);
       setPublicationCredits({ available: 0, establishments: [] });
       return;
     }
 
     void loadPublicationCredits();
-  }, [area, canManageBilling, selectedEstablishmentId, user]);
+  }, [area, canManageBilling, loadPublicationCredits, selectedEstablishmentId, user]);
 
   useAutoRefresh(async () => {
     if (area === 'admin') return;
@@ -561,7 +561,7 @@ export function AppShell({
     return () => {
       unsubscribeStatus.forEach((unsubscribe) => unsubscribe());
     };
-  }, [area, publicationCredits.establishments]);
+  }, [area, loadPublicationCredits, publicationCredits.establishments]);
 
   useEffect(() => {
     if (area !== 'candidate' || user?.role !== 'CANDIDATE') {

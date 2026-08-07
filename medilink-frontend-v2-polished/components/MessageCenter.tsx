@@ -324,6 +324,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
 
     void loadConversations();
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- souscription posée une seule fois au montage
   }, []);
   useEffect(() => {
     if (conversationIdParam && conversations.some((item) => item.id === conversationIdParam)) {
@@ -357,6 +358,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       endTime: current?.mission?.endTime || '',
       notes: '',
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- conversations lu pour initialiser le formulaire, ne doit pas déclencher un reset à chaque refresh
   }, [activeId]);
 
   useAutoRefresh(() => refresh({ reload: true }), { enabled: !loading });
@@ -423,6 +425,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       document.removeEventListener('visibilitychange', refreshWhenVisible);
       window.removeEventListener('focus', refreshWhenVisible);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refresh lu via la fermeture, ré-abonner à chaque identité casserait le focus refresh
   }, [activeId]);
   useEffect(() => {
     const source = new EventSource(getApiEventUrl('/conversations/events'), { withCredentials: true });
@@ -446,6 +449,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
     };
 
     return () => source.close();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- connexion SSE posée une seule fois au montage, scope lu via les refs
   }, []);
 
   async function refresh(options: { reload?: boolean } = {}) {

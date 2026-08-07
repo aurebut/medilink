@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentVerificationStatus } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
@@ -21,7 +21,7 @@ export default function AdminDocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  async function load(options: { silent?: boolean; reload?: boolean } = {}) {
+  const load = useCallback(async (options: { silent?: boolean; reload?: boolean } = {}) => {
     if (!options.silent) setLoading(true);
     setError(null);
     try {
@@ -35,9 +35,9 @@ export default function AdminDocumentsPage() {
     } finally {
       if (!options.silent) setLoading(false);
     }
-  }
+  }, [status]);
 
-  useEffect(() => { void load(); }, [status]);
+  useEffect(() => { void load(); }, [load]);
   useAutoRefresh(() => load({ silent: true, reload: true }), { enabled: !loading });
 
   async function approve(id: string) {
