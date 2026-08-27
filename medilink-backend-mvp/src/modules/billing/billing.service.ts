@@ -230,7 +230,7 @@ export class BillingService {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: this.frontendUrl('/establishment/billing?tab=subscription'),
+      return_url: this.frontendUrl('/establishment/missions/new'),
     });
 
     return { url: session.url };

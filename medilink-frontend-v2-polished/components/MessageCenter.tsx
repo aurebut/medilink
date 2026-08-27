@@ -1664,7 +1664,7 @@ function RetrocessionReleaseForm({
       <div className="retrocession-release-heading">
         <div>
           <strong>Valider le règlement réel</strong>
-          <span>Le montant final sera ajouté au journal comptable du remplaçant.</span>
+          <span>Le montant final sera enregistré dans le suivi de cette mission.</span>
         </div>
         <Badge tone="neutral">Taux convenu : {percentage}%</Badge>
       </div>

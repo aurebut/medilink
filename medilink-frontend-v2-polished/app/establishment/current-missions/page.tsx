@@ -5,7 +5,7 @@ import { api, clearApiCache, getApiCacheValue, getApiUrl, isMockStorageUrl, open
 import { agreementLabel, agreementNextStep, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { documentTypeLabel, medicalStatusLabel, missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
+import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import type { Application, Conversation, Document, Mission, MissionAgreement, CandidateProfileForApplication } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
@@ -33,14 +33,14 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'candidat' | 'documents' | 'compta';
+type MissionSection = 'pilotage' | 'brief' | 'candidat' | 'documents' | 'payment';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
   { id: 'brief', label: 'Brief & notes' },
   { id: 'candidat', label: 'Candidat & contact' },
   { id: 'documents', label: 'Documents validés' },
-  { id: 'compta', label: 'Compta & facturation' },
+  { id: 'payment', label: 'Paiement & justificatifs' },
 ];
 
 function candidateName(application: Application) {
@@ -1007,7 +1007,7 @@ function MissionControlPanel({
         />
       ) : null}
 
-      {activeSection === 'compta' ? (
+      {activeSection === 'payment' ? (
         <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
@@ -1072,7 +1072,6 @@ function MissionControlPanel({
             {mission?.id ? (
               <LinkButton href={`/establishment/missions/${mission.id}`} variant="light">Voir l'annonce</LinkButton>
             ) : null}
-            <LinkButton href={getEstablishmentBillingMissionPath(row.application.conversation, row.agreement)} variant="light">Suivi facturation complet</LinkButton>
           </div>
         </div>
       ) : null}

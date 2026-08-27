@@ -179,7 +179,7 @@ export function EstablishmentSelectionGate({ children }: { children: React.React
     <Card className="establishment-selection-card">
       <span className="eyebrow">Contexte de travail</span>
       <h1>Choisissez un établissement</h1>
-      <p>Ce choix détermine les missions, candidatures et données comptables affichées. Il sera conservé pour votre prochaine visite.</p>
+      <p>Ce choix détermine les missions, candidatures et conversations affichées. Il sera conservé pour votre prochaine visite.</p>
       {error ? <p className="error" role="alert">{error}</p> : null}
       <div className="establishment-selection-actions">
         {establishments.map((establishment) => (

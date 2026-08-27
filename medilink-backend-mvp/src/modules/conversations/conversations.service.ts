@@ -20,7 +20,6 @@ import {
 } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
-import { AccountingService } from '../billing/accounting.service';
 import { BillingService } from '../billing/billing.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
@@ -41,7 +40,6 @@ export class ConversationsService {
     private readonly audit: AuditService,
     private readonly events: ConversationEventsService,
     private readonly billing: BillingService,
-    private readonly accounting: AccountingService,
     private readonly config: ConfigService,
   ) {}
 
@@ -479,27 +477,20 @@ export class ConversationsService {
     await this.ensureRecruiterForConversation(user, conversationId);
     const agreement = await this.findLatestAgreement(conversationId, MissionAgreementStatus.COMPLETED);
     this.assertPaymentWorkflowAvailable(agreement.compensationMode);
+    const payment = this.resolveReleasedPayment(agreement, dto);
 
     const message = await this.prisma.$transaction(async (tx) => {
-      const paidAt = new Date();
-      const accountingResult = await this.accounting.recordReleasedRetrocessionTx(
-        tx,
-        user.id,
-        agreement,
-        dto,
-        paidAt,
-      );
       const updatedAgreement = await tx.missionAgreement.update({
         where: { id: agreement.id },
         data: {
           status: MissionAgreementStatus.PAYMENT_RELEASED,
-          amount: accountingResult.legacyAmount,
-          candidateAmount: accountingResult.legacyAmount,
+          amount: payment.legacyAmount,
+          candidateAmount: payment.legacyAmount,
           payment: {
             update: {
               status: EscrowPaymentStatus.RELEASED,
-              amount: accountingResult.legacyAmount,
-              releasedAt: paidAt,
+              amount: payment.legacyAmount,
+              releasedAt: payment.paidAt,
             },
           },
           events: {
@@ -508,8 +499,11 @@ export class ConversationsService {
               actorUserId: user.id,
               type: AgreementEventType.PAYMENT_RELEASED,
               metadata: {
-                candidateAmountCents: accountingResult.candidateAmountCents,
-                accountingEntryId: accountingResult.entryId,
+                candidateAmountCents: payment.candidateAmountCents,
+                grossHonorariaCents: dto.grossHonorariaCents ?? null,
+                paidAt: payment.paidAt.toISOString(),
+                dueDate: dto.dueDate ?? null,
+                notes: dto.notes?.trim() || null,
               },
             },
           },
@@ -537,7 +531,6 @@ export class ConversationsService {
 
     const message = await this.prisma.$transaction(async (tx) => {
       const invoices = await this.ensureInvoicesTx(tx, agreement);
-      await this.accounting.markAgreementReceiptAvailableTx(tx, agreement.id);
 
       await tx.agreementEvent.create({
         data: {
@@ -682,6 +675,42 @@ export class ConversationsService {
     return conversation;
   }
 
+  private resolveReleasedPayment(
+    agreement: { candidateAmount: number; retrocessionPercentage?: number | null },
+    input: ReleasePaymentDto,
+  ) {
+    const percentage = agreement.retrocessionPercentage || 0;
+    const expectedAmountCents = input.grossHonorariaCents !== undefined && percentage > 0
+      ? Math.round(input.grossHonorariaCents * percentage / 100)
+      : undefined;
+    const candidateAmountCents = input.candidateAmountCents
+      ?? expectedAmountCents
+      ?? (agreement.candidateAmount > 0 ? agreement.candidateAmount * 100 : undefined);
+
+    if (!candidateAmountCents || candidateAmountCents <= 0) {
+      throw new BadRequestException('Renseignez le montant réel de la rétrocession avant de la valider.');
+    }
+
+    if (input.dueDate && Number.isNaN(new Date(input.dueDate).getTime())) {
+      throw new BadRequestException("Date d'échéance invalide.");
+    }
+
+    const validatedAt = new Date();
+    const paidAt = input.paidAt ? new Date(input.paidAt) : validatedAt;
+    if (Number.isNaN(paidAt.getTime())) {
+      throw new BadRequestException("Date d'encaissement invalide.");
+    }
+    if (paidAt.toISOString().slice(0, 10) > validatedAt.toISOString().slice(0, 10)) {
+      throw new BadRequestException("La date d'encaissement ne peut pas être future.");
+    }
+
+    return {
+      candidateAmountCents,
+      legacyAmount: Math.round(candidateAmountCents / 100),
+      paidAt,
+    };
+  }
+
   private assertPaymentWorkflowAvailable(compensationMode?: CompensationMode | null) {
     if (compensationMode === CompensationMode.RETROCESSION) {
       return;
@@ -725,11 +754,18 @@ export class ConversationsService {
       orderBy: { issuedAt: 'asc' },
     });
     const invoices = [...existingInvoices];
-    const [payment, settlement] = await Promise.all([
+    const [payment, releasedEvent] = await Promise.all([
       tx.escrowPayment.findUnique({ where: { agreementId: agreement.id } }),
-      tx.retrocessionSettlement.findUnique({ where: { agreementId: agreement.id } }),
+      tx.agreementEvent.findFirst({
+        where: { agreementId: agreement.id, type: AgreementEventType.PAYMENT_RELEASED },
+        orderBy: { createdAt: 'desc' },
+        select: { metadata: true },
+      }),
     ]);
-    const exactAmountCents = settlement?.finalAmountCents ?? agreement.candidateAmount * 100;
+    const releasedMetadata = releasedEvent?.metadata as Record<string, unknown> | null;
+    const exactAmountCents = typeof releasedMetadata?.candidateAmountCents === 'number'
+      ? releasedMetadata.candidateAmountCents
+      : agreement.candidateAmount * 100;
 
     if (!invoices.some((invoice) => invoice.type === InvoiceType.RECRUITER_INVOICE)) {
       const count = await tx.invoice.count();

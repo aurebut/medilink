@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import {
-  AccountingOwnerType,
   EstablishmentMemberRole,
   UserRole,
 } from '@prisma/client';
@@ -193,7 +192,6 @@ export class EstablishmentsService {
       publicationCreditCount,
       billingCustomer,
       subscription,
-      accountingWorkspace,
     ] = await Promise.all([
       this.prisma.mission.count({ where: { establishmentId } }),
       this.prisma.conversation.count({ where: { establishmentId } }),
@@ -206,15 +204,6 @@ export class EstablishmentsService {
         where: { establishmentId },
         select: { id: true },
       }),
-      this.prisma.accountingWorkspace.findUnique({
-        where: {
-          ownerType_ownerId: {
-            ownerType: AccountingOwnerType.ESTABLISHMENT,
-            ownerId: establishmentId,
-          },
-        },
-        select: { id: true },
-      }),
     ]);
 
     if (
@@ -222,8 +211,7 @@ export class EstablishmentsService {
       conversationCount > 0 ||
       publicationCreditCount > 0 ||
       billingCustomer ||
-      subscription ||
-      accountingWorkspace
+      subscription
     ) {
       throw new ConflictException(
         'Un etablissement ayant un historique operationnel ou financier ne peut pas etre supprime.',

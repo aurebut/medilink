@@ -19,6 +19,14 @@ export function isEstablishmentAccountRole(role?: UserRole | null) {
   return Boolean(role && ESTABLISHMENT_ROLES.includes(role));
 }
 
+export function canAccessCandidatePath(
+  role: UserRole | null | undefined,
+  pathname: string,
+) {
+  if (role !== 'CANDIDATE') return false;
+  return pathname !== '/app/billing' && !pathname.startsWith('/app/billing/');
+}
+
 export function hasEstablishmentCapability(
   role: UserRole | null | undefined,
   capability: EstablishmentCapability,
@@ -67,13 +75,6 @@ export function canAccessEstablishmentPath(
     || pathname.startsWith('/establishment/edit/')
   ) {
     return hasEstablishmentCapability(role, 'manage_establishment');
-  }
-
-  if (
-    pathname === '/establishment/billing'
-    || pathname.startsWith('/establishment/billing/')
-  ) {
-    return hasEstablishmentCapability(role, 'manage_billing');
   }
 
   if (

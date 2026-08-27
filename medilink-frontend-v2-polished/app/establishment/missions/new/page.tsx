@@ -347,7 +347,7 @@ export default function NewMissionPage() {
   const [saving, setSaving] = useState(false);
   const [billingStatus, setBillingStatus] = useState<EstablishmentBillingStatus | null>(null);
   const [billingLoading, setBillingLoading] = useState(false);
-  const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | null>(null);
+  const [billingBusy, setBillingBusy] = useState<'subscription' | 'credit' | 'portal' | null>(null);
   const [billingNotice, setBillingNotice] = useState<string | null>(null);
   const [landingIntentNotice, setLandingIntentNotice] = useState<string | null>(null);
   const [billingReturnStatus, setBillingReturnStatus] = useState<'subscription-success' | 'credit-success' | 'cancelled' | null>(null);
@@ -851,6 +851,21 @@ export default function NewMissionPage() {
     }
   }
 
+  async function openBillingPortal() {
+    if (!selectedEstablishment?.id) return;
+
+    setBillingBusy('portal');
+    setError(null);
+    try {
+      const response = await api.post<{ url: string }>('/billing/portal', { establishmentId: selectedEstablishment.id });
+      window.location.href = response.url;
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally {
+      setBillingBusy(null);
+    }
+  }
+
   if (loading || loadingDraft) return <LoadingCard label={loadingDraft ? "Chargement du brouillon..." : "Chargement..."} />;
 
   if (establishments.length === 0) {
@@ -911,6 +926,7 @@ export default function NewMissionPage() {
         busy={billingBusy}
         onSubscribe={() => void startBillingCheckout('subscription')}
         onBuyCredit={() => void startBillingCheckout('credit')}
+        onManageSubscription={() => void openBillingPortal()}
         onCreateNew={() => setForceNewMission(true)}
         drafts={drafts}
         onDeleted={(draftId) => {
@@ -933,7 +949,14 @@ export default function NewMissionPage() {
         ) : null}
         {landingIntentNotice ? <Alert type="info">{landingIntentNotice}</Alert> : null}
         {billingStatus.hasActiveSubscription ? (
-          <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
+          <>
+            <Alert type="success">Abonnement actif : vous pouvez créer et publier vos annonces sans paiement unitaire.</Alert>
+            <div className="actions">
+              <Button type="button" variant="light" disabled={billingBusy === 'portal'} onClick={() => void openBillingPortal()}>
+                {billingBusy === 'portal' ? 'Redirection...' : 'Gérer mon abonnement'}
+              </Button>
+            </div>
+          </>
         ) : creditAlertVisible ? (
           <div
             style={{
@@ -1046,6 +1069,7 @@ function PublicationAccessGate({
   busy,
   onSubscribe,
   onBuyCredit,
+  onManageSubscription,
   onCreateNew,
   drafts,
   onDeleted,
@@ -1057,9 +1081,10 @@ function PublicationAccessGate({
   billingNotice: string | null;
   billingReturnStatus: 'subscription-success' | 'credit-success' | 'cancelled' | null;
   error: string | null;
-  busy: 'subscription' | 'credit' | null;
+  busy: 'subscription' | 'credit' | 'portal' | null;
   onSubscribe: () => void;
   onBuyCredit: () => void;
+  onManageSubscription: () => void;
   onCreateNew: () => void;
   drafts: Array<{ id: string; title: string; specialty: string; startDate: string }>;
   onDeleted: (draftId: string) => void;
@@ -1136,9 +1161,14 @@ function PublicationAccessGate({
                   Votre abonnement vous permet de publier autant d'annonces que vous le souhaitez sans frais supplémentaires.
                 </p>
               </div>
-              <Button type="button" onClick={onCreateNew}>
-                Créer une nouvelle mission
-              </Button>
+              <div className="actions">
+                <Button type="button" onClick={onCreateNew}>
+                  Créer une nouvelle mission
+                </Button>
+                <Button type="button" variant="light" disabled={busy === 'portal'} onClick={onManageSubscription}>
+                  {busy === 'portal' ? 'Redirection...' : 'Gérer mon abonnement'}
+                </Button>
+              </div>
             </div>
           </Card>
         </div>

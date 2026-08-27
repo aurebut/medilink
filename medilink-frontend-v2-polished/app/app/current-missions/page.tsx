@@ -5,7 +5,7 @@ import { api, clearApiCache, isMockStorageUrl, subscribeApiCache } from '@/lib/a
 import { agreementLabel, agreementNextStep, conversationForApplication, latestAgreement } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
-import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
+import { getCandidateConversationPath } from '@/lib/mission-links';
 import { getDepartmentLabel, getEquipmentLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -30,14 +30,14 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'compta';
+type MissionSection = 'pilotage' | 'brief' | 'lieu' | 'documents' | 'conditions';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: "Vue d'ensemble" },
   { id: 'brief', label: 'Brief' },
   { id: 'lieu', label: 'Lieu & contact' },
   { id: 'documents', label: 'Documents de mission' },
-  { id: 'compta', label: 'Compta & actions' },
+  { id: 'conditions', label: 'Rémunération & actions' },
 ];
 
 type UploadResponse = {
@@ -537,7 +537,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
         <MissionDocumentsPanel row={row} />
       ) : null}
 
-      {activeSection === 'compta' ? (
+      {activeSection === 'conditions' ? (
         <div className="candidate-current-tab-panel candidate-current-tab-panel-flat">
           <div className="candidate-current-grid">
             <div className="candidate-current-panel">
@@ -549,14 +549,13 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
             <div className="candidate-current-panel">
               <span>Prochaine action</span>
               <strong>{nextStep}</strong>
-              <p>Le suivi comptable sera alimenté au fil des validations de mission et de paiement.</p>
+              <p>Le statut et les prochaines étapes restent disponibles directement dans le suivi de mission.</p>
             </div>
           </div>
 
           <div className="actions">
             {row.conversation ? <LinkButton href={getCandidateConversationPath(row.conversation.id)}>Contacter l’établissement</LinkButton> : null}
             {mission?.id ? <LinkButton href={`/app/missions/${mission.id}`} variant="light">Voir la mission</LinkButton> : null}
-            <LinkButton href={getCandidateBillingMissionPath(row.conversation, row.agreement)} variant="light">Suivi compta</LinkButton>
           </div>
         </div>
       ) : null}

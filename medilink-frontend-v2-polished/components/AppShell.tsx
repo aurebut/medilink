@@ -40,7 +40,6 @@ const candidateNav: NavItem[] = [
   { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
   { href: '/app/agenda', label: 'Agenda', icon: 'A' },
   { href: '/app/current-missions', label: 'Missions en cours', icon: '>' },
-  { href: '/app/billing', label: 'Ma compta', icon: 'C' },
   { href: '/app/search', label: 'Annonce et candidature', icon: 'A' },
   { href: '/app/messages', label: 'Messagerie', icon: 'M' },
 ];
@@ -50,7 +49,6 @@ const establishmentNav: NavItem[] = [
   { href: '/establishment/agenda', label: 'Agenda', icon: 'A' },
   { href: '/establishment/missions', label: 'Annonce et candidature', icon: 'A' },
   { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
-  { href: '/establishment/billing', label: 'Ma compta', icon: 'C' },
   { href: '/establishment/messages', label: 'Messagerie', icon: 'M' },
 ];
 
@@ -176,7 +174,7 @@ function warmPathsForRoute(
     if (href === '/app/profile') return ['/me/profile', '/me/documents'];
     if (href === '/app/notifications') return ['/notifications'];
     if (href === '/app/messages') return ['/conversations'];
-    if (href === '/app/agenda' || href === '/app/current-missions' || href === '/app/billing' || href === '/app/missions') {
+    if (href === '/app/agenda' || href === '/app/current-missions' || href === '/app/missions') {
       return ['/me/applications', '/conversations'];
     }
   }
@@ -193,7 +191,6 @@ function warmPathsForRoute(
       href === '/establishment/agenda' ||
       href === '/establishment/missions' ||
       href === '/establishment/current-missions' ||
-      href === '/establishment/billing' ||
       href === '/establishment/onboarding'
     ) {
       return dashboardPath ? [dashboardPath, '/conversations'] : ['/establishments/me', '/conversations'];
@@ -747,7 +744,7 @@ export function AppShell({
                   </div>
                   <div className="publication-credit-menu-footer">
                     <Link
-                      href="/establishment/billing?tab=subscription"
+                      href="/establishment/missions/new"
                       className="notification-action-link"
                       onClick={() => setCreditsOpen(false)}
                     >

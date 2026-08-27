@@ -2,10 +2,10 @@ import { agreementLabel, agreementNextStep, agreementTone, candidateAmountLabel 
 import { applicationTone, type CandidateMissionHistoryRow } from '@/lib/candidate-mission-history';
 import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
-import { getCandidateBillingMissionPath, getCandidateConversationPath } from '@/lib/mission-links';
+import { getCandidateConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
 
-function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'billing' }) {
+function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' }) {
   if (type === 'message') {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -15,19 +15,10 @@ function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'bil
     );
   }
 
-  if (type === 'mission') {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M8 4h8l3 3v13H5V4h3Z" />
-        <path d="M15 4v4h4M8 12h8M8 16h6" />
-      </svg>
-    );
-  }
-
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M4 7h16v12H4z" />
-      <path d="M7 7V5h10v2M8 12h8M8 16h5" />
+      <path d="M8 4h8l3 3v13H5V4h3Z" />
+      <path d="M15 4v4h4M8 12h8M8 16h6" />
     </svg>
   );
 }
@@ -98,16 +89,6 @@ export function CandidateMissionHistoryList({
                 <span className="sr-only">Détail mission</span>
               </LinkButton>
             ) : null}
-            <LinkButton
-              href={getCandidateBillingMissionPath(conversation, agreement)}
-              variant="light"
-              className="application-icon-action"
-              aria-label={`Ouvrir la compta pour ${application.mission?.title || 'cette mission'}`}
-              title="Ma compta"
-            >
-              <MissionHistoryActionIcon type="billing" />
-              <span className="sr-only">Ma compta</span>
-            </LinkButton>
           </div>
         </Card>
       ))}

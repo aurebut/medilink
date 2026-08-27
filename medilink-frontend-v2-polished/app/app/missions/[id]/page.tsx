@@ -12,7 +12,7 @@ import {
 } from '@/lib/candidate-workspace';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
-import { getCandidateBillingMissionPath, getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
+import { getCandidateConversationPath, getMissionApplyPath } from '@/lib/mission-links';
 import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel, getSpecialtyLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -284,7 +284,7 @@ export default function CandidateMissionDetailPage() {
     <div className="candidate-mission-detail-page">
       <PageHeader
         title={mission?.title || 'Ma mission'}
-        description="Votre page de mission personnelle : statut, brief, lieu, documents et compta."
+        description="Votre page de mission personnelle : statut, brief, lieu, documents et conditions."
         actions={
           <>
             {context.conversation ? <LinkButton href={getCandidateConversationPath(context.conversation.id)}>Messagerie</LinkButton> : null}
@@ -310,7 +310,6 @@ export default function CandidateMissionDetailPage() {
         </div>
         <div className="candidate-command-actions">
           {hasAddress ? <a className="btn btn-light" href={mapsHref(address)} target="_blank" rel="noreferrer">Itinéraire</a> : null}
-          <LinkButton href={getCandidateBillingMissionPath(context.conversation, context.agreement)} variant="secondary">Compta</LinkButton>
         </div>
       </section>
 

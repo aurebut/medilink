@@ -7,11 +7,11 @@ import {
 } from '@/lib/establishment-agenda';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, statusLabel } from '@/lib/labels';
-import { getEstablishmentBillingMissionPath, getEstablishmentConversationPath } from '@/lib/mission-links';
+import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
 import { EstablishmentCapabilityGate } from './EstablishmentCapability';
 
-function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'billing' }) {
+function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' }) {
   if (type === 'message') {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -21,19 +21,10 @@ function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' | 'bil
     );
   }
 
-  if (type === 'mission') {
-    return (
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M8 4h8l3 3v13H5V4h3Z" />
-        <path d="M15 4v4h4M8 12h8M8 16h6" />
-      </svg>
-    );
-  }
-
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24">
-      <path d="M4 7h16v12H4z" />
-      <path d="M7 7V5h10v2M8 12h8M8 16h5" />
+      <path d="M8 4h8l3 3v13H5V4h3Z" />
+      <path d="M15 4v4h4M8 12h8M8 16h6" />
     </svg>
   );
 }
@@ -108,16 +99,6 @@ export function EstablishmentMissionHistoryList({
             >
               <MissionHistoryActionIcon type="mission" />
               <span className="sr-only">Détail mission</span>
-            </LinkButton>
-            <LinkButton
-              href={getEstablishmentBillingMissionPath(row.conversation, row.agreement)}
-              variant="light"
-              className="application-icon-action"
-              aria-label={`Ouvrir la compta pour ${row.mission.title}`}
-              title="Ma compta"
-            >
-              <MissionHistoryActionIcon type="billing" />
-              <span className="sr-only">Ma compta</span>
             </LinkButton>
           </div>
         </Card>

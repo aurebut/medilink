@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildCalendarEventWeeks, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, missionEndDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
-import { formatDate, formatDateTime, formatMoney } from '@/lib/format';
+import { formatDate, formatDateTime } from '@/lib/format';
 import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
@@ -166,10 +166,6 @@ export default function CandidateDashboardPage() {
         endDate: missionEndDateValue(application, agreement),
       };
     });
-    const proposedAgreements = missionRows.filter((row) => row.agreement?.status === 'PROPOSED');
-    const billingReady = missionRows.filter((row) => row.agreement?.status === 'PAYMENT_RELEASED');
-    const billingPending = missionRows.filter((row) => row.agreement && ['PAYMENT_REQUIRED', 'FUNDS_SECURED', 'COMPLETED'].includes(row.agreement.status));
-    const billingReadyTotal = billingReady.reduce((sum, row) => sum + (row.agreement?.candidateAmount || row.agreement?.amount || 0), 0);
     const nextAgendaItem = [...missionRows]
       .filter((row) => row.date)
       .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())[0];
@@ -209,10 +205,6 @@ export default function CandidateDashboardPage() {
       pendingDocuments,
       blockedDocuments,
       missionRows,
-      proposedAgreements,
-      billingReady,
-      billingPending,
-      billingReadyTotal,
       nextAgendaItem,
       latestReceivedMessages,
       unreadReceivedMessages,
@@ -221,44 +213,6 @@ export default function CandidateDashboardPage() {
       sortedConversations,
     };
   }, [applications, conversations, documents, notifications, profile?.userId]);
-
-  const financeStatus = useMemo(() => {
-    let tone: 'success' | 'warning' | 'info' | 'neutral' = 'neutral';
-    let label = 'Aucune action urgente';
-    let amountLabel = 'Registre à jour';
-    let description = 'Suivez vos recettes, provisions et remplacements hors MédiLink.';
-    let buttonText = 'Voir ma compta';
-    let buttonHref = '/app/billing';
-    let buttonVariant: 'primary' | 'secondary' | 'light' = 'light';
-
-    if (dashboard.proposedAgreements.length > 0) {
-      tone = 'warning';
-      label = 'Proposition à valider';
-      amountLabel = `${dashboard.proposedAgreements.length} à traiter`;
-      description = 'Répondez aux conditions finales depuis la messagerie avant d’alimenter votre registre.';
-      buttonText = 'Répondre';
-      buttonHref = '/app/messages';
-      buttonVariant = 'secondary';
-    } else if (dashboard.billingReady.length > 0) {
-      tone = 'success';
-      label = 'Recette à classer';
-      amountLabel = `${formatMoney(dashboard.billingReadyTotal)} prêts`;
-      description = 'Retrouvez ces recettes dans votre livre comptable avec les justificatifs PDF.';
-      buttonText = 'Ouvrir le registre';
-      buttonHref = '/app/billing';
-      buttonVariant = 'secondary';
-    } else if (dashboard.billingPending.length > 0) {
-      tone = 'info';
-      label = 'Mission en attente';
-      amountLabel = `${dashboard.billingPending.length} en attente`;
-      description = 'Les missions validées entreront dans le registre après validation de la rétrocession déclarée.';
-      buttonText = 'Voir ma compta';
-      buttonHref = '/app/billing';
-      buttonVariant = 'light';
-    }
-
-    return { tone, label, amountLabel, description, buttonText, buttonHref, buttonVariant };
-  }, [dashboard.proposedAgreements.length, dashboard.billingReady.length, dashboard.billingReadyTotal, dashboard.billingPending.length]);
 
   if (loading) return <LoadingCard />;
 
@@ -464,29 +418,6 @@ export default function CandidateDashboardPage() {
             )}
           </Card>
 
-          <Card className="dashboard-focus-card dashboard-finance-card">
-            <div className="dashboard-section-head">
-              <div>
-                <span>Comptabilité</span>
-                <h2>Ma compta</h2>
-              </div>
-              <LinkButton variant="light" href="/app/billing">Ouvrir</LinkButton>
-            </div>
-            <div className={`dashboard-finance-status is-${financeStatus.tone}`}>
-              <div className="finance-status-header">
-                <span className="status-dot" />
-                <span>{financeStatus.label}</span>
-              </div>
-              <strong>{financeStatus.amountLabel}</strong>
-              <p>{financeStatus.description}</p>
-              <LinkButton
-                href={financeStatus.buttonHref}
-                variant={financeStatus.buttonVariant}
-              >
-                {financeStatus.buttonText}
-              </LinkButton>
-            </div>
-          </Card>
         </section>
 
         <Card className="dashboard-panel dashboard-missions-panel">
