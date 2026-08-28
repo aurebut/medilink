@@ -9,10 +9,15 @@
 <meta property="og:description" content="Trouvez une mission médicale courte ou publiez votre besoin : candidature, échanges et confirmation réunis au même endroit."/>
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="MédiLink"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<!-- Les polices et visuels embarqués dans la maquette source sont servis comme assets statiques. -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet"/>
 <style>
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300 500;font-display:swap;src:url(/landing-assets/dm-sans-latin.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:swap;src:url(/landing-assets/instrument-serif-regular.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:swap;src:url(/landing-assets/instrument-serif-italic.woff2) format('woff2')}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#0B1929;--navy-2:#112238;--navy-3:#1A3355;
@@ -24,13 +29,13 @@
   --serif:'Instrument Serif',Georgia,serif;
   --sans:'DM Sans',sans-serif;
 }
-html{scroll-behavior:smooth;touch-action:pan-x pan-y;scroll-padding-top:76px}
-body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:pan-x pan-y}
+html{scroll-behavior:smooth;touch-action:pan-x pan-y;scroll-padding-top:96px}
+body{font-family:var(--sans);background:var(--ivory);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden;touch-action:pan-x pan-y;position:relative}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 
 /* NAV */
-nav{position:sticky;top:0;z-index:900;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(26,82,160,.1);height:60px;display:flex;align-items:center;padding:0 40px;gap:0;transition:all .35s cubic-bezier(.22,1,.36,1)}
-nav.nav-scrolled{background:rgba(248,247,243,.97);box-shadow:0 4px 24px rgba(11,25,41,.06);border-bottom-color:rgba(26,82,160,.06)}
+nav{position:sticky;top:14px;z-index:900;width:min(1240px,calc(100% - 32px));margin:0 auto;background:rgba(248,247,243,.92);backdrop-filter:blur(14px);border:1px solid rgba(26,82,160,.1);border-radius:18px;height:68px;display:flex;align-items:center;padding:0 24px;gap:0;transition:all .35s cubic-bezier(.22,1,.36,1);box-shadow:0 10px 28px rgba(11,25,41,.06)}
+nav.nav-scrolled{background:rgba(248,247,243,.97);box-shadow:0 12px 32px rgba(11,25,41,.09);border-color:rgba(26,82,160,.08)}
 .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-right:36px}
 .nav-name{font-family:var(--serif);font-size:20px;color:var(--navy);letter-spacing:0}
 .nav-name em{font-style:italic;color:var(--blue)}
@@ -144,7 +149,7 @@ section,footer,.search-section{position:relative;z-index:1;}
 .stagger-child{opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1)}
 .stagger-child.visible{opacity:1;transform:none}
 
-.hero-h{font-family:var(--serif);font-size:clamp(36px,4.5vw,62px);color:var(--navy);line-height:1.05;letter-spacing:0;margin-bottom:22px}
+.hero-h{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(36px,4.5vw,62px);font-weight:700;color:rgb(11,25,41);line-height:1.0484;letter-spacing:0;margin-bottom:22px}
 .hero-h em{font-style:italic;color:var(--blue)}
 .hero-sub{font-size:17px;color:var(--text-3);max-width:460px;margin:0 0 36px;line-height:1.6}
 .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
@@ -208,8 +213,8 @@ section,footer,.search-section{position:relative;z-index:1;}
 
 /* PROFILES */
 .profiles{padding:0 40px 100px}
-.profiles-inner{max-width:1100px;margin:0 auto}
-.profiles-header{text-align:center;margin-bottom:48px}
+.profiles-inner{max-width:none;width:100%;margin:0 auto}
+.profiles-header{text-align:center;max-width:1100px;margin:0 auto 48px}
 .profiles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .profile-card{border-radius:20px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1)}
 .profile-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%);opacity:0;transition:opacity .35s;pointer-events:none}
@@ -226,6 +231,24 @@ section,footer,.search-section{position:relative;z-index:1;}
 .profile-card-feature::before{content:'';width:5px;height:5px;background:currentColor;border-radius:50%;opacity:.5;flex-shrink:0}
 .profile-card-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;text-decoration:none;color:#fff;transition:all .25s cubic-bezier(.22,1,.36,1)}
 .profile-card-cta:hover{background:rgba(255,255,255,.28);transform:translateX(4px)}
+
+.interviews-panel{grid-column:1/-1;width:100%;background:linear-gradient(180deg,#ffffff 0%,#F5F8FC 100%);border:1px solid rgba(26,82,160,.12);border-radius:30px;padding:34px;box-shadow:0 18px 48px rgba(11,25,41,.08)}
+.interviews-panel-head{display:flex;flex-direction:column;gap:10px;max-width:840px;margin:0 auto 28px;text-align:center}
+.interviews-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6F8DB2;font-weight:700}
+.interviews-title{font-family:var(--serif);font-size:34px;font-weight:400;line-height:1.06;color:var(--navy);margin:0}
+.interviews-sub{font-size:15px;line-height:1.7;color:var(--text-2);margin:0}
+.interviews-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
+.interview-item{background:#fff;border:1px solid rgba(26,82,160,.1);border-radius:24px;padding:16px 16px 18px;box-shadow:0 10px 24px rgba(11,25,41,.05);height:100%}
+.interview-photo-wrap{width:100%;aspect-ratio:16/11;border-radius:18px;overflow:hidden;margin-bottom:18px;background:#E7EEF5}
+.interview-photo{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
+.interview-quote{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--text);margin:0 0 18px}
+.interview-quote::before{content:'“';font-family:var(--serif);font-size:34px;line-height:0;color:var(--teal);margin-right:4px;vertical-align:-8px}
+.interview-meta{display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(26,82,160,.1);padding-top:14px}
+.interview-name{font-size:16px;font-weight:700;color:var(--navy)}
+.interview-role{font-size:13px;color:var(--text-2)}
+@media(max-width:980px){.profiles-grid{grid-template-columns:1fr}.interviews-panel{grid-column:auto;padding:28px}.interviews-row{grid-template-columns:1fr 1fr}.interviews-title{font-size:30px}}
+@media(max-width:640px){.interviews-panel{padding:22px;border-radius:22px}.interviews-row{grid-template-columns:1fr;gap:18px}.interviews-title{font-size:28px}.interview-item{border-radius:18px}.interview-photo-wrap{border-radius:14px}}
+
 
 /* MISSIONS PREVIEW */
 .missions-preview{padding:0 40px 100px}
@@ -493,18 +516,56 @@ footer{background:var(--navy);padding:60px 40px 32px}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .reveal,.reveal-left,.reveal-right,.reveal-scale,.reveal-zoom,.stagger-child{opacity:1!important;transform:none!important}
 }
+
+/* ── Hero éditorial inspiré des codes Hublo : texte + humain ── */
+.hero{height:100svh;min-height:700px;margin-top:-82px;padding:124px 40px 0!important;overflow:hidden;display:flex;align-items:stretch;position:relative;z-index:0;isolation:isolate}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;pointer-events:none;z-index:1;background:linear-gradient(180deg, rgba(245,246,244,0) 0%, rgba(245,246,244,.72) 58%, rgba(245,246,244,.94) 84%, rgba(245,246,244,1) 100%)}
+.hero-layout-human{position:relative;z-index:2;max-width:1120px;height:100%;display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr);gap:0;align-items:stretch;justify-items:center;margin:0 auto;padding:0}
+.hero-copy{max-width:860px;text-align:center;margin:0 auto;align-self:center;display:flex;flex-direction:column;justify-content:center;padding-top:10px}
+.hero-copy .hero-h{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(32px,3.7vw,48px);font-weight:700;line-height:1.05;color:rgb(11,25,41);margin:0 auto 10px;max-width:760px}
+.hero-copy .hero-note{font-size:17px;line-height:1.45;font-weight:500;color:rgb(11,25,41);margin:0 auto 18px;max-width:760px}
+.hero-copy .hero-sub{font-size:18px;line-height:1.65;max-width:720px;margin:0 auto 30px}
+.hero-copy .hero-ctas{justify-content:center;margin-bottom:0}
+.hero-human-wrap{position:relative;width:100%;height:100%;min-height:0;display:flex;align-items:flex-end;justify-content:center;margin:0;padding:0;align-self:end;line-height:0}
+.hero-human-frame{position:relative;width:min(100%,900px);height:100%;max-height:100%;border-radius:28px 28px 0 0;overflow:hidden;background:transparent;box-shadow:none;display:block;margin:0}
+.hero-human-frame:after{content:none}
+.hero-human-photo{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;transform:none;background:transparent;margin:0;padding:0}
+.hero-float-card{position:absolute;background:rgba(255,255,255,.94);border:1px solid rgba(11,25,41,.08);box-shadow:0 14px 38px rgba(11,25,41,.13);backdrop-filter:blur(14px);border-radius:16px;padding:14px 16px;color:var(--navy);z-index:3}
+.hero-float-card strong{display:block;font-size:13px;font-weight:600;line-height:1.25}.hero-float-card small{display:block;margin-top:3px;font-size:11px;color:var(--text-3);line-height:1.35}
+.hero-float-card-top{top:28px;left:calc(50% - 420px);display:flex;align-items:center;gap:10px;min-width:205px}.hero-float-card-bottom{right:calc(50% - 420px);bottom:28px;min-width:205px}
+.hero-float-dot{width:10px;height:10px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 6px rgba(20,168,150,.12);flex:none}
+@media(max-width:980px){nav{width:calc(100% - 24px);height:64px;padding:0 18px}.hero-layout-human{grid-template-columns:1fr;gap:28px}.hero-copy{max-width:720px}.hero-human-wrap{min-height:0}.hero-human-frame{width:min(100%,760px);height:auto;aspect-ratio:1217/562}}
+@media(max-width:640px){nav{top:10px;width:calc(100% - 20px);height:auto;min-height:58px;padding:10px 14px;flex-wrap:wrap;row-gap:8px}.nav-logo{margin-right:14px}.nav-links{display:none}.nav-right{margin-left:auto}.hero{padding:38px 20px 0!important}.hero-copy .hero-h{font-size:clamp(32px,9.5vw,42px);max-width:520px}.hero-human-wrap{min-height:0}.hero-human-frame{width:100%;height:auto;aspect-ratio:1217/562;border-radius:22px}}
+@media (max-height:760px) and (min-width:641px){
+  .hero{height:auto;min-height:100svh;margin-top:-82px;padding-top:112px!important}
+  .hero-layout-human{height:auto;grid-template-rows:auto auto;gap:24px}
+  .hero-copy{padding-top:0}
+  .hero-human-wrap{height:auto}
+  .hero-human-frame{height:auto;aspect-ratio:1217/562}
+  .hero-human-photo{object-fit:cover}
+}
+@media (max-width:640px){
+  .hero{height:auto;min-height:100svh;margin-top:-78px;padding:108px 20px 0!important}
+  .hero-layout-human{height:auto;grid-template-rows:auto auto;gap:22px}
+  .hero-copy{padding-top:0}
+  .hero-copy .hero-ctas{display:flex;flex-direction:column;width:100%;max-width:335px;margin:0 auto 22px}
+  .hero-copy .hero-ctas .btn{width:100%;justify-content:center}
+  .hero-human-wrap{height:auto}
+  .hero-human-frame{height:auto;aspect-ratio:1217/562}
+  .hero-human-photo{object-fit:cover}
+}
+
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <a class="nav-logo" href="/">
+<nav aria-label="Navigation principale">
+  <a class="nav-logo" href="/landing.html">
     <span class="nav-name">Médi<em>Link</em></span>
   </a>
   <div class="nav-links">
     <a class="nav-link" href="#how-it-works">Comment ça marche</a>
-    <a class="nav-link" href="#transaction">Paiement sécurisé</a>
     <a class="nav-link" href="#missions">Missions</a>
     <a class="nav-link" href="#faq">FAQ</a>
   </div>
@@ -522,44 +583,20 @@ footer{background:var(--navy);padding:60px 40px 32px}
     <div class="hero-blob hero-blob-3"></div>
     <div class="hero-grid"></div>
   </div>
-  <div class="hero-layout">
-    <div class="hero-inner" style="max-width:680px;text-align:center;margin:0 auto">
-      <h1 class="hero-h fade-up fade-up-1">Une plateforme de remplacement<br> faite <em>par et pour</em><br> les médecins généralistes</h1>
-      <p class="hero-sub fade-up fade-up-2">MédiLink met en relation les médecins remplaçants avec les cabinets et maisons de santé qui en ont besoin. Un vivier qualifié, une expérience pensée du terrain.</p>
-      <div class="hero-ctas fade-up fade-up-3" style="justify-content:center">
-        <a class="btn btn-primary btn-lg" href="/register">Trouver une mission</a>
-        <a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Je suis un établissement</a>
-      </div>
-      <div class="hero-stats fade-up fade-up-4" style="justify-content:center">
-        <div><div class="hero-stat-num">Recherche</div><div class="hero-stat-label">Filtres adaptés au terrain</div></div>
-        <div><div class="hero-stat-num">Dossier</div><div class="hero-stat-label">Profil et documents réunis</div></div>
-        <div><div class="hero-stat-num">Suivi</div><div class="hero-stat-label">Étapes et échanges centralisés</div></div>
+  <div class="hero-layout hero-layout-human">
+    <div class="hero-inner hero-copy">
+<h1 class="hero-h fade-up fade-up-1">La plateforme de remplacement conçue <em>avec et pour</em> les médecins généralistes</h1>
+      <p class="hero-note fade-up fade-up-2">Vivier qualifié, compte rendu mission simplifié</p>
+<div class="hero-ctas fade-up fade-up-3">
+        <a class="btn btn-primary btn-lg" href="/search">Trouver une mission</a>
+        <a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Trouver un remplaçant</a>
       </div>
     </div>
-  </div>
-  <!-- SEARCH BAR -->
-  <div class="search-section">
-    <form class="search-bar-wrap" action="/search" method="get" role="search" aria-label="Rechercher une mission">
-      <div class="search-field" style="flex:1.5">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        <label class="sr-only" for="search-q">Spécialité ou établissement</label>
-        <input id="search-q" name="q" type="search" autocomplete="off" placeholder="Spécialité, établissement…"/>
+    <div class="hero-human-wrap fade-up fade-up-2" aria-label="Médecin généraliste dans son cabinet">
+      <div class="hero-human-frame">
+        <img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste souriante dans un cabinet médical" fetchpriority="high" decoding="async"/>
       </div>
-      <div class="search-field">
-        <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <label class="sr-only" for="search-city">Ville ou département</label>
-        <input id="search-city" name="city" type="search" autocomplete="address-level2" placeholder="Ville, département"/>
-      </div>
-      <div class="search-field">
-        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <label class="sr-only" for="search-type">Type de mission</label>
-        <select id="search-type" name="missionType"><option value="">Type de mission</option><option value="GARDE">Garde</option><option value="REMPLACEMENT">Remplacement</option><option value="VACATION">Vacation</option><option value="STAGE">Stage</option><option value="AIDE_OP">Aide opératoire</option></select>
-      </div>
-      <button class="search-btn" type="submit">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-        Rechercher
-      </button>
-    </form>
+</div>
   </div>
 </section>
 
@@ -567,10 +604,8 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <section class="how" id="how-it-works">
   <div class="how-header">
     <div>
-      <div class="how-kicker">Parcours mission &amp; matching</div>
-      <h2 class="section-h">Du besoin précis à la mission matchée, jusqu'au remplacement confirmé.</h2>
+      <h2 class="section-h">Du besoin précis à la mission matchée, jusqu’au remplacement fini.</h2>
     </div>
-    <p class="section-sub">MédiLink clarifie chaque étape&nbsp;: le cabinet publie son besoin, notre système de matching identifie les profils les plus pertinents, le remplaçant candidate avec un dossier vérifié, puis tout se suit au même endroit jusqu'à la fin de mission.</p>
   </div>
   <div class="how-shell">
     <div class="how-steps">
@@ -610,18 +645,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
       </div>
     </div>
-    <aside class="how-panel reveal-scale reveal-delay-3">
-      <div class="how-panel-kicker">Parcours encadré</div>
-      <h3>Moins d'improvisation, plus de missions confirmées.</h3>
-      <p>La section mission devient le fil conducteur entre le cabinet et le remplaçant: annonce, candidature, échange, confirmation et suivi.</p>
-      <div class="how-panel-list">
-        <div class="how-panel-item">Un matching intelligent entre besoins du moment et profils vérifiés.</div>
-        <div class="how-panel-item">Des annonces plus complètes avant publication.</div>
-        <div class="how-panel-item">Des profils remplaçants lisibles et vérifiés.</div>
-        <div class="how-panel-item">Une messagerie rattachée à chaque candidature.</div>
-      </div>
-      <a class="how-panel-cta" href="/register">Publier ou trouver une mission →</a>
-    </aside>
   </div>
 </section>
 
@@ -630,44 +653,40 @@ footer{background:var(--navy);padding:60px 40px 32px}
   <div class="profiles-inner">
     <div class="profiles-header">
       <h2 class="section-h">Une plateforme pensée<br><em style="font-family:var(--serif);font-style:italic">par des généralistes</em></h2>
-      <p class="section-sub">MédiLink a été co-construit avec des médecins généralistes remplaçants et installés. Chaque fonctionnalité répond à un besoin réel du terrain.</p>
+      <p class="section-sub">Des entretiens menés avec des médecins généralistes installés et remplaçants nourrissent la conception de MédiLink. Voici quelques verbatims fictifs en attendant les témoignages finaux.</p>
     </div>
     <div class="profiles-grid">
-      <div class="profile-card card-etudiant reveal-zoom">
-        <div class="profile-card-label">Pour les remplaçants</div>
-        <h3>Médecin remplaçant</h3>
-        <p>Accédez à un vivier de missions qualifiées, gérez votre agenda et construisez votre réputation de remplaçant fiable.</p>
-        <div class="profile-card-features">
-          <div class="profile-card-feature">Conditions et rémunération affichées</div>
-          <div class="profile-card-feature">Gestion des disponibilités intégrée</div>
-          <div class="profile-card-feature">Messagerie directe avec les cabinets</div>
-          <div class="profile-card-feature">Suivi des candidatures par statut</div>
+      <div class="interviews-panel reveal-zoom">
+        <div class="interviews-panel-head">
+          <div class="interviews-kicker">Conçue avec le terrain</div>
+          <h3 class="interviews-title">Des retours de médecins qui nous aident à construire MédiLink</h3>
         </div>
-        <a class="profile-card-cta" href="/landing-medecin.html">Découvrir l'espace médecin →</a>
-      </div>
-      <div class="profile-card card-interne reveal-zoom reveal-delay-1">
-        <div class="profile-card-label">Pour les cabinets</div>
-        <h3>Cabinet &amp; Maison de santé</h3>
-        <p>Trouvez rapidement un remplaçant qualifié pour vos congés, arrêts maladie ou pics d'activité, puis échangez directement.</p>
-        <div class="profile-card-features">
-          <div class="profile-card-feature">Vivier de remplaçants qualifiés</div>
-          <div class="profile-card-feature">Publication guidée étape par étape</div>
-          <div class="profile-card-feature">Profils et documents centralisés</div>
-          <div class="profile-card-feature">Messagerie et accord intégrés</div>
+        <div class="interviews-row">
+          <article class="interview-item">
+            <div class="interview-photo-wrap"><img class="interview-photo" src="/landing-assets/temoignage-claire-martin.png" width="308" height="218" alt="Portrait fictif d’un médecin généraliste remplaçant" loading="lazy" decoding="async"/></div>
+            <p class="interview-quote">J’avais besoin d’un outil simple, pensé pour la réalité du cabinet. Ce qui compte pour moi, c’est de trouver rapidement un remplaçant fiable et de garder un suivi clair jusqu’à la fin de la mission.</p>
+            <div class="interview-meta">
+              <div class="interview-name">Dr Claire Martin</div>
+              <div class="interview-role">Médecin généraliste installée</div>
+            </div>
+          </article>
+          <article class="interview-item">
+            <div class="interview-photo-wrap"><img class="interview-photo" src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait fictif d’une médecin généraliste" loading="lazy" decoding="async"/></div>
+            <p class="interview-quote">Quand je candidate à un remplacement, j’ai besoin d’avoir les bonnes informations tout de suite. Un parcours plus lisible et un cadre clair me font gagner un temps précieux.</p>
+            <div class="interview-meta">
+              <div class="interview-name">Dr Sarah Bernard</div>
+              <div class="interview-role">Médecin généraliste remplaçante</div>
+            </div>
+          </article>
+          <article class="interview-item">
+            <div class="interview-photo-wrap"><img class="interview-photo" src="/landing-assets/temoignage-juliette-moreau.png" width="318" height="218" alt="Portrait fictif d’un médecin généraliste remplaçant" loading="lazy" decoding="async"/></div>
+            <p class="interview-quote">Nous avons insisté sur un point : il faut un vivier qualifié, une messagerie claire, et un compte rendu de mission suffisamment simple pour ne pas alourdir le quotidien.</p>
+            <div class="interview-meta">
+              <div class="interview-name">Dr Juliette Moreau</div>
+              <div class="interview-role">Médecin généraliste installée</div>
+            </div>
+          </article>
         </div>
-        <a class="profile-card-cta" href="/landing-etablissement.html">Découvrir l'espace établissement →</a>
-      </div>
-      <div class="profile-card card-docteur reveal-zoom reveal-delay-2">
-        <div class="profile-card-label">Notre promesse</div>
-        <h3>Conçu avec des médecins</h3>
-        <p>Chaque fonctionnalité a été imaginée avec des généralistes remplaçants et installés pour répondre aux vrais besoins du terrain.</p>
-        <div class="profile-card-features">
-          <div class="profile-card-feature">Conditions visibles avant candidature</div>
-          <div class="profile-card-feature">Documents centralisés dans le dossier</div>
-          <div class="profile-card-feature">Support dédié aux médecins</div>
-          <div class="profile-card-feature">Mises à jour guidées par les retours terrain</div>
-        </div>
-        <a class="profile-card-cta" href="/register">Commencer →</a>
       </div>
     </div>
   </div>
@@ -731,134 +750,6 @@ footer{background:var(--navy);padding:60px 40px 32px}
   </div>
 </section>
 
-<!-- TRANSACTION -->
-<section class="transaction" id="transaction">
-  <div class="transaction-inner">
-    <div class="transaction-header reveal">
-      <div>
-        <div class="how-kicker">Bien plus qu'une bourse aux annonces</div>
-        <h2 class="section-h">De la publication au paiement libéré, un seul parcours.</h2>
-      </div>
-      <p class="section-sub">MédiLink n'arrête pas à la mise en relation : le paiement reste sécurisé jusqu'à la fin de mission, puis la somme est libérée et les justificatifs générés.</p>
-    </div>
-
-    <div class="transaction-panel reveal-scale">
-      <div class="tx-kicker">Le cycle de la mission</div>
-      <h3 class="tx-headline">Un tiers de confiance entre le recruteur et le professionnel.</h3>
-      <p class="tx-sub">Le recruteur sécurise le paiement avant la mission. MédiLink conserve les fonds jusqu'à la validation de fin de mission, puis le paiement est libéré au candidat et les documents sont émis.</p>
-
-      <div class="tx-flow" role="list" aria-label="Parcours transactionnel d'une mission">
-        <div class="tx-flow-item" role="listitem">
-          <span class="tx-num">01</span>
-          <strong>Mission publiée</strong>
-          <span>Besoin structuré par le recruteur</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item" role="listitem">
-          <span class="tx-num">02</span>
-          <strong>Candidature</strong>
-          <span>Profil et documents réunis</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item" role="listitem">
-          <span class="tx-num">03</span>
-          <strong>Proposition</strong>
-          <span>Montant, dates et conditions</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item tx-highlight" role="listitem">
-          <span class="tx-num">04</span>
-          <strong>Paiement sécurisé</strong>
-          <span>Fonds conservés par MédiLink</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item" role="listitem">
-          <span class="tx-num">05</span>
-          <strong>Mission réalisée</strong>
-          <span>Validation de fin de mission</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item tx-highlight" role="listitem">
-          <span class="tx-num">06</span>
-          <strong>Paiement libéré</strong>
-          <span>Versement au candidat</span>
-        </div>
-        <div class="tx-flow-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
-        <div class="tx-flow-item" role="listitem">
-          <span class="tx-num">07</span>
-          <strong>Factures &amp; justificatifs</strong>
-          <span>Documents générés</span>
-        </div>
-      </div>
-
-      <div class="tx-legend">
-        <span class="tx-legend-item held">Fonds sécurisés par MédiLink entre l'accord et la fin de mission</span>
-      </div>
-
-      <a class="tx-cta" href="/register">Créer mon compte →</a>
-    </div>
-
-    <div class="transaction-grid">
-      <div class="tx-card reveal">
-        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
-        <h3>Paiement sécurisé</h3>
-        <p>Le recruteur sécurise le paiement avant la mission. Les fonds sont conservés par MédiLink, puis libérés uniquement après validation de fin de mission.</p>
-        <span class="tx-card-chip">Tiers de confiance</span>
-      </div>
-      <div class="tx-card reveal reveal-delay-1">
-        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <h3>Fin de mission encadrée</h3>
-        <p>Le recruteur valide que la mission est terminée. Le statut passe à « mission terminée » et le paiement est libéré au candidat dans un cadre clair.</p>
-        <span class="tx-card-chip">Validation explicite</span>
-      </div>
-      <div class="tx-card reveal reveal-delay-2">
-        <div class="tx-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        <h3>Factures &amp; justificatifs</h3>
-        <p>Facture côté recruteur, justificatif ou reçu côté candidat : les documents administratifs sont générés et restent accessibles depuis le dossier de mission.</p>
-        <span class="tx-card-chip">Documents émis</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- TRUST -->
-<section class="trust">
-  <div class="trust-inner">
-    <h2>Un parcours lisible des deux côtés</h2>
-    <p class="trust-sub">Les fonctionnalités ci-dessous décrivent ce que la plateforme centralise, sans chiffres d’usage ni témoignages non vérifiés.</p>
-    <div class="trust-logos stagger-container">
-      <span class="trust-logo stagger-child">Profil professionnel</span>
-      <span class="trust-logo stagger-child">Recherche ciblée</span>
-      <span class="trust-logo stagger-child">Candidature contextualisée</span>
-      <span class="trust-logo stagger-child">Messagerie dédiée</span>
-      <span class="trust-logo stagger-child">Agenda partagé</span>
-    </div>
-    <div class="trust-testimonials">
-      <div class="testimonial">
-        <div class="testimonial-text">Comparez les dates, horaires, lieux, niveaux requis et conditions renseignées avant de candidater.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-av" aria-hidden="true">01</div>
-          <div><div class="testimonial-name">Décider avec le contexte</div><div class="testimonial-role">Fonctionnalité de recherche</div></div>
-        </div>
-      </div>
-      <div class="testimonial">
-        <div class="testimonial-text">Retrouvez le profil, les documents autorisés et les échanges au même endroit pour chaque candidature.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-av" aria-hidden="true">02</div>
-          <div><div class="testimonial-name">Garder un dossier commun</div><div class="testimonial-role">Candidature et messagerie</div></div>
-        </div>
-      </div>
-      <div class="testimonial">
-        <div class="testimonial-text">Suivez les conditions convenues, les échéances de mission et la rétrocession déclarée par les parties.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-av" aria-hidden="true">03</div>
-          <div><div class="testimonial-name">Suivre la mission</div><div class="testimonial-role">Agenda et clôture</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- CTA BAND -->
 <section class="cta-band">
   <div class="cta-band-inner">
@@ -875,9 +766,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <section class="faq" id="faq">
   <div class="faq-inner">
     <div class="faq-header reveal">
-      <div class="faq-kicker">Questions fréquentes</div>
       <h2 class="section-h">Ce qu'il faut savoir avant d'organiser une mission</h2>
-      <p class="section-sub">MédiLink centralise les missions courtes de santé, de la candidature au suivi des conditions et de la rétrocession convenue entre les parties.</p>
     </div>
     <div class="faq-list">
       <details class="faq-item reveal">
@@ -922,7 +811,7 @@ footer{background:var(--navy);padding:60px 40px 32px}
         <h4>Candidats</h4>
         <a href="#how-it-works">Comment ça marche</a>
         <a href="/search">Rechercher une mission</a>
-        <a href="/register">Créer un profil</a>
+        <a href="/register?type=candidate">Créer un profil</a>
         <a href="/landing-medecin.html#faq">Questions des professionnels</a>
       </div>
       <div class="footer-col">
@@ -1029,6 +918,7 @@ document.querySelectorAll('.btn').forEach(btn => {
     btn.style.setProperty('--y', y + '%');
   });
 });
+
 </script>
 </body>
 </html>
