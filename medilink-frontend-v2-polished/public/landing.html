@@ -216,7 +216,7 @@ section,footer,.search-section{position:relative;z-index:1;}
 /* PROFILES */
 .profiles{padding:0 40px 100px}
 .profiles-inner{max-width:none;width:100%;margin:0 auto}
-.profiles-header{text-align:center;max-width:1100px;margin:0 auto 48px}
+.profiles-header{text-align:center;max-width:1100px;margin:0 auto 32px}
 .profiles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .profile-card{border-radius:20px;padding:32px 28px;color:#fff;position:relative;overflow:hidden;cursor:pointer;transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s cubic-bezier(.22,1,.36,1)}
 .profile-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 50%);opacity:0;transition:opacity .35s;pointer-events:none}
@@ -234,10 +234,10 @@ section,footer,.search-section{position:relative;z-index:1;}
 .profile-card-cta{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;text-decoration:none;color:#fff;transition:all .25s cubic-bezier(.22,1,.36,1)}
 .profile-card-cta:hover{background:rgba(255,255,255,.28);transform:translateX(4px)}
 
-.interviews-panel{grid-column:1/-1;width:100%;background:linear-gradient(180deg,#ffffff 0%,#F5F8FC 100%);border:1px solid rgba(26,82,160,.12);border-radius:30px;padding:34px;box-shadow:0 18px 48px rgba(11,25,41,.08)}
-.interviews-panel-head{display:flex;flex-direction:column;gap:10px;max-width:840px;margin:0 auto 28px;text-align:center}
+.interviews-panel{grid-column:1/-1;width:100%;padding:0;background:transparent;border:0;border-radius:0;box-shadow:none}
 .interviews-kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6F8DB2;font-weight:700}
 .interviews-title{font-family:var(--serif);font-size:34px;font-weight:400;line-height:1.06;color:var(--navy);margin:0}
+.profiles-header .interviews-title{max-width:840px;margin:0 auto}
 .interviews-sub{font-size:15px;line-height:1.7;color:var(--text-2);margin:0}
 .interviews-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;align-items:start}
 .interview-item{background:#fff;border:1px solid rgba(26,82,160,.1);border-radius:24px;padding:16px 16px 18px;box-shadow:0 10px 24px rgba(11,25,41,.05);height:100%}
@@ -248,8 +248,8 @@ section,footer,.search-section{position:relative;z-index:1;}
 .interview-meta{display:flex;flex-direction:column;gap:4px;border-top:1px solid rgba(26,82,160,.1);padding-top:14px}
 .interview-name{font-size:16px;font-weight:700;color:var(--navy)}
 .interview-role{font-size:13px;color:var(--text-2)}
-@media(max-width:980px){.profiles-grid{grid-template-columns:1fr}.interviews-panel{grid-column:auto;padding:28px}.interviews-row{grid-template-columns:1fr 1fr}.interviews-title{font-size:30px}}
-@media(max-width:640px){.interviews-panel{padding:22px;border-radius:22px}.interviews-row{grid-template-columns:1fr;gap:18px}.interviews-title{font-size:28px}.interview-item{border-radius:18px}.interview-photo-wrap{border-radius:14px}}
+@media(max-width:980px){.profiles-grid{grid-template-columns:1fr}.interviews-panel{grid-column:auto}.interviews-row{grid-template-columns:1fr 1fr}.interviews-title{font-size:30px}}
+@media(max-width:640px){.interviews-row{grid-template-columns:1fr;gap:18px}.interviews-title{font-size:28px}.interview-item{border-radius:18px}.interview-photo-wrap{border-radius:14px}}
 
 
 /* TRANSACTION */
@@ -689,15 +689,11 @@ footer{background:var(--navy);padding:60px 40px 32px}
 <section class="profiles" id="profiles">
   <div class="profiles-inner">
     <div class="profiles-header">
-      <h2 class="section-h">Une plateforme pensée<br><em style="font-family:var(--serif);font-style:italic">par des généralistes</em></h2>
-      <p class="section-sub">Des entretiens menés avec des médecins généralistes installés et remplaçants nourrissent la conception de MédiLink. Voici quelques verbatims fictifs en attendant les témoignages finaux.</p>
+      <div class="interviews-kicker">Conçue avec le terrain</div>
+      <h2 class="interviews-title">Des retours de médecins qui nous aident à construire MédiLink</h2>
     </div>
     <div class="profiles-grid">
       <div class="interviews-panel reveal-zoom">
-        <div class="interviews-panel-head">
-          <div class="interviews-kicker">Conçue avec le terrain</div>
-          <h3 class="interviews-title">Des retours de médecins qui nous aident à construire MédiLink</h3>
-        </div>
         <div class="interviews-row">
           <article class="interview-item">
             <div class="interview-photo-wrap"><img class="interview-photo" src="/landing-assets/temoignage-claire-martin.png" width="308" height="218" alt="Portrait fictif d’un médecin généraliste remplaçant" loading="lazy" decoding="async"/></div>
