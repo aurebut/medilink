@@ -2448,6 +2448,10 @@ button { touch-action: manipulation; }
 }
 .candidate-dashboard > .dashboard-command-grid {
   order: -2;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.establishment-dashboard > .dashboard-command-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .candidate-dashboard > .dashboard-week-card {
   order: -1;
@@ -2457,7 +2461,7 @@ button { touch-action: manipulation; }
 }
 .dashboard-command-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, .72fr) minmax(280px, .72fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   align-items: stretch;
 }
@@ -2499,6 +2503,11 @@ button { touch-action: manipulation; }
   align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
+}
+.dashboard-section-head .btn,
+.dashboard-section-head a.btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 .agenda-month-title {
   display: flex;
@@ -4975,6 +4984,8 @@ tbody tr:hover { background: #FAFBFD; }
   .dashboard-main,
   .dashboard-notification-grid,
   .dashboard-command-grid,
+  .candidate-dashboard > .dashboard-command-grid,
+  .establishment-dashboard > .dashboard-command-grid,
   .dashboard-operations-grid,
   .establishment-priority-grid,
   .establishment-command-strip,
