@@ -1,6 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import {
+  Bell,
+  BriefcaseMedical,
+  Building2,
+  CalendarDays,
+  ClipboardList,
+  FileText,
+  LayoutDashboard,
+  MessageCircle,
+  Search,
+  Settings,
+  Sparkles,
+  Trash2,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -34,35 +50,40 @@ import { useAuth } from './AuthProvider';
 import { useOptionalEstablishments } from './EstablishmentSelector';
 import { errorMessage } from '@/lib/user-facing';
 
-type NavItem = { href: string; label: string; icon: string };
+type NavItem = {
+  href: string;
+  label: string;
+  mobileLabel: string;
+  icon: LucideIcon;
+};
 
 const candidateNav: NavItem[] = [
-  { href: '/app/dashboard', label: 'Dashboard', icon: 'D' },
-  { href: '/app/agenda', label: 'Agenda', icon: 'A' },
-  { href: '/app/current-missions', label: 'Missions en cours', icon: '>' },
-  { href: '/app/search', label: 'Annonce et candidature', icon: 'A' },
-  { href: '/app/messages', label: 'Messagerie', icon: 'M' },
+  { href: '/app/dashboard', label: 'Dashboard', mobileLabel: 'Accueil', icon: LayoutDashboard },
+  { href: '/app/agenda', label: 'Agenda', mobileLabel: 'Agenda', icon: CalendarDays },
+  { href: '/app/current-missions', label: 'Missions en cours', mobileLabel: 'Missions', icon: BriefcaseMedical },
+  { href: '/app/search', label: 'Annonce et candidature', mobileLabel: 'Annonces', icon: Search },
+  { href: '/app/messages', label: 'Messagerie', mobileLabel: 'Messages', icon: MessageCircle },
 ];
 
 const establishmentNav: NavItem[] = [
-  { href: '/establishment/dashboard', label: 'Dashboard', icon: 'D' },
-  { href: '/establishment/agenda', label: 'Agenda', icon: 'A' },
-  { href: '/establishment/missions', label: 'Annonce et candidature', icon: 'A' },
-  { href: '/establishment/current-missions', label: 'Missions en cours', icon: '>' },
-  { href: '/establishment/messages', label: 'Messagerie', icon: 'M' },
+  { href: '/establishment/dashboard', label: 'Dashboard', mobileLabel: 'Accueil', icon: LayoutDashboard },
+  { href: '/establishment/agenda', label: 'Agenda', mobileLabel: 'Agenda', icon: CalendarDays },
+  { href: '/establishment/missions', label: 'Annonce et candidature', mobileLabel: 'Annonces', icon: ClipboardList },
+  { href: '/establishment/current-missions', label: 'Missions en cours', mobileLabel: 'Missions', icon: BriefcaseMedical },
+  { href: '/establishment/messages', label: 'Messagerie', mobileLabel: 'Messages', icon: MessageCircle },
 ];
 
 const adminNav: NavItem[] = [
-  { href: '/admin/dashboard', label: 'Dashboard', icon: 'D' },
-  { href: '/admin/users', label: 'Utilisateurs', icon: 'U' },
-  { href: '/admin/documents', label: 'Documents', icon: 'F' },
-  { href: '/admin/establishments', label: 'Établissements', icon: 'E' },
-  { href: '/admin/missions', label: 'Missions', icon: 'M' },
-  { href: '/admin/matching', label: 'Matching', icon: 'S' },
+  { href: '/admin/dashboard', label: 'Dashboard', mobileLabel: 'Accueil', icon: LayoutDashboard },
+  { href: '/admin/users', label: 'Utilisateurs', mobileLabel: 'Utilisateurs', icon: Users },
+  { href: '/admin/documents', label: 'Documents', mobileLabel: 'Documents', icon: FileText },
+  { href: '/admin/establishments', label: 'Établissements', mobileLabel: 'Établissements', icon: Building2 },
+  { href: '/admin/missions', label: 'Missions', mobileLabel: 'Missions', icon: BriefcaseMedical },
+  { href: '/admin/matching', label: 'Matching', mobileLabel: 'Matching', icon: Sparkles },
 ];
 
 const supportNav: NavItem[] = [
-  { href: '/admin/account', label: 'Mon compte', icon: 'C' },
+  { href: '/admin/account', label: 'Mon compte', mobileLabel: 'Compte', icon: Settings },
 ];
 
 const WARMED_PATH_TTL_MS = 60_000;
@@ -631,7 +652,7 @@ export function AppShell({
   }, [area, canManageBilling, canViewRecruitment, selectedEstablishmentId, user]);
 
   return (
-    <div className="shell">
+    <div className={`shell shell-${area} ${area === 'admin' ? 'admin-shell' : 'workspace-shell'}`}>
       <aside className={`sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-head">
           <Link
@@ -644,13 +665,21 @@ export function AppShell({
               Medi<em>Link</em>
             </span>
           </Link>
+          {area !== 'admin' ? (
+            <span className="sidebar-context">{areaLabel(area, candidateProfile, user?.role)}</span>
+          ) : null}
         </div>
 
-        <nav id="sidebar-nav" className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}>
+        <nav
+          id="sidebar-nav"
+          className={`sidebar-nav ${mobileNavOpen ? 'open' : ''}`}
+          aria-label={`Navigation ${areaLabel(area, candidateProfile, user?.role).toLowerCase()}`}
+        >
           {nav.map((item) => {
             const active = pathname === item.href
               || pathname.startsWith(`${item.href}/`)
               || (area === 'candidate' && item.href === '/app/agenda' && pathname.startsWith('/app/missions/'));
+            const Icon = item.icon;
             return (
               <Link
                 key={item.href}
@@ -662,8 +691,11 @@ export function AppShell({
                 onClick={() => setMobileNavOpen(false)}
               >
                 <span className="nav-main">
-                  <span className="nav-icon">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="nav-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span className="nav-label-desktop">{item.label}</span>
+                  <span className="nav-label-mobile">{item.mobileLabel}</span>
                 </span>
               </Link>
             );
@@ -829,13 +861,7 @@ export function AppShell({
                                 aria-label={`Supprimer la notification ${formatNotificationText(notification.title)}`}
                                 onClick={() => void deleteNotification(notification.id)}
                               >
-                                <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                                  <path d="M3 6h18" />
-                                  <path d="M8 6V4h8v2" />
-                                  <path d="M19 6l-1 16H6L5 6" />
-                                  <path d="M10 11v6" />
-                                  <path d="M14 11v6" />
-                                </svg>
+                                <Trash2 aria-hidden="true" />
                               </button>
                             </span>
                           </div>
@@ -872,10 +898,7 @@ export function AppShell({
                 if (!notificationsOpen) openNotificationsMenu();
               }}
             >
-              <svg aria-hidden="true" viewBox="0 0 24 24" focusable="false">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
+              <Bell aria-hidden="true" />
               {unreadNotifications > 0 ? <span className="notification-dot">{unreadNotifications > 9 ? '9+' : unreadNotifications}</span> : null}
             </button>
           </div>

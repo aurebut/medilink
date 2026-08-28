@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import './workspace-navigation.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {

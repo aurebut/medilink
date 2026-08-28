@@ -1,0 +1,538 @@
+/* Candidate and establishment workspace navigation */
+.workspace-shell {
+  display: block;
+  min-height: 100vh;
+  padding-top: 0;
+  background: rgba(248, 247, 243, .84);
+}
+
+.workspace-shell > .sidebar {
+  position: fixed !important;
+  inset: 0 auto 0 0 !important;
+  z-index: 70;
+  width: 272px !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  max-height: none !important;
+  padding: 26px 18px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 22px;
+  overflow: visible !important;
+  color: #dbe4ef;
+  background:
+    radial-gradient(circle at 16% 8%, rgba(44, 111, 190, .26), transparent 28%),
+    linear-gradient(180deg, #102844 0%, #0b1929 100%) !important;
+  border: 0 !important;
+  border-right: 1px solid rgba(255, 255, 255, .08) !important;
+  box-shadow: 12px 0 40px rgba(11, 25, 41, .08);
+  backdrop-filter: none;
+}
+
+.workspace-shell > .sidebar .sidebar-head {
+  min-height: 58px;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 0 10px;
+}
+
+.workspace-shell > .sidebar .brand {
+  width: fit-content;
+  padding: 0;
+  color: #fff;
+  line-height: 1;
+}
+
+.workspace-shell > .sidebar .brand em {
+  color: #8fc5f2;
+}
+
+.sidebar-context {
+  color: rgba(219, 228, 239, .68);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.workspace-shell > .sidebar .sidebar-nav {
+  position: static !important;
+  flex: 0 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 0 !important;
+  overflow-x: visible;
+  overflow-y: auto;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  scrollbar-width: thin;
+}
+
+.workspace-shell > .sidebar .sidebar-link {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 48px;
+  padding: 9px 11px;
+  justify-content: flex-start;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: rgba(231, 238, 247, .76);
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  box-shadow: none;
+  transition: color .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.workspace-shell > .sidebar .sidebar-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, .07);
+  border-color: rgba(255, 255, 255, .06);
+}
+
+.workspace-shell > .sidebar .sidebar-link.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(75, 143, 218, .28), rgba(75, 143, 218, .12));
+  border-color: rgba(143, 197, 242, .16);
+  box-shadow: inset 3px 0 0 #8fc5f2;
+}
+
+.workspace-shell > .sidebar .sidebar-link .nav-main {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.workspace-shell > .sidebar .sidebar-link .nav-icon {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .07);
+  color: #9ec7ed;
+}
+
+.workspace-shell > .sidebar .sidebar-link .nav-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+}
+
+.workspace-shell > .sidebar .sidebar-link.active .nav-icon {
+  background: rgba(143, 197, 242, .16);
+  color: #d7edff;
+}
+
+.nav-label-mobile {
+  display: none;
+}
+
+.workspace-shell > .sidebar .mobile-menu-button,
+.workspace-shell > .sidebar .mobile-menu-account {
+  display: none !important;
+}
+
+.workspace-shell > .sidebar .sidebar-quick-actions {
+  order: initial;
+  width: 100%;
+  margin-top: auto;
+  padding: 14px 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid rgba(255, 255, 255, .09);
+}
+
+.workspace-shell > .sidebar .notification-bell {
+  width: 42px;
+  height: 42px;
+  border-color: rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .07);
+  color: #d7e9f9;
+}
+
+.workspace-shell > .sidebar .notification-bell:hover,
+.workspace-shell > .sidebar .notification-bell.open {
+  border-color: rgba(143, 197, 242, .25);
+  background: rgba(143, 197, 242, .14);
+  color: #fff;
+}
+
+.workspace-shell > .sidebar .publication-credit-button {
+  border-color: rgba(83, 201, 174, .22);
+  background: rgba(83, 201, 174, .1);
+  color: #93e2cf;
+}
+
+.workspace-shell > .sidebar .notification-dot {
+  border-color: #10233a;
+}
+
+.workspace-shell > .sidebar .sidebar-footer {
+  position: relative;
+  z-index: 90;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  display: grid;
+  color: rgba(231, 238, 247, .72);
+  background: rgba(255, 255, 255, .055);
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: 13px;
+}
+
+.workspace-shell > .sidebar .user-chip {
+  position: relative;
+  z-index: 91;
+  color: inherit;
+}
+
+.workspace-shell > .sidebar .user-chip strong {
+  color: #fff;
+}
+
+.workspace-shell > .sidebar .user-chip .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(143, 197, 242, .14);
+  color: #cfe9ff;
+}
+
+.workspace-shell > .sidebar .user-chip-arrow {
+  color: rgba(219, 228, 239, .48);
+}
+
+.workspace-shell > .sidebar .account-menu {
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: 18px;
+  left: 288px;
+  z-index: 1000;
+  width: 320px;
+  max-width: calc(100vw - 306px);
+}
+
+.workspace-shell > .sidebar .notification-menu,
+.workspace-shell > .sidebar .publication-credit-menu {
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: 94px;
+  left: 288px;
+  z-index: 1000;
+}
+
+.workspace-shell > .main {
+  width: auto;
+  min-width: 0;
+  margin-left: 272px;
+  overflow: visible;
+}
+
+.workspace-shell > .main > .content {
+  width: min(1180px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 32px 0 48px;
+}
+
+@media (max-width: 860px) {
+  .workspace-shell {
+    padding-top: 62px;
+  }
+
+  .workspace-shell > .sidebar {
+    position: fixed !important;
+    inset: 0 0 auto 0 !important;
+    z-index: 80;
+    width: 100% !important;
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
+    padding: 0 14px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px;
+    overflow: visible !important;
+    color: var(--text);
+    background: rgba(248, 247, 243, .96) !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(26, 82, 160, .11) !important;
+    box-shadow: 0 8px 24px rgba(11, 25, 41, .06);
+    backdrop-filter: blur(16px);
+  }
+
+  .workspace-shell > .sidebar .sidebar-head {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    padding: 0;
+  }
+
+  .workspace-shell > .sidebar .brand {
+    color: var(--navy);
+  }
+
+  .workspace-shell > .sidebar .brand em {
+    color: var(--blue);
+  }
+
+  .workspace-shell > .sidebar .sidebar-context {
+    display: none;
+  }
+
+  .workspace-shell > .sidebar .sidebar-nav {
+    position: fixed !important;
+    inset: auto 0 0 0 !important;
+    z-index: 85;
+    width: 100% !important;
+    height: calc(72px + env(safe-area-inset-bottom));
+    min-height: calc(72px + env(safe-area-inset-bottom));
+    max-height: none !important;
+    padding: 7px 6px calc(7px + env(safe-area-inset-bottom)) !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    gap: 2px;
+    overflow: visible !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(26, 82, 160, .11) !important;
+    border-radius: 0;
+    background: rgba(255, 255, 255, .96) !important;
+    box-shadow: 0 -10px 32px rgba(11, 25, 41, .09) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
+    backdrop-filter: blur(18px);
+  }
+
+  .workspace-shell > .sidebar .sidebar-link,
+  .workspace-shell > .sidebar .sidebar-link:first-child {
+    width: 100%;
+    min-width: 0;
+    min-height: 58px;
+    margin: 0;
+    padding: 4px 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 11px;
+    color: #6b7789;
+    background: transparent;
+    font-size: 10px;
+    font-weight: 750;
+    line-height: 1;
+    box-shadow: none;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link:hover {
+    color: var(--navy);
+    background: rgba(26, 82, 160, .045);
+    border: 0;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link.active {
+    color: var(--blue);
+    background: rgba(26, 82, 160, .065);
+    border: 0;
+    box-shadow: none;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link .nav-main {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link .nav-icon {
+    width: 36px;
+    height: 28px;
+    flex: 0 0 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: currentColor;
+    background: transparent;
+    transition: color .16s ease, background .16s ease;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link .nav-icon svg {
+    width: 21px;
+    height: 21px;
+    stroke-width: 2.15;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link.active .nav-icon {
+    color: var(--blue);
+    background: rgba(26, 82, 160, .11);
+  }
+
+  .workspace-shell .nav-label-desktop {
+    display: none;
+  }
+
+  .workspace-shell .nav-label-mobile {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .workspace-shell > .sidebar .sidebar-quick-actions {
+    order: 2;
+    flex: 0 0 auto;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 6px;
+    border: 0;
+  }
+
+  .workspace-shell > .sidebar .notification-bell {
+    width: 38px;
+    height: 38px;
+    border-color: rgba(26, 82, 160, .12);
+    background: #fff;
+    color: var(--navy);
+  }
+
+  .workspace-shell > .sidebar .publication-credit-button {
+    border-color: rgba(14, 138, 122, .2);
+    background: rgba(14, 138, 122, .08);
+    color: var(--teal);
+  }
+
+  .workspace-shell > .sidebar .notification-dot {
+    border-color: #f8f7f3;
+  }
+
+  .workspace-shell > .sidebar .sidebar-footer {
+    order: 3;
+    flex: 0 0 38px;
+    width: 38px;
+    margin: 0;
+    padding: 0;
+    display: block;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+  }
+
+  .workspace-shell > .sidebar .user-chip {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(26, 82, 160, .12);
+    border-radius: 10px;
+    background: #fff;
+  }
+
+  .workspace-shell > .sidebar .user-chip .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: #e6f0fa;
+    color: var(--blue);
+  }
+
+  .workspace-shell > .sidebar .user-chip > .truncate,
+  .workspace-shell > .sidebar .user-chip-arrow {
+    display: none;
+  }
+
+  .workspace-shell > .sidebar .account-menu {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    bottom: auto;
+    left: auto;
+    width: min(320px, calc(100vw - 24px));
+    max-width: none;
+  }
+
+  .workspace-shell > .sidebar .notification-menu,
+  .workspace-shell > .sidebar .publication-credit-menu {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    bottom: auto;
+    left: 12px;
+    width: auto;
+    max-height: calc(100dvh - 160px - env(safe-area-inset-bottom));
+  }
+
+  .workspace-shell > .sidebar .notification-menu-list {
+    max-height: calc(100dvh - 280px - env(safe-area-inset-bottom));
+  }
+
+  .workspace-shell > .main {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .workspace-shell > .main > .content {
+    width: min(100% - 28px, 1180px);
+    padding: 22px 0 calc(100px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 390px) {
+  .workspace-shell > .sidebar {
+    padding-inline: 10px !important;
+  }
+
+  .workspace-shell > .sidebar .brand {
+    font-size: 20px;
+  }
+
+  .workspace-shell > .sidebar .notification-bell,
+  .workspace-shell > .sidebar .sidebar-footer,
+  .workspace-shell > .sidebar .user-chip {
+    width: 36px;
+    height: 36px;
+  }
+
+  .workspace-shell > .sidebar .sidebar-footer {
+    flex-basis: 36px;
+  }
+
+  .workspace-shell > .sidebar .user-chip .avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .workspace-shell > .sidebar .sidebar-link {
+    font-size: 9.25px;
+  }
+}
