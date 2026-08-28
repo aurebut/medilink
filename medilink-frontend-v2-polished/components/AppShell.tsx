@@ -680,6 +680,7 @@ export function AppShell({
               || pathname.startsWith(`${item.href}/`)
               || (area === 'candidate' && item.href === '/app/agenda' && pathname.startsWith('/app/missions/'));
             const Icon = item.icon;
+
             return (
               <Link
                 key={item.href}
@@ -695,7 +696,6 @@ export function AppShell({
                     <Icon />
                   </span>
                   <span className="nav-label-desktop">{item.label}</span>
-                  <span className="nav-label-mobile">{item.mobileLabel}</span>
                 </span>
               </Link>
             );
@@ -1001,6 +1001,36 @@ export function AppShell({
           </button>
         </div>
       </aside>
+
+      {area !== 'admin' ? (
+        <nav className="mobile-bottom-nav" aria-label={`Navigation mobile ${areaLabel(area, candidateProfile, user?.role).toLowerCase()}`}>
+          {nav.map((item) => {
+            const active = pathname === item.href
+              || pathname.startsWith(`${item.href}/`)
+              || (area === 'candidate' && item.href === '/app/agenda' && pathname.startsWith('/app/missions/'));
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`mobile-bottom-link ${active ? 'active' : ''}`}
+                aria-current={active ? 'page' : undefined}
+                aria-label={item.label}
+                onFocus={() => warmRoute(item.href)}
+                onMouseEnter={() => warmRoute(item.href)}
+              >
+                <span className="nav-main">
+                  <span className="nav-icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span className="mobile-bottom-label">{item.mobileLabel}</span>
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      ) : null}
 
       <main className="main">
         {area === 'admin' ? (

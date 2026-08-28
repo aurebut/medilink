@@ -140,7 +140,7 @@
   color: #d7edff;
 }
 
-.nav-label-mobile {
+.workspace-shell > .mobile-bottom-nav {
   display: none;
 }
 
@@ -255,7 +255,7 @@
   padding: 32px 0 48px;
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1024px) {
   .workspace-shell {
     padding-top: 62px;
   }
@@ -303,8 +303,15 @@
   }
 
   .workspace-shell > .sidebar .sidebar-nav {
+    display: none !important;
+  }
+
+  .workspace-shell > .mobile-bottom-nav {
     position: fixed !important;
-    inset: auto 0 0 0 !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
     z-index: 85;
     width: 100% !important;
     height: calc(72px + env(safe-area-inset-bottom));
@@ -328,8 +335,7 @@
     backdrop-filter: blur(18px);
   }
 
-  .workspace-shell > .sidebar .sidebar-link,
-  .workspace-shell > .sidebar .sidebar-link:first-child {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link {
     width: 100%;
     min-width: 0;
     min-height: 58px;
@@ -348,20 +354,20 @@
     box-shadow: none;
   }
 
-  .workspace-shell > .sidebar .sidebar-link:hover {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link:hover {
     color: var(--navy);
     background: rgba(26, 82, 160, .045);
     border: 0;
   }
 
-  .workspace-shell > .sidebar .sidebar-link.active {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link.active {
     color: var(--blue);
     background: rgba(26, 82, 160, .065);
     border: 0;
     box-shadow: none;
   }
 
-  .workspace-shell > .sidebar .sidebar-link .nav-main {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link .nav-main {
     width: 100%;
     min-width: 0;
     display: flex;
@@ -371,7 +377,7 @@
     gap: 4px;
   }
 
-  .workspace-shell > .sidebar .sidebar-link .nav-icon {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link .nav-icon {
     width: 36px;
     height: 28px;
     flex: 0 0 28px;
@@ -383,22 +389,18 @@
     transition: color .16s ease, background .16s ease;
   }
 
-  .workspace-shell > .sidebar .sidebar-link .nav-icon svg {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link .nav-icon svg {
     width: 21px;
     height: 21px;
     stroke-width: 2.15;
   }
 
-  .workspace-shell > .sidebar .sidebar-link.active .nav-icon {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link.active .nav-icon {
     color: var(--blue);
     background: rgba(26, 82, 160, .11);
   }
 
-  .workspace-shell .nav-label-desktop {
-    display: none;
-  }
-
-  .workspace-shell .nav-label-mobile {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-label {
     display: block;
     max-width: 100%;
     overflow: hidden;
@@ -532,7 +534,7 @@
     height: 34px;
   }
 
-  .workspace-shell > .sidebar .sidebar-link {
+  .workspace-shell > .mobile-bottom-nav .mobile-bottom-link {
     font-size: 9.25px;
   }
 }
