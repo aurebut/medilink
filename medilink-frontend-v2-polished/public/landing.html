@@ -181,28 +181,32 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-kicker{display:inline-flex;align-items:center;gap:9px;margin-bottom:16px;border:0;background:transparent;padding:0;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6482A3}
 .how-kicker::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 5px rgba(14,138,122,.08)}
 .how-shell{position:relative;z-index:1;max-width:1080px;margin:0 auto}
-.how-steps{position:relative;display:flex;gap:18px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding:36px 2px 10px;cursor:grab;scrollbar-width:none;-ms-overflow-style:none}
-.how-steps::-webkit-scrollbar{display:none}
-.how-steps.dragging{scroll-snap-type:none;cursor:grabbing;user-select:none}
-.how-step{position:relative;flex:0 0 min(330px,84vw);scroll-snap-align:center;padding:42px 24px 26px;background:rgba(255,255,255,.9);border:1px solid rgba(200,210,228,.86);border-radius:22px;box-shadow:0 18px 44px rgba(11,25,41,.07);transition:all .35s cubic-bezier(.22,1,.36,1);backdrop-filter:blur(10px)}
-.how-step::before{content:'';position:absolute;top:0;left:80px;right:-19px;height:2px;background:linear-gradient(90deg,rgba(26,82,160,.3),rgba(14,138,122,.45))}
-.how-step:last-child::before{right:24px;background:linear-gradient(90deg,rgba(26,82,160,.3),rgba(14,138,122,0))}
-.how-step:hover{border-color:rgba(26,82,160,.3);box-shadow:0 28px 60px rgba(11,25,41,.12);transform:translateY(-5px)}
-.how-step-num{position:absolute;top:-27px;left:22px;width:54px;height:54px;border-radius:50%;background:var(--navy);color:#C8DFF5;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:21px;font-weight:400;line-height:1;border:5px solid var(--ivory);box-shadow:0 14px 30px rgba(11,25,41,.18);z-index:2}
-.how-step-icon{width:42px;height:42px;background:#EAF0FC;border:1px solid rgba(26,82,160,.12);border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.how-step-icon svg{width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.how-step h3{font-family:var(--serif);font-size:23px;color:var(--navy);font-weight:400;margin-bottom:9px;letter-spacing:0;line-height:1.15}
-.how-step p{font-size:13px;color:var(--text-3);line-height:1.68}
-.how-step-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
-.how-chip{display:inline-flex;align-items:center;border-radius:999px;background:#F0F4FA;color:var(--text-2);font-size:11px;font-weight:500;padding:5px 10px;border:1px solid rgba(200,210,228,.6)}
+.how-rail{position:relative;display:flex;justify-content:space-between;align-items:center;max-width:680px;margin:0 auto 52px}
+.how-rail::before{content:'';position:absolute;left:24px;right:24px;top:24px;height:2px;background:rgba(26,82,160,.15);border-radius:2px}
+.how-rail-fill{position:absolute;left:24px;top:24px;height:2px;width:0;background:linear-gradient(90deg,var(--blue),var(--teal));border-radius:2px;transition:width .5s cubic-bezier(.22,1,.36,1)}
+.how-node{position:relative;z-index:1;width:48px;height:48px;padding:0;border-radius:50%;border:5px solid var(--ivory);background:#fff;color:#93A8C2;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:17px;line-height:1;cursor:pointer;box-shadow:0 8px 22px rgba(11,25,41,.09);transition:all .35s cubic-bezier(.22,1,.36,1)}
+.how-node:hover{transform:translateY(-3px);color:var(--blue)}
+.how-node.done{background:#E8F1FA;color:var(--blue)}
+.how-node.active{background:var(--navy);color:#C8DFF5;transform:scale(1.14);box-shadow:0 14px 30px rgba(11,25,41,.24)}
+.how-stage{position:relative;min-height:360px}
+.how-slide{position:absolute;left:0;top:0;width:100%;opacity:0;visibility:hidden;transform:translateY(26px);transition:opacity .4s ease,transform .45s cubic-bezier(.22,1,.36,1),visibility 0s linear .45s;pointer-events:none}
+.how-slide.active{position:relative;opacity:1;visibility:visible;transform:none;pointer-events:auto;transition-delay:0s}
+.how-slide-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:36px;align-items:start;background:rgba(255,255,255,.92);border:1px solid rgba(200,210,228,.86);border-radius:28px;padding:46px 48px;box-shadow:0 26px 64px rgba(11,25,41,.09);backdrop-filter:blur(10px)}
+.how-slide-side{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.how-step-icon-lg{width:64px;height:64px;border-radius:20px;background:#EAF0FC;border:1px solid rgba(26,82,160,.12);display:flex;align-items:center;justify-content:center}
+.how-step-icon-lg svg{width:28px;height:28px;stroke:var(--blue);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.how-step-num-lg{font-family:var(--serif);font-size:66px;line-height:.9;color:rgba(26,82,160,.16)}
+.how-step-meta{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+.how-chip{display:inline-flex;align-items:center;border-radius:999px;background:#F0F4FA;color:var(--text-2);font-size:11px;font-weight:500;padding:6px 12px;border:1px solid rgba(200,210,228,.6)}
 .how-chip.teal{background:#E0F5F2;color:var(--teal);border-color:rgba(14,138,122,.14)}
-.how-nav{display:flex;align-items:center;gap:18px;margin-top:18px}
-.how-arrow{width:46px;height:46px;border-radius:50%;background:#fff;border:1px solid rgba(26,82,160,.18);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,25,41,.08);transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
+.how-slide-body h3{font-family:var(--serif);font-size:clamp(30px,3.8vw,44px);color:var(--navy);font-weight:400;line-height:1.12;letter-spacing:0;margin-bottom:14px}
+.how-slide-body p{font-size:16px;color:var(--text-3);line-height:1.78;max-width:740px}
+.how-nav{display:flex;align-items:center;justify-content:center;gap:20px;margin-top:42px}
+.how-arrow{width:52px;height:52px;border-radius:50%;background:#fff;border:1px solid rgba(26,82,160,.18);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,25,41,.08);transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
 .how-arrow:hover:not(:disabled){background:var(--navy);color:#C8DFF5;transform:translateY(-2px);box-shadow:0 14px 30px rgba(11,25,41,.16)}
 .how-arrow:disabled{opacity:.35;cursor:default;box-shadow:none}
-.how-arrow svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.how-progress{flex:1;height:4px;border-radius:999px;background:rgba(26,82,160,.12);overflow:hidden}
-.how-progress-bar{height:100%;width:30%;border-radius:999px;background:linear-gradient(90deg,var(--blue),var(--teal));transition:width .25s ease,transform .25s ease;will-change:transform}
+.how-arrow svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.how-counter{min-width:130px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6482A3}
 .how-panel{position:relative;margin:34px auto 0;background:linear-gradient(135deg,var(--navy),var(--navy-3));border-radius:24px;padding:28px 30px;color:#fff;overflow:hidden;display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1fr);gap:28px;align-items:center;box-shadow:0 24px 60px rgba(11,25,41,.16)}
 .how-panel::before{content:'';position:absolute;left:50%;top:-24px;width:14px;height:14px;border-radius:50%;background:var(--teal-lt);border:4px solid var(--ivory);box-shadow:0 0 0 1px rgba(14,138,122,.3);transform:translateX(-50%)}
 .how-panel-kicker{position:relative;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#7AAAD8;font-weight:500;margin-bottom:12px}
@@ -393,8 +397,8 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .how,.mockup-section,.trust,.cta-band,.faq,footer{padding-left:24px;padding-right:24px}
   .profiles,.missions-preview,.transaction{padding-left:24px;padding-right:24px}
   .how-header{max-width:720px;margin-bottom:42px}
-  .how-step{flex-basis:300px}
-  .how-step::before{left:74px}
+  .how-slide-card{gap:26px;padding:38px 34px}
+  .how-step-num-lg{font-size:56px}
   .how-panel{grid-template-columns:1fr;gap:18px}
   .profiles-grid,.missions-grid,.trust-testimonials{grid-template-columns:1fr 1fr}
   .transaction-panel{padding:34px 26px 36px}
@@ -444,15 +448,21 @@ footer{background:var(--navy);padding:60px 40px 32px}
   .how-header{text-align:left;margin-bottom:28px}
   .profiles-header{margin-bottom:32px}
   .profiles-grid,.missions-grid,.trust-testimonials{grid-template-columns:1fr}
-  .how-steps{gap:14px;padding:32px 0 8px}
-  .how-step{flex-basis:calc(100% - 52px);padding:38px 20px 22px}
-  .how-step::before,.how-step:last-child::before{left:70px;right:20px}
-  .how-step-num{top:-24px;left:18px;width:48px;height:48px;font-size:19px;border-width:4px}
-  .how-step-icon{width:38px;height:38px;border-radius:13px;margin-bottom:12px;background:#F1F6FC}
-  .how-step h3{font-size:21px}
-  .how-step p{font-size:13px}
-  .how-nav{gap:12px;margin-top:12px}
-  .how-arrow{width:42px;height:42px}
+  .how-rail{max-width:100%;margin-bottom:34px}
+  .how-rail::before{left:20px;right:20px;top:20px}
+  .how-rail-fill{left:20px;top:20px}
+  .how-node{width:40px;height:40px;font-size:14px;border-width:4px}
+  .how-stage{min-height:0}
+  .how-slide-card{grid-template-columns:1fr;gap:18px;padding:28px 22px;border-radius:20px}
+  .how-slide-side{flex-direction:row;align-items:center;gap:14px}
+  .how-step-icon-lg{width:52px;height:52px;border-radius:16px;flex:none}
+  .how-step-icon-lg svg{width:23px;height:23px}
+  .how-step-num-lg{font-size:44px}
+  .how-slide-body h3{font-size:26px}
+  .how-slide-body p{font-size:14.5px}
+  .how-nav{gap:14px;margin-top:26px}
+  .how-arrow{width:46px;height:46px}
+  .how-counter{min-width:96px}
   .how-panel{display:block;margin-top:24px;border-radius:22px;padding:24px 22px}
   .how-panel::before{left:18px;top:-19px;transform:none}
   .how-panel h3{font-size:29px;max-width:none}
@@ -606,46 +616,84 @@ footer{background:var(--navy);padding:60px 40px 32px}
     </div>
   </div>
   <div class="how-shell">
-    <div class="how-steps" id="howTrack" role="region" aria-label="Étapes du parcours MédiLink" tabindex="0">
-      <div class="how-step reveal">
-        <div class="how-step-num">01</div>
-        <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Cabinet</span><span class="how-chip teal">Besoin guidé</span></div>
-        <h3>Cadrage du besoin</h3>
-        <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
-      </div>
-      <div class="how-step reveal reveal-delay-1">
-        <div class="how-step-num">02</div>
-        <div class="how-step-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Remplaçant</span><span class="how-chip teal">Filtres utiles</span><span class="how-chip">Matching intelligent</span></div>
-        <h3>Scoring intelligent /100</h3>
-        <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
-      </div>
-      <div class="how-step reveal reveal-delay-2">
-        <div class="how-step-num">03</div>
-        <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Profil vérifié</span><span class="how-chip teal">Candidature claire</span></div>
-        <h3>Recommandation ciblée</h3>
-        <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
-      </div>
-      <div class="how-step reveal reveal-delay-3">
-        <div class="how-step-num">04</div>
-        <div class="how-step-icon"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Messagerie</span><span class="how-chip teal">Accord rapide</span></div>
-        <h3>Validation dans la messagerie</h3>
-        <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
-      </div>
-      <div class="how-step reveal reveal-delay-4">
-        <div class="how-step-num">05</div>
-        <div class="how-step-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
-        <div class="how-step-meta"><span class="how-chip">Mission confirmée</span><span class="how-chip teal">Suivi complet</span></div>
-        <h3>Suivi et bilan mission</h3>
-        <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
-      </div>
+    <div class="how-rail">
+      <div class="how-rail-fill" id="howFill"></div>
+      <button class="how-node active" type="button" aria-label="Étape 1 : Cadrage du besoin">01</button>
+      <button class="how-node" type="button" aria-label="Étape 2 : Scoring intelligent">02</button>
+      <button class="how-node" type="button" aria-label="Étape 3 : Recommandation ciblée">03</button>
+      <button class="how-node" type="button" aria-label="Étape 4 : Validation dans la messagerie">04</button>
+      <button class="how-node" type="button" aria-label="Étape 5 : Suivi et bilan mission">05</button>
+    </div>
+    <div class="how-stage" id="howStage">
+      <article class="how-slide active">
+        <div class="how-slide-card">
+          <div class="how-slide-side">
+            <div class="how-step-icon-lg"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></div>
+            <div class="how-step-num-lg">01</div>
+          </div>
+          <div class="how-slide-body">
+            <div class="how-step-meta"><span class="how-chip">Cabinet</span><span class="how-chip teal">Besoin guidé</span></div>
+            <h3>Cadrage du besoin</h3>
+            <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
+          </div>
+        </div>
+      </article>
+      <article class="how-slide">
+        <div class="how-slide-card">
+          <div class="how-slide-side">
+            <div class="how-step-icon-lg"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/></svg></div>
+            <div class="how-step-num-lg">02</div>
+          </div>
+          <div class="how-slide-body">
+            <div class="how-step-meta"><span class="how-chip">Remplaçant</span><span class="how-chip teal">Filtres utiles</span><span class="how-chip">Matching intelligent</span></div>
+            <h3>Scoring intelligent /100</h3>
+            <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
+          </div>
+        </div>
+      </article>
+      <article class="how-slide">
+        <div class="how-slide-card">
+          <div class="how-slide-side">
+            <div class="how-step-icon-lg"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+            <div class="how-step-num-lg">03</div>
+          </div>
+          <div class="how-slide-body">
+            <div class="how-step-meta"><span class="how-chip">Profil vérifié</span><span class="how-chip teal">Candidature claire</span></div>
+            <h3>Recommandation ciblée</h3>
+            <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
+          </div>
+        </div>
+      </article>
+      <article class="how-slide">
+        <div class="how-slide-card">
+          <div class="how-slide-side">
+            <div class="how-step-icon-lg"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7A8.38 8.38 0 0 1 4 11.5a8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+            <div class="how-step-num-lg">04</div>
+          </div>
+          <div class="how-slide-body">
+            <div class="how-step-meta"><span class="how-chip">Messagerie</span><span class="how-chip teal">Accord rapide</span></div>
+            <h3>Validation dans la messagerie</h3>
+            <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
+          </div>
+        </div>
+      </article>
+      <article class="how-slide">
+        <div class="how-slide-card">
+          <div class="how-slide-side">
+            <div class="how-step-icon-lg"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg></div>
+            <div class="how-step-num-lg">05</div>
+          </div>
+          <div class="how-slide-body">
+            <div class="how-step-meta"><span class="how-chip">Mission confirmée</span><span class="how-chip teal">Suivi complet</span></div>
+            <h3>Suivi et bilan mission</h3>
+            <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
+          </div>
+        </div>
+      </article>
     </div>
     <div class="how-nav">
       <button class="how-arrow" id="howPrev" type="button" aria-label="Étape précédente" disabled><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="how-progress" aria-hidden="true"><div class="how-progress-bar" id="howBar"></div></div>
+      <div class="how-counter" id="howCounter">Étape 1 / 5</div>
       <button class="how-arrow" id="howNext" type="button" aria-label="Étape suivante"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
   </div>
@@ -921,61 +969,38 @@ document.querySelectorAll('.btn').forEach(btn => {
     btn.style.setProperty('--y', y + '%');
   });
 });
-// ── How-it-works carousel ──
+// ── How-it-works stepper ──
 (function(){
-  const track = document.getElementById('howTrack');
-  if(!track) return;
+  const shell = document.querySelector('.how-shell');
+  if(!shell) return;
+  const slides = Array.prototype.slice.call(shell.querySelectorAll('.how-slide'));
+  const nodes = Array.prototype.slice.call(shell.querySelectorAll('.how-node'));
+  const fill = document.getElementById('howFill');
+  const counter = document.getElementById('howCounter');
   const prev = document.getElementById('howPrev');
   const next = document.getElementById('howNext');
-  const bar = document.getElementById('howBar');
-  const stepSize = () => {
-    const card = track.querySelector('.how-step');
-    if(!card) return 320;
-    const styles = getComputedStyle(track);
-    const gap = parseFloat(styles.columnGap || styles.gap) || 18;
-    return card.getBoundingClientRect().width + gap;
-  };
-  function update(){
-    const max = track.scrollWidth - track.clientWidth;
-    const x = track.scrollLeft;
-    prev.disabled = x <= 2;
-    next.disabled = x >= max - 2;
-    const ratio = Math.min(1, track.clientWidth / track.scrollWidth);
-    const progress = max > 0 ? Math.min(1, x / max) : 1;
-    bar.style.width = (ratio * 100) + '%';
-    bar.style.transform = 'translateX(' + (progress * (1 / ratio - 1) * 100) + '%)';
+  let idx = 0;
+  function render(){
+    slides.forEach((s,i) => s.classList.toggle('active', i === idx));
+    nodes.forEach((n,i) => {
+      n.classList.toggle('active', i === idx);
+      n.classList.toggle('done', i < idx);
+    });
+    if(fill) fill.style.width = (nodes[idx].offsetLeft - nodes[0].offsetLeft) + 'px';
+    if(counter) counter.textContent = 'Étape ' + (idx + 1) + ' / ' + slides.length;
+    prev.disabled = idx === 0;
+    next.disabled = idx === slides.length - 1;
   }
-  const go = (dir) => track.scrollBy({ left: dir * stepSize(), behavior: reducedMotion ? 'auto' : 'smooth' });
-  prev.addEventListener('click', () => go(-1));
-  next.addEventListener('click', () => go(1));
-  track.addEventListener('scroll', () => requestAnimationFrame(update), { passive: true });
-  window.addEventListener('resize', update);
-  track.addEventListener('keydown', (e) => {
-    if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
-    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+  const go = (i) => { idx = Math.max(0, Math.min(slides.length - 1, i)); render(); };
+  nodes.forEach((n,i) => n.addEventListener('click', () => go(i)));
+  prev.addEventListener('click', () => go(idx - 1));
+  next.addEventListener('click', () => go(idx + 1));
+  shell.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight'){ e.preventDefault(); go(idx + 1); }
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); go(idx - 1); }
   });
-  let dragging = false, dragMoved = false, startX = 0, startLeft = 0;
-  track.addEventListener('pointerdown', (e) => {
-    if(e.pointerType !== 'mouse') return;
-    dragging = true; dragMoved = false;
-    startX = e.clientX; startLeft = track.scrollLeft;
-    track.classList.add('dragging');
-  });
-  window.addEventListener('pointermove', (e) => {
-    if(!dragging) return;
-    const dx = e.clientX - startX;
-    if(Math.abs(dx) > 5) dragMoved = true;
-    track.scrollLeft = startLeft - dx;
-  });
-  window.addEventListener('pointerup', () => {
-    if(!dragging) return;
-    dragging = false;
-    track.classList.remove('dragging');
-  });
-  track.addEventListener('click', (e) => {
-    if(dragMoved){ e.preventDefault(); e.stopPropagation(); dragMoved = false; }
-  }, true);
-  update();
+  window.addEventListener('resize', render);
+  render();
 })();
 
 </script>
