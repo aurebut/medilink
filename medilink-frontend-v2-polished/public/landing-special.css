@@ -29,7 +29,8 @@ footer{background:var(--navy);padding:58px 40px 30px}.footer-inner{max-width:110
 }
 
 /* FAQ alignment */
-.faq{padding:96px 40px 104px;background:linear-gradient(180deg,var(--ivory) 0%,#F1F4F8 100%)}
+.cta-band{padding:64px 40px}
+.faq{padding:48px 40px 72px;background:linear-gradient(180deg,var(--ivory) 0%,#F1F4F8 100%)}
 .faq-inner{max-width:1100px;display:grid;grid-template-columns:minmax(250px,.78fr) minmax(0,1.22fr);gap:72px;align-items:start}
 .faq-inner > .section-head{position:sticky;top:100px;max-width:360px;margin:0;text-align:left}
 .faq-inner > .section-head .section-h{font-size:clamp(32px,3.5vw,46px);line-height:1.08}
@@ -47,7 +48,8 @@ footer{background:var(--navy);padding:58px 40px 30px}.footer-inner{max-width:110
   .faq-inner > .section-head{top:88px}
 }
 @media(max-width:640px){
-  .faq{padding:72px 18px 64px}
+  .cta-band{padding:48px 18px}
+  .faq{padding:48px 18px 56px}
   .faq-inner{display:block}
   .faq-inner > .section-head{position:static;max-width:none;margin:0 0 26px;text-align:left}
   .faq-item{border-radius:14px}
