@@ -17,6 +17,9 @@ export function userFacingError(
   fallback = 'Une erreur est survenue. Réessayez dans quelques instants.',
 ) {
   if (error instanceof ApiError) {
+    if (error.message && error.message !== 'Erreur API.') {
+      return error.message;
+    }
     if (error.status === 401) {
       return 'Votre session a expiré. Reconnectez-vous pour continuer.';
     }
@@ -26,7 +29,7 @@ export function userFacingError(
     if (error.status >= 500) {
       return 'Le service est momentanément indisponible. Réessayez dans quelques instants.';
     }
-    return error.message || fallback;
+    return fallback;
   }
 
   const message = error instanceof Error ? error.message : '';
