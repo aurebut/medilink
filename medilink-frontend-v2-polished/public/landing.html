@@ -198,18 +198,9 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-slide-media:hover{border-color:rgba(26,82,160,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 22px 46px rgba(11,25,41,.12);transform:translateY(-2px)}
 .how-slide-media img,.how-slide-media .how-slide-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
-/* Captures d'interface recréées à partir des composants de l'application. */
-.ui-shot{--ui-navy:#0B1929;--ui-blue:#1A52A0;--ui-teal:#0E8A7A;--ui-text:#0F1E32;--ui-muted:#56667D;--ui-line:#E4E9F2;position:relative;z-index:1;display:grid;grid-template-columns:112px minmax(0,1fr);width:100%;height:100%;min-height:0;overflow:hidden;border:1px solid rgba(11,25,41,.13);border-radius:14px;background:#F8F7F3;color:var(--ui-text);box-shadow:0 18px 46px rgba(11,25,41,.16);text-align:left;font-family:var(--sans);font-size:10px;line-height:1.35}
+/* Cartes produit focalisees sur une fonctionnalite. */
+.ui-shot{--ui-navy:#0B1929;--ui-blue:#1A52A0;--ui-teal:#0E8A7A;--ui-text:#0F1E32;--ui-muted:#56667D;--ui-line:#E4E9F2;position:relative;z-index:1;display:block;width:100%;height:100%;min-height:0;overflow:hidden;border:0;border-radius:14px;background:transparent;color:var(--ui-text);box-shadow:none;text-align:left;font-family:var(--sans);font-size:10px;line-height:1.35}
 .ui-shot *{box-sizing:border-box}
-.ui-side{display:flex;flex-direction:column;min-width:0;padding:15px 10px 11px;background:linear-gradient(180deg,#0B1929,#112238);color:#fff}
-.ui-brand{font-family:var(--serif);font-size:17px;line-height:1;color:#fff;letter-spacing:0}
-.ui-brand em{color:#7AAAD8;font-style:italic}
-.ui-context{margin:6px 0 14px;color:#7891AA;font-size:7px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-.ui-nav{display:grid;gap:5px}
-.ui-nav-item{display:flex;align-items:center;gap:7px;min-width:0;padding:7px 6px;border-radius:7px;color:#8DA7C0;font-size:8px;font-weight:600;white-space:nowrap}
-.ui-nav-item i{width:17px;height:17px;flex:0 0 17px;display:grid;place-items:center;border-radius:5px;background:rgba(255,255,255,.07);font-size:8px;font-style:normal;color:#AACBE8}
-.ui-nav-item.active{background:rgba(26,82,160,.42);box-shadow:inset 2px 0 0 #7AAAD8;color:#fff}
-.ui-side-user{display:flex;align-items:center;gap:6px;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.08);color:#8DA7C0;font-size:7px}
 .ui-avatar{width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;border-radius:50%;background:#E8F1FC;color:var(--ui-blue);font-size:8px;font-weight:800}
 .ui-main{position:relative;min-width:0;overflow:hidden;padding:15px 17px;background:#F8F7F3;background-image:linear-gradient(rgba(26,82,160,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(26,82,160,.035) 1px,transparent 1px);background-size:27px 27px}
 .ui-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -242,10 +233,6 @@ section,footer,.search-section{position:relative;z-index:1;}
 .ui-button.primary{border-color:var(--ui-navy);background:var(--ui-navy);color:#C8DFF5}
 .ui-button.success{border-color:rgba(14,138,122,.22);background:rgba(14,138,122,.1);color:#0B6F62}
 .ui-button.danger{border-color:#FECACA;background:#FEF3F2;color:#B42318}
-.ui-tabs{display:flex;gap:3px;margin-bottom:8px;padding:3px;border:1px solid var(--ui-line);border-radius:9px;background:#F2F4F8}
-.ui-tabs span{flex:1;padding:5px 7px;border-radius:6px;color:var(--ui-muted);font-size:7px;font-weight:700;text-align:center}
-.ui-tabs span.active{background:#fff;color:var(--ui-navy);box-shadow:0 3px 10px rgba(11,25,41,.07)}
-
 /* Matching */
 .ui-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:8px}
 .ui-stat{position:relative;display:grid;gap:2px;min-height:47px;padding:8px;overflow:hidden}
@@ -297,16 +284,6 @@ section,footer,.search-section{position:relative;z-index:1;}
 /* Messagerie */
 .ui-message-main{padding:10px 11px}
 .ui-message-layout{display:grid;grid-template-columns:31% minmax(0,1fr);gap:7px;height:100%;min-height:0}
-.ui-conversations{display:flex;flex-direction:column;min-height:0;padding:8px}
-.ui-conversations h5{font-size:12px}
-.ui-conversation-search{height:24px;margin:6px 0;padding:0 7px;display:flex;align-items:center;border:1px solid var(--ui-line);border-radius:7px;background:#fff;color:#8A9AB8;font-size:6.5px}
-.ui-conversation-items{display:grid;align-content:start;gap:5px;overflow:hidden}
-.ui-conversation{display:grid;grid-template-columns:23px minmax(0,1fr);gap:6px;align-items:center;padding:6px;border:1px solid var(--ui-line);border-radius:8px;background:#fff}
-.ui-conversation.active{border-color:rgba(26,82,160,.3);background:rgba(26,82,160,.07)}
-.ui-conversation .ui-avatar{width:23px;height:23px;flex-basis:23px}
-.ui-conversation strong,.ui-conversation span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ui-conversation strong{font-size:7px;color:var(--ui-navy)}
-.ui-conversation span{margin-top:2px;font-size:6px;color:var(--ui-muted)}
 .ui-message-pane{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;overflow:hidden}
 .ui-message-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-bottom:1px solid var(--ui-line)}
 .ui-message-head strong{display:block;color:var(--ui-navy);font-size:9px}
@@ -524,10 +501,7 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .faq-header{top:96px}
   .how-slide-card{gap:26px;padding:36px 30px}
   .how-slide-media{min-height:200px}
-  .ui-shot{grid-template-columns:94px minmax(0,1fr)}
-  .ui-side{padding-left:8px;padding-right:8px}
-  .ui-nav-item{padding-left:5px;padding-right:5px;font-size:7px}
-  .ui-main{padding:12px 13px}
+   .ui-main{padding:12px 13px}
   .how-panel{grid-template-columns:1fr;gap:18px}
   .profiles-grid,.trust-testimonials{grid-template-columns:1fr 1fr}
   .transaction-panel{padding:34px 26px 36px}
@@ -578,18 +552,7 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .how-stage{min-height:0}
   .how-slide-card{grid-template-columns:1fr;gap:22px;padding:26px 20px;border-radius:20px}
   .how-slide-media{aspect-ratio:16/9;min-height:180px}
-  .ui-shot{grid-template-columns:42px minmax(0,1fr);border-radius:11px}
-  .ui-side{align-items:center;padding:9px 5px 7px}
-  .ui-brand{font-size:0}
-  .ui-brand::first-letter{font-size:14px}
-  .ui-context,.ui-nav-item:not(.active) span,.ui-side-user>span:last-child{display:none}
-  .ui-context{margin:0}
-  .ui-nav{width:100%;margin-top:12px;justify-items:center}
-  .ui-nav-item{width:28px;justify-content:center;padding:5px;font-size:0}
-  .ui-nav-item i{width:18px;height:18px;flex-basis:18px}
-  .ui-side-user{justify-content:center;width:100%}
-  .ui-side-user .ui-avatar{width:20px;height:20px;flex-basis:20px}
-  .ui-main{padding:9px 10px}
+   .ui-main{padding:9px 10px}
   .ui-page-head{margin-bottom:7px}
   .ui-page-head h4{font-size:15px}
   .ui-page-head p{display:none}
@@ -598,9 +561,7 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .ui-stat small{display:none}
   .ui-match-layout,.ui-application-shell,.ui-mission-layout{gap:5px}
   .ui-card{border-radius:8px}
-  .ui-shot-messages .ui-side{display:none}
-  .ui-shot-messages{grid-template-columns:1fr}
-  .ui-message-main{padding:7px}
+   .ui-message-main{padding:7px}
   .how-slide-content h3{font-size:24px}
   .how-slide-content p{font-size:14.5px}
   .how-nav{gap:12px;margin-top:24px}
@@ -653,10 +614,7 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .hero-stat-num{font-size:30px}
   .section-h{font-size:30px}
   .how-slide-media{aspect-ratio:4/3;min-height:224px}
-  .ui-shot-messages .ui-bubble{display:none}
-  .ui-shot-messages .ui-message-log{padding:5px}
-  .ui-shot-messages .ui-workflow-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .ui-shot-mission .ui-command{display:none}
+   .ui-shot-mission .ui-command{display:none}
   .ui-shot-mission .ui-mission-layout{grid-template-columns:1fr}
   .ui-shot-mission .ui-route{display:none}
   .dash-side{display:none}
@@ -709,6 +667,258 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .hero-human-photo{object-fit:cover}
 }
 
+/* ── Navigation finale : une seule composition stable à tous les breakpoints ── */
+.nav-mobile-toggle,.nav-mobile-panel{display:none}
+nav{
+  top:16px;
+  width:min(1180px,calc(100% - 32px));
+  height:64px;
+  min-height:64px;
+  display:grid;
+  grid-template-columns:minmax(190px,1fr) auto minmax(300px,1fr);
+  align-items:center;
+  gap:16px;
+  padding:0 12px 0 22px;
+  border:1px solid rgba(26,82,160,.11);
+  border-radius:19px;
+  background:rgba(248,247,243,.91);
+  box-shadow:0 12px 34px rgba(11,25,41,.075),inset 0 1px 0 rgba(255,255,255,.8);
+  backdrop-filter:blur(18px) saturate(1.18);
+  overflow:visible;
+  flex-wrap:nowrap;
+  transition:top .3s cubic-bezier(.22,1,.36,1),height .3s cubic-bezier(.22,1,.36,1),width .3s cubic-bezier(.22,1,.36,1),background .3s ease,box-shadow .3s ease,border-color .3s ease;
+}
+nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-height:60px;background:rgba(248,247,243,.97);border-color:rgba(26,82,160,.14);box-shadow:0 16px 42px rgba(11,25,41,.11),inset 0 1px 0 rgba(255,255,255,.9)}
+.nav-logo{justify-self:start;min-width:0;margin:0;gap:10px}
+.nav-logo::before{content:'';width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 5px rgba(14,138,122,.1)}
+.nav-name{font-size:22px;line-height:1}
+.nav-links{display:flex;justify-self:center;order:initial;width:auto;gap:2px;padding:4px;border:1px solid rgba(26,82,160,.08);border-radius:12px;background:rgba(255,255,255,.5);overflow:visible}
+.nav-link{min-height:34px;display:flex;align-items:center;padding:0 13px;border-radius:9px;font-size:12.5px;font-weight:500;color:#53637A}
+.nav-link:hover{background:#fff;color:var(--navy);box-shadow:0 5px 14px rgba(11,25,41,.07);transform:none}
+.nav-right{justify-self:end;width:auto;margin:0;gap:5px}
+.nav-right .btn{min-height:40px;padding:9px 15px;border-radius:10px;font-size:12.5px}
+.nav-right .btn-ghost{color:#435269}
+.nav-right .btn-primary{padding-left:19px;padding-right:19px}
+
+/* Navigation du carrousel */
+.how-nav-status{display:grid;justify-items:center;gap:9px;min-width:138px}
+.how-dots{display:flex;align-items:center;justify-content:center;gap:6px}
+.how-dots button{width:18px;height:4px;padding:0;border:0;border-radius:999px;background:#D6DFEA;cursor:pointer;transition:width .25s cubic-bezier(.22,1,.36,1),background .25s ease,transform .25s ease}
+.how-dots button:hover{background:#A9BACD;transform:scaleY(1.35)}
+.how-dots button.active{width:34px;background:var(--teal)}
+.how-dots button:focus-visible{outline:2px solid var(--blue-lt);outline-offset:3px}
+
+@media(max-width:980px){
+  nav{top:14px;width:calc(100% - 24px);height:62px;min-height:62px;grid-template-columns:auto auto 1fr;padding:0 10px 0 18px;gap:12px}
+  nav.nav-scrolled{top:9px;width:calc(100% - 24px);height:58px;min-height:58px}
+  .nav-logo{margin:0}
+  .nav-links{justify-self:start}
+  .nav-right{justify-self:end}
+}
+
+@media(max-width:860px) and (min-width:721px){
+  .nav-right .btn-ghost{display:none}
+  .nav-links{justify-self:center}
+}
+
+@media(max-width:720px){
+  nav,nav.nav-scrolled{
+    top:10px;
+    width:calc(100% - 20px);
+    height:60px;
+    min-height:60px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    padding:0 9px 0 16px;
+    border-radius:18px;
+  }
+  .nav-logo{margin:0;gap:9px}
+  .nav-logo::before{width:7px;height:7px;flex-basis:7px;box-shadow:0 0 0 4px rgba(14,138,122,.1)}
+  .nav-name{font-size:21px}
+  .nav-links,.nav-right{display:none}
+  .nav-mobile-toggle{position:relative;z-index:2;width:42px;height:42px;display:grid;place-items:center;padding:0;border:1px solid rgba(26,82,160,.11);border-radius:13px;background:rgba(255,255,255,.7);color:var(--navy);cursor:pointer;box-shadow:0 5px 14px rgba(11,25,41,.05)}
+  .nav-mobile-toggle-lines{width:17px;height:13px;display:flex;flex-direction:column;justify-content:center;gap:5px}
+  .nav-mobile-toggle-lines i{display:block;width:17px;height:1.5px;border-radius:999px;background:currentColor;transition:transform .25s cubic-bezier(.22,1,.36,1),width .25s ease}
+  nav.mobile-open .nav-mobile-toggle-lines i:first-child{transform:translateY(3.25px) rotate(45deg)}
+  nav.mobile-open .nav-mobile-toggle-lines i:last-child{transform:translateY(-3.25px) rotate(-45deg)}
+  .nav-mobile-panel{position:absolute;top:calc(100% + 8px);left:0;right:0;display:grid;gap:6px;padding:14px;border:1px solid rgba(26,82,160,.12);border-radius:20px;background:rgba(248,247,243,.98);box-shadow:0 24px 55px rgba(11,25,41,.16),inset 0 1px 0 #fff;backdrop-filter:blur(20px);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px) scale(.985);transform-origin:top;transition:opacity .22s ease,visibility 0s linear .22s,transform .28s cubic-bezier(.22,1,.36,1)}
+  nav.mobile-open .nav-mobile-panel{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition-delay:0s}
+  .nav-mobile-kicker{padding:3px 4px 8px;color:#71829A;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+  .nav-mobile-link{min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 13px;border:1px solid rgba(26,82,160,.08);border-radius:13px;background:rgba(255,255,255,.72);color:var(--navy);font-size:14px;font-weight:600}
+  .nav-mobile-link i{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:#EEF3F8;color:var(--blue);font-style:normal}
+  .nav-mobile-actions{display:grid;grid-template-columns:1fr 1.18fr;gap:8px;margin-top:5px;padding-top:12px;border-top:1px solid rgba(26,82,160,.09)}
+  .nav-mobile-actions .btn{width:100%;min-height:44px;justify-content:center;padding:9px 11px;border-radius:12px;font-size:12px}
+
+  .hero{min-height:0;margin-top:-80px;padding:108px 18px 42px!important}
+  .hero::after{height:110px}
+  .hero-layout-human{height:auto;grid-template-rows:auto auto;align-content:start;gap:18px}
+  .hero-copy .hero-h{font-size:clamp(34px,9.6vw,43px);line-height:1.02;margin-bottom:12px}
+  .hero-copy .hero-note{max-width:330px;margin-bottom:22px;font-size:15px;line-height:1.45}
+  .hero-copy .hero-ctas{gap:9px;margin-bottom:0}
+  .hero-copy .hero-ctas .btn{min-height:46px;border-radius:12px}
+  .hero-human-wrap{top:0}
+  .hero-human-frame{border-radius:24px;box-shadow:0 20px 42px rgba(11,25,41,.1)}
+
+  .how{padding:66px 14px 54px}
+  .how-header{max-width:560px;margin-bottom:28px;text-align:center}
+  .how-kicker{margin-bottom:14px;padding:6px 12px;border:1px solid rgba(14,138,122,.12);border-radius:999px;background:rgba(255,255,255,.64)}
+  .section-h{font-size:clamp(32px,8vw,40px);line-height:1.04}
+  .how-slide-card{grid-template-columns:1fr;gap:20px;min-height:0;padding:26px 14px 14px;border-radius:27px;background:linear-gradient(155deg,rgba(255,255,255,.98),rgba(250,252,254,.95));box-shadow:0 18px 45px rgba(11,25,41,.075)}
+  .how-slide-content{padding:0 8px}
+  .how-step-meta{margin-bottom:11px}
+  .how-step-badge{padding:5px 10px;font-size:10px}
+  .how-slide-content h3{font-size:30px;line-height:1.08;margin-bottom:10px}
+  .how-slide-content p{font-size:14.5px;line-height:1.62}
+  .how-slide-media{min-height:0;padding:8px;border-radius:21px;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 12px 28px rgba(11,25,41,.09)}
+  .how-nav{display:grid;grid-template-columns:48px minmax(132px,auto) 48px;gap:10px;width:max-content;max-width:100%;margin:22px auto 0;padding:7px;border:1px solid rgba(26,82,160,.09);border-radius:999px;background:rgba(255,255,255,.68);box-shadow:0 12px 30px rgba(11,25,41,.07);backdrop-filter:blur(12px)}
+  .how-arrow{width:48px;height:48px;box-shadow:none}
+  .how-nav-status{min-width:132px;gap:7px}
+  .how-counter{min-width:0;font-size:9px}
+  .how-dots{gap:5px}
+  .how-dots button{width:13px;height:3px}
+  .how-dots button.active{width:25px}
+}
+
+@media(max-width:480px){
+  nav,nav.nav-scrolled{top:8px;width:calc(100% - 16px);height:56px;min-height:56px;padding-left:14px;border-radius:17px}
+  .nav-name{font-size:20px}
+  .nav-mobile-toggle{width:40px;height:40px;border-radius:12px}
+  .nav-mobile-panel{top:calc(100% + 7px);padding:11px;border-radius:18px}
+  .nav-mobile-actions{grid-template-columns:1fr}
+  .hero{margin-top:-72px;padding:94px 14px 34px!important}
+  .hero-copy .hero-h{font-size:clamp(32px,10.2vw,39px)}
+  .hero-copy .hero-note{font-size:14.5px}
+  .hero-human-frame{border-radius:21px}
+
+  .how{padding:58px 12px 48px}
+  .how-header{margin-bottom:24px;text-align:left}
+  .how-kicker{padding:5px 10px}
+  .section-h{font-size:31px;line-height:1.04}
+  .how-slide-card{gap:18px;padding:23px 10px 10px;border-radius:24px}
+  .how-slide-content{padding:0 9px}
+  .how-slide-content h3{font-size:28px}
+  .how-slide-content p{font-size:14px;line-height:1.58}
+  .how-slide-media{aspect-ratio:1.28;min-height:234px;border-radius:19px;padding:7px}
+  .how-nav{grid-template-columns:44px minmax(120px,auto) 44px;padding:6px}
+  .how-arrow{width:44px;height:44px}
+}
+
+/* Illustrations produit : une fonctionnalite a la fois, sans chrome d'application. */
+.how-slide-media{padding:16px;background:radial-gradient(circle at 14% 10%,rgba(255,255,255,.9),transparent 34%),linear-gradient(145deg,#EAF2FA 0%,#DCEAF6 100%)}
+.ui-main{height:100%;min-height:0;padding:18px 20px;border:1px solid rgba(26,82,160,.13);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(244,249,253,.96));box-shadow:0 16px 36px rgba(11,25,41,.12)}
+.ui-page-head{margin-bottom:14px}
+.ui-eyebrow{font-size:8px;letter-spacing:.1em}
+.ui-page-head h4{font-size:22px;line-height:1.05}
+.ui-page-head p{font-size:9px;margin-top:5px}
+.ui-pill{min-height:22px;padding:4px 8px;font-size:7.5px}
+.ui-card{border-radius:13px;box-shadow:0 8px 24px rgba(11,25,41,.06)}
+.ui-form-card{gap:11px;padding:15px}
+.ui-toolbar{padding:11px;border-radius:10px}
+.ui-toolbar strong{font-size:11px}
+.ui-form-head h5{font-size:15px}
+.ui-form-head p{font-size:8px}
+.ui-field-grid{gap:8px}
+.ui-label{font-size:7px}
+.ui-input{height:32px;font-size:9px}
+.ui-shot-actions{gap:9px}
+.ui-button{min-height:30px;padding:0 11px;font-size:8px}
+.ui-shot-wizard .ui-main{background:linear-gradient(145deg,#FCFEFF 0%,#EEF7FC 100%)}
+.ui-shot-wizard .ui-form-card{max-width:720px;margin:0 auto}
+
+.ui-shot-matching .ui-main{background:linear-gradient(145deg,#FBFEFD 0%,#EDF8F6 100%)}
+.ui-shot-matching .ui-match-layout{grid-template-columns:minmax(0,1.05fr) minmax(220px,.95fr);gap:10px}
+.ui-shot-matching .ui-score{width:40px;height:40px;font-size:12px}
+.ui-shot-matching .ui-candidate-row{grid-template-columns:43px minmax(0,1fr) auto;padding:8px}
+.ui-shot-matching .ui-candidate-copy strong{font-size:9px}
+.ui-shot-matching .ui-candidate-copy span{font-size:7px}
+.ui-shot-matching .ui-match-detail{padding:11px;gap:9px}
+.ui-shot-matching .ui-match-detail-head strong{font-size:10px}
+
+.ui-shot-applications .ui-main{background:linear-gradient(145deg,#FCFDFF 0%,#F0F4FB 100%)}
+.ui-shot-applications .ui-application-shell{grid-template-columns:minmax(0,.88fr) minmax(240px,1.12fr);gap:10px}
+.ui-shot-applications .ui-application-row{grid-template-columns:31px minmax(0,1fr) auto;padding:8px}
+.ui-shot-applications .ui-profile-card{padding:12px;gap:10px}
+.ui-shot-applications .ui-profile-identity strong{font-size:10px}
+.ui-shot-applications .ui-profile-identity span{font-size:7px}
+.ui-shot-applications .ui-check{padding:7px;font-size:7px}
+.ui-shot-applications .ui-profile-note{font-size:7px}
+
+.ui-shot-messages .ui-main{padding:14px;background:linear-gradient(145deg,#FDFEFF 0%,#EEF5FC 100%)}
+.ui-shot-messages .ui-message-layout{grid-template-columns:1fr;gap:0}
+.ui-shot-messages .ui-message-pane{border-radius:13px;background:#fff;box-shadow:0 10px 28px rgba(11,25,41,.08)}
+.ui-shot-messages .ui-message-head{padding:12px 14px}
+.ui-shot-messages .ui-message-head strong{font-size:10px}
+.ui-shot-messages .ui-message-head span{font-size:7px}
+.ui-shot-messages .ui-message-log{gap:9px;padding:12px 14px}
+.ui-shot-messages .ui-bubble{font-size:8px;line-height:1.45;padding:8px 10px}
+.ui-shot-messages .ui-workflow-card{gap:8px;padding:10px}
+.ui-shot-messages .ui-workflow-head strong{font-size:12px}
+.ui-shot-messages .ui-workflow-summary{gap:5px}
+.ui-shot-messages .ui-workflow-summary div{padding:7px}
+.ui-shot-messages .ui-workflow-summary span{font-size:6px}
+.ui-shot-messages .ui-workflow-summary strong{font-size:7px}
+.ui-shot-messages .ui-composer{padding:10px}
+.ui-shot-messages .ui-composer span{font-size:8px}
+
+.ui-shot-mission .ui-main{background:linear-gradient(145deg,#FCFEFD 0%,#EEF8F6 100%)}
+.ui-shot-mission .ui-command{gap:9px;padding:10px}
+.ui-shot-mission .ui-mission-layout{grid-template-columns:minmax(0,1.08fr) minmax(220px,.92fr);gap:10px}
+.ui-shot-mission .ui-route{padding:11px;gap:9px}
+.ui-shot-mission .ui-route-head strong{font-size:10px}
+.ui-shot-mission .ui-route-head span{font-size:7px}
+.ui-shot-mission .ui-route-step{grid-template-columns:26px minmax(0,1fr);gap:8px;padding-bottom:9px}
+.ui-shot-mission .ui-route-dot{width:25px;height:25px}
+.ui-shot-mission .ui-route-copy strong{font-size:8px}
+.ui-shot-mission .ui-route-copy span{font-size:7px}
+.ui-shot-mission .ui-close-card{padding:12px;gap:9px}
+.ui-shot-mission .ui-close-card h5{font-size:16px}
+.ui-shot-mission .ui-close-card p{font-size:8px}
+
+@media(max-width:720px){
+  .how-slide-media{padding:10px}
+  .ui-main,.ui-shot-messages .ui-main{padding:12px}
+  .ui-page-head{margin-bottom:9px}
+  .ui-page-head h4{font-size:18px}
+  .ui-page-head p{display:none}
+  .ui-pill{min-height:20px;padding:3px 7px;font-size:7px}
+  .ui-form-card{gap:8px;padding:10px}
+  .ui-toolbar{padding:8px}
+  .ui-form-head h5{font-size:12px}
+  .ui-field-grid{gap:6px}
+  .ui-input{height:28px;font-size:8px}
+  .ui-button{min-height:27px;padding:0 9px;font-size:7px}
+  .ui-shot-matching .ui-match-layout,.ui-shot-applications .ui-application-shell,.ui-shot-mission .ui-mission-layout{gap:6px}
+  .ui-shot-matching .ui-score{width:34px;height:34px;font-size:10px}
+  .ui-shot-matching .ui-candidate-row{grid-template-columns:37px minmax(0,1fr) auto;padding:6px}
+  .ui-shot-matching .ui-candidate-copy strong{font-size:8px}
+  .ui-shot-matching .ui-candidate-copy span{font-size:6.5px}
+  .ui-shot-applications .ui-application-row{grid-template-columns:27px minmax(0,1fr) auto;padding:6px}
+  .ui-shot-applications .ui-profile-card{padding:9px;gap:8px}
+  .ui-shot-applications .ui-check{padding:5px 6px;font-size:6.5px}
+  .ui-shot-messages .ui-message-head{padding:9px 10px}
+  .ui-shot-messages .ui-message-log{gap:6px;padding:8px}
+  .ui-shot-messages .ui-bubble{font-size:7px;padding:6px 7px}
+  .ui-shot-messages .ui-workflow-card{padding:7px}
+  .ui-shot-messages .ui-workflow-summary div{padding:5px}
+  .ui-shot-messages .ui-composer{padding:7px}
+  .ui-shot-mission .ui-command{gap:6px;padding:8px}
+  .ui-shot-mission .ui-route{padding:8px;gap:7px}
+  .ui-shot-mission .ui-route-step{grid-template-columns:23px minmax(0,1fr);gap:7px;padding-bottom:7px}
+  .ui-shot-mission .ui-route-dot{width:22px;height:22px}
+  .ui-shot-mission .ui-route-copy strong{font-size:7.5px}
+  .ui-shot-mission .ui-route-copy span{font-size:6px}
+  .ui-shot-mission .ui-close-card{padding:9px;gap:7px}
+  .ui-shot-mission .ui-close-card h5{font-size:14px}
+  .ui-shot-mission .ui-close-card p{font-size:7px}
+}
+
+@media(max-width:420px){
+  .ui-shot-messages .ui-bubble{display:block}
+  .ui-shot-messages .ui-message-log{padding:6px}
+  .ui-shot-messages .ui-workflow-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
 </style>
 </head>
 <body>
@@ -725,6 +935,19 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   <div class="nav-right">
     <a class="btn btn-ghost" href="/login">Se connecter</a>
     <a class="btn btn-primary" href="/register">Créer un compte</a>
+  </div>
+  <button class="nav-mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileNavigation">
+    <span class="sr-only">Ouvrir le menu</span>
+    <span class="nav-mobile-toggle-lines" aria-hidden="true"><i></i><i></i></span>
+  </button>
+  <div class="nav-mobile-panel" id="mobileNavigation">
+    <span class="nav-mobile-kicker">Explorer MédiLink</span>
+    <a class="nav-mobile-link" href="#how-it-works"><span>Comment ça marche</span><i aria-hidden="true">→</i></a>
+    <a class="nav-mobile-link" href="#faq"><span>Questions fréquentes</span><i aria-hidden="true">→</i></a>
+    <div class="nav-mobile-actions">
+      <a class="btn btn-light" href="/login">Se connecter</a>
+      <a class="btn btn-primary" href="/register">Créer un compte</a>
+    </div>
   </div>
 </nav>
 
@@ -772,23 +995,11 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
             <h3>Cadrage du besoin</h3>
             <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Interface MédiLink de création d'une mission, avec planning, horaires et rétrocession renseignés">
+          <div class="how-slide-media" role="img" aria-label="Illustration du formulaire MédiLink de création d'une mission, avec planning, horaires et rétrocession renseignés">
             <div class="ui-shot ui-shot-wizard" aria-hidden="true">
-              <aside class="ui-side">
-                <span class="ui-brand">Médi<em>Link</em></span>
-                <span class="ui-context">Espace établissement</span>
-                <div class="ui-nav">
-                  <span class="ui-nav-item"><i>⌂</i>Dashboard</span>
-                  <span class="ui-nav-item"><i>□</i>Agenda</span>
-                  <span class="ui-nav-item active"><i>＋</i>Annonce & candidature</span>
-                  <span class="ui-nav-item"><i>◇</i>Missions en cours</span>
-                  <span class="ui-nav-item"><i>○</i>Messagerie</span>
-                </div>
-                <div class="ui-side-user"><span class="ui-avatar">CM</span><span>Cabinet Montaigne</span></div>
-              </aside>
               <div class="ui-main">
                 <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Nouvelle annonce</span><h4>Créer une mission</h4><p>Cabinet médical Montaigne · Bordeaux</p></div>
+                  <div><span class="ui-eyebrow">Formulaire de mission</span><h4>Créer une mission</h4><p>Les informations essentielles, au même endroit.</p></div>
                   <span class="ui-pill success">✓ Brouillon sauvegardé</span>
                 </div>
                 <div class="ui-card ui-form-card">
@@ -825,22 +1036,11 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
             <h3>Scoring intelligent /100</h3>
             <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Interface MédiLink de matching avec candidats classés et détail d'un score de 92 sur 100">
+          <div class="how-slide-media" role="img" aria-label="Illustration du matching MédiLink avec candidats classés et détail d'un score de 92 sur 100">
             <div class="ui-shot ui-shot-matching" aria-hidden="true">
-              <aside class="ui-side">
-                <span class="ui-brand">Médi<em>Link</em></span>
-                <span class="ui-context">Administration</span>
-                <div class="ui-nav">
-                  <span class="ui-nav-item"><i>⌂</i>Dashboard</span>
-                  <span class="ui-nav-item"><i>♙</i>Utilisateurs</span>
-                  <span class="ui-nav-item"><i>◇</i>Missions</span>
-                  <span class="ui-nav-item active"><i>✦</i>Matching</span>
-                </div>
-                <div class="ui-side-user"><span class="ui-avatar">ML</span><span>Équipe MédiLink</span></div>
-              </aside>
               <div class="ui-main">
                 <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Pilotage</span><h4>Matching de la mission</h4><p>Remplacement en médecine générale · Bordeaux</p></div>
+                  <div><span class="ui-eyebrow">Matching intelligent</span><h4>Le bon profil, au bon moment</h4><p>Un score lisible pour décider plus vite.</p></div>
                   <span class="ui-pill success">24 profils analysés</span>
                 </div>
                 <div class="ui-stats">
@@ -880,26 +1080,13 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
             <h3>Recommandation ciblée</h3>
             <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Interface MédiLink des candidatures reçues avec un profil vérifié et ses pièces justificatives">
+          <div class="how-slide-media" role="img" aria-label="Illustration d'une candidature MédiLink avec profil vérifié et pièces justificatives">
             <div class="ui-shot ui-shot-applications" aria-hidden="true">
-              <aside class="ui-side">
-                <span class="ui-brand">Médi<em>Link</em></span>
-                <span class="ui-context">Espace établissement</span>
-                <div class="ui-nav">
-                  <span class="ui-nav-item"><i>⌂</i>Dashboard</span>
-                  <span class="ui-nav-item"><i>□</i>Agenda</span>
-                  <span class="ui-nav-item active"><i>＋</i>Annonce & candidature</span>
-                  <span class="ui-nav-item"><i>◇</i>Missions en cours</span>
-                  <span class="ui-nav-item"><i>○</i>Messagerie</span>
-                </div>
-                <div class="ui-side-user"><span class="ui-avatar">CM</span><span>Cabinet Montaigne</span></div>
-              </aside>
               <div class="ui-main">
                 <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Recrutement</span><h4>Annonce et candidature</h4><p>Publiez vos missions et traitez les candidatures reçues.</p></div>
+                  <div><span class="ui-eyebrow">Profil recommandé</span><h4>Une candidature prête à étudier</h4><p>Disponibilité, expérience et documents réunis.</p></div>
                   <span class="ui-pill success">3 nouvelles</span>
                 </div>
-                <div class="ui-tabs"><span>Mes missions</span><span class="active">Candidatures</span><span>Brouillons</span></div>
                 <div class="ui-application-shell">
                   <div class="ui-card ui-application-list">
                     <div class="ui-section-head"><div><strong>Candidatures d’actualité</strong><span>Nouveaux profils à qualifier</span></div><span class="ui-pill neutral">3</span></div>
@@ -930,31 +1117,10 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
             <h3>Validation dans la messagerie</h3>
             <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Messagerie MédiLink avec conversation, proposition finale structurée et boutons d'acceptation">
+          <div class="how-slide-media" role="img" aria-label="Illustration de la messagerie MédiLink avec conversation et proposition finale structurée">
             <div class="ui-shot ui-shot-messages" aria-hidden="true">
-              <aside class="ui-side">
-                <span class="ui-brand">Médi<em>Link</em></span>
-                <span class="ui-context">Espace professionnel</span>
-                <div class="ui-nav">
-                  <span class="ui-nav-item"><i>⌂</i>Dashboard</span>
-                  <span class="ui-nav-item"><i>□</i>Agenda</span>
-                  <span class="ui-nav-item"><i>◇</i>Missions en cours</span>
-                  <span class="ui-nav-item"><i>⌕</i>Annonces</span>
-                  <span class="ui-nav-item active"><i>○</i>Messagerie</span>
-                </div>
-                <div class="ui-side-user"><span class="ui-avatar">CL</span><span>Dr C. Laurent</span></div>
-              </aside>
               <div class="ui-main ui-message-main">
                 <div class="ui-message-layout">
-                  <div class="ui-card ui-conversations">
-                    <div class="ui-section-head"><div><h5>Messagerie</h5><span>3 échanges</span></div><span class="ui-pill success">2</span></div>
-                    <div class="ui-conversation-search">⌕ Rechercher une discussion</div>
-                    <div class="ui-conversation-items">
-                      <div class="ui-conversation active"><span class="ui-avatar">CM</span><span><strong>Cabinet Montaigne</strong><span>Proposition finale envoyée</span></span></div>
-                      <div class="ui-conversation"><span class="ui-avatar">SC</span><span><strong>Maison de santé Chartrons</strong><span>Merci pour votre retour</span></span></div>
-                      <div class="ui-conversation"><span class="ui-avatar">CS</span><span><strong>Centre Saint-Augustin</strong><span>Mission du 22 septembre</span></span></div>
-                    </div>
-                  </div>
                   <div class="ui-card ui-message-pane">
                     <div class="ui-message-head"><div><strong>Cabinet Montaigne</strong><span>Remplacement médecine générale · Bordeaux</span></div><span class="ui-pill warning">Accord à valider</span></div>
                     <div class="ui-message-log">
@@ -983,23 +1149,11 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
             <h3>Suivi et bilan mission</h3>
             <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Interface MédiLink de suivi d'une mission avec timeline complétée et validation de fin de remplacement">
+          <div class="how-slide-media" role="img" aria-label="Illustration du suivi MédiLink avec timeline complétée et validation de fin de remplacement">
             <div class="ui-shot ui-shot-mission" aria-hidden="true">
-              <aside class="ui-side">
-                <span class="ui-brand">Médi<em>Link</em></span>
-                <span class="ui-context">Espace professionnel</span>
-                <div class="ui-nav">
-                  <span class="ui-nav-item"><i>⌂</i>Dashboard</span>
-                  <span class="ui-nav-item"><i>□</i>Agenda</span>
-                  <span class="ui-nav-item active"><i>◇</i>Missions en cours</span>
-                  <span class="ui-nav-item"><i>⌕</i>Annonces</span>
-                  <span class="ui-nav-item"><i>○</i>Messagerie</span>
-                </div>
-                <div class="ui-side-user"><span class="ui-avatar">CL</span><span>Dr C. Laurent</span></div>
-              </aside>
               <div class="ui-main">
                 <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Pilotage</span><h4>Missions en cours</h4><p>Départ, consignes, établissement et prochaines actions.</p></div>
+                  <div><span class="ui-eyebrow">Suivi de mission</span><h4>Chaque étape reste claire</h4><p>Prochaines actions et clôture au même endroit.</p></div>
                   <span class="ui-pill success">Mission réalisée</span>
                 </div>
                 <div class="ui-command">
@@ -1033,7 +1187,16 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
     </div>
     <div class="how-nav">
       <button class="how-arrow" id="howPrev" type="button" aria-label="Étape précédente"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-      <div class="how-counter" id="howCounter">Étape 1 / 5</div>
+      <div class="how-nav-status">
+        <div class="how-counter" id="howCounter" aria-live="polite">Étape 1 / 5</div>
+        <div class="how-dots" aria-label="Choisir une étape">
+          <button class="active" type="button" data-how-index="0" aria-label="Étape 1 : Cadrage du besoin" aria-current="step"></button>
+          <button type="button" data-how-index="1" aria-label="Étape 2 : Scoring intelligent"></button>
+          <button type="button" data-how-index="2" aria-label="Étape 3 : Recommandation ciblée"></button>
+          <button type="button" data-how-index="3" aria-label="Étape 4 : Validation dans la messagerie"></button>
+          <button type="button" data-how-index="4" aria-label="Étape 5 : Suivi et bilan mission"></button>
+        </div>
+      </div>
       <button class="how-arrow" id="howNext" type="button" aria-label="Étape suivante"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
     </div>
   </div>
@@ -1274,6 +1437,36 @@ window.addEventListener('scroll', () => {
   if (!navTicking) { requestAnimationFrame(onNavScroll); navTicking = true; }
 }, { passive: true });
 
+// ── Mobile navigation ──
+const mobileNavToggle = document.querySelector('.nav-mobile-toggle');
+const mobileNavPanel = document.getElementById('mobileNavigation');
+function setMobileNavigation(open){
+  if(!mobileNavToggle || !mobileNavPanel) return;
+  navEl.classList.toggle('mobile-open', open);
+  mobileNavToggle.setAttribute('aria-expanded', String(open));
+  const label = mobileNavToggle.querySelector('.sr-only');
+  if(label) label.textContent = open ? 'Fermer le menu' : 'Ouvrir le menu';
+}
+if(mobileNavToggle){
+  mobileNavToggle.addEventListener('click', () => {
+    setMobileNavigation(!navEl.classList.contains('mobile-open'));
+  });
+}
+if(mobileNavPanel){
+  mobileNavPanel.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => setMobileNavigation(false));
+  });
+}
+document.addEventListener('click', event => {
+  if(navEl.classList.contains('mobile-open') && !navEl.contains(event.target)) setMobileNavigation(false);
+});
+document.addEventListener('keydown', event => {
+  if(event.key === 'Escape') setMobileNavigation(false);
+});
+window.addEventListener('resize', () => {
+  if(window.innerWidth > 720) setMobileNavigation(false);
+});
+
 // ── Button ripple (follows cursor) ──
 document.querySelectorAll('.btn').forEach(btn => {
   btn.addEventListener('mousemove', (e) => {
@@ -1292,6 +1485,7 @@ document.querySelectorAll('.btn').forEach(btn => {
   const counter = document.getElementById('howCounter');
   const prev = document.getElementById('howPrev');
   const next = document.getElementById('howNext');
+  const dots = Array.prototype.slice.call(shell.querySelectorAll('[data-how-index]'));
   let idx = 0;
   let timer = null;
   const INTERVAL = 5500;
@@ -1299,6 +1493,12 @@ document.querySelectorAll('.btn').forEach(btn => {
   function render(){
     slides.forEach((s, i) => s.classList.toggle('active', i === idx));
     if(counter) counter.textContent = 'Étape ' + (idx + 1) + ' / ' + slides.length;
+    dots.forEach((dot, i) => {
+      const active = i === idx;
+      dot.classList.toggle('active', active);
+      if(active) dot.setAttribute('aria-current', 'step');
+      else dot.removeAttribute('aria-current');
+    });
   }
 
   function go(i, manual){
@@ -1331,6 +1531,7 @@ document.querySelectorAll('.btn').forEach(btn => {
 
   if(prev) prev.addEventListener('click', () => go(idx - 1, true));
   if(next) next.addEventListener('click', () => go(idx + 1, true));
+  dots.forEach(dot => dot.addEventListener('click', () => go(Number(dot.dataset.howIndex), true)));
 
   shell.addEventListener('mouseenter', stopAutoplay);
   shell.addEventListener('mouseleave', startAutoplay);
