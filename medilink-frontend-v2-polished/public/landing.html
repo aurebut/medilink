@@ -199,60 +199,66 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-slide-media img,.how-slide-media .how-slide-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
 /* ===================================================
-   ILLUSTRATIONS PARCOURS MINIMALISTES & ESTHÉTIQUES
+   ILLUSTRATIONS CONCEPTUELLES & PARAMÉTRAGES SAAS
    =================================================== */
-.min-shot {
-  --min-navy: #0B1929;
-  --min-navy-soft: #14273E;
-  --min-blue: #1A52A0;
-  --min-blue-light: #EEF5FC;
-  --min-blue-border: rgba(26, 82, 160, 0.14);
-  --min-teal: #0E8A7A;
-  --min-teal-light: #E6F7F4;
-  --min-teal-border: rgba(14, 138, 122, 0.2);
-  --min-text-main: #0F1E32;
-  --min-text-muted: #5E718D;
+.concept-shot {
+  --c-navy: #0B1929;
+  --c-navy-dark: #07101B;
+  --c-navy-soft: #16263B;
+  --c-blue: #1A52A0;
+  --c-blue-glow: rgba(26, 82, 160, 0.25);
+  --c-teal: #0E8A7A;
+  --c-teal-glow: rgba(14, 138, 122, 0.3);
+  --c-emerald: #10B981;
+  --c-text-main: #0B1929;
+  --c-text-muted: #5A6E85;
+  --c-border: rgba(26, 82, 160, 0.12);
+  --c-card-bg: rgba(255, 255, 255, 0.94);
+  
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 380px;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 22px 24px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 250, 255, 0.93) 100%);
-  border: 1px solid var(--min-blue-border);
-  box-shadow: 0 16px 40px rgba(11, 25, 41, 0.07), inset 0 1px 0 #fff;
+  padding: 24px 28px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 10% 15%, rgba(240, 248, 255, 0.95), rgba(248, 252, 255, 0.98) 70%), linear-gradient(145deg, #FFFFFF 0%, #F1F6FC 100%);
+  border: 1px solid var(--c-border);
+  box-shadow: 0 20px 48px rgba(11, 25, 41, 0.08), inset 0 1px 0 #FFFFFF;
   font-family: var(--sans);
-  color: var(--min-text-main);
+  color: var(--c-text-main);
   box-sizing: border-box;
   overflow: hidden;
 }
-.min-shot * { box-sizing: border-box; }
+.concept-shot * { box-sizing: border-box; }
 
-.min-shot-glow {
+/* Glowing backdrop orbs */
+.concept-orb {
   position: absolute;
-  width: 320px;
-  height: 320px;
   border-radius: 50%;
-  filter: blur(60px);
+  filter: blur(55px);
   pointer-events: none;
-  opacity: 0.45;
   z-index: 0;
 }
-.min-shot-glow-teal {
-  background: radial-gradient(circle, rgba(14, 138, 122, 0.28) 0%, transparent 70%);
-  top: -80px;
-  right: -80px;
+.concept-orb-1 {
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(14, 138, 122, 0.22) 0%, transparent 70%);
+  top: -60px;
+  right: -50px;
 }
-.min-shot-glow-blue {
-  background: radial-gradient(circle, rgba(26, 82, 160, 0.22) 0%, transparent 70%);
-  bottom: -90px;
-  left: -90px;
+.concept-orb-2 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(26, 82, 160, 0.18) 0%, transparent 70%);
+  bottom: -60px;
+  left: -60px;
 }
 
-.min-shot-head {
+/* Header */
+.concept-head {
   position: relative;
   z-index: 1;
   display: flex;
@@ -260,441 +266,550 @@ section,footer,.search-section{position:relative;z-index:1;}
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(220, 228, 240, 0.75);
+  border-bottom: 1px solid rgba(215, 226, 240, 0.7);
 }
-.min-shot-title-wrap {
+.concept-tag {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-navy);
 }
-.min-shot-dot {
+.concept-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--min-teal);
-  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.18);
+  background: var(--c-teal);
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
+  animation: pulseDot 2.4s infinite;
 }
-.min-shot-category {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--min-navy);
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.8; }
 }
-.min-shot-badge {
+.concept-pill-badge {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 10px;
-  border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
-  background: var(--min-blue-light);
-  color: var(--min-blue);
-  border: 1px solid var(--min-blue-border);
-}
-.min-shot-badge.teal {
-  background: var(--min-teal-light);
-  color: var(--min-teal);
-  border-color: var(--min-teal-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #E8F7F4;
+  color: var(--c-teal);
+  border: 1px solid rgba(14, 138, 122, 0.2);
 }
 
-.min-shot-body {
+/* Body */
+.concept-body {
   position: relative;
   z-index: 1;
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   margin: 12px 0;
 }
 
-.min-shot-foot {
+/* Footer */
+.concept-foot {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   padding-top: 12px;
-  border-top: 1px solid rgba(220, 228, 240, 0.75);
+  border-top: 1px solid rgba(215, 226, 240, 0.7);
+  font-size: 12px;
+  color: var(--c-text-muted);
 }
-.min-foot-status {
+.concept-foot-meta {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11.5px;
   font-weight: 500;
-  color: var(--min-text-muted);
 }
-.min-foot-status svg {
+.concept-foot-meta svg {
   width: 15px;
   height: 15px;
-  stroke: var(--min-teal);
-  flex-shrink: 0;
+  stroke: var(--c-teal);
 }
-.min-foot-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 8px;
-  font-size: 11.5px;
-  font-weight: 600;
-  background: var(--min-navy);
+.concept-foot-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: var(--c-navy);
   color: #C8DFF5;
-  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.15);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-.min-foot-action.teal {
-  background: var(--min-teal);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(14, 138, 122, 0.2);
 }
 
-/* Slide 1 - Cadrage */
-.min-step1-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 12px;
+/* ===================================================
+   SLIDE 1: LE CONTROL MIXER & CURSEURS RÉGLABLES
+   =================================================== */
+.mixer-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
 }
-.min-card {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(215, 226, 242, 0.85);
+.mixer-slider-card {
+  background: var(--c-card-bg);
+  border: 1px solid rgba(215, 226, 242, 0.9);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 12px 16px;
   box-shadow: 0 6px 18px rgba(11, 25, 41, 0.04);
 }
-.min-card-label {
-  font-size: 10px;
+.mixer-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.mixer-label {
+  font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--min-text-muted);
-  margin-bottom: 6px;
+  color: var(--c-text-muted);
 }
-.min-date-hero {
-  font-size: 15px;
+.mixer-val-hero {
+  font-size: 13.5px;
   font-weight: 700;
-  color: var(--min-navy);
+  color: var(--c-navy);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.min-date-hero svg {
-  width: 16px;
-  height: 16px;
-  stroke: var(--min-blue);
-  flex-shrink: 0;
-}
-.min-hours-sub {
-  font-size: 12px;
-  color: var(--min-text-muted);
-}
-.min-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
-}
-.min-chip {
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: #F1F5FA;
-  font-size: 10.5px;
-  font-weight: 500;
-  color: var(--min-navy-soft);
-  border: 1px solid rgba(200, 212, 230, 0.6);
-}
-.min-gauge-wrap {
-  display: flex;
-  flex-direction: column;
   gap: 6px;
 }
-.min-gauge-num {
+.mixer-val-hero strong {
   font-family: var(--serif);
-  font-size: 32px;
-  font-weight: 400;
-  color: var(--min-navy);
+  font-size: 22px;
+  color: var(--c-teal);
   line-height: 1;
 }
-.min-gauge-num small {
-  font-family: var(--sans);
+.mixer-val-hero small {
   font-size: 11px;
-  font-weight: 600;
-  color: var(--min-teal);
-  margin-left: 4px;
+  color: var(--c-text-muted);
+  font-weight: 500;
 }
-.min-gauge-bar {
+.mixer-track-wrap {
+  position: relative;
+  width: 100%;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+.mixer-track {
   width: 100%;
   height: 8px;
   border-radius: 999px;
-  background: #E5ECF6;
+  background: #E4ECF6;
+  position: relative;
   overflow: hidden;
 }
-.min-gauge-bar-fill {
+.mixer-track-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
+  width: 70%;
   border-radius: 999px;
   background: linear-gradient(90deg, #1A52A0, #0E8A7A);
 }
-.min-gauge-sub {
-  font-size: 11px;
-  color: var(--min-text-muted);
+.mixer-thumb {
+  position: absolute;
+  left: 70%;
+  transform: translate(-50%, 0);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #0E8A7A;
+  box-shadow: 0 2px 10px rgba(14, 138, 122, 0.4), 0 0 0 4px rgba(14, 138, 122, 0.15);
+  display: grid;
+  place-items: center;
+}
+.mixer-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #8CA0B8;
+}
+.mixer-ticks span.active {
+  color: var(--c-teal);
+  font-weight: 800;
 }
 
-/* Slide 2 - Scoring /100 */
-.min-step2-layout {
+.mixer-dates-row {
   display: grid;
-  grid-template-columns: 130px 1fr;
+  grid-template-columns: repeat(5, 1fr) 1.2fr;
+  gap: 6px;
+  align-items: center;
+}
+.mixer-day-pill {
+  background: #fff;
+  border: 1.5px solid rgba(26, 82, 160, 0.2);
+  border-radius: 9px;
+  padding: 6px 4px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(11, 25, 41, 0.03);
+}
+.mixer-day-pill.active {
+  background: #F0F6FD;
+  border-color: #1A52A0;
+  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.12);
+}
+.mixer-day-pill span {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #728AA6;
+}
+.mixer-day-pill strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--c-navy);
+  line-height: 1.1;
+}
+.mixer-hours-capsule {
+  background: linear-gradient(135deg, #0B1929, #152A42);
+  color: #fff;
+  border-radius: 9px;
+  padding: 7px 10px;
+  text-align: center;
+}
+.mixer-hours-capsule span {
+  display: block;
+  font-size: 8.5px;
+  color: #92B5D8;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.mixer-hours-capsule strong {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #E2EEFC;
+  margin-top: 1px;
+}
+
+.mixer-toggles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mixer-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(215, 226, 242, 0.9);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-navy);
+}
+.mixer-toggle-switch {
+  width: 24px;
+  height: 14px;
+  border-radius: 999px;
+  background: #10B981;
+  position: relative;
+  padding: 2px;
+}
+.mixer-toggle-switch::after {
+  content: '';
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* ===================================================
+   SLIDE 2: LE FAISCEAU D'AFFINITÉ (CONVERGENCE SCORING)
+   =================================================== */
+.score-matrix {
+  display: grid;
+  grid-template-columns: 135px 1fr;
   gap: 16px;
   align-items: center;
 }
-.min-score-hero-box {
+.score-beacon-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 14px 10px;
-  background: linear-gradient(145deg, #F5FAF9, #E6F6F3);
-  border: 1.5px solid rgba(14, 138, 122, 0.3);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(14, 138, 122, 0.08);
+  position: relative;
+  padding: 16px 12px;
+  background: radial-gradient(circle at 50% 30%, #FFFFFF, #E8F7F4 85%);
+  border: 2px solid rgba(14, 138, 122, 0.35);
+  border-radius: 20px;
+  box-shadow: 0 12px 32px rgba(14, 138, 122, 0.14), inset 0 1px 0 #fff;
 }
-.min-score-hero-num {
+.score-beacon-num {
   font-family: var(--serif);
-  font-size: 42px;
+  font-size: 46px;
   line-height: 1;
-  font-weight: 700;
-  color: var(--min-teal);
+  font-weight: 400;
+  color: var(--c-teal);
+  letter-spacing: -0.02em;
 }
-.min-score-hero-num span {
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 600;
-  color: #558E85;
+.score-beacon-sub {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--c-teal);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
 }
-.min-score-hero-badge {
-  margin-top: 6px;
-  font-size: 10px;
+.score-beacon-badge {
+  font-size: 9.5px;
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 999px;
-  background: #0E8A7A;
+  background: var(--c-teal);
   color: #fff;
+  margin-top: 6px;
 }
-.min-score-bars {
+.score-criteria-list {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
 }
-.min-criteria-row {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.score-criteria-item {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(215, 226, 242, 0.8);
+  border-radius: 10px;
+  padding: 7px 11px;
 }
-.min-criteria-head {
+.score-crit-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11.5px;
+  font-size: 11px;
+  margin-bottom: 4px;
 }
-.min-criteria-title {
+.score-crit-name {
   font-weight: 600;
-  color: var(--min-navy);
+  color: var(--c-navy);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.min-criteria-val {
-  font-weight: 700;
-  color: var(--min-teal);
+.score-crit-val {
+  font-weight: 800;
+  color: var(--c-teal);
 }
-.min-criteria-bar {
-  height: 6px;
+.score-crit-bar {
+  height: 5px;
   border-radius: 999px;
   background: #E5ECF6;
   overflow: hidden;
 }
-.min-criteria-fill {
+.score-crit-fill {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #1A52A0, #0E8A7A);
 }
 
-/* Slide 3 - Profil Vérifié */
-.min-profile-card {
+/* ===================================================
+   SLIDE 3: LE VIVIER FILTRÉ & LE SPOTLIGHT PRATICIEN
+   =================================================== */
+.spotlight-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 12px;
+  align-items: stretch;
+}
+.pool-filters-box {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(215, 226, 242, 0.85);
-  border-radius: 16px;
-  padding: 14px 16px;
-  box-shadow: 0 8px 24px rgba(11, 25, 41, 0.05);
+  justify-content: space-between;
+  gap: 6px;
+  background: rgba(244, 248, 254, 0.85);
+  border: 1px solid rgba(215, 226, 242, 0.8);
+  border-radius: 14px;
+  padding: 11px;
 }
-.min-profile-top {
+.pool-filter-step {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--c-navy);
+  background: #fff;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(215, 226, 242, 0.7);
 }
-.min-doc-avatar {
-  width: 42px;
-  height: 42px;
+.pool-filter-icon {
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #E2EEFC, #CBE1FA);
-  color: var(--min-blue);
-  font-weight: 800;
-  font-size: 14px;
+  background: #E8F7F4;
+  color: var(--c-teal);
   display: grid;
   place-items: center;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.15);
+  font-size: 10px;
+  font-weight: 800;
   flex-shrink: 0;
-  position: relative;
 }
-.min-doc-avatar::after {
+.spotlight-card {
+  background: #fff;
+  border: 1.5px solid rgba(14, 138, 122, 0.35);
+  border-radius: 16px;
+  padding: 13px;
+  box-shadow: 0 10px 28px rgba(14, 138, 122, 0.09);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 9px;
+}
+.spotlight-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.spotlight-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1A52A0, #0E8A7A);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.2);
+  flex-shrink: 0;
+}
+.spotlight-avatar::after {
   content: '';
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #10B981;
-  border: 2px solid #fff;
+  border: 1.5px solid #fff;
 }
-.min-doc-meta strong {
+.spotlight-info strong {
   display: block;
-  font-size: 13.5px;
-  color: var(--min-navy);
+  font-size: 13px;
+  color: var(--c-navy);
 }
-.min-doc-meta span {
+.spotlight-info span {
   display: block;
-  font-size: 11px;
-  color: var(--min-text-muted);
-}
-.min-doc-rating {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #B45309;
-  background: #FEF3C7;
-  padding: 4px 8px;
-  border-radius: 999px;
-}
-.min-badges-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.min-trust-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: #F4F8FC;
-  border: 1px solid rgba(26, 82, 160, 0.1);
   font-size: 10.5px;
-  font-weight: 600;
-  color: var(--min-navy);
+  color: var(--c-text-muted);
 }
-.min-trust-badge svg {
-  width: 13px;
-  height: 13px;
-  stroke: var(--min-teal);
-  flex-shrink: 0;
-}
-.min-profile-quote {
-  font-size: 11px;
-  font-style: italic;
-  color: var(--min-text-muted);
-  line-height: 1.45;
-  background: #FAFBFD;
-  padding: 7px 10px;
+.spotlight-verified-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #0E8A7A;
+  background: #E8F7F4;
+  padding: 5px 8px;
   border-radius: 8px;
-  border-left: 3px solid var(--min-blue);
 }
 
-/* Slide 4 - Validation Accord */
-.min-step4-wrap {
+/* ===================================================
+   SLIDE 4: L'ACCORD BILATÉRAL DIRECT & SCELLÉ
+   =================================================== */
+.deal-bridge {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
-.min-chat-bubble {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 9px 12px;
-  background: #F3F7FC;
-  border-radius: 12px 12px 12px 2px;
-  border: 1px solid rgba(26, 82, 160, 0.12);
-  font-size: 11.5px;
-  color: var(--min-navy);
-  line-height: 1.4;
+.deal-actors-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
 }
-.min-chat-avatar {
-  width: 22px;
-  height: 22px;
+.deal-actor-node {
+  background: #fff;
+  border: 1px solid rgba(215, 226, 242, 0.9);
+  border-radius: 12px;
+  padding: 8px 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.04);
+}
+.deal-actor-node span {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+.deal-actor-node strong {
+  display: block;
+  font-size: 11.5px;
+  color: var(--c-navy);
+  margin-top: 1px;
+}
+.deal-connector {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: #1A52A0;
+  background: linear-gradient(135deg, #1A52A0, #0E8A7A);
   color: #fff;
-  font-size: 9px;
-  font-weight: 800;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
+  font-size: 12px;
+  box-shadow: 0 4px 14px rgba(14, 138, 122, 0.3);
 }
-.min-contract-box {
+.deal-capsule {
   background: rgba(255, 255, 255, 0.95);
-  border: 1.5px solid rgba(14, 138, 122, 0.25);
+  border: 1.5px solid rgba(14, 138, 122, 0.3);
   border-radius: 14px;
-  padding: 11px 13px;
+  padding: 10px 12px;
   box-shadow: 0 8px 24px rgba(11, 25, 41, 0.05);
 }
-.min-contract-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 7px;
-}
-.min-contract-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--min-navy);
-}
-.min-tiles-row {
+.deal-terms-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
   margin-bottom: 7px;
 }
-.min-tile {
-  background: #F6F9FD;
-  border: 1px solid rgba(215, 226, 242, 0.7);
-  border-radius: 8px;
+.deal-term-item {
+  background: #F4F8FC;
+  border-radius: 7px;
   padding: 5px 6px;
   text-align: center;
 }
-.min-tile span {
+.deal-term-item span {
   display: block;
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 600;
   text-transform: uppercase;
-  color: var(--min-text-muted);
+  color: var(--c-text-muted);
 }
-.min-tile strong {
+.deal-term-item strong {
   display: block;
   font-size: 11px;
-  color: var(--min-navy);
+  color: var(--c-navy);
   margin-top: 1px;
 }
-.min-seal-badge {
+.deal-lock-stamp {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -704,79 +819,88 @@ section,footer,.search-section{position:relative;z-index:1;}
   color: #0E8A7A;
   background: #E8F7F4;
   padding: 4px 8px;
-  border-radius: 8px;
+  border-radius: 7px;
 }
 
-/* Slide 5 - Suivi & Clôture */
-.min-step5-wrap {
+/* ===================================================
+   SLIDE 5: DÉROULÉ CONTINU & DÉNOUEMENT AUTOMATISÉ
+   =================================================== */
+.mission-track-wrap {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 11px;
 }
-.min-stepper-row {
+.mission-days-track {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
   position: relative;
 }
-.min-step-node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 3px;
-}
-.min-node-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+.mission-day-node {
   background: #E8F7F4;
   border: 1.5px solid #0E8A7A;
+  border-radius: 10px;
+  padding: 6px 4px;
+  text-align: center;
   color: #0E8A7A;
-  font-size: 10px;
-  font-weight: 800;
-  display: grid;
-  place-items: center;
 }
-.min-step-node.active .min-node-circle {
-  background: #0E8A7A;
-  color: #fff;
-  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
-}
-.min-node-label {
-  font-size: 10px;
+.mission-day-node span {
+  display: block;
+  font-size: 8px;
   font-weight: 700;
-  color: var(--min-navy);
+  text-transform: uppercase;
 }
-.min-node-sub {
-  font-size: 8.5px;
-  color: var(--min-text-muted);
+.mission-day-node strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-top: 1px;
 }
-.min-summary-grid {
+.mission-stats-trio {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
 }
-.min-metric-card {
+.mission-stat-box {
   background: #fff;
   border: 1px solid rgba(215, 226, 242, 0.85);
-  border-radius: 10px;
-  padding: 8px 10px;
+  border-radius: 12px;
+  padding: 9px 8px;
   text-align: center;
+  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.03);
 }
-.min-metric-card strong {
+.mission-stat-box strong {
   display: block;
   font-family: var(--serif);
-  font-size: 19px;
-  color: var(--min-navy);
-  line-height: 1.1;
+  font-size: 20px;
+  color: var(--c-navy);
+  line-height: 1;
 }
-.min-metric-card span {
+.mission-stat-box span {
   display: block;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 600;
-  color: var(--min-text-muted);
-  margin-top: 2px;
+  color: var(--c-text-muted);
+  margin-top: 3px;
+}
+
+/* Responsive */
+@media(max-width: 900px) {
+  .concept-shot { padding: 20px 22px; min-height: 360px; }
+}
+@media(max-width: 720px) {
+  .concept-shot { padding: 16px 18px; min-height: 330px; }
+  .score-matrix { grid-template-columns: 120px 1fr; gap: 12px; }
+  .score-beacon-num { font-size: 38px; }
+  .spotlight-layout { grid-template-columns: 1fr; gap: 10px; }
+  .deal-terms-grid { grid-template-columns: repeat(2, 1fr); }
+  .mixer-dates-row { grid-template-columns: repeat(5, 1fr); }
+  .mixer-hours-capsule { grid-column: span 5; }
+}
+@media(max-width: 480px) {
+  .concept-shot { padding: 14px 12px; min-height: auto; }
+  .score-matrix { grid-template-columns: 1fr; gap: 10px; }
+  .mission-stats-trio { grid-template-columns: 1fr; gap: 6px; }
 }
 .how-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:34px}
 .how-arrow{width:48px;height:48px;border-radius:50%;background:#fff;border:1px solid rgba(26,82,160,.18);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,25,41,.08);transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
@@ -1244,29 +1368,11 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
   .how-arrow{width:44px;height:44px}
 }
 
-/* Illustrations produit : minimalistes et épurées */
+/* Illustrations produit : cadrage et fond */
 .how-slide-media{padding:12px;background:radial-gradient(circle at 14% 10%,rgba(255,255,255,.9),transparent 34%),linear-gradient(145deg,#EAF2FA 0%,#DCEAF6 100%)}
-
-@media(max-width:900px){
-  .min-shot{padding:18px 20px;min-height:350px}
-}
 
 @media(max-width:720px){
   .how-slide-media{padding:8px}
-  .min-shot{padding:16px;min-height:320px}
-  .min-step1-grid{grid-template-columns:1fr;gap:10px}
-  .min-step2-layout{grid-template-columns:110px 1fr;gap:12px}
-  .min-score-hero-num{font-size:34px}
-  .min-badges-row{grid-template-columns:1fr;gap:6px}
-  .min-tiles-row{grid-template-columns:repeat(2,1fr);gap:6px}
-}
-
-@media(max-width:480px){
-  .min-shot{padding:14px 12px;min-height:auto}
-  .min-step2-layout{grid-template-columns:1fr;gap:10px}
-  .min-stepper-row{grid-template-columns:repeat(2,1fr);gap:8px}
-  .min-profile-quote{display:none}
-  .min-foot-action{font-size:10.5px;padding:5px 10px}
 }
 
 </style>
@@ -1345,54 +1451,97 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Cadrage du besoin</h3>
             <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration épurée du cadrage de mission MédiLink avec planning, horaires et rétrocession">
-            <div class="min-shot min-step1">
-              <div class="min-shot-glow min-shot-glow-teal"></div>
-              <div class="min-shot-glow min-shot-glow-blue"></div>
+          <div class="how-slide-media" role="img" aria-label="Table de mixage des paramètres de la mission avec curseurs et toggles">
+            <div class="concept-shot">
+              <div class="concept-orb concept-orb-1"></div>
+              <div class="concept-orb concept-orb-2"></div>
               
-              <div class="min-shot-head">
-                <div class="min-shot-title-wrap">
-                  <span class="min-shot-dot"></span>
-                  <span class="min-shot-category">Cadrage de mission</span>
+              <div class="concept-head">
+                <div class="concept-tag">
+                  <span class="concept-dot"></span>
+                  <span>01 · Paramétrage sur-mesure</span>
                 </div>
-                <span class="min-shot-badge teal">Cabinet Montaigne · Bordeaux</span>
+                <span class="concept-pill-badge">● Calibrage instantané</span>
               </div>
 
-              <div class="min-shot-body">
-                <div class="min-step1-grid">
-                  <div class="min-card">
-                    <div class="min-card-label">Période & Organisation</div>
-                    <div class="min-date-hero">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                      <span>14 — 18 Septembre 2026</span>
-                    </div>
-                    <div class="min-hours-sub">08:30 – 18:30 · 5 journées (40h)</div>
-                    <div class="min-chips">
-                      <span class="min-chip">Doctolib</span>
-                      <span class="min-chip">Cabinet de groupe</span>
-                      <span class="min-chip">Médecine générale</span>
-                    </div>
-                  </div>
-
-                  <div class="min-card">
-                    <div class="min-card-label">Rétrocession convenue</div>
-                    <div class="min-gauge-wrap">
-                      <div class="min-gauge-num">70% <small>Recommandé</small></div>
-                      <div class="min-gauge-bar">
-                        <div class="min-gauge-bar-fill" style="width: 70%;"></div>
+              <div class="concept-body">
+                <div class="mixer-grid">
+                  <!-- Curseur Rétrocession -->
+                  <div class="mixer-slider-card">
+                    <div class="mixer-row-head">
+                      <span class="mixer-label">Pourcentage de rétrocession</span>
+                      <div class="mixer-val-hero">
+                        <strong>70 %</strong>
+                        <small>(~3 850 € prévus)</small>
                       </div>
-                      <div class="min-gauge-sub">Honoraires prévus : <strong>~3 850 €</strong></div>
+                    </div>
+                    <div class="mixer-track-wrap">
+                      <div class="mixer-track">
+                        <div class="mixer-track-fill" style="width: 70%;"></div>
+                      </div>
+                      <div class="mixer-thumb" style="left: 70%;"></div>
+                    </div>
+                    <div class="mixer-ticks">
+                      <span>50%</span>
+                      <span>60%</span>
+                      <span class="active">70%</span>
+                      <span>80%</span>
+                      <span>90%</span>
+                    </div>
+                  </div>
+
+                  <!-- Sélecteur Dates -->
+                  <div class="mixer-dates-row">
+                    <div class="mixer-day-pill active">
+                      <span>Lun</span>
+                      <strong>14</strong>
+                    </div>
+                    <div class="mixer-day-pill active">
+                      <span>Mar</span>
+                      <strong>15</strong>
+                    </div>
+                    <div class="mixer-day-pill active">
+                      <span>Mer</span>
+                      <strong>16</strong>
+                    </div>
+                    <div class="mixer-day-pill active">
+                      <span>Jeu</span>
+                      <strong>17</strong>
+                    </div>
+                    <div class="mixer-day-pill active">
+                      <span>Ven</span>
+                      <strong>18</strong>
+                    </div>
+                    <div class="mixer-hours-capsule">
+                      <span>Horaires calibrés</span>
+                      <strong>08:30 – 18:30 (40h)</strong>
+                    </div>
+                  </div>
+
+                  <!-- Toggles Pratique -->
+                  <div class="mixer-toggles-row">
+                    <div class="mixer-toggle">
+                      <span class="mixer-toggle-switch"></span>
+                      <span>Logiciel Doctolib</span>
+                    </div>
+                    <div class="mixer-toggle">
+                      <span class="mixer-toggle-switch"></span>
+                      <span>Cabinet de groupe</span>
+                    </div>
+                    <div class="mixer-toggle">
+                      <span class="mixer-toggle-switch"></span>
+                      <span>Médecine générale</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="min-shot-foot">
-                <div class="min-foot-status">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Paramètres calibrés pour le matching</span>
+              <div class="concept-foot">
+                <div class="concept-foot-meta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Curseurs ajustés selon vos besoins exacts</span>
                 </div>
-                <span class="min-foot-action">Lancer le matching →</span>
+                <span class="concept-foot-chip">Matching actif</span>
               </div>
             </div>
           </div>
@@ -1407,61 +1556,69 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Scoring intelligent /100</h3>
             <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration épurée du score de compatibilité MédiLink de 92 sur 100 et décomposition des critères">
-            <div class="min-shot min-step2">
-              <div class="min-shot-glow min-shot-glow-teal"></div>
-              <div class="min-shot-glow min-shot-glow-blue"></div>
+          <div class="how-slide-media" role="img" aria-label="Visualisation de la convergence multi-critères et score d'affinité">
+            <div class="concept-shot">
+              <div class="concept-orb concept-orb-1"></div>
+              <div class="concept-orb concept-orb-2"></div>
 
-              <div class="min-shot-head">
-                <div class="min-shot-title-wrap">
-                  <span class="min-shot-dot"></span>
-                  <span class="min-shot-category">Algorithme de compatibilité</span>
+              <div class="concept-head">
+                <div class="concept-tag">
+                  <span class="concept-dot"></span>
+                  <span>02 · Convergence multi-critères</span>
                 </div>
-                <span class="min-shot-badge teal">24 profils analysés</span>
+                <span class="concept-pill-badge">24 profils scannés</span>
               </div>
 
-              <div class="min-shot-body">
-                <div class="min-step2-layout">
-                  <div class="min-score-hero-box">
-                    <div class="min-score-hero-num">92<span>/100</span></div>
-                    <span class="min-score-hero-badge">Score Idéal</span>
-                    <div style="font-size: 10px; color: var(--min-text-muted); margin-top: 6px; font-weight: 500;">Dr Camille L.</div>
+              <div class="concept-body">
+                <div class="score-matrix">
+                  <div class="score-beacon-box">
+                    <div class="score-beacon-num">92</div>
+                    <div class="score-beacon-sub">Sur 100</div>
+                    <span class="score-beacon-badge">Match Optimal</span>
                   </div>
 
-                  <div class="min-score-bars">
-                    <div class="min-criteria-row">
-                      <div class="min-criteria-head">
-                        <span class="min-criteria-title">Spécialité & Actes médicaux</span>
-                        <span class="min-criteria-val">100%</span>
+                  <div class="score-criteria-list">
+                    <div class="score-criteria-item">
+                      <div class="score-crit-head">
+                        <span class="score-crit-name">🩺 Spécialité & Actes requis</span>
+                        <span class="score-crit-val">100%</span>
                       </div>
-                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 100%;"></div></div>
+                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
                     </div>
 
-                    <div class="min-criteria-row">
-                      <div class="min-criteria-head">
-                        <span class="min-criteria-title">Disponibilité planning (14-18 sept.)</span>
-                        <span class="min-criteria-val">96%</span>
+                    <div class="score-criteria-item">
+                      <div class="score-crit-head">
+                        <span class="score-crit-name">📅 Créneau 14-18 sept. (5j)</span>
+                        <span class="score-crit-val">100%</span>
                       </div>
-                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 96%;"></div></div>
+                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
                     </div>
 
-                    <div class="min-criteria-row">
-                      <div class="min-criteria-head">
-                        <span class="min-criteria-title">Proximité (4,8 km · Bordeaux)</span>
-                        <span class="min-criteria-val">90%</span>
+                    <div class="score-criteria-item">
+                      <div class="score-crit-head">
+                        <span class="score-crit-name">📍 Proximité (4,8 km)</span>
+                        <span class="score-crit-val">90%</span>
                       </div>
-                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 90%;"></div></div>
+                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 90%;"></div></div>
+                    </div>
+
+                    <div class="score-criteria-item">
+                      <div class="score-crit-head">
+                        <span class="score-crit-name">💻 Logiciel Doctolib maîtrisé</span>
+                        <span class="score-crit-val">100%</span>
+                      </div>
+                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="min-shot-foot">
-                <div class="min-foot-status">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Profil prioritaire recommandé avec succès</span>
+              <div class="concept-foot">
+                <div class="concept-foot-meta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Pondération intelligente en temps réel</span>
                 </div>
-                <span class="min-foot-action teal">Voir la candidature →</span>
+                <span class="concept-foot-chip">Profil prioritaire</span>
               </div>
             </div>
           </div>
@@ -1476,57 +1633,58 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Recommandation ciblée</h3>
             <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration épurée d'une candidature qualifiée avec profil praticien vérifié et pièces conformes">
-            <div class="min-shot min-step3">
-              <div class="min-shot-glow min-shot-glow-blue"></div>
-              <div class="min-shot-glow min-shot-glow-teal"></div>
+          <div class="how-slide-media" role="img" aria-label="Filtrage du vivier et mise en avant du profil certifié conforme">
+            <div class="concept-shot">
+              <div class="concept-orb concept-orb-1"></div>
+              <div class="concept-orb concept-orb-2"></div>
 
-              <div class="min-shot-head">
-                <div class="min-shot-title-wrap">
-                  <span class="min-shot-dot"></span>
-                  <span class="min-shot-category">Candidature qualifiée</span>
+              <div class="concept-head">
+                <div class="concept-tag">
+                  <span class="concept-dot"></span>
+                  <span>03 · Vivier qualifié & certification</span>
                 </div>
-                <span class="min-shot-badge teal">Profil 100% Vérifié ✓</span>
+                <span class="concept-pill-badge">100% Conforme</span>
               </div>
 
-              <div class="min-shot-body">
-                <div class="min-profile-card">
-                  <div class="min-profile-top">
-                    <div class="min-doc-avatar">CL</div>
-                    <div class="min-doc-meta">
-                      <strong>Dr Camille Laurent</strong>
-                      <span>Médecin généraliste · 6 ans d'exercice</span>
+              <div class="concept-body">
+                <div class="spotlight-layout">
+                  <div class="pool-filters-box">
+                    <div class="pool-filter-step">
+                      <span class="pool-filter-icon">✓</span>
+                      <span>RPPS & CNOM contrôlés</span>
                     </div>
-                    <div class="min-doc-rating">★ 4.9 <small style="font-weight: 500; opacity: 0.85;">(18 missions)</small></div>
-                  </div>
-
-                  <div class="min-badges-row">
-                    <div class="min-trust-badge">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                      <span>RPPS & CNOM vérifiés</span>
+                    <div class="pool-filter-step">
+                      <span class="pool-filter-icon">✓</span>
+                      <span>Assurance RCP validée</span>
                     </div>
-                    <div class="min-trust-badge">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                      <span>Assurance RCP valide</span>
-                    </div>
-                    <div class="min-trust-badge">
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                      <span>Dispo 5/5 jours</span>
+                    <div class="pool-filter-step">
+                      <span class="pool-filter-icon">✓</span>
+                      <span>Disponibilité 5/5 j garantie</span>
                     </div>
                   </div>
 
-                  <div class="min-profile-quote">
-                    « Disponible sur l'ensemble de votre créneau. Maîtrise confirmée de votre logiciel Doctolib et du secteur. »
+                  <div class="spotlight-card">
+                    <div class="spotlight-header">
+                      <div class="spotlight-avatar">CL</div>
+                      <div class="spotlight-info">
+                        <strong>Dr Camille Laurent</strong>
+                        <span>Médecin généraliste · 6 ans d'exp.</span>
+                      </div>
+                    </div>
+                    <div class="spotlight-verified-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                      <span>Profil certifié & prêt à intervenir</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="min-shot-foot">
-                <div class="min-foot-status">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Dossier administratif complet et certifié</span>
+              <div class="concept-foot">
+                <div class="concept-foot-meta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Zéro profil non qualifié : sécurité totale</span>
                 </div>
-                <span class="min-foot-action">Échanger & valider →</span>
+                <span class="concept-foot-chip">Dossier vérifié</span>
               </div>
             </div>
           </div>
@@ -1541,63 +1699,66 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Validation dans la messagerie</h3>
             <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration épurée de la messagerie MédiLink avec proposition d'accord contractuel bilatéral validée">
-            <div class="min-shot min-step4">
-              <div class="min-shot-glow min-shot-glow-teal"></div>
-              <div class="min-shot-glow min-shot-glow-blue"></div>
+          <div class="how-slide-media" role="img" aria-label="Passerelle d'accord bilatéral scellé entre le cabinet et le praticien">
+            <div class="concept-shot">
+              <div class="concept-orb concept-orb-1"></div>
+              <div class="concept-orb concept-orb-2"></div>
 
-              <div class="min-shot-head">
-                <div class="min-shot-title-wrap">
-                  <span class="min-shot-dot"></span>
-                  <span class="min-shot-category">Messagerie & Accord</span>
+              <div class="concept-head">
+                <div class="concept-tag">
+                  <span class="concept-dot"></span>
+                  <span>04 · Accord bilatéral direct</span>
                 </div>
-                <span class="min-shot-badge teal">Accord mutuel validé</span>
+                <span class="concept-pill-badge">Zéro intermédiaire</span>
               </div>
 
-              <div class="min-shot-body">
-                <div class="min-step4-wrap">
-                  <div class="min-chat-bubble">
-                    <span class="min-chat-avatar">CL</span>
-                    <div><strong>Dr Camille Laurent :</strong> « Conditions validées du 14 au 18 sept. avec 70% de rétrocession. Je signe la proposition ! »</div>
+              <div class="concept-body">
+                <div class="deal-bridge">
+                  <div class="deal-actors-row">
+                    <div class="deal-actor-node">
+                      <span>Cabinet</span>
+                      <strong>Dr Montaigne</strong>
+                    </div>
+                    <div class="deal-connector">⇄</div>
+                    <div class="deal-actor-node">
+                      <span>Remplaçant</span>
+                      <strong>Dr C. Laurent</strong>
+                    </div>
                   </div>
 
-                  <div class="min-contract-box">
-                    <div class="min-contract-head">
-                      <span class="min-contract-title">Proposition de remplacement confirmée</span>
-                      <span class="min-shot-badge" style="font-size: 10px; padding: 2px 7px;">Cabinet Montaigne</span>
-                    </div>
-                    <div class="min-tiles-row">
-                      <div class="min-tile">
+                  <div class="deal-capsule">
+                    <div class="deal-terms-grid">
+                      <div class="deal-term-item">
                         <span>Période</span>
-                        <strong>14 – 18 Sept.</strong>
+                        <strong>14–18 Sept.</strong>
                       </div>
-                      <div class="min-tile">
-                        <span>Horaires</span>
-                        <strong>08:30 – 18:30</strong>
+                      <div class="deal-term-item">
+                        <span>Créneau</span>
+                        <strong>8h30–18h30</strong>
                       </div>
-                      <div class="min-tile">
+                      <div class="deal-term-item">
                         <span>Rétrocession</span>
                         <strong>70 %</strong>
                       </div>
-                      <div class="min-tile">
-                        <span>Sécurisation</span>
-                        <strong>Garanti</strong>
+                      <div class="deal-term-item">
+                        <span>Garantie</span>
+                        <strong>Validée</strong>
                       </div>
                     </div>
-                    <div class="min-seal-badge">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                      <span>Contrat dématérialisé bilatéral prêt</span>
+                    <div class="deal-lock-stamp">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                      <span>Contrat bilatéral scellé & horodaté</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="min-shot-foot">
-                <div class="min-foot-status">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Conditions enregistrées et scellées</span>
+              <div class="concept-foot">
+                <div class="concept-foot-meta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Formalisation juridique immédiate sans friction</span>
                 </div>
-                <span class="min-foot-action teal">Télécharger le contrat →</span>
+                <span class="concept-foot-chip">Contrat signé</span>
               </div>
             </div>
           </div>
@@ -1612,71 +1773,69 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Suivi et bilan mission</h3>
             <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration épurée du suivi et bilan de mission MédiLink avec jalons franchis et clôture réussie">
-            <div class="min-shot min-step5">
-              <div class="min-shot-glow min-shot-glow-teal"></div>
-              <div class="min-shot-glow min-shot-glow-blue"></div>
+          <div class="how-slide-media" role="img" aria-label="Déroulé continu de la mission et dénouement financier automatisé">
+            <div class="concept-shot">
+              <div class="concept-orb concept-orb-1"></div>
+              <div class="concept-orb concept-orb-2"></div>
 
-              <div class="min-shot-head">
-                <div class="min-shot-title-wrap">
-                  <span class="min-shot-dot"></span>
-                  <span class="min-shot-category">Suivi & Clôture</span>
+              <div class="concept-head">
+                <div class="concept-tag">
+                  <span class="concept-dot"></span>
+                  <span>05 · Exécution & clôture automatisée</span>
                 </div>
-                <span class="min-shot-badge teal">Mission 100% Réalisée ✓</span>
+                <span class="concept-pill-badge">Mission clôturée</span>
               </div>
 
-              <div class="min-shot-body">
-                <div class="min-step5-wrap">
-                  <div class="min-stepper-row">
-                    <div class="min-step-node">
-                      <div class="min-node-circle">✓</div>
-                      <div class="min-node-label">Cadrage</div>
-                      <div class="min-node-sub">Complété</div>
+              <div class="concept-body">
+                <div class="mission-track-wrap">
+                  <div class="mission-days-track">
+                    <div class="mission-day-node">
+                      <span>J1</span>
+                      <strong>14/09 ✓</strong>
                     </div>
-                    <div class="min-step-node">
-                      <div class="min-node-circle">✓</div>
-                      <div class="min-node-label">Accord</div>
-                      <div class="min-node-sub">Signé</div>
+                    <div class="mission-day-node">
+                      <span>J2</span>
+                      <strong>15/09 ✓</strong>
                     </div>
-                    <div class="min-step-node">
-                      <div class="min-node-circle">✓</div>
-                      <div class="min-node-label">Remplacement</div>
-                      <div class="min-node-sub">5 journées</div>
+                    <div class="mission-day-node">
+                      <span>J3</span>
+                      <strong>16/09 ✓</strong>
                     </div>
-                    <div class="min-step-node active">
-                      <div class="min-node-circle">✓</div>
-                      <div class="min-node-label">Clôture</div>
-                      <div class="min-node-sub">Validée</div>
+                    <div class="mission-day-node">
+                      <span>J4</span>
+                      <strong>17/09 ✓</strong>
+                    </div>
+                    <div class="mission-day-node">
+                      <span>J5</span>
+                      <strong>18/09 ✓</strong>
                     </div>
                   </div>
 
-                  <div class="min-summary-grid">
-                    <div class="min-metric-card">
+                  <div class="mission-stats-trio">
+                    <div class="mission-stat-box">
                       <strong>5 / 5 j</strong>
-                      <span>Séances effectuées</span>
+                      <span>Réalisés</span>
                     </div>
-                    <div class="min-metric-card">
-                      <strong>100%</strong>
-                      <span>Actes transmis</span>
-                    </div>
-                    <div class="min-metric-card">
+                    <div class="mission-stat-box">
                       <strong>3 850 €</strong>
                       <span>Rétrocession nette</span>
                     </div>
+                    <div class="mission-stat-box">
+                      <strong>1 clic</strong>
+                      <span>Attestation & Relevé</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div class="min-shot-foot">
-                <div class="min-foot-status">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Relevé et attestation prêts au téléchargement</span>
+              <div class="concept-foot">
+                <div class="concept-foot-meta">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Clôture automatique : justificatifs et paiements prêts</span>
                 </div>
-                <span class="min-foot-action teal">Voir les documents ↓</span>
+                <span class="concept-foot-chip">Archive certifiée</span>
               </div>
             </div>
-          </div>
-        </div>
       </article>
     </div>
     <div class="how-nav">
