@@ -198,142 +198,586 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-slide-media:hover{border-color:rgba(26,82,160,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 22px 46px rgba(11,25,41,.12);transform:translateY(-2px)}
 .how-slide-media img,.how-slide-media .how-slide-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
-/* Cartes produit focalisees sur une fonctionnalite. */
-.ui-shot{--ui-navy:#0B1929;--ui-blue:#1A52A0;--ui-teal:#0E8A7A;--ui-text:#0F1E32;--ui-muted:#56667D;--ui-line:#E4E9F2;position:relative;z-index:1;display:block;width:100%;height:100%;min-height:0;overflow:hidden;border:0;border-radius:14px;background:transparent;color:var(--ui-text);box-shadow:none;text-align:left;font-family:var(--sans);font-size:10px;line-height:1.35}
-.ui-shot *{box-sizing:border-box}
-.ui-avatar{width:22px;height:22px;display:grid;place-items:center;flex:0 0 22px;border-radius:50%;background:#E8F1FC;color:var(--ui-blue);font-size:8px;font-weight:800}
-.ui-main{position:relative;min-width:0;overflow:hidden;padding:15px 17px;background:#F8F7F3;background-image:linear-gradient(rgba(26,82,160,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(26,82,160,.035) 1px,transparent 1px);background-size:27px 27px}
-.ui-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.ui-eyebrow{display:block;margin-bottom:3px;color:var(--ui-teal);font-size:7px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.ui-page-head h4,.ui-card h5{margin:0;color:var(--ui-navy);font-family:var(--serif);font-weight:400;letter-spacing:0}
-.ui-page-head h4{font-size:18px;line-height:1}
-.ui-page-head p{margin:4px 0 0;color:var(--ui-muted);font-size:8px}
-.ui-pill{display:inline-flex;align-items:center;gap:4px;min-height:19px;padding:3px 7px;border:1px solid rgba(26,82,160,.12);border-radius:999px;background:rgba(26,82,160,.07);color:var(--ui-blue);font-size:7px;font-weight:700;white-space:nowrap}
-.ui-pill.success{border-color:rgba(14,138,122,.2);background:rgba(14,138,122,.09);color:#0B6F62}
-.ui-pill.warning{border-color:#F5D08A;background:#FFF7E6;color:#8A4B00}
-.ui-pill.neutral{border-color:var(--ui-line);background:#F2F4F8;color:#4A5A72}
-.ui-card{min-width:0;border:1px solid var(--ui-line);border-radius:11px;background:rgba(255,255,255,.96);box-shadow:0 8px 24px rgba(11,25,41,.045)}
-.ui-card h5{font-size:13px;line-height:1.05}
-.ui-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding:9px;border:1px solid rgba(26,82,160,.1);border-radius:9px;background:rgba(255,255,255,.68)}
-.ui-toolbar strong{display:block;margin-top:4px;color:var(--ui-navy);font-size:10px}
-.ui-muted{color:var(--ui-muted)}
-.ui-progress{height:4px;overflow:hidden;border-radius:999px;background:#E4E9F2}
-.ui-progress span{display:block;height:100%;border-radius:inherit;background:var(--ui-teal)}
-.ui-form-card{display:grid;gap:8px;padding:11px}
-.ui-form-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.ui-form-head p{margin:3px 0 0;color:var(--ui-muted);font-size:7px}
-.ui-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
-.ui-field{display:grid;gap:4px;min-width:0}
-.ui-label{color:#3A4A62;font-size:6.5px;font-weight:800;letter-spacing:.045em;text-transform:uppercase}
-.ui-input{min-width:0;height:27px;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:0 8px;border:1px solid var(--ui-line);border-radius:7px;background:#fff;color:var(--ui-text);font-size:8px;white-space:nowrap;overflow:hidden}
-.ui-input span:last-child{color:#8A9AB8}
-.ui-input.focus{border-color:rgba(26,82,160,.52);box-shadow:0 0 0 3px rgba(26,82,160,.08)}
-.ui-shot-actions{display:flex;align-items:center;justify-content:space-between;gap:7px}
-.ui-button{min-height:26px;display:inline-flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid var(--ui-line);border-radius:7px;background:#fff;color:var(--ui-text);font-size:7px;font-weight:700}
-.ui-button.primary{border-color:var(--ui-navy);background:var(--ui-navy);color:#C8DFF5}
-.ui-button.success{border-color:rgba(14,138,122,.22);background:rgba(14,138,122,.1);color:#0B6F62}
-.ui-button.danger{border-color:#FECACA;background:#FEF3F2;color:#B42318}
-/* Matching */
-.ui-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-bottom:8px}
-.ui-stat{position:relative;display:grid;gap:2px;min-height:47px;padding:8px;overflow:hidden}
-.ui-stat::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:var(--ui-teal)}
-.ui-stat span{color:var(--ui-muted);font-size:6px;font-weight:800;text-transform:uppercase}
-.ui-stat strong{color:var(--ui-navy);font-family:var(--serif);font-size:17px;font-weight:400;line-height:1}
-.ui-match-layout{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(150px,.96fr);gap:8px;min-height:0}
-.ui-candidate-list{display:grid;align-content:start;gap:6px;padding:8px}
-.ui-candidate-row{display:grid;grid-template-columns:37px minmax(0,1fr) auto;gap:7px;align-items:center;padding:6px;border:1px solid var(--ui-line);border-radius:8px;background:#fff}
-.ui-candidate-row.active{border-color:rgba(14,138,122,.34);box-shadow:0 6px 16px rgba(11,25,41,.06)}
-.ui-score{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(14,138,122,.18);border-radius:9px;background:rgba(14,138,122,.08);color:var(--ui-teal);font-size:10px;font-weight:800}
-.ui-candidate-copy{min-width:0}
-.ui-candidate-copy strong,.ui-candidate-copy span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ui-candidate-copy strong{color:var(--ui-navy);font-size:8px}
-.ui-candidate-copy span{margin-top:2px;color:var(--ui-muted);font-size:6.5px}
-.ui-match-detail{display:grid;align-content:start;gap:8px;padding:9px;background:#FCFDFE}
-.ui-match-detail-head{display:flex;justify-content:space-between;gap:7px}
-.ui-match-detail-head strong{color:var(--ui-navy);font-size:9px}
-.ui-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;overflow:hidden;border:1px solid var(--ui-line);border-radius:7px;background:var(--ui-line)}
-.ui-profile-grid div{padding:6px;background:#fff}
-.ui-profile-grid span,.ui-breakdown-head span{display:block;color:var(--ui-muted);font-size:6px;font-weight:700;text-transform:uppercase}
-.ui-profile-grid strong{display:block;margin-top:2px;color:var(--ui-navy);font-size:7px}
-.ui-reasons{display:flex;flex-wrap:wrap;gap:4px}
-.ui-reasons span{padding:3px 5px;border:1px solid rgba(14,138,122,.18);border-radius:999px;background:rgba(14,138,122,.08);color:#0B6F62;font-size:6px;font-weight:700}
-.ui-breakdown{display:grid;gap:5px}
-.ui-breakdown-head{display:flex;justify-content:space-between;gap:8px}
-.ui-score-bar{height:4px;overflow:hidden;border-radius:999px;background:#E8EDF4}
-.ui-score-bar span{display:block;height:100%;border-radius:inherit;background:var(--ui-teal)}
+/* ===================================================
+   ILLUSTRATIONS PARCOURS MINIMALISTES & ESTHÉTIQUES
+   =================================================== */
+.min-shot {
+  --min-navy: #0B1929;
+  --min-navy-soft: #14273E;
+  --min-blue: #1A52A0;
+  --min-blue-light: #EEF5FC;
+  --min-blue-border: rgba(26, 82, 160, 0.14);
+  --min-teal: #0E8A7A;
+  --min-teal-light: #E6F7F4;
+  --min-teal-border: rgba(14, 138, 122, 0.2);
+  --min-text-main: #0F1E32;
+  --min-text-muted: #5E718D;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 250, 255, 0.93) 100%);
+  border: 1px solid var(--min-blue-border);
+  box-shadow: 0 16px 40px rgba(11, 25, 41, 0.07), inset 0 1px 0 #fff;
+  font-family: var(--sans);
+  color: var(--min-text-main);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.min-shot * { box-sizing: border-box; }
 
-/* Candidatures */
-.ui-application-shell{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(150px,.88fr);gap:8px}
-.ui-application-list{display:grid;align-content:start;gap:6px;padding:8px}
-.ui-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid var(--ui-line)}
-.ui-section-head strong{color:var(--ui-navy);font-size:9px}
-.ui-section-head span{display:block;margin-top:2px;color:var(--ui-muted);font-size:6.5px}
-.ui-application-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:7px;align-items:center;padding:6px;border:1px solid var(--ui-line);border-radius:8px;background:#fff}
-.ui-application-row.active{border-color:rgba(26,82,160,.28);background:rgba(26,82,160,.035)}
-.ui-application-row .ui-avatar{width:27px;height:27px;flex-basis:27px}
-.ui-profile-card{display:grid;align-content:start;gap:8px;padding:9px;background:#FCFDFE}
-.ui-profile-identity{display:flex;align-items:center;gap:7px}
-.ui-profile-identity .ui-avatar{width:34px;height:34px;flex-basis:34px;background:rgba(14,138,122,.1);color:var(--ui-teal)}
-.ui-profile-identity strong{display:block;color:var(--ui-navy);font-size:9px}
-.ui-profile-identity span{display:block;margin-top:2px;color:var(--ui-muted);font-size:6.5px}
-.ui-check-list{display:grid;gap:5px}
-.ui-check{display:flex;align-items:center;gap:6px;padding:5px 6px;border:1px solid var(--ui-line);border-radius:7px;background:#fff;color:var(--ui-text);font-size:6.5px}
-.ui-check i{width:13px;height:13px;display:grid;place-items:center;flex:0 0 13px;border-radius:50%;background:rgba(14,138,122,.1);color:var(--ui-teal);font-size:7px;font-style:normal;font-weight:900}
-.ui-profile-note{margin:0;padding:7px;border-radius:7px;background:#F2F4F8;color:var(--ui-muted);font-size:6.5px;line-height:1.45}
+.min-shot-glow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.45;
+  z-index: 0;
+}
+.min-shot-glow-teal {
+  background: radial-gradient(circle, rgba(14, 138, 122, 0.28) 0%, transparent 70%);
+  top: -80px;
+  right: -80px;
+}
+.min-shot-glow-blue {
+  background: radial-gradient(circle, rgba(26, 82, 160, 0.22) 0%, transparent 70%);
+  bottom: -90px;
+  left: -90px;
+}
 
-/* Messagerie */
-.ui-message-main{padding:10px 11px}
-.ui-message-layout{display:grid;grid-template-columns:31% minmax(0,1fr);gap:7px;height:100%;min-height:0}
-.ui-message-pane{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;overflow:hidden}
-.ui-message-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border-bottom:1px solid var(--ui-line)}
-.ui-message-head strong{display:block;color:var(--ui-navy);font-size:9px}
-.ui-message-head span{display:block;margin-top:2px;color:var(--ui-muted);font-size:6px}
-.ui-message-log{display:grid;align-content:start;gap:6px;min-height:0;overflow:hidden;padding:7px}
-.ui-bubble{max-width:68%;padding:6px 7px;border:1px solid var(--ui-line);border-radius:8px 8px 8px 3px;background:#F2F4F8;color:var(--ui-text);font-size:6.5px}
-.ui-bubble.mine{justify-self:end;border-color:rgba(26,82,160,.18);border-radius:8px 8px 3px 8px;background:rgba(26,82,160,.08)}
-.ui-workflow-card{display:grid;gap:6px;padding:7px;border:1px solid rgba(14,138,122,.18);border-radius:9px;background:#fff;box-shadow:0 7px 18px rgba(11,25,41,.05)}
-.ui-workflow-head{display:flex;align-items:center;justify-content:space-between;gap:7px}
-.ui-workflow-head strong{font-family:var(--serif);font-size:10px;font-weight:400;color:var(--ui-navy)}
-.ui-workflow-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-.ui-workflow-summary div{padding:5px;border-radius:6px;background:#F8FAFC}
-.ui-workflow-summary span{display:block;color:var(--ui-muted);font-size:5.5px;font-weight:700;text-transform:uppercase}
-.ui-workflow-summary strong{display:block;margin-top:2px;color:var(--ui-navy);font-size:6.5px}
-.ui-composer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:7px;border-top:1px solid var(--ui-line)}
-.ui-composer span{display:flex;align-items:center;padding:0 7px;border:1px solid var(--ui-line);border-radius:7px;background:#fff;color:#8A9AB8;font-size:6.5px}
+.min-shot-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(220, 228, 240, 0.75);
+}
+.min-shot-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.min-shot-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--min-teal);
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.18);
+}
+.min-shot-category {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--min-navy);
+}
+.min-shot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--min-blue-light);
+  color: var(--min-blue);
+  border: 1px solid var(--min-blue-border);
+}
+.min-shot-badge.teal {
+  background: var(--min-teal-light);
+  color: var(--min-teal);
+  border-color: var(--min-teal-border);
+}
 
-/* Suivi de mission */
-.ui-command{display:grid;grid-template-columns:minmax(0,1fr) repeat(2,minmax(72px,.48fr));gap:7px;margin-bottom:8px;padding:8px;border:1px solid rgba(14,138,122,.18);border-radius:9px;background:linear-gradient(135deg,rgba(14,138,122,.1),rgba(255,255,255,.95) 55%,rgba(26,82,160,.07))}
-.ui-command > div{min-width:0}
-.ui-command > div:not(:first-child){padding:6px;border:1px solid rgba(255,255,255,.84);border-radius:7px;background:rgba(255,255,255,.72)}
-.ui-command span{display:block;color:var(--ui-muted);font-size:5.8px;font-weight:800;text-transform:uppercase}
-.ui-command strong{display:block;margin-top:3px;color:var(--ui-navy);font-size:8px}
-.ui-command h5{font-size:12px}
-.ui-command p{margin:2px 0 0;color:var(--ui-muted);font-size:6px}
-.ui-mission-layout{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(140px,.82fr);gap:8px}
-.ui-route{display:grid;align-content:start;gap:7px;padding:9px}
-.ui-route-head{display:flex;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid rgba(14,138,122,.16)}
-.ui-route-head strong{color:var(--ui-navy);font-size:9px}
-.ui-route-head span{color:var(--ui-muted);font-size:6.5px}
-.ui-route-list{display:grid}
-.ui-route-step{position:relative;display:grid;grid-template-columns:23px minmax(0,1fr);gap:7px;padding-bottom:7px}
-.ui-route-step:last-child{padding-bottom:0}
-.ui-route-step::before{content:'';position:absolute;left:10px;top:21px;bottom:0;width:1px;background:#DCE5EF}
-.ui-route-step.done::before{background:rgba(14,138,122,.34)}
-.ui-route-step:last-child::before{display:none}
-.ui-route-dot{z-index:1;width:22px;height:22px;display:grid;place-items:center;border:1.5px solid #D8E0EC;border-radius:50%;background:#fff;color:var(--ui-muted);font-size:6px;font-weight:800}
-.ui-route-step.done .ui-route-dot{border-color:var(--ui-teal);background:var(--ui-teal);color:#fff}
-.ui-route-step.active .ui-route-dot{border-color:var(--ui-teal);box-shadow:0 0 0 3px rgba(14,138,122,.11)}
-.ui-route-copy{min-width:0}
-.ui-route-copy strong{display:block;color:var(--ui-navy);font-size:7.5px}
-.ui-route-copy span{display:block;margin-top:2px;color:var(--ui-muted);font-size:6px}
-.ui-close-card{display:grid;align-content:start;gap:8px;padding:10px;background:linear-gradient(145deg,#fff,rgba(14,138,122,.045))}
-.ui-close-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:9px;background:rgba(14,138,122,.1);color:var(--ui-teal);font-size:14px;font-weight:900}
-.ui-close-card h5{font-size:14px}
-.ui-close-card p{margin:0;color:var(--ui-muted);font-size:7px;line-height:1.45}
-.ui-close-summary{display:grid;gap:1px;overflow:hidden;border:1px solid var(--ui-line);border-radius:7px;background:var(--ui-line)}
-.ui-close-summary div{display:flex;justify-content:space-between;gap:7px;padding:5px 6px;background:#fff;font-size:6.5px}
-.ui-close-summary span{color:var(--ui-muted)}
-.ui-close-summary strong{color:var(--ui-navy)}
+.min-shot-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.min-shot-foot {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(220, 228, 240, 0.75);
+}
+.min-foot-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--min-text-muted);
+}
+.min-foot-status svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--min-teal);
+  flex-shrink: 0;
+}
+.min-foot-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--min-navy);
+  color: #C8DFF5;
+  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.15);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.min-foot-action.teal {
+  background: var(--min-teal);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(14, 138, 122, 0.2);
+}
+
+/* Slide 1 - Cadrage */
+.min-step1-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 12px;
+}
+.min-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(215, 226, 242, 0.85);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 6px 18px rgba(11, 25, 41, 0.04);
+}
+.min-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--min-text-muted);
+  margin-bottom: 6px;
+}
+.min-date-hero {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--min-navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.min-date-hero svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--min-blue);
+  flex-shrink: 0;
+}
+.min-hours-sub {
+  font-size: 12px;
+  color: var(--min-text-muted);
+}
+.min-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.min-chip {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #F1F5FA;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--min-navy-soft);
+  border: 1px solid rgba(200, 212, 230, 0.6);
+}
+.min-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.min-gauge-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--min-navy);
+  line-height: 1;
+}
+.min-gauge-num small {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--min-teal);
+  margin-left: 4px;
+}
+.min-gauge-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #E5ECF6;
+  overflow: hidden;
+}
+.min-gauge-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1A52A0, #0E8A7A);
+}
+.min-gauge-sub {
+  font-size: 11px;
+  color: var(--min-text-muted);
+}
+
+/* Slide 2 - Scoring /100 */
+.min-step2-layout {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.min-score-hero-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px 10px;
+  background: linear-gradient(145deg, #F5FAF9, #E6F6F3);
+  border: 1.5px solid rgba(14, 138, 122, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(14, 138, 122, 0.08);
+}
+.min-score-hero-num {
+  font-family: var(--serif);
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--min-teal);
+}
+.min-score-hero-num span {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: #558E85;
+}
+.min-score-hero-badge {
+  margin-top: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #0E8A7A;
+  color: #fff;
+}
+.min-score-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.min-criteria-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.min-criteria-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+}
+.min-criteria-title {
+  font-weight: 600;
+  color: var(--min-navy);
+}
+.min-criteria-val {
+  font-weight: 700;
+  color: var(--min-teal);
+}
+.min-criteria-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #E5ECF6;
+  overflow: hidden;
+}
+.min-criteria-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1A52A0, #0E8A7A);
+}
+
+/* Slide 3 - Profil Vérifié */
+.min-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(215, 226, 242, 0.85);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 24px rgba(11, 25, 41, 0.05);
+}
+.min-profile-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.min-doc-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #E2EEFC, #CBE1FA);
+  color: var(--min-blue);
+  font-weight: 800;
+  font-size: 14px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.15);
+  flex-shrink: 0;
+  position: relative;
+}
+.min-doc-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid #fff;
+}
+.min-doc-meta strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--min-navy);
+}
+.min-doc-meta span {
+  display: block;
+  font-size: 11px;
+  color: var(--min-text-muted);
+}
+.min-doc-rating {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #B45309;
+  background: #FEF3C7;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+.min-badges-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.min-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: #F4F8FC;
+  border: 1px solid rgba(26, 82, 160, 0.1);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--min-navy);
+}
+.min-trust-badge svg {
+  width: 13px;
+  height: 13px;
+  stroke: var(--min-teal);
+  flex-shrink: 0;
+}
+.min-profile-quote {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--min-text-muted);
+  line-height: 1.45;
+  background: #FAFBFD;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border-left: 3px solid var(--min-blue);
+}
+
+/* Slide 4 - Validation Accord */
+.min-step4-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.min-chat-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 12px;
+  background: #F3F7FC;
+  border-radius: 12px 12px 12px 2px;
+  border: 1px solid rgba(26, 82, 160, 0.12);
+  font-size: 11.5px;
+  color: var(--min-navy);
+  line-height: 1.4;
+}
+.min-chat-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1A52A0;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.min-contract-box {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1.5px solid rgba(14, 138, 122, 0.25);
+  border-radius: 14px;
+  padding: 11px 13px;
+  box-shadow: 0 8px 24px rgba(11, 25, 41, 0.05);
+}
+.min-contract-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+.min-contract-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--min-navy);
+}
+.min-tiles-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 7px;
+}
+.min-tile {
+  background: #F6F9FD;
+  border: 1px solid rgba(215, 226, 242, 0.7);
+  border-radius: 8px;
+  padding: 5px 6px;
+  text-align: center;
+}
+.min-tile span {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--min-text-muted);
+}
+.min-tile strong {
+  display: block;
+  font-size: 11px;
+  color: var(--min-navy);
+  margin-top: 1px;
+}
+.min-seal-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #0E8A7A;
+  background: #E8F7F4;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+/* Slide 5 - Suivi & Clôture */
+.min-step5-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.min-stepper-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  position: relative;
+}
+.min-step-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+}
+.min-node-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #E8F7F4;
+  border: 1.5px solid #0E8A7A;
+  color: #0E8A7A;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.min-step-node.active .min-node-circle {
+  background: #0E8A7A;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
+}
+.min-node-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--min-navy);
+}
+.min-node-sub {
+  font-size: 8.5px;
+  color: var(--min-text-muted);
+}
+.min-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.min-metric-card {
+  background: #fff;
+  border: 1px solid rgba(215, 226, 242, 0.85);
+  border-radius: 10px;
+  padding: 8px 10px;
+  text-align: center;
+}
+.min-metric-card strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--min-navy);
+  line-height: 1.1;
+}
+.min-metric-card span {
+  display: block;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--min-text-muted);
+  margin-top: 2px;
+}
 .how-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:34px}
 .how-arrow{width:48px;height:48px;border-radius:50%;background:#fff;border:1px solid rgba(26,82,160,.18);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,25,41,.08);transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
 .how-arrow:hover{background:var(--navy);color:#C8DFF5;transform:translateY(-2px);box-shadow:0 14px 30px rgba(11,25,41,.16)}
@@ -612,11 +1056,7 @@ footer{background:var(--navy);padding:var(--space-section) 40px 32px}
   .btn-lg{font-size:14px;padding:11px 18px}
   .hero-stats{grid-template-columns:1fr;gap:14px}
   .hero-stat-num{font-size:30px}
-  .section-h{font-size:30px}
   .how-slide-media{aspect-ratio:4/3;min-height:224px}
-   .ui-shot-mission .ui-command{display:none}
-  .ui-shot-mission .ui-mission-layout{grid-template-columns:1fr}
-  .ui-shot-mission .ui-route{display:none}
   .dash-side{display:none}
   .dash-content{grid-template-columns:1fr}
   .dash-card-wide{grid-column:auto}
@@ -804,138 +1244,29 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
   .how-arrow{width:44px;height:44px}
 }
 
-/* Illustrations produit : une fonctionnalite a la fois, sans chrome d'application. */
-.how-slide-media{padding:16px;background:radial-gradient(circle at 14% 10%,rgba(255,255,255,.9),transparent 34%),linear-gradient(145deg,#EAF2FA 0%,#DCEAF6 100%)}
-.ui-main{height:100%;min-height:0;padding:18px 20px;border:1px solid rgba(26,82,160,.13);border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(244,249,253,.96));box-shadow:0 16px 36px rgba(11,25,41,.12)}
-.ui-page-head{margin-bottom:14px}
-.ui-eyebrow{font-size:8px;letter-spacing:.1em}
-.ui-page-head h4{font-size:22px;line-height:1.05}
-.ui-page-head p{font-size:9px;margin-top:5px}
-.ui-pill{min-height:22px;padding:4px 8px;font-size:7.5px}
-.ui-card{border-radius:13px;box-shadow:0 8px 24px rgba(11,25,41,.06)}
-.ui-form-card{gap:11px;padding:15px}
-.ui-toolbar{padding:11px;border-radius:10px}
-.ui-toolbar strong{font-size:11px}
-.ui-form-head h5{font-size:15px}
-.ui-form-head p{font-size:8px}
-.ui-field-grid{gap:8px}
-.ui-label{font-size:7px}
-.ui-input{height:32px;font-size:9px}
-.ui-shot-actions{gap:9px}
-.ui-button{min-height:30px;padding:0 11px;font-size:8px}
-.ui-shot-wizard .ui-main{background:linear-gradient(145deg,#FCFEFF 0%,#EEF7FC 100%)}
-.ui-shot-wizard .ui-main{padding:12px 16px}
-.ui-shot-wizard .ui-page-head{margin-bottom:8px}
-.ui-shot-wizard .ui-page-head p{display:none}
-.ui-shot-wizard .ui-page-head h4{font-size:19px}
-.ui-shot-wizard .ui-form-card{max-width:720px;margin:0 auto;gap:7px;padding:10px}
-.ui-shot-wizard .ui-toolbar{padding:8px}
-.ui-shot-wizard .ui-toolbar > div > .ui-muted{display:none}
-.ui-shot-wizard .ui-form-head p{display:none}
-.ui-shot-wizard .ui-field-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-.ui-shot-wizard .ui-input{height:28px}
-.ui-shot-wizard .ui-button{min-height:27px}
+/* Illustrations produit : minimalistes et épurées */
+.how-slide-media{padding:12px;background:radial-gradient(circle at 14% 10%,rgba(255,255,255,.9),transparent 34%),linear-gradient(145deg,#EAF2FA 0%,#DCEAF6 100%)}
 
-.ui-shot-matching .ui-main{background:linear-gradient(145deg,#FBFEFD 0%,#EDF8F6 100%)}
-.ui-shot-matching .ui-match-layout{grid-template-columns:minmax(0,1.05fr) minmax(220px,.95fr);gap:10px}
-.ui-shot-matching .ui-score{width:40px;height:40px;font-size:12px}
-.ui-shot-matching .ui-candidate-row{grid-template-columns:43px minmax(0,1fr) auto;padding:8px}
-.ui-shot-matching .ui-candidate-copy strong{font-size:9px}
-.ui-shot-matching .ui-candidate-copy span{font-size:7px}
-.ui-shot-matching .ui-match-detail{padding:11px;gap:9px}
-.ui-shot-matching .ui-match-detail-head strong{font-size:10px}
-
-.ui-shot-applications .ui-main{background:linear-gradient(145deg,#FCFDFF 0%,#F0F4FB 100%)}
-.ui-shot-applications .ui-application-shell{grid-template-columns:minmax(0,.88fr) minmax(240px,1.12fr);gap:10px}
-.ui-shot-applications .ui-application-row{grid-template-columns:31px minmax(0,1fr) auto;padding:8px}
-.ui-shot-applications .ui-profile-card{padding:12px;gap:10px}
-.ui-shot-applications .ui-profile-identity strong{font-size:10px}
-.ui-shot-applications .ui-profile-identity span{font-size:7px}
-.ui-shot-applications .ui-check{padding:7px;font-size:7px}
-.ui-shot-applications .ui-profile-note{font-size:7px}
-
-.ui-shot-messages .ui-main{padding:14px;background:linear-gradient(145deg,#FDFEFF 0%,#EEF5FC 100%)}
-.ui-shot-messages .ui-message-layout{grid-template-columns:1fr;gap:0}
-.ui-shot-messages .ui-message-pane{border-radius:13px;background:#fff;box-shadow:0 10px 28px rgba(11,25,41,.08)}
-.ui-shot-messages .ui-message-head{padding:12px 14px}
-.ui-shot-messages .ui-message-head strong{font-size:10px}
-.ui-shot-messages .ui-message-head span{font-size:7px}
-.ui-shot-messages .ui-message-log{gap:9px;padding:12px 14px}
-.ui-shot-messages .ui-bubble{font-size:8px;line-height:1.45;padding:8px 10px}
-.ui-shot-messages .ui-workflow-card{gap:8px;padding:10px}
-.ui-shot-messages .ui-workflow-head strong{font-size:12px}
-.ui-shot-messages .ui-workflow-summary{gap:5px}
-.ui-shot-messages .ui-workflow-summary div{padding:7px}
-.ui-shot-messages .ui-workflow-summary span{font-size:6px}
-.ui-shot-messages .ui-workflow-summary strong{font-size:7px}
-.ui-shot-messages .ui-composer{padding:10px}
-.ui-shot-messages .ui-composer span{font-size:8px}
-
-.ui-shot-mission .ui-main{background:linear-gradient(145deg,#FCFEFD 0%,#EEF8F6 100%)}
-.ui-shot-mission .ui-command{gap:9px;padding:10px}
-.ui-shot-mission .ui-mission-layout{grid-template-columns:minmax(0,1.08fr) minmax(220px,.92fr);gap:10px}
-.ui-shot-mission .ui-route{padding:11px;gap:9px}
-.ui-shot-mission .ui-route-head strong{font-size:10px}
-.ui-shot-mission .ui-route-head span{font-size:7px}
-.ui-shot-mission .ui-route-step{grid-template-columns:26px minmax(0,1fr);gap:8px;padding-bottom:9px}
-.ui-shot-mission .ui-route-dot{width:25px;height:25px}
-.ui-shot-mission .ui-route-copy strong{font-size:8px}
-.ui-shot-mission .ui-route-copy span{font-size:7px}
-.ui-shot-mission .ui-close-card{padding:12px;gap:9px}
-.ui-shot-mission .ui-close-card h5{font-size:16px}
-.ui-shot-mission .ui-close-card p{font-size:8px}
-
-@media(max-width:720px){
-  .how-slide-media{padding:10px}
-  .ui-main,.ui-shot-messages .ui-main{padding:12px}
-  .ui-page-head{margin-bottom:9px}
-  .ui-page-head h4{font-size:18px}
-  .ui-page-head p{display:none}
-  .ui-pill{min-height:20px;padding:3px 7px;font-size:7px}
-  .ui-form-card{gap:8px;padding:10px}
-  .ui-toolbar{padding:8px}
-  .ui-form-head h5{font-size:12px}
-  .ui-field-grid{gap:6px}
-  .ui-input{height:28px;font-size:8px}
-  .ui-button{min-height:27px;padding:0 9px;font-size:7px}
-  .ui-shot-matching .ui-match-layout,.ui-shot-applications .ui-application-shell,.ui-shot-mission .ui-mission-layout{gap:6px}
-  .ui-shot-matching .ui-score{width:34px;height:34px;font-size:10px}
-  .ui-shot-matching .ui-candidate-row{grid-template-columns:37px minmax(0,1fr) auto;padding:6px}
-  .ui-shot-matching .ui-candidate-copy strong{font-size:8px}
-  .ui-shot-matching .ui-candidate-copy span{font-size:6.5px}
-  .ui-shot-applications .ui-application-row{grid-template-columns:27px minmax(0,1fr) auto;padding:6px}
-  .ui-shot-applications .ui-profile-card{padding:9px;gap:8px}
-  .ui-shot-applications .ui-check{padding:5px 6px;font-size:6.5px}
-  .ui-shot-messages .ui-message-head{padding:9px 10px}
-  .ui-shot-messages .ui-message-log{gap:6px;padding:8px}
-  .ui-shot-messages .ui-bubble{font-size:7px;padding:6px 7px}
-  .ui-shot-messages .ui-workflow-card{padding:7px}
-  .ui-shot-messages .ui-workflow-summary div{padding:5px}
-  .ui-shot-messages .ui-composer{padding:7px}
-  .ui-shot-mission .ui-command{gap:6px;padding:8px}
-  .ui-shot-mission .ui-route{padding:8px;gap:7px}
-  .ui-shot-mission .ui-route-step{grid-template-columns:23px minmax(0,1fr);gap:7px;padding-bottom:7px}
-  .ui-shot-mission .ui-route-dot{width:22px;height:22px}
-  .ui-shot-mission .ui-route-copy strong{font-size:7.5px}
-  .ui-shot-mission .ui-route-copy span{font-size:6px}
-  .ui-shot-mission .ui-close-card{padding:9px;gap:7px}
-  .ui-shot-mission .ui-close-card h5{font-size:14px}
-  .ui-shot-mission .ui-close-card p{font-size:7px}
+@media(max-width:900px){
+  .min-shot{padding:18px 20px;min-height:350px}
 }
 
-@media(max-width:420px){
-  .ui-shot-messages .ui-bubble{display:block}
-  .ui-shot-messages .ui-message-log{padding:6px}
-  .ui-shot-messages .ui-workflow-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:720px){
+  .how-slide-media{padding:8px}
+  .min-shot{padding:16px;min-height:320px}
+  .min-step1-grid{grid-template-columns:1fr;gap:10px}
+  .min-step2-layout{grid-template-columns:110px 1fr;gap:12px}
+  .min-score-hero-num{font-size:34px}
+  .min-badges-row{grid-template-columns:1fr;gap:6px}
+  .min-tiles-row{grid-template-columns:repeat(2,1fr);gap:6px}
 }
 
 @media(max-width:480px){
-  .ui-shot-wizard .ui-main{padding:9px}
-  .ui-shot-wizard .ui-page-head{display:none}
-  .ui-shot-wizard .ui-toolbar{display:none}
-  .ui-shot-wizard .ui-form-card{gap:6px;padding:8px}
-  .ui-shot-wizard .ui-field-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-  .ui-shot-wizard .ui-field:nth-child(n+5){display:none}
+  .min-shot{padding:14px 12px;min-height:auto}
+  .min-step2-layout{grid-template-columns:1fr;gap:10px}
+  .min-stepper-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .min-profile-quote{display:none}
+  .min-foot-action{font-size:10.5px;padding:5px 10px}
 }
 
 </style>
@@ -1014,33 +1345,54 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Cadrage du besoin</h3>
             <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration du formulaire MédiLink de création d'une mission, avec planning, horaires et rétrocession renseignés">
-            <div class="ui-shot ui-shot-wizard" aria-hidden="true">
-              <div class="ui-main">
-                <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Formulaire de mission</span><h4>Créer une mission</h4><p>Les informations essentielles, au même endroit.</p></div>
-                  <span class="ui-pill success">✓ Brouillon sauvegardé</span>
+          <div class="how-slide-media" role="img" aria-label="Illustration épurée du cadrage de mission MédiLink avec planning, horaires et rétrocession">
+            <div class="min-shot min-step1">
+              <div class="min-shot-glow min-shot-glow-teal"></div>
+              <div class="min-shot-glow min-shot-glow-blue"></div>
+              
+              <div class="min-shot-head">
+                <div class="min-shot-title-wrap">
+                  <span class="min-shot-dot"></span>
+                  <span class="min-shot-category">Cadrage de mission</span>
                 </div>
-                <div class="ui-card ui-form-card">
-                  <div class="ui-toolbar">
-                    <div><span class="ui-pill neutral">Étape 4/6</span><strong>Planning</strong><span class="ui-muted">Dates, horaires et rémunération</span></div>
-                    <div class="ui-muted">67% complété</div>
+                <span class="min-shot-badge teal">Cabinet Montaigne · Bordeaux</span>
+              </div>
+
+              <div class="min-shot-body">
+                <div class="min-step1-grid">
+                  <div class="min-card">
+                    <div class="min-card-label">Période & Organisation</div>
+                    <div class="min-date-hero">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      <span>14 — 18 Septembre 2026</span>
+                    </div>
+                    <div class="min-hours-sub">08:30 – 18:30 · 5 journées (40h)</div>
+                    <div class="min-chips">
+                      <span class="min-chip">Doctolib</span>
+                      <span class="min-chip">Cabinet de groupe</span>
+                      <span class="min-chip">Médecine générale</span>
+                    </div>
                   </div>
-                  <div class="ui-progress"><span style="width:67%"></span></div>
-                  <div class="ui-form-head">
-                    <div><h5>Cadrez le planning et la rémunération</h5><p>Des conditions lisibles évitent les échanges inutiles.</p></div>
-                    <span class="ui-pill success">Rétrocession</span>
+
+                  <div class="min-card">
+                    <div class="min-card-label">Rétrocession convenue</div>
+                    <div class="min-gauge-wrap">
+                      <div class="min-gauge-num">70% <small>Recommandé</small></div>
+                      <div class="min-gauge-bar">
+                        <div class="min-gauge-bar-fill" style="width: 70%;"></div>
+                      </div>
+                      <div class="min-gauge-sub">Honoraires prévus : <strong>~3 850 €</strong></div>
+                    </div>
                   </div>
-                  <div class="ui-field-grid">
-                    <div class="ui-field"><span class="ui-label">Date de début</span><div class="ui-input focus"><span>14 septembre 2026</span><span>▣</span></div></div>
-                    <div class="ui-field"><span class="ui-label">Date de fin</span><div class="ui-input"><span>18 septembre 2026</span><span>▣</span></div></div>
-                    <div class="ui-field"><span class="ui-label">Heure de début</span><div class="ui-input"><span>08:30</span><span>◷</span></div></div>
-                    <div class="ui-field"><span class="ui-label">Heure de fin</span><div class="ui-input"><span>18:30</span><span>◷</span></div></div>
-                    <div class="ui-field"><span class="ui-label">Durée estimée</span><div class="ui-input"><span>40 heures</span><span>⌃</span></div></div>
-                    <div class="ui-field"><span class="ui-label">Pourcentage de rétrocession</span><div class="ui-input"><span>70 %</span><span>⌃</span></div></div>
-                  </div>
-                  <div class="ui-shot-actions"><span class="ui-button">Retour</span><span class="ui-button primary">Continuer →</span></div>
                 </div>
+              </div>
+
+              <div class="min-shot-foot">
+                <div class="min-foot-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Paramètres calibrés pour le matching</span>
+                </div>
+                <span class="min-foot-action">Lancer le matching →</span>
               </div>
             </div>
           </div>
@@ -1055,36 +1407,61 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Scoring intelligent /100</h3>
             <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration du matching MédiLink avec candidats classés et détail d'un score de 92 sur 100">
-            <div class="ui-shot ui-shot-matching" aria-hidden="true">
-              <div class="ui-main">
-                <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Matching intelligent</span><h4>Le bon profil, au bon moment</h4><p>Un score lisible pour décider plus vite.</p></div>
-                  <span class="ui-pill success">24 profils analysés</span>
+          <div class="how-slide-media" role="img" aria-label="Illustration épurée du score de compatibilité MédiLink de 92 sur 100 et décomposition des critères">
+            <div class="min-shot min-step2">
+              <div class="min-shot-glow min-shot-glow-teal"></div>
+              <div class="min-shot-glow min-shot-glow-blue"></div>
+
+              <div class="min-shot-head">
+                <div class="min-shot-title-wrap">
+                  <span class="min-shot-dot"></span>
+                  <span class="min-shot-category">Algorithme de compatibilité</span>
                 </div>
-                <div class="ui-stats">
-                  <div class="ui-card ui-stat"><span>Éligibles</span><strong>8</strong><small class="ui-muted">profils qualifiés</small></div>
-                  <div class="ui-card ui-stat"><span>Meilleur score</span><strong>92/100</strong><small class="ui-muted">priorité forte</small></div>
-                  <div class="ui-card ui-stat"><span>Score moyen</span><strong>78</strong><small class="ui-muted">bonne pertinence</small></div>
-                </div>
-                <div class="ui-match-layout">
-                  <div class="ui-card ui-candidate-list">
-                    <div class="ui-section-head"><div><strong>Candidats matchés</strong><span>Classés par pertinence</span></div><span class="ui-pill neutral">Éligibles</span></div>
-                    <div class="ui-candidate-row active"><span class="ui-score">92</span><span class="ui-candidate-copy"><strong>Dr Camille Laurent</strong><span>Médecine générale · Bordeaux</span></span><span class="ui-pill success">Priorité forte</span></div>
-                    <div class="ui-candidate-row"><span class="ui-score">86</span><span class="ui-candidate-copy"><strong>Dr Thomas Bernard</strong><span>Médecine générale · Mérignac</span></span><span class="ui-pill success">Priorité forte</span></div>
-                    <div class="ui-candidate-row"><span class="ui-score">79</span><span class="ui-candidate-copy"><strong>Dr Inès Robert</strong><span>Médecine générale · Pessac</span></span><span class="ui-pill warning">Bon candidat</span></div>
+                <span class="min-shot-badge teal">24 profils analysés</span>
+              </div>
+
+              <div class="min-shot-body">
+                <div class="min-step2-layout">
+                  <div class="min-score-hero-box">
+                    <div class="min-score-hero-num">92<span>/100</span></div>
+                    <span class="min-score-hero-badge">Score Idéal</span>
+                    <div style="font-size: 10px; color: var(--min-text-muted); margin-top: 6px; font-weight: 500;">Dr Camille L.</div>
                   </div>
-                  <div class="ui-card ui-match-detail">
-                    <div class="ui-match-detail-head"><div><span class="ui-eyebrow">Lecture détaillée</span><strong>Dr Camille Laurent</strong></div><span class="ui-pill success">92/100</span></div>
-                    <div class="ui-profile-grid"><div><span>Statut</span><strong>Docteur en médecine</strong></div><div><span>Distance</span><strong>4,8 km</strong></div><div><span>Spécialité</span><strong>Médecine générale</strong></div><div><span>Disponibilité</span><strong>Créneau complet</strong></div></div>
-                    <div class="ui-reasons"><span>Spécialité exacte</span><span>Dates compatibles</span><span>Logiciel connu</span></div>
-                    <div class="ui-breakdown">
-                      <div><div class="ui-breakdown-head"><span>Spécialité</span><strong>24/24</strong></div><div class="ui-score-bar"><span style="width:100%"></span></div></div>
-                      <div><div class="ui-breakdown-head"><span>Disponibilité</span><strong>22/24</strong></div><div class="ui-score-bar"><span style="width:92%"></span></div></div>
-                      <div><div class="ui-breakdown-head"><span>Proximité</span><strong>18/20</strong></div><div class="ui-score-bar"><span style="width:90%"></span></div></div>
+
+                  <div class="min-score-bars">
+                    <div class="min-criteria-row">
+                      <div class="min-criteria-head">
+                        <span class="min-criteria-title">Spécialité & Actes médicaux</span>
+                        <span class="min-criteria-val">100%</span>
+                      </div>
+                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 100%;"></div></div>
+                    </div>
+
+                    <div class="min-criteria-row">
+                      <div class="min-criteria-head">
+                        <span class="min-criteria-title">Disponibilité planning (14-18 sept.)</span>
+                        <span class="min-criteria-val">96%</span>
+                      </div>
+                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 96%;"></div></div>
+                    </div>
+
+                    <div class="min-criteria-row">
+                      <div class="min-criteria-head">
+                        <span class="min-criteria-title">Proximité (4,8 km · Bordeaux)</span>
+                        <span class="min-criteria-val">90%</span>
+                      </div>
+                      <div class="min-criteria-bar"><div class="min-criteria-fill" style="width: 90%;"></div></div>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="min-shot-foot">
+                <div class="min-foot-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Profil prioritaire recommandé avec succès</span>
+                </div>
+                <span class="min-foot-action teal">Voir la candidature →</span>
               </div>
             </div>
           </div>
@@ -1099,29 +1476,57 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Recommandation ciblée</h3>
             <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration d'une candidature MédiLink avec profil vérifié et pièces justificatives">
-            <div class="ui-shot ui-shot-applications" aria-hidden="true">
-              <div class="ui-main">
-                <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Profil recommandé</span><h4>Une candidature prête à étudier</h4><p>Disponibilité, expérience et documents réunis.</p></div>
-                  <span class="ui-pill success">3 nouvelles</span>
+          <div class="how-slide-media" role="img" aria-label="Illustration épurée d'une candidature qualifiée avec profil praticien vérifié et pièces conformes">
+            <div class="min-shot min-step3">
+              <div class="min-shot-glow min-shot-glow-blue"></div>
+              <div class="min-shot-glow min-shot-glow-teal"></div>
+
+              <div class="min-shot-head">
+                <div class="min-shot-title-wrap">
+                  <span class="min-shot-dot"></span>
+                  <span class="min-shot-category">Candidature qualifiée</span>
                 </div>
-                <div class="ui-application-shell">
-                  <div class="ui-card ui-application-list">
-                    <div class="ui-section-head"><div><strong>Candidatures d’actualité</strong><span>Nouveaux profils à qualifier</span></div><span class="ui-pill neutral">3</span></div>
-                    <div class="ui-application-row active"><span class="ui-avatar">CL</span><span class="ui-candidate-copy"><strong>Dr Camille Laurent</strong><span>Remplacement médecine générale · Il y a 12 min</span></span><span class="ui-pill success">Profil vérifié</span></div>
-                    <div class="ui-application-row"><span class="ui-avatar">TB</span><span class="ui-candidate-copy"><strong>Dr Thomas Bernard</strong><span>Remplacement médecine générale · Il y a 1 h</span></span><span class="ui-pill warning">À étudier</span></div>
-                    <div class="ui-application-row"><span class="ui-avatar">IR</span><span class="ui-candidate-copy"><strong>Dr Inès Robert</strong><span>Remplacement médecine générale · Hier</span></span><span class="ui-pill neutral">Nouveau</span></div>
-                    <div class="ui-shot-actions"><span class="ui-muted">Mission du 14 au 18 septembre</span><span class="ui-button">Voir toutes les candidatures</span></div>
+                <span class="min-shot-badge teal">Profil 100% Vérifié ✓</span>
+              </div>
+
+              <div class="min-shot-body">
+                <div class="min-profile-card">
+                  <div class="min-profile-top">
+                    <div class="min-doc-avatar">CL</div>
+                    <div class="min-doc-meta">
+                      <strong>Dr Camille Laurent</strong>
+                      <span>Médecin généraliste · 6 ans d'exercice</span>
+                    </div>
+                    <div class="min-doc-rating">★ 4.9 <small style="font-weight: 500; opacity: 0.85;">(18 missions)</small></div>
                   </div>
-                  <div class="ui-card ui-profile-card">
-                    <div class="ui-profile-identity"><span class="ui-avatar">CL</span><div><strong>Dr Camille Laurent</strong><span>Médecin généraliste · Bordeaux</span></div></div>
-                    <div class="ui-profile-grid"><div><span>Expérience</span><strong>6 ans</strong></div><div><span>Disponibilité</span><strong>5/5 jours</strong></div></div>
-                    <div class="ui-check-list"><div class="ui-check"><i>✓</i><span>Identité et RPPS vérifiés</span></div><div class="ui-check"><i>✓</i><span>Attestation professionnelle valide</span></div><div class="ui-check"><i>✓</i><span>Logiciel métier maîtrisé</span></div></div>
-                    <p class="ui-profile-note">« Disponible sur toute la période, je connais déjà le logiciel et la patientèle du secteur. »</p>
-                    <div class="ui-shot-actions"><span class="ui-button">Voir le profil</span><span class="ui-button success">Échanger</span></div>
+
+                  <div class="min-badges-row">
+                    <div class="min-trust-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                      <span>RPPS & CNOM vérifiés</span>
+                    </div>
+                    <div class="min-trust-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Assurance RCP valide</span>
+                    </div>
+                    <div class="min-trust-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                      <span>Dispo 5/5 jours</span>
+                    </div>
+                  </div>
+
+                  <div class="min-profile-quote">
+                    « Disponible sur l'ensemble de votre créneau. Maîtrise confirmée de votre logiciel Doctolib et du secteur. »
                   </div>
                 </div>
+              </div>
+
+              <div class="min-shot-foot">
+                <div class="min-foot-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Dossier administratif complet et certifié</span>
+                </div>
+                <span class="min-foot-action">Échanger & valider →</span>
               </div>
             </div>
           </div>
@@ -1136,24 +1541,63 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Validation dans la messagerie</h3>
             <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration de la messagerie MédiLink avec conversation et proposition finale structurée">
-            <div class="ui-shot ui-shot-messages" aria-hidden="true">
-              <div class="ui-main ui-message-main">
-                <div class="ui-message-layout">
-                  <div class="ui-card ui-message-pane">
-                    <div class="ui-message-head"><div><strong>Cabinet Montaigne</strong><span>Remplacement médecine générale · Bordeaux</span></div><span class="ui-pill warning">Accord à valider</span></div>
-                    <div class="ui-message-log">
-                      <div class="ui-bubble">Bonjour Dr Laurent, les horaires sont bien de 8h30 à 18h30 avec une pause déjeuner.</div>
-                      <div class="ui-bubble mine">Parfait, merci. Je vous confirme ma disponibilité sur les cinq journées.</div>
-                      <div class="ui-workflow-card">
-                        <div class="ui-workflow-head"><strong>Proposition finale</strong><span class="ui-pill warning">À valider</span></div>
-                        <div class="ui-workflow-summary"><div><span>Début</span><strong>14 sept.</strong></div><div><span>Fin</span><strong>18 sept.</strong></div><div><span>Horaires</span><strong>8h30–18h30</strong></div><div><span>Rétrocession</span><strong>70 %</strong></div></div>
-                        <div class="ui-shot-actions"><span class="ui-muted">Les conditions restent rattachées à la mission.</span><span><span class="ui-button danger">Refuser</span> <span class="ui-button success">Accepter</span></span></div>
+          <div class="how-slide-media" role="img" aria-label="Illustration épurée de la messagerie MédiLink avec proposition d'accord contractuel bilatéral validée">
+            <div class="min-shot min-step4">
+              <div class="min-shot-glow min-shot-glow-teal"></div>
+              <div class="min-shot-glow min-shot-glow-blue"></div>
+
+              <div class="min-shot-head">
+                <div class="min-shot-title-wrap">
+                  <span class="min-shot-dot"></span>
+                  <span class="min-shot-category">Messagerie & Accord</span>
+                </div>
+                <span class="min-shot-badge teal">Accord mutuel validé</span>
+              </div>
+
+              <div class="min-shot-body">
+                <div class="min-step4-wrap">
+                  <div class="min-chat-bubble">
+                    <span class="min-chat-avatar">CL</span>
+                    <div><strong>Dr Camille Laurent :</strong> « Conditions validées du 14 au 18 sept. avec 70% de rétrocession. Je signe la proposition ! »</div>
+                  </div>
+
+                  <div class="min-contract-box">
+                    <div class="min-contract-head">
+                      <span class="min-contract-title">Proposition de remplacement confirmée</span>
+                      <span class="min-shot-badge" style="font-size: 10px; padding: 2px 7px;">Cabinet Montaigne</span>
+                    </div>
+                    <div class="min-tiles-row">
+                      <div class="min-tile">
+                        <span>Période</span>
+                        <strong>14 – 18 Sept.</strong>
+                      </div>
+                      <div class="min-tile">
+                        <span>Horaires</span>
+                        <strong>08:30 – 18:30</strong>
+                      </div>
+                      <div class="min-tile">
+                        <span>Rétrocession</span>
+                        <strong>70 %</strong>
+                      </div>
+                      <div class="min-tile">
+                        <span>Sécurisation</span>
+                        <strong>Garanti</strong>
                       </div>
                     </div>
-                    <div class="ui-composer"><span>Écrire un message…</span><span class="ui-button primary">Envoyer</span></div>
+                    <div class="min-seal-badge">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                      <span>Contrat dématérialisé bilatéral prêt</span>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="min-shot-foot">
+                <div class="min-foot-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Conditions enregistrées et scellées</span>
+                </div>
+                <span class="min-foot-action teal">Télécharger le contrat →</span>
               </div>
             </div>
           </div>
@@ -1168,36 +1612,67 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Suivi et bilan mission</h3>
             <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Illustration du suivi MédiLink avec timeline complétée et validation de fin de remplacement">
-            <div class="ui-shot ui-shot-mission" aria-hidden="true">
-              <div class="ui-main">
-                <div class="ui-page-head">
-                  <div><span class="ui-eyebrow">Suivi de mission</span><h4>Chaque étape reste claire</h4><p>Prochaines actions et clôture au même endroit.</p></div>
-                  <span class="ui-pill success">Mission réalisée</span>
+          <div class="how-slide-media" role="img" aria-label="Illustration épurée du suivi et bilan de mission MédiLink avec jalons franchis et clôture réussie">
+            <div class="min-shot min-step5">
+              <div class="min-shot-glow min-shot-glow-teal"></div>
+              <div class="min-shot-glow min-shot-glow-blue"></div>
+
+              <div class="min-shot-head">
+                <div class="min-shot-title-wrap">
+                  <span class="min-shot-dot"></span>
+                  <span class="min-shot-category">Suivi & Clôture</span>
                 </div>
-                <div class="ui-command">
-                  <div><span>Mission sélectionnée</span><h5>Remplacement médecine générale</h5><p>Cabinet Montaigne · Bordeaux</p></div>
-                  <div><span>Période</span><strong>14–18 sept. 2026</strong><p>5 journées</p></div>
-                  <div><span>Statut</span><strong>À clôturer</strong><p>Dernière action</p></div>
-                </div>
-                <div class="ui-mission-layout">
-                  <div class="ui-card ui-route">
-                    <div class="ui-route-head"><div><span class="ui-eyebrow">Timeline</span><strong>Avancement mission</strong></div><span>4 étapes sur 5 complétées</span></div>
-                    <div class="ui-route-list">
-                      <div class="ui-route-step done"><span class="ui-route-dot">✓</span><span class="ui-route-copy"><strong>Mission confirmée</strong><span>Conditions acceptées par les deux parties</span></span></div>
-                      <div class="ui-route-step done"><span class="ui-route-dot">✓</span><span class="ui-route-copy"><strong>Préparation du départ</strong><span>Consignes et documents consultés</span></span></div>
-                      <div class="ui-route-step done"><span class="ui-route-dot">✓</span><span class="ui-route-copy"><strong>Remplacement réalisé</strong><span>Du 14 au 18 septembre · 5 journées</span></span></div>
-                      <div class="ui-route-step active"><span class="ui-route-dot">4</span><span class="ui-route-copy"><strong>Validation de mission</strong><span>Clôture et rétrocession à confirmer</span></span></div>
+                <span class="min-shot-badge teal">Mission 100% Réalisée ✓</span>
+              </div>
+
+              <div class="min-shot-body">
+                <div class="min-step5-wrap">
+                  <div class="min-stepper-row">
+                    <div class="min-step-node">
+                      <div class="min-node-circle">✓</div>
+                      <div class="min-node-label">Cadrage</div>
+                      <div class="min-node-sub">Complété</div>
+                    </div>
+                    <div class="min-step-node">
+                      <div class="min-node-circle">✓</div>
+                      <div class="min-node-label">Accord</div>
+                      <div class="min-node-sub">Signé</div>
+                    </div>
+                    <div class="min-step-node">
+                      <div class="min-node-circle">✓</div>
+                      <div class="min-node-label">Remplacement</div>
+                      <div class="min-node-sub">5 journées</div>
+                    </div>
+                    <div class="min-step-node active">
+                      <div class="min-node-circle">✓</div>
+                      <div class="min-node-label">Clôture</div>
+                      <div class="min-node-sub">Validée</div>
                     </div>
                   </div>
-                  <div class="ui-card ui-close-card">
-                    <span class="ui-close-icon">✓</span>
-                    <div><span class="ui-eyebrow">Dernière étape</span><h5>Mission terminée</h5></div>
-                    <p>Le remplacement est terminé. Validez la fin de mission pour mettre à jour le suivi et préparer les justificatifs.</p>
-                    <div class="ui-close-summary"><div><span>Période</span><strong>5 jours</strong></div><div><span>Rétrocession</span><strong>70 %</strong></div><div><span>Documents</span><strong>Complets</strong></div></div>
-                    <span class="ui-button success">Valider la fin de mission</span>
+
+                  <div class="min-summary-grid">
+                    <div class="min-metric-card">
+                      <strong>5 / 5 j</strong>
+                      <span>Séances effectuées</span>
+                    </div>
+                    <div class="min-metric-card">
+                      <strong>100%</strong>
+                      <span>Actes transmis</span>
+                    </div>
+                    <div class="min-metric-card">
+                      <strong>3 850 €</strong>
+                      <span>Rétrocession nette</span>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="min-shot-foot">
+                <div class="min-foot-status">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Relevé et attestation prêts au téléchargement</span>
+                </div>
+                <span class="min-foot-action teal">Voir les documents ↓</span>
               </div>
             </div>
           </div>
