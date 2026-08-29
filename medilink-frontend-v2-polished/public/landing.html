@@ -195,509 +195,372 @@ section,footer,.search-section{position:relative;z-index:1;}
 .how-slide-content p{font-size:15px;color:var(--text-3);line-height:1.72;max-width:540px;margin-bottom:0}
 .how-slide-media{position:relative;width:100%;aspect-ratio:16/9;min-height:360px;border-radius:20px;background:linear-gradient(145deg,#EAF1F9 0%,#DCE9F7 100%);border:1px solid rgba(26,82,160,.16);display:flex;align-items:stretch;justify-content:stretch;overflow:hidden;padding:11px;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 16px 38px rgba(11,25,41,.08);transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease,border-color .35s ease}
 .how-slide-media::before{content:'';position:absolute;inset:-35% auto auto -18%;width:68%;height:105%;border-radius:50%;background:rgba(255,255,255,.6);filter:blur(40px);pointer-events:none}
-.how-slide-media:hover{border-color:rgba(26,82,160,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 22px 46px rgba(11,25,41,.12);transform:translateY(-2px)}
 .how-slide-media img,.how-slide-media .how-slide-img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
 /* ===================================================
-   ILLUSTRATIONS CONCEPTUELLES & PARAMÉTRAGES SAAS
+   APERÇUS DE L'INTERFACE LOGICIELLE MÉDILINK (V3)
+   Authentique, Moderne, Épurée et Haute-Fidélité
    =================================================== */
-.concept-shot {
-  --c-navy: #0B1929;
-  --c-navy-dark: #07101B;
-  --c-navy-soft: #16263B;
-  --c-blue: #1A52A0;
-  --c-blue-glow: rgba(26, 82, 160, 0.25);
-  --c-teal: #0E8A7A;
-  --c-teal-glow: rgba(14, 138, 122, 0.3);
-  --c-emerald: #10B981;
-  --c-text-main: #0B1929;
-  --c-text-muted: #5A6E85;
-  --c-border: rgba(26, 82, 160, 0.12);
-  --c-card-bg: rgba(255, 255, 255, 0.94);
-  
+.ui-win {
+  --w-navy: #0B1929;
+  --w-blue: #1A52A0;
+  --w-blue-bg: #EEF5FC;
+  --w-teal: #0E8A7A;
+  --w-teal-bg: #E6F7F4;
+  --w-green: #10B981;
+  --w-text-main: #0B1929;
+  --w-text-muted: #5E718D;
+  --w-border: rgba(26, 82, 160, 0.14);
+  --w-border-light: rgba(215, 226, 242, 0.85);
+
   position: relative;
   width: 100%;
   height: 100%;
   min-height: 400px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 24px 28px;
-  border-radius: 20px;
-  background: radial-gradient(circle at 10% 15%, rgba(240, 248, 255, 0.95), rgba(248, 252, 255, 0.98) 70%), linear-gradient(145deg, #FFFFFF 0%, #F1F6FC 100%);
-  border: 1px solid var(--c-border);
-  box-shadow: 0 20px 48px rgba(11, 25, 41, 0.08), inset 0 1px 0 #FFFFFF;
+  border-radius: 18px;
+  background: #FFFFFF;
+  border: 1px solid var(--w-border);
+  box-shadow: 0 20px 48px rgba(11, 25, 41, 0.08), 0 2px 6px rgba(11, 25, 41, 0.03);
   font-family: var(--sans);
-  color: var(--c-text-main);
+  color: var(--w-text-main);
   box-sizing: border-box;
   overflow: hidden;
 }
-.concept-shot * { box-sizing: border-box; }
+.ui-win * { box-sizing: border-box; }
 
-/* Glowing backdrop orbs */
-.concept-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(55px);
-  pointer-events: none;
-  z-index: 0;
-}
-.concept-orb-1 {
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(14, 138, 122, 0.22) 0%, transparent 70%);
-  top: -60px;
-  right: -50px;
-}
-.concept-orb-2 {
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(26, 82, 160, 0.18) 0%, transparent 70%);
-  bottom: -60px;
-  left: -60px;
-}
-
-/* Header */
-.concept-head {
-  position: relative;
-  z-index: 1;
+/* Top Window Chrome Bar */
+.ui-win-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 10px 16px;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF3F8 100%);
+  border-bottom: 1px solid var(--w-border-light);
   gap: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(215, 226, 240, 0.7);
 }
-.concept-tag {
+.ui-win-dots {
   display: flex;
+  gap: 6px;
   align-items: center;
-  gap: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--c-navy);
 }
-.concept-dot {
-  width: 8px;
-  height: 8px;
+.ui-win-dot {
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: var(--c-teal);
-  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
-  animation: pulseDot 2.4s infinite;
+  background: #CBD5E1;
 }
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.8; }
-}
-.concept-pill-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: #E8F7F4;
-  color: var(--c-teal);
-  border: 1px solid rgba(14, 138, 122, 0.2);
-}
-
-/* Body */
-.concept-body {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 14px;
-  margin: 12px 0;
-}
-
-/* Footer */
-.concept-foot {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(215, 226, 240, 0.7);
-  font-size: 12px;
-  color: var(--c-text-muted);
-}
-.concept-foot-meta {
+.ui-win-dot.red { background: #FDA4AF; }
+.ui-win-dot.yellow { background: #FDE047; }
+.ui-win-dot.green { background: #86EFAC; }
+.ui-win-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-}
-.concept-foot-meta svg {
-  width: 15px;
-  height: 15px;
-  stroke: var(--c-teal);
-}
-.concept-foot-chip {
   font-size: 11px;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: var(--c-navy);
-  color: #C8DFF5;
+  font-weight: 600;
+  color: var(--w-navy);
+}
+.ui-win-title span.crumb {
+  color: var(--w-text-muted);
+  font-weight: 400;
+}
+.ui-win-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #E8F7F4;
+  color: var(--w-teal);
+  border: 1px solid rgba(14, 138, 122, 0.2);
+}
+.ui-win-badge.blue {
+  background: #EEF5FC;
+  color: var(--w-blue);
+  border-color: rgba(26, 82, 160, 0.2);
+}
+
+/* Window Content Body */
+.ui-win-body {
+  flex: 1;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 11px;
+  background: radial-gradient(circle at 10% 10%, rgba(246, 250, 255, 0.8), rgba(255, 255, 255, 1) 60%);
+}
+
+/* Window Footer Action Bar */
+.ui-win-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--w-border-light);
+  font-size: 11.5px;
+  color: var(--w-text-muted);
+}
+.ui-win-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+.ui-win-btn.primary {
+  background: var(--w-navy);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.15);
+}
+.ui-win-btn.teal {
+  background: var(--w-teal);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(14, 138, 122, 0.2);
+}
+.ui-win-btn.ghost {
+  background: #F1F5F9;
+  color: var(--w-navy);
 }
 
 /* ===================================================
-   SLIDE 1: LE CONTROL MIXER & CURSEURS RÉGLABLES
+   STEP 1: MISSION CREATION FORM INTERFACE
    =================================================== */
-.mixer-grid {
-  display: flex;
-  flex-direction: column;
+.ui-form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 11px;
 }
-.mixer-slider-card {
-  background: var(--c-card-bg);
-  border: 1px solid rgba(215, 226, 242, 0.9);
-  border-radius: 14px;
-  padding: 12px 16px;
-  box-shadow: 0 6px 18px rgba(11, 25, 41, 0.04);
+.ui-form-block {
+  background: #FFFFFF;
+  border: 1px solid var(--w-border-light);
+  border-radius: 12px;
+  padding: 11px 13px;
+  box-shadow: 0 4px 14px rgba(11, 25, 41, 0.03);
 }
-.mixer-row-head {
+.ui-field-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--w-text-muted);
+  margin-bottom: 5px;
+}
+.ui-date-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 9px;
+  background: #F8FAFC;
+  border: 1.5px solid #1A52A0;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--w-navy);
+  margin-bottom: 5px;
+}
+.ui-date-input-row svg { width: 14px; height: 14px; stroke: #1A52A0; }
+.ui-time-sub {
+  font-size: 10.5px;
+  color: var(--w-text-muted);
+}
+.ui-retro-val-wrap {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
-.mixer-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--c-text-muted);
-}
-.mixer-val-hero {
-  font-size: 13.5px;
-  font-weight: 700;
-  color: var(--c-navy);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.mixer-val-hero strong {
+.ui-retro-big {
   font-family: var(--serif);
   font-size: 22px;
-  color: var(--c-teal);
+  font-weight: 400;
+  color: var(--w-teal);
   line-height: 1;
 }
-.mixer-val-hero small {
-  font-size: 11px;
-  color: var(--c-text-muted);
+.ui-retro-sub {
+  font-size: 10px;
+  color: var(--w-text-muted);
   font-weight: 500;
 }
-.mixer-track-wrap {
-  position: relative;
+.ui-retro-slider {
   width: 100%;
-  height: 22px;
-  display: flex;
-  align-items: center;
-}
-.mixer-track {
-  width: 100%;
-  height: 8px;
+  height: 6px;
   border-radius: 999px;
-  background: #E4ECF6;
+  background: #E2E8F0;
   position: relative;
-  overflow: hidden;
+  margin-bottom: 6px;
 }
-.mixer-track-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
+.ui-retro-slider-fill {
   height: 100%;
   width: 70%;
   border-radius: 999px;
   background: linear-gradient(90deg, #1A52A0, #0E8A7A);
 }
-.mixer-thumb {
+.ui-retro-slider-handle {
   position: absolute;
   left: 70%;
-  transform: translate(-50%, 0);
-  width: 22px;
-  height: 22px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #fff;
   border: 3px solid #0E8A7A;
-  box-shadow: 0 2px 10px rgba(14, 138, 122, 0.4), 0 0 0 4px rgba(14, 138, 122, 0.15);
-  display: grid;
-  place-items: center;
+  box-shadow: 0 2px 8px rgba(14, 138, 122, 0.4);
 }
-.mixer-ticks {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 5px;
-  font-size: 9.5px;
-  font-weight: 600;
-  color: #8CA0B8;
-}
-.mixer-ticks span.active {
-  color: var(--c-teal);
-  font-weight: 800;
-}
-
-.mixer-dates-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr) 1.2fr;
-  gap: 6px;
-  align-items: center;
-}
-.mixer-day-pill {
-  background: #fff;
-  border: 1.5px solid rgba(26, 82, 160, 0.2);
-  border-radius: 9px;
-  padding: 6px 4px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(11, 25, 41, 0.03);
-}
-.mixer-day-pill.active {
-  background: #F0F6FD;
-  border-color: #1A52A0;
-  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.12);
-}
-.mixer-day-pill span {
-  display: block;
-  font-size: 8.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #728AA6;
-}
-.mixer-day-pill strong {
-  display: block;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--c-navy);
-  line-height: 1.1;
-}
-.mixer-hours-capsule {
-  background: linear-gradient(135deg, #0B1929, #152A42);
-  color: #fff;
-  border-radius: 9px;
-  padding: 7px 10px;
-  text-align: center;
-}
-.mixer-hours-capsule span {
-  display: block;
-  font-size: 8.5px;
-  color: #92B5D8;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-.mixer-hours-capsule strong {
-  display: block;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #E2EEFC;
-  margin-top: 1px;
-}
-
-.mixer-toggles-row {
+.ui-pills-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
-.mixer-toggle {
+.ui-check-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(215, 226, 242, 0.9);
-  font-size: 11px;
+  gap: 5px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: #F1F5F9;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--w-navy);
+  border: 1px solid #CBD5E1;
+}
+.ui-check-pill.checked {
+  background: #E8F7F4;
+  border-color: rgba(14, 138, 122, 0.3);
+  color: var(--w-teal);
   font-weight: 600;
-  color: var(--c-navy);
-}
-.mixer-toggle-switch {
-  width: 24px;
-  height: 14px;
-  border-radius: 999px;
-  background: #10B981;
-  position: relative;
-  padding: 2px;
-}
-.mixer-toggle-switch::after {
-  content: '';
-  position: absolute;
-  right: 2px;
-  top: 2px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #fff;
 }
 
 /* ===================================================
-   SLIDE 2: LE FAISCEAU D'AFFINITÉ (CONVERGENCE SCORING)
+   STEP 2: MATCHING & SCORING INTERFACE
    =================================================== */
-.score-matrix {
+.ui-matching-layout {
   display: grid;
-  grid-template-columns: 135px 1fr;
-  gap: 16px;
-  align-items: center;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 11px;
 }
-.score-beacon-box {
+.ui-match-candidates {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: relative;
-  padding: 16px 12px;
-  background: radial-gradient(circle at 50% 30%, #FFFFFF, #E8F7F4 85%);
-  border: 2px solid rgba(14, 138, 122, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 12px 32px rgba(14, 138, 122, 0.14), inset 0 1px 0 #fff;
-}
-.score-beacon-num {
-  font-family: var(--serif);
-  font-size: 46px;
-  line-height: 1;
-  font-weight: 400;
-  color: var(--c-teal);
-  letter-spacing: -0.02em;
-}
-.score-beacon-sub {
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--c-teal);
-  letter-spacing: 0.05em;
-  margin-top: 4px;
-}
-.score-beacon-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: var(--c-teal);
-  color: #fff;
-  margin-top: 6px;
-}
-.score-criteria-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.score-criteria-item {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(215, 226, 242, 0.8);
-  border-radius: 10px;
-  padding: 7px 11px;
-}
-.score-crit-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  margin-bottom: 4px;
-}
-.score-crit-name {
-  font-weight: 600;
-  color: var(--c-navy);
-  display: flex;
-  align-items: center;
   gap: 6px;
 }
-.score-crit-val {
-  font-weight: 800;
-  color: var(--c-teal);
+.ui-candidate-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--w-border-light);
 }
-.score-crit-bar {
-  height: 5px;
+.ui-candidate-card.active {
+  border: 1.5px solid #0E8A7A;
+  background: #F4FAF8;
+  box-shadow: 0 4px 12px rgba(14, 138, 122, 0.1);
+}
+.ui-candidate-score-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #0E8A7A;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.ui-candidate-score-badge.silver {
+  background: #64748B;
+}
+.ui-candidate-info strong {
+  display: block;
+  font-size: 11.5px;
+  color: var(--w-navy);
+}
+.ui-candidate-info span {
+  display: block;
+  font-size: 9.5px;
+  color: var(--w-text-muted);
+}
+.ui-match-breakdown-card {
+  background: #fff;
+  border: 1px solid var(--w-border-light);
+  border-radius: 12px;
+  padding: 10px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ui-breakdown-title {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--w-text-muted);
+}
+.ui-criteria-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ui-crit-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+}
+.ui-crit-bar {
+  height: 4px;
   border-radius: 999px;
-  background: #E5ECF6;
+  background: #E2E8F0;
   overflow: hidden;
 }
-.score-crit-fill {
+.ui-crit-fill {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #1A52A0, #0E8A7A);
 }
 
 /* ===================================================
-   SLIDE 3: LE VIVIER FILTRÉ & LE SPOTLIGHT PRATICIEN
+   STEP 3: CANDIDATE PROFILE & VERIFICATION DRAWER
    =================================================== */
-.spotlight-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.15fr;
-  gap: 12px;
-  align-items: stretch;
-}
-.pool-filters-box {
+.ui-profile-view {
+  background: #fff;
+  border: 1px solid var(--w-border-light);
+  border-radius: 12px;
+  padding: 11px 13px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 6px;
-  background: rgba(244, 248, 254, 0.85);
-  border: 1px solid rgba(215, 226, 242, 0.8);
-  border-radius: 14px;
-  padding: 11px;
-}
-.pool-filter-step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--c-navy);
-  background: #fff;
-  padding: 6px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(215, 226, 242, 0.7);
-}
-.pool-filter-icon {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #E8F7F4;
-  color: var(--c-teal);
-  display: grid;
-  place-items: center;
-  font-size: 10px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-.spotlight-card {
-  background: #fff;
-  border: 1.5px solid rgba(14, 138, 122, 0.35);
-  border-radius: 16px;
-  padding: 13px;
-  box-shadow: 0 10px 28px rgba(14, 138, 122, 0.09);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   gap: 9px;
 }
-.spotlight-header {
+.ui-profile-hero {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
 }
-.spotlight-avatar {
-  width: 38px;
-  height: 38px;
+.ui-profile-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1A52A0, #0E8A7A);
   color: #fff;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 13.5px;
   display: grid;
   place-items: center;
   position: relative;
-  box-shadow: 0 4px 12px rgba(26, 82, 160, 0.2);
   flex-shrink: 0;
 }
-.spotlight-avatar::after {
+.ui-profile-avatar::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -706,201 +569,246 @@ section,footer,.search-section{position:relative;z-index:1;}
   height: 9px;
   border-radius: 50%;
   background: #10B981;
-  border: 1.5px solid #fff;
+  border: 2px solid #fff;
 }
-.spotlight-info strong {
+.ui-profile-name strong {
   display: block;
   font-size: 13px;
-  color: var(--c-navy);
+  color: var(--w-navy);
 }
-.spotlight-info span {
+.ui-profile-name span {
   display: block;
   font-size: 10.5px;
-  color: var(--c-text-muted);
+  color: var(--w-text-muted);
 }
-.spotlight-verified-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+.ui-profile-rating {
+  margin-left: auto;
   font-size: 10.5px;
   font-weight: 700;
-  color: #0E8A7A;
-  background: #E8F7F4;
-  padding: 5px 8px;
+  color: #B45309;
+  background: #FEF3C7;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.ui-checklist-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.ui-check-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border-radius: 6px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--w-navy);
+}
+.ui-check-item svg { width: 12px; height: 12px; stroke: #0E8A7A; flex-shrink: 0; }
+.ui-profile-quote-bubble {
+  font-size: 10.5px;
+  color: var(--w-text-muted);
+  font-style: italic;
+  background: #F1F5F9;
+  padding: 6px 9px;
   border-radius: 8px;
+  border-left: 3px solid var(--w-blue);
+  line-height: 1.4;
 }
 
 /* ===================================================
-   SLIDE 4: L'ACCORD BILATÉRAL DIRECT & SCELLÉ
+   STEP 4: REAL IN-APP CHAT & PROPOSAL AGREEMENT
    =================================================== */
-.deal-bridge {
+.ui-chat-view {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-.deal-actors-row {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-}
-.deal-actor-node {
-  background: #fff;
-  border: 1px solid rgba(215, 226, 242, 0.9);
+  gap: 7px;
+  background: #FAFBFD;
+  border: 1px solid var(--w-border-light);
   border-radius: 12px;
-  padding: 8px 10px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.04);
+  padding: 9px 11px;
 }
-.deal-actor-node span {
-  display: block;
-  font-size: 8.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--c-text-muted);
+.ui-chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
-.deal-actor-node strong {
-  display: block;
-  font-size: 11.5px;
-  color: var(--c-navy);
-  margin-top: 1px;
+.ui-bubble-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
 }
-.deal-connector {
-  width: 30px;
-  height: 30px;
+.ui-bubble-row.mine {
+  justify-content: flex-end;
+}
+.ui-chat-av {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1A52A0, #0E8A7A);
+  background: #1A52A0;
   color: #fff;
+  font-size: 8px;
+  font-weight: 800;
   display: grid;
   place-items: center;
-  font-size: 12px;
-  box-shadow: 0 4px 14px rgba(14, 138, 122, 0.3);
+  flex-shrink: 0;
 }
-.deal-capsule {
-  background: rgba(255, 255, 255, 0.95);
+.ui-bubble {
+  max-width: 82%;
+  padding: 5px 9px;
+  border-radius: 9px;
+  font-size: 10.5px;
+  line-height: 1.38;
+}
+.ui-bubble.them {
+  background: #FFFFFF;
+  color: var(--w-navy);
+  border: 1px solid #E2E8F0;
+  border-bottom-left-radius: 2px;
+}
+.ui-bubble.mine {
+  background: #1A52A0;
+  color: #FFFFFF;
+  border-bottom-right-radius: 2px;
+}
+.ui-chat-proposal-card {
+  background: #FFFFFF;
   border: 1.5px solid rgba(14, 138, 122, 0.3);
-  border-radius: 14px;
-  padding: 10px 12px;
-  box-shadow: 0 8px 24px rgba(11, 25, 41, 0.05);
+  border-radius: 9px;
+  padding: 7px 9px;
+  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.04);
 }
-.deal-terms-grid {
+.ui-proposal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.ui-proposal-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--w-navy);
+}
+.ui-proposal-badges {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 5px;
+}
+.ui-prop-badge {
+  background: #F1F5F9;
+  border-radius: 5px;
+  padding: 3px 4px;
+  text-align: center;
+}
+.ui-prop-badge span { display: block; font-size: 7px; text-transform: uppercase; color: var(--w-text-muted); }
+.ui-prop-badge strong { display: block; font-size: 9.5px; color: var(--w-navy); }
+.ui-proposal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+.ui-composer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: #fff;
+  border: 1px solid #CBD5E1;
+  border-radius: 7px;
+  font-size: 10px;
+  color: #94A3B8;
+}
+
+/* ===================================================
+   STEP 5: REAL MISSION TRACKING DASHBOARD
+   =================================================== */
+.ui-tracking-view {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.ui-track-timeline {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 6px;
-  margin-bottom: 7px;
+  background: #fff;
+  border: 1px solid var(--w-border-light);
+  border-radius: 12px;
+  padding: 9px;
 }
-.deal-term-item {
-  background: #F4F8FC;
-  border-radius: 7px;
-  padding: 5px 6px;
-  text-align: center;
-}
-.deal-term-item span {
-  display: block;
-  font-size: 8px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--c-text-muted);
-}
-.deal-term-item strong {
-  display: block;
-  font-size: 11px;
-  color: var(--c-navy);
-  margin-top: 1px;
-}
-.deal-lock-stamp {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #0E8A7A;
-  background: #E8F7F4;
-  padding: 4px 8px;
-  border-radius: 7px;
-}
-
-/* ===================================================
-   SLIDE 5: DÉROULÉ CONTINU & DÉNOUEMENT AUTOMATISÉ
-   =================================================== */
-.mission-track-wrap {
+.ui-timeline-node {
   display: flex;
   flex-direction: column;
-  gap: 11px;
-}
-.mission-days-track {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
-  position: relative;
-}
-.mission-day-node {
-  background: #E8F7F4;
-  border: 1.5px solid #0E8A7A;
-  border-radius: 10px;
-  padding: 6px 4px;
+  align-items: center;
   text-align: center;
+  gap: 2px;
+}
+.ui-node-bullet {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #E8F7F4;
   color: #0E8A7A;
-}
-.mission-day-node span {
-  display: block;
-  font-size: 8px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.mission-day-node strong {
-  display: block;
-  font-size: 12px;
+  font-size: 9.5px;
   font-weight: 800;
-  margin-top: 1px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid #0E8A7A;
 }
-.mission-stats-trio {
+.ui-timeline-node.active .ui-node-bullet {
+  background: #0E8A7A;
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, 0.2);
+}
+.ui-node-name { font-size: 9.5px; font-weight: 700; color: var(--w-navy); }
+.ui-node-state { font-size: 8px; color: var(--w-text-muted); }
+.ui-track-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 6px;
 }
-.mission-stat-box {
+.ui-summary-tile {
   background: #fff;
-  border: 1px solid rgba(215, 226, 242, 0.85);
-  border-radius: 12px;
-  padding: 9px 8px;
+  border: 1px solid var(--w-border-light);
+  border-radius: 10px;
+  padding: 7px;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(11, 25, 41, 0.03);
 }
-.mission-stat-box strong {
+.ui-summary-tile strong {
   display: block;
   font-family: var(--serif);
-  font-size: 20px;
-  color: var(--c-navy);
+  font-size: 18px;
+  color: var(--w-navy);
   line-height: 1;
 }
-.mission-stat-box span {
+.ui-summary-tile span {
   display: block;
-  font-size: 9px;
+  font-size: 8.5px;
+  color: var(--w-text-muted);
   font-weight: 600;
-  color: var(--c-text-muted);
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 /* Responsive */
 @media(max-width: 900px) {
-  .concept-shot { padding: 20px 22px; min-height: 360px; }
+  .ui-win { min-height: 370px; }
 }
 @media(max-width: 720px) {
-  .concept-shot { padding: 16px 18px; min-height: 330px; }
-  .score-matrix { grid-template-columns: 120px 1fr; gap: 12px; }
-  .score-beacon-num { font-size: 38px; }
-  .spotlight-layout { grid-template-columns: 1fr; gap: 10px; }
-  .deal-terms-grid { grid-template-columns: repeat(2, 1fr); }
-  .mixer-dates-row { grid-template-columns: repeat(5, 1fr); }
-  .mixer-hours-capsule { grid-column: span 5; }
+  .ui-win { min-height: 340px; }
+  .ui-form-grid { grid-template-columns: 1fr; gap: 8px; }
+  .ui-matching-layout { grid-template-columns: 1fr; gap: 8px; }
+  .ui-checklist-box { grid-template-columns: 1fr; gap: 4px; }
+  .ui-proposal-badges { grid-template-columns: repeat(2, 1fr); }
 }
 @media(max-width: 480px) {
-  .concept-shot { padding: 14px 12px; min-height: auto; }
-  .score-matrix { grid-template-columns: 1fr; gap: 10px; }
-  .mission-stats-trio { grid-template-columns: 1fr; gap: 6px; }
+  .ui-win { min-height: auto; }
+  .ui-track-timeline { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+  .ui-track-summary-grid { grid-template-columns: 1fr; }
+}ion-stats-trio { grid-template-columns: 1fr; gap: 6px; }
 }
 .how-nav{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:34px}
 .how-arrow{width:48px;height:48px;border-radius:50%;background:#fff;border:1px solid rgba(26,82,160,.18);color:var(--navy);display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 24px rgba(11,25,41,.08);transition:all .25s cubic-bezier(.22,1,.36,1);flex-shrink:0}
@@ -1451,97 +1359,65 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Cadrage du besoin</h3>
             <p>Le cabinet renseigne les dates, horaires, rémunération, conditions d'exercice, patientèle et informations pratiques. Le besoin est structuré pour matcher avec les bons profils.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Table de mixage des paramètres de la mission avec curseurs et toggles">
-            <div class="concept-shot">
-              <div class="concept-orb concept-orb-1"></div>
-              <div class="concept-orb concept-orb-2"></div>
-              
-              <div class="concept-head">
-                <div class="concept-tag">
-                  <span class="concept-dot"></span>
-                  <span>01 · Paramétrage sur-mesure</span>
+          <div class="how-slide-media" role="img" aria-label="Aperçu de l'interface de création de mission avec formulaire de dates et rétrocession">
+            <div class="ui-win">
+              <div class="ui-win-bar">
+                <div class="ui-win-dots">
+                  <span class="ui-win-dot red"></span>
+                  <span class="ui-win-dot yellow"></span>
+                  <span class="ui-win-dot green"></span>
                 </div>
-                <span class="concept-pill-badge">● Calibrage instantané</span>
+                <div class="ui-win-title">
+                  <span class="crumb">Missions /</span>
+                  <span>Nouvelle mission</span>
+                </div>
+                <span class="ui-win-badge">Étape 2 sur 4</span>
               </div>
 
-              <div class="concept-body">
-                <div class="mixer-grid">
-                  <!-- Curseur Rétrocession -->
-                  <div class="mixer-slider-card">
-                    <div class="mixer-row-head">
-                      <span class="mixer-label">Pourcentage de rétrocession</span>
-                      <div class="mixer-val-hero">
-                        <strong>70 %</strong>
-                        <small>(~3 850 € prévus)</small>
-                      </div>
+              <div class="ui-win-body">
+                <div class="ui-form-grid">
+                  <!-- Block Dates & Horaires -->
+                  <div class="ui-form-block">
+                    <span class="ui-field-label">Période du remplacement</span>
+                    <div class="ui-date-input-row">
+                      <span>14 Septembre ➔ 18 Septembre 2026</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     </div>
-                    <div class="mixer-track-wrap">
-                      <div class="mixer-track">
-                        <div class="mixer-track-fill" style="width: 70%;"></div>
-                      </div>
-                      <div class="mixer-thumb" style="left: 70%;"></div>
-                    </div>
-                    <div class="mixer-ticks">
-                      <span>50%</span>
-                      <span>60%</span>
-                      <span class="active">70%</span>
-                      <span>80%</span>
-                      <span>90%</span>
-                    </div>
+                    <div class="ui-time-sub">⏱ 08:30 – 18:30 · 5 journées (40h)</div>
                   </div>
 
-                  <!-- Sélecteur Dates -->
-                  <div class="mixer-dates-row">
-                    <div class="mixer-day-pill active">
-                      <span>Lun</span>
-                      <strong>14</strong>
+                  <!-- Block Rétrocession -->
+                  <div class="ui-form-block">
+                    <span class="ui-field-label">Rétrocession convenue</span>
+                    <div class="ui-retro-val-wrap">
+                      <div class="ui-retro-big">70 %</div>
+                      <div class="ui-retro-sub">~3 850 € prévus</div>
                     </div>
-                    <div class="mixer-day-pill active">
-                      <span>Mar</span>
-                      <strong>15</strong>
-                    </div>
-                    <div class="mixer-day-pill active">
-                      <span>Mer</span>
-                      <strong>16</strong>
-                    </div>
-                    <div class="mixer-day-pill active">
-                      <span>Jeu</span>
-                      <strong>17</strong>
-                    </div>
-                    <div class="mixer-day-pill active">
-                      <span>Ven</span>
-                      <strong>18</strong>
-                    </div>
-                    <div class="mixer-hours-capsule">
-                      <span>Horaires calibrés</span>
-                      <strong>08:30 – 18:30 (40h)</strong>
-                    </div>
-                  </div>
-
-                  <!-- Toggles Pratique -->
-                  <div class="mixer-toggles-row">
-                    <div class="mixer-toggle">
-                      <span class="mixer-toggle-switch"></span>
-                      <span>Logiciel Doctolib</span>
-                    </div>
-                    <div class="mixer-toggle">
-                      <span class="mixer-toggle-switch"></span>
-                      <span>Cabinet de groupe</span>
-                    </div>
-                    <div class="mixer-toggle">
-                      <span class="mixer-toggle-switch"></span>
-                      <span>Médecine générale</span>
+                    <div class="ui-retro-slider">
+                      <div class="ui-retro-slider-fill"></div>
+                      <div class="ui-retro-slider-handle"></div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="concept-foot">
-                <div class="concept-foot-meta">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Curseurs ajustés selon vos besoins exacts</span>
+                <!-- Conditions & Cadre d'exercice -->
+                <div class="ui-form-block">
+                  <span class="ui-field-label">Conditions & Cadre du cabinet</span>
+                  <div class="ui-pills-row">
+                    <span class="ui-check-pill checked">✓ Logiciel Doctolib</span>
+                    <span class="ui-check-pill checked">✓ Cabinet de groupe</span>
+                    <span class="ui-check-pill checked">✓ Patientèle habituelle</span>
+                    <span class="ui-check-pill checked">✓ Secrétariat sur place</span>
+                  </div>
                 </div>
-                <span class="concept-foot-chip">Matching actif</span>
+
+                <div class="ui-win-footer">
+                  <span style="font-size: 11px; color: var(--w-text-muted);">Paramètres enregistrés automatiquement</span>
+                  <div style="display: flex; gap: 8px;">
+                    <span class="ui-win-btn ghost">Brouillon</span>
+                    <span class="ui-win-btn primary">Continuer vers le matching →</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1556,69 +1432,70 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Scoring intelligent /100</h3>
             <p>Le matching croise niveau requis, spécialité, localisation, type de mission, créneau, durée, cadre d'exercice, logiciel, patientèle et actes. Chaque profil reçoit un score et un palier de pertinence.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Visualisation de la convergence multi-critères et score d'affinité">
-            <div class="concept-shot">
-              <div class="concept-orb concept-orb-1"></div>
-              <div class="concept-orb concept-orb-2"></div>
-
-              <div class="concept-head">
-                <div class="concept-tag">
-                  <span class="concept-dot"></span>
-                  <span>02 · Convergence multi-critères</span>
+          <div class="how-slide-media" role="img" aria-label="Aperçu de l'interface de matching avec liste des candidats et score de compatibilité">
+            <div class="ui-win">
+              <div class="ui-win-bar">
+                <div class="ui-win-dots">
+                  <span class="ui-win-dot red"></span>
+                  <span class="ui-win-dot yellow"></span>
+                  <span class="ui-win-dot green"></span>
                 </div>
-                <span class="concept-pill-badge">24 profils scannés</span>
+                <div class="ui-win-title">
+                  <span class="crumb">Matching /</span>
+                  <span>Candidats qualifiés</span>
+                </div>
+                <span class="ui-win-badge blue">24 profils analysés</span>
               </div>
 
-              <div class="concept-body">
-                <div class="score-matrix">
-                  <div class="score-beacon-box">
-                    <div class="score-beacon-num">92</div>
-                    <div class="score-beacon-sub">Sur 100</div>
-                    <span class="score-beacon-badge">Match Optimal</span>
+              <div class="ui-win-body">
+                <div class="ui-matching-layout">
+                  <!-- Liste Candidats -->
+                  <div class="ui-match-candidates">
+                    <div class="ui-candidate-card active">
+                      <div class="ui-candidate-score-badge">92</div>
+                      <div class="ui-candidate-info">
+                        <strong>Dr Camille Laurent</strong>
+                        <span>Médecine générale · 4,8 km</span>
+                      </div>
+                      <span class="ui-win-badge" style="margin-left: auto; font-size: 9.5px;">Prioritaire</span>
+                    </div>
+
+                    <div class="ui-candidate-card">
+                      <div class="ui-candidate-score-badge silver">86</div>
+                      <div class="ui-candidate-info">
+                        <strong>Dr Thomas Bernard</strong>
+                        <span>Médecine générale · 12 km</span>
+                      </div>
+                      <span class="ui-win-badge blue" style="margin-left: auto; font-size: 9.5px;">Éligible</span>
+                    </div>
                   </div>
 
-                  <div class="score-criteria-list">
-                    <div class="score-criteria-item">
-                      <div class="score-crit-head">
-                        <span class="score-crit-name">🩺 Spécialité & Actes requis</span>
-                        <span class="score-crit-val">100%</span>
-                      </div>
-                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
+                  <!-- Détail du Score 92/100 -->
+                  <div class="ui-match-breakdown-card">
+                    <span class="ui-breakdown-title">Critères d'affinité · 92/100</span>
+                    <div class="ui-criteria-item">
+                      <div class="ui-crit-labels"><span>Spécialité & Actes</span><strong>100%</strong></div>
+                      <div class="ui-crit-bar"><div class="ui-crit-fill" style="width: 100%;"></div></div>
                     </div>
-
-                    <div class="score-criteria-item">
-                      <div class="score-crit-head">
-                        <span class="score-crit-name">📅 Créneau 14-18 sept. (5j)</span>
-                        <span class="score-crit-val">100%</span>
-                      </div>
-                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
+                    <div class="ui-criteria-item">
+                      <div class="ui-crit-labels"><span>Disponibilité (14-18 sept.)</span><strong>100%</strong></div>
+                      <div class="ui-crit-bar"><div class="ui-crit-fill" style="width: 100%;"></div></div>
                     </div>
-
-                    <div class="score-criteria-item">
-                      <div class="score-crit-head">
-                        <span class="score-crit-name">📍 Proximité (4,8 km)</span>
-                        <span class="score-crit-val">90%</span>
-                      </div>
-                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 90%;"></div></div>
+                    <div class="ui-criteria-item">
+                      <div class="ui-crit-labels"><span>Proximité géographique</span><strong>90%</strong></div>
+                      <div class="ui-crit-bar"><div class="ui-crit-fill" style="width: 90%;"></div></div>
                     </div>
-
-                    <div class="score-criteria-item">
-                      <div class="score-crit-head">
-                        <span class="score-crit-name">💻 Logiciel Doctolib maîtrisé</span>
-                        <span class="score-crit-val">100%</span>
-                      </div>
-                      <div class="score-crit-bar"><div class="score-crit-fill" style="width: 100%;"></div></div>
+                    <div class="ui-criteria-item">
+                      <div class="ui-crit-labels"><span>Logiciel Doctolib</span><strong>100%</strong></div>
+                      <div class="ui-crit-bar"><div class="ui-crit-fill" style="width: 100%;"></div></div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="concept-foot">
-                <div class="concept-foot-meta">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Pondération intelligente en temps réel</span>
+                <div class="ui-win-footer">
+                  <span style="font-size: 11px; color: var(--w-text-muted);">Compatibilité calculée selon vos critères</span>
+                  <span class="ui-win-btn teal">Étudier le profil prioritaire →</span>
                 </div>
-                <span class="concept-foot-chip">Profil prioritaire</span>
               </div>
             </div>
           </div>
@@ -1633,58 +1510,59 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Recommandation ciblée</h3>
             <p>Les remplaçants retenus reçoivent la mission recommandée. Le cabinet reçoit en retour des candidatures complètes : identité, statut, documents, disponibilités, expérience et message d'intention.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Filtrage du vivier et mise en avant du profil certifié conforme">
-            <div class="concept-shot">
-              <div class="concept-orb concept-orb-1"></div>
-              <div class="concept-orb concept-orb-2"></div>
-
-              <div class="concept-head">
-                <div class="concept-tag">
-                  <span class="concept-dot"></span>
-                  <span>03 · Vivier qualifié & certification</span>
+          <div class="how-slide-media" role="img" aria-label="Aperçu de la fiche praticien recommandée avec certifications et documents conformes">
+            <div class="ui-win">
+              <div class="ui-win-bar">
+                <div class="ui-win-dots">
+                  <span class="ui-win-dot red"></span>
+                  <span class="ui-win-dot yellow"></span>
+                  <span class="ui-win-dot green"></span>
                 </div>
-                <span class="concept-pill-badge">100% Conforme</span>
+                <div class="ui-win-title">
+                  <span class="crumb">Candidatures /</span>
+                  <span>Dr Camille Laurent</span>
+                </div>
+                <span class="ui-win-badge">Profil vérifié ✓</span>
               </div>
 
-              <div class="concept-body">
-                <div class="spotlight-layout">
-                  <div class="pool-filters-box">
-                    <div class="pool-filter-step">
-                      <span class="pool-filter-icon">✓</span>
-                      <span>RPPS & CNOM contrôlés</span>
+              <div class="ui-win-body">
+                <div class="ui-profile-view">
+                  <div class="ui-profile-hero">
+                    <div class="ui-profile-avatar">CL</div>
+                    <div class="ui-profile-name">
+                      <strong>Dr Camille Laurent</strong>
+                      <span>Médecin généraliste remplaçante · 6 ans d'exercice</span>
                     </div>
-                    <div class="pool-filter-step">
-                      <span class="pool-filter-icon">✓</span>
-                      <span>Assurance RCP validée</span>
+                    <div class="ui-profile-rating">★ 4.9 <small>(18 avis)</small></div>
+                  </div>
+
+                  <div class="ui-checklist-box">
+                    <div class="ui-check-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>RPPS & CNOM vérifiés</span>
                     </div>
-                    <div class="pool-filter-step">
-                      <span class="pool-filter-icon">✓</span>
-                      <span>Disponibilité 5/5 j garantie</span>
+                    <div class="ui-check-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Assurance RCP valide</span>
+                    </div>
+                    <div class="ui-check-item">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Dispo 5/5 jours</span>
                     </div>
                   </div>
 
-                  <div class="spotlight-card">
-                    <div class="spotlight-header">
-                      <div class="spotlight-avatar">CL</div>
-                      <div class="spotlight-info">
-                        <strong>Dr Camille Laurent</strong>
-                        <span>Médecin généraliste · 6 ans d'exp.</span>
-                      </div>
-                    </div>
-                    <div class="spotlight-verified-badge">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                      <span>Profil certifié & prêt à intervenir</span>
-                    </div>
+                  <div class="ui-profile-quote-bubble">
+                    « Disponible sur l'ensemble de votre créneau 14–18 sept. Je connais très bien votre logiciel Doctolib et la patientèle du secteur. »
                   </div>
                 </div>
-              </div>
 
-              <div class="concept-foot">
-                <div class="concept-foot-meta">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Zéro profil non qualifié : sécurité totale</span>
+                <div class="ui-win-footer">
+                  <span style="font-size: 11px; color: var(--w-text-muted);">Dossier administratif certifié</span>
+                  <div style="display: flex; gap: 8px;">
+                    <span class="ui-win-btn ghost">Voir CV complet</span>
+                    <span class="ui-win-btn primary">Ouvrir la messagerie →</span>
+                  </div>
                 </div>
-                <span class="concept-foot-chip">Dossier vérifié</span>
               </div>
             </div>
           </div>
@@ -1699,66 +1577,68 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Validation dans la messagerie</h3>
             <p>Questions pratiques, confirmation du planning, documents complémentaires et accord final : chaque échange reste rattaché à la mission, sans perte d'information.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Passerelle d'accord bilatéral scellé entre le cabinet et le praticien">
-            <div class="concept-shot">
-              <div class="concept-orb concept-orb-1"></div>
-              <div class="concept-orb concept-orb-2"></div>
-
-              <div class="concept-head">
-                <div class="concept-tag">
-                  <span class="concept-dot"></span>
-                  <span>04 · Accord bilatéral direct</span>
+          <div class="how-slide-media" role="img" aria-label="Aperçu de la messagerie en direct avec échange de messages et proposition de contrat intégrée">
+            <div class="ui-win">
+              <div class="ui-win-bar">
+                <div class="ui-win-dots">
+                  <span class="ui-win-dot red"></span>
+                  <span class="ui-win-dot yellow"></span>
+                  <span class="ui-win-dot green"></span>
                 </div>
-                <span class="concept-pill-badge">Zéro intermédiaire</span>
+                <div class="ui-win-title">
+                  <span class="crumb">Messagerie /</span>
+                  <span>Dr Camille Laurent</span>
+                </div>
+                <span class="ui-win-badge">● En ligne</span>
               </div>
 
-              <div class="concept-body">
-                <div class="deal-bridge">
-                  <div class="deal-actors-row">
-                    <div class="deal-actor-node">
-                      <span>Cabinet</span>
-                      <strong>Dr Montaigne</strong>
+              <div class="ui-win-body">
+                <div class="ui-chat-view">
+                  <div class="ui-chat-messages">
+                    <!-- Message Reçu -->
+                    <div class="ui-bubble-row">
+                      <div class="ui-chat-av">CL</div>
+                      <div class="ui-bubble them">
+                        Bonjour ! Je vous confirme ma pleine disponibilité du 14 au 18 sept. aux horaires indiqués (8h30–18h30).
+                      </div>
                     </div>
-                    <div class="deal-connector">⇄</div>
-                    <div class="deal-actor-node">
-                      <span>Remplaçant</span>
-                      <strong>Dr C. Laurent</strong>
+
+                    <!-- Carte Proposition de mission intégrée -->
+                    <div class="ui-chat-proposal-card">
+                      <div class="ui-proposal-head">
+                        <span class="ui-proposal-title">📄 Proposition d'accord contractuel</span>
+                        <span class="ui-win-badge" style="font-size: 9px; padding: 2px 7px;">Prête à signer</span>
+                      </div>
+                      <div class="ui-proposal-badges">
+                        <div class="ui-prop-badge"><span>Dates</span><strong>14–18 Sept.</strong></div>
+                        <div class="ui-prop-badge"><span>Horaires</span><strong>08:30–18:30</strong></div>
+                        <div class="ui-prop-badge"><span>Rétrocession</span><strong>70 %</strong></div>
+                        <div class="ui-prop-badge"><span>Garantie</span><strong>Sécurisée</strong></div>
+                      </div>
+                      <div class="ui-proposal-actions">
+                        <span class="ui-win-btn ghost" style="padding: 4px 10px; font-size: 10.5px;">Ajuster</span>
+                        <span class="ui-win-btn teal" style="padding: 4px 10px; font-size: 10.5px;">✓ Valider l'accord bilatéral</span>
+                      </div>
+                    </div>
+
+                    <!-- Message Envoyé -->
+                    <div class="ui-bubble-row mine">
+                      <div class="ui-bubble mine">
+                        Parfait Dr Laurent, accord validé ! Le contrat dématérialisé est généré.
+                      </div>
                     </div>
                   </div>
 
-                  <div class="deal-capsule">
-                    <div class="deal-terms-grid">
-                      <div class="deal-term-item">
-                        <span>Période</span>
-                        <strong>14–18 Sept.</strong>
-                      </div>
-                      <div class="deal-term-item">
-                        <span>Créneau</span>
-                        <strong>8h30–18h30</strong>
-                      </div>
-                      <div class="deal-term-item">
-                        <span>Rétrocession</span>
-                        <strong>70 %</strong>
-                      </div>
-                      <div class="deal-term-item">
-                        <span>Garantie</span>
-                        <strong>Validée</strong>
-                      </div>
-                    </div>
-                    <div class="deal-lock-stamp">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                      <span>Contrat bilatéral scellé & horodaté</span>
-                    </div>
+                  <div class="ui-composer-bar">
+                    <span>Écrire une réponse au Dr Laurent...</span>
+                    <span class="ui-win-btn primary" style="padding: 3px 10px; font-size: 10.5px;">Envoyer ➔</span>
                   </div>
                 </div>
-              </div>
 
-              <div class="concept-foot">
-                <div class="concept-foot-meta">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Formalisation juridique immédiate sans friction</span>
+                <div class="ui-win-footer">
+                  <span style="font-size: 11px; color: var(--w-text-muted);">Échanges sécurisés et rattachés à la mission</span>
+                  <span class="ui-win-btn ghost" style="font-size: 11px;">Télécharger le contrat (PDF) ↓</span>
                 </div>
-                <span class="concept-foot-chip">Contrat signé</span>
               </div>
             </div>
           </div>
@@ -1773,69 +1653,72 @@ nav.nav-scrolled{top:10px;width:min(1120px,calc(100% - 32px));height:60px;min-he
             <h3>Suivi et bilan mission</h3>
             <p>Le remplaçant retrouve les informations clés avant le jour J. Après la mission, chacun peut clôturer proprement l'expérience et fiabiliser les prochaines collaborations.</p>
           </div>
-          <div class="how-slide-media" role="img" aria-label="Déroulé continu de la mission et dénouement financier automatisé">
-            <div class="concept-shot">
-              <div class="concept-orb concept-orb-1"></div>
-              <div class="concept-orb concept-orb-2"></div>
-
-              <div class="concept-head">
-                <div class="concept-tag">
-                  <span class="concept-dot"></span>
-                  <span>05 · Exécution & clôture automatisée</span>
+          <div class="how-slide-media" role="img" aria-label="Aperçu du tableau de bord de suivi avec timeline de mission et dénouement financier">
+            <div class="ui-win">
+              <div class="ui-win-bar">
+                <div class="ui-win-dots">
+                  <span class="ui-win-dot red"></span>
+                  <span class="ui-win-dot yellow"></span>
+                  <span class="ui-win-dot green"></span>
                 </div>
-                <span class="concept-pill-badge">Mission clôturée</span>
+                <div class="ui-win-title">
+                  <span class="crumb">Suivi de mission /</span>
+                  <span>Remplacement Médecine Générale</span>
+                </div>
+                <span class="ui-win-badge">Terminée ✓</span>
               </div>
 
-              <div class="concept-body">
-                <div class="mission-track-wrap">
-                  <div class="mission-days-track">
-                    <div class="mission-day-node">
-                      <span>J1</span>
-                      <strong>14/09 ✓</strong>
+              <div class="ui-win-body">
+                <div class="ui-tracking-view">
+                  <!-- Stepper Timeline -->
+                  <div class="ui-track-timeline">
+                    <div class="ui-timeline-node">
+                      <div class="ui-node-bullet">✓</div>
+                      <div class="ui-node-name">Cadrage</div>
+                      <div class="ui-node-state">Validé</div>
                     </div>
-                    <div class="mission-day-node">
-                      <span>J2</span>
-                      <strong>15/09 ✓</strong>
+                    <div class="ui-timeline-node">
+                      <div class="ui-node-bullet">✓</div>
+                      <div class="ui-node-name">Accord</div>
+                      <div class="ui-node-state">Signé</div>
                     </div>
-                    <div class="mission-day-node">
-                      <span>J3</span>
-                      <strong>16/09 ✓</strong>
+                    <div class="ui-timeline-node">
+                      <div class="ui-node-bullet">✓</div>
+                      <div class="ui-node-name">Remplacement</div>
+                      <div class="ui-node-state">5/5 jours</div>
                     </div>
-                    <div class="mission-day-node">
-                      <span>J4</span>
-                      <strong>17/09 ✓</strong>
-                    </div>
-                    <div class="mission-day-node">
-                      <span>J5</span>
-                      <strong>18/09 ✓</strong>
+                    <div class="ui-timeline-node active">
+                      <div class="ui-node-bullet">✓</div>
+                      <div class="ui-node-name">Clôture</div>
+                      <div class="ui-node-state">Prête</div>
                     </div>
                   </div>
 
-                  <div class="mission-stats-trio">
-                    <div class="mission-stat-box">
+                  <!-- Synthèse Métriques -->
+                  <div class="ui-track-summary-grid">
+                    <div class="ui-summary-tile">
                       <strong>5 / 5 j</strong>
-                      <span>Réalisés</span>
+                      <span>Journées réalisées</span>
                     </div>
-                    <div class="mission-stat-box">
+                    <div class="ui-summary-tile">
                       <strong>3 850 €</strong>
-                      <span>Rétrocession nette</span>
+                      <span>Rétrocession libérée</span>
                     </div>
-                    <div class="mission-stat-box">
-                      <strong>1 clic</strong>
-                      <span>Attestation & Relevé</span>
+                    <div class="ui-summary-tile">
+                      <strong>100%</strong>
+                      <span>Actes télétransmis</span>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="concept-foot">
-                <div class="concept-foot-meta">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Clôture automatique : justificatifs et paiements prêts</span>
+                <div class="ui-win-footer">
+                  <span style="font-size: 11px; color: var(--w-text-muted);">Attestation et relevé fiscal prêts</span>
+                  <span class="ui-win-btn teal">✓ Télécharger le bilan & pièces</span>
                 </div>
-                <span class="concept-foot-chip">Archive certifiée</span>
               </div>
             </div>
+          </div>
+        </div>
       </article>
     </div>
     <div class="how-nav">
