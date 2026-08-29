@@ -160,3 +160,17 @@ nav.nav-scrolled{top:10px;background:rgba(248,247,243,.97);box-shadow:0 16px 42p
 @media(max-width:640px){
   .matching-explanation article{grid-template-columns:34px minmax(0,1fr);padding:11px 12px}.matching-explanation .matching-level{width:34px;height:34px;font-size:13px}.matching-explanation p{font-size:9px}.score-breakdown>h3{margin-bottom:18px;font-size:23px}
 }
+
+/* Conversation — rebalance context and dialogue, then let real events fill the thread. */
+.communication .message-panel{grid-template-columns:.68fr 1.32fr;max-width:none}
+.conversation-flow{min-height:56px}.conversation-flow>span{padding:9px 16px}.conversation-flow>span>i{width:24px;height:24px;flex-basis:24px}
+.message-context{padding:24px 23px 22px}.message-context h3{font-size:25px}.context-details{margin-top:19px}.context-details>div{padding:10px 0}.context-confirmed{margin-top:15px}.context-document{margin-top:14px}
+.conversation-body{grid-template-rows:auto auto auto auto auto auto minmax(24px,1fr) auto;align-content:stretch;gap:10px;min-height:500px;padding:18px 20px 17px}
+.conversation-event{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 11px;border:1px solid rgba(26,82,160,.1);border-radius:11px;background:#F2F5F8}.conversation-event>span:first-child{display:grid;place-items:center;width:27px;height:27px;border-radius:8px;background:#fff;color:var(--blue);font-size:9px}.conversation-event>div{display:grid;gap:2px}.conversation-event strong{color:var(--navy);font-size:8.5px}.conversation-event small{color:var(--text-3);font-size:7.5px}.conversation-event>span:last-child{color:var(--blue);font-size:7.5px;font-weight:600}.message-row-confirmation{max-width:72%}.message-row-confirmation .bubble{border-color:rgba(14,138,122,.14);background:#F5FAF8}.conversation-footer{padding-top:1px}.conversation-compose{margin-top:1px}
+
+@media(max-width:760px){
+  .communication .message-panel{grid-template-columns:1fr;max-width:none}.conversation-flow>span{padding:9px 10px}.message-context{padding:20px}.conversation-body{grid-template-rows:auto;min-height:0;padding:17px}.conversation-event{grid-template-columns:27px minmax(0,1fr)}.conversation-event>span:last-child{grid-column:2;justify-self:start}.message-row-confirmation{max-width:88%}
+}
+@media(max-width:480px){
+  .conversation-event{padding:9px}.conversation-event strong{font-size:8px}.conversation-event small{font-size:7px}.message-row-confirmation{max-width:94%}
+}
