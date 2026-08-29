@@ -189,3 +189,37 @@ nav.nav-scrolled{top:10px;background:rgba(248,247,243,.97);box-shadow:0 16px 42p
 @media(max-width:480px){
   .audiences .section-head{margin-bottom:28px}.audience-card{padding:23px 20px 22px}.audience-index{width:42px;height:42px;flex-basis:42px;border-radius:13px;font-size:18px}.audience-card h3{font-size:27px}.audience-points{display:grid}.audience-points li{width:fit-content}
 }
+
+/* Landing rhythm — consistent breathing room from the hero to the FAQ. */
+.hero{height:auto;min-height:0;padding:106px 40px 0}
+.hero-layout-human{height:auto;grid-template-rows:auto auto;row-gap:24px}
+.hero-human-wrap{height:auto}
+.hero-human-frame{width:min(100%,820px);height:auto;aspect-ratio:1217/562}
+.hero-human-photo{object-fit:cover}
+
+.matching{padding:76px 40px}
+.journey{padding:76px 40px}
+.communication{padding:76px 40px}
+.followup{padding:76px 40px}
+.audiences{padding:76px 40px}
+.terrain{padding:76px 40px}
+.matching .section-head,.journey .section-head,.communication .trust-heading,.followup .preview-head,.audiences .section-head,.terrain>.section-head{margin-bottom:40px}
+.communication .message-panel,.followup .mission-center{margin-top:0}
+.cta-band{padding:60px 40px}
+
+@media(max-width:900px){
+  .hero{height:auto;min-height:0;padding:102px 24px 24px}
+  .hero-layout-human{height:auto;grid-template-rows:auto auto}
+  .hero-human-wrap{height:auto}
+  .hero-human-frame{width:min(100%,760px);height:auto;aspect-ratio:1217/562}
+  .matching,.journey,.communication,.followup,.audiences,.terrain{padding:68px 24px}
+  .matching .section-head,.journey .section-head,.communication .trust-heading,.followup .preview-head,.audiences .section-head,.terrain>.section-head{margin-bottom:36px}
+}
+
+@media(max-width:640px){
+  .hero{padding:94px 18px 28px}
+  .hero-layout-human{row-gap:22px}
+  .matching,.journey,.communication,.followup,.audiences,.terrain{padding:60px 18px}
+  .matching .section-head,.journey .section-head,.communication .trust-heading,.followup .preview-head,.audiences .section-head,.terrain>.section-head{margin-bottom:28px}
+  .cta-band{padding:46px 18px}
+}
