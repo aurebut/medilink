@@ -226,6 +226,105 @@
       </div>
     </section>
 
+    <section class="continuity" id="continuite" aria-labelledby="continuity-title">
+      <div class="continuity-inner">
+        <header class="continuity-heading reveal">
+          <div class="continuity-title-block">
+            <div class="continuity-kicker">Pendant toute la mission</div>
+            <h2 id="continuity-title">Le remplacement se termine. <em>Le suivi, lui, continue.</em></h2>
+          </div>
+          <div class="continuity-intro">
+            <p>MédiLink se connecte aux logiciels utilisés par le cabinet pour centraliser les informations utiles au suivi pendant la mission.</p>
+            <p>Le médecin titulaire garde ainsi une vision claire de ce qui s’est passé pendant son absence, sans avoir à reconstituer l’information à son retour.</p>
+          </div>
+        </header>
+
+        <div class="continuity-console reveal">
+          <aside class="continuity-features" aria-labelledby="continuity-features-title">
+            <div class="continuity-features-head">
+              <span>Situation actualisée</span>
+              <h3 id="continuity-features-title">Suivez l’essentiel en un coup d’œil</h3>
+            </div>
+            <ol class="continuity-feature-list">
+              <li>
+                <span class="continuity-feature-index" aria-hidden="true">01</span>
+                <div><h4>Les consultations réalisées</h4><p>Visualisez l’activité effectuée pendant le remplacement et les éléments importants associés.</p></div>
+              </li>
+              <li>
+                <span class="continuity-feature-index" aria-hidden="true">02</span>
+                <div><h4>Les situations à surveiller</h4><p>Repérez rapidement les patients ou situations qui nécessitent une attention particulière ou une continuité de prise en charge.</p></div>
+              </li>
+              <li>
+                <span class="continuity-feature-index" aria-hidden="true">03</span>
+                <div><h4>Les transmissions importantes</h4><p>Retrouvez ce qui doit être repris, vérifié ou poursuivi après le remplacement.</p></div>
+              </li>
+              <li class="is-synced">
+                <span class="continuity-feature-index" aria-hidden="true">04</span>
+                <div><h4>Synchronisé avec les outils du cabinet</h4><p>MédiLink se connecte aux logiciels métiers pour éviter la double saisie et garder les informations à jour tout au long de la mission.</p></div>
+              </li>
+            </ol>
+          </aside>
+
+          <figure class="continuity-dashboard">
+            <figcaption class="sr-only">Exemple du tableau de suivi actualisé pendant un remplacement, avec l’activité réalisée, les situations à surveiller et les transmissions à reprendre.</figcaption>
+            <div class="continuity-dashboard-head">
+              <div class="continuity-mission">
+                <span>Mission #ML-0428 · En cours</span>
+                <h3>Point de situation</h3>
+                <p>Cabinet des Tilleuls · Jour 3 sur 5</p>
+              </div>
+              <div class="continuity-sync-status"><i aria-hidden="true"></i><span><strong>Informations à jour</strong><small>Synchronisées à l’instant</small></span></div>
+            </div>
+
+            <div class="continuity-stats" aria-label="Résumé de la mission">
+              <article>
+                <div class="continuity-stat-head"><span>Consultations</span><i aria-hidden="true">↗</i></div>
+                <strong>87</strong>
+                <small>réalisées depuis le début</small>
+                <div class="continuity-sparkline" aria-hidden="true"><i style="height:40%"></i><i style="height:62%"></i><i style="height:54%"></i><i style="height:88%"></i><i style="height:72%"></i></div>
+              </article>
+              <article>
+                <div class="continuity-stat-head"><span>À surveiller</span><i class="is-alert" aria-hidden="true">!</i></div>
+                <strong>2</strong>
+                <small>situations signalées</small>
+                <div class="continuity-stat-foot"><span>Priorité visible</span><b>À reprendre</b></div>
+              </article>
+              <article>
+                <div class="continuity-stat-head"><span>Transmissions</span><i class="is-check" aria-hidden="true">✓</i></div>
+                <strong>4</strong>
+                <small>éléments centralisés</small>
+                <div class="continuity-stat-foot"><span>Dossier préparé</span><b>Complet</b></div>
+              </article>
+            </div>
+
+            <div class="continuity-detail-grid">
+              <section class="continuity-detail-card" aria-labelledby="watch-title">
+                <div class="continuity-detail-head"><div><span>À reprendre</span><h4 id="watch-title">Situations à surveiller</h4></div><b>2 éléments</b></div>
+                <div class="continuity-watch-list">
+                  <article><span class="continuity-watch-icon" aria-hidden="true">01</span><div><strong>Suivi clinique à poursuivre</strong><small>Dossier #2841 · contrôle recommandé sous 7 jours</small></div><b>Prioritaire</b></article>
+                  <article><span class="continuity-watch-icon" aria-hidden="true">02</span><div><strong>Résultat attendu</strong><small>Dossier #1976 · compte rendu à vérifier</small></div><b>À vérifier</b></article>
+                </div>
+              </section>
+
+              <section class="continuity-detail-card" aria-labelledby="handoff-title">
+                <div class="continuity-detail-head"><div><span>Transmission</span><h4 id="handoff-title">Informations importantes</h4></div><b>4 notes</b></div>
+                <ul class="continuity-handoff-list">
+                  <li><i aria-hidden="true">✓</i><span><strong>Compte rendu de spécialiste</strong><small>Vérifier la réception</small></span></li>
+                  <li><i aria-hidden="true">✓</i><span><strong>Renouvellement à confirmer</strong><small>Échéance vendredi</small></span></li>
+                  <li><i aria-hidden="true">✓</i><span><strong>Appel de suivi programmé</strong><small>Rappel ajouté à l’agenda</small></span></li>
+                </ul>
+              </section>
+            </div>
+
+            <div class="continuity-sources">
+              <div><span class="continuity-source-mark" aria-hidden="true">↻</span><span><strong>Sources synchronisées</strong><small>La situation reste actualisée tout au long de la mission</small></span></div>
+              <ul aria-label="Outils du cabinet synchronisés"><li>Logiciel métier <i aria-hidden="true">✓</i></li><li>Agenda du cabinet <i aria-hidden="true">✓</i></li><li>Dossier de mission <i aria-hidden="true">✓</i></li></ul>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </section>
+
     <section class="how terrain" id="terrain" aria-labelledby="terrain-title">
       <header class="section-head reveal"><div class="section-kicker">Moins de mauvaises surprises</div><h2 class="section-h" id="terrain-title">Les informations utiles, au bon moment.</h2><p class="section-sub">MédiLink rend visibles les éléments qui font réussir un remplacement, du premier choix jusqu’à la clôture.</p></header>
       <div class="terrain-grid">
