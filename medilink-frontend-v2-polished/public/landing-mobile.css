@@ -1,0 +1,1528 @@
+/*
+ * Mobile-only composition layer for the public MediLink pages.
+ * Desktop rules remain owned by landing-main.css / landing-persona.css.
+ */
+
+@media (max-width: 900px) {
+  body:not(.persona-page) .hero {
+    padding-bottom: 40px;
+  }
+
+  body:not(.persona-page) .hero-layout-human {
+    row-gap: 20px;
+  }
+
+  body:not(.persona-page) .matching,
+  body:not(.persona-page) .journey,
+  body:not(.persona-page) .communication,
+  body:not(.persona-page) .followup,
+  body:not(.persona-page) .continuity,
+  body:not(.persona-page) .audiences,
+  body:not(.persona-page) .terrain {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  body:not(.persona-page) .section-head,
+  body:not(.persona-page) .trust-heading,
+  body:not(.persona-page) .preview-head,
+  body:not(.persona-page) .continuity-heading {
+    margin-bottom: 32px;
+  }
+
+  body:not(.persona-page) .section-sub,
+  body:not(.persona-page) .trust-sub,
+  body:not(.persona-page) .continuity-intro p {
+    line-height: 1.58;
+  }
+
+  body:not(.persona-page) .journey-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .journey-step {
+    display: flex;
+    min-height: 290px;
+    flex-direction: column;
+    gap: 16px;
+    padding: 23px;
+  }
+
+  body:not(.persona-page) .journey-step:not(:last-child)::after {
+    display: none;
+  }
+
+  body:not(.persona-page) .journey-step:nth-child(2) {
+    border-right: 0;
+  }
+
+  body:not(.persona-page) .journey-step:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(200, 210, 228, .78);
+  }
+
+  body:not(.persona-page) .journey-list {
+    grid-column: auto;
+  }
+
+  body:not(.persona-page) .matching-explanation {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  body:not(.persona-page) .matching-explanation article {
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px;
+    padding: 15px;
+  }
+
+  body:not(.persona-page) .matching-explanation .matching-level {
+    width: 38px;
+    height: 38px;
+  }
+
+  body:not(.persona-page) .matching-explanation h3 {
+    font-size: 18px;
+  }
+
+  body:not(.persona-page) .matching-explanation p {
+    font-size: 11.5px;
+  }
+
+  body:not(.persona-page) .continuity-console {
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  body:not(.persona-page) {
+    --mobile-gutter: 16px;
+  }
+
+  body:not(.persona-page) nav {
+    top: max(8px, env(safe-area-inset-top, 8px));
+    width: calc(100% - 20px);
+  }
+
+  body:not(.persona-page) .nav-mobile-panel {
+    max-height: calc(100dvh - 88px - env(safe-area-inset-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  body:not(.persona-page) .nav-mobile-panel > a,
+  body:not(.persona-page) .nav-mobile-actions .btn,
+  body:not(.persona-page) .hero-ctas .btn,
+  body:not(.persona-page) .cta-actions .btn {
+    min-height: 46px;
+  }
+
+  body:not(.persona-page) .hero {
+    padding: 86px var(--mobile-gutter) 42px;
+  }
+
+  body:not(.persona-page) .hero-layout-human {
+    row-gap: 18px;
+  }
+
+  body:not(.persona-page) .hero h1 {
+    max-width: 520px;
+    font-size: clamp(36px, 10.7vw, 44px);
+    line-height: 1.01;
+  }
+
+  body:not(.persona-page) .hero-sub {
+    max-width: 520px;
+    margin: 15px auto 20px;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  body:not(.persona-page) .hero-human-frame {
+    max-height: 190px;
+    border-radius: 21px;
+  }
+
+  body:not(.persona-page) .matching,
+  body:not(.persona-page) .journey,
+  body:not(.persona-page) .communication,
+  body:not(.persona-page) .followup,
+  body:not(.persona-page) .continuity,
+  body:not(.persona-page) .audiences,
+  body:not(.persona-page) .terrain {
+    padding: 52px var(--mobile-gutter);
+  }
+
+  body:not(.persona-page) .section-head,
+  body:not(.persona-page) .trust-heading,
+  body:not(.persona-page) .preview-head,
+  body:not(.persona-page) .continuity-heading {
+    margin-bottom: 24px;
+  }
+
+  body:not(.persona-page) .section-kicker,
+  body:not(.persona-page) .trust-kicker,
+  body:not(.persona-page) .continuity-kicker {
+    margin-bottom: 12px;
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .section-h,
+  body:not(.persona-page) .trust h2,
+  body:not(.persona-page) .continuity-title-block h2 {
+    font-size: clamp(32px, 9.2vw, 38px);
+    line-height: 1.04;
+  }
+
+  body:not(.persona-page) .section-sub,
+  body:not(.persona-page) .trust-sub,
+  body:not(.persona-page) .continuity-intro p {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  body:not(.persona-page) .section-sub br + br,
+  body:not(.persona-page) .trust-sub br + br {
+    line-height: .65;
+  }
+
+  /* Repeated explanations become swipeable rails instead of very tall stacks. */
+  body:not(.persona-page) .journey-shell {
+    overflow: hidden;
+    padding: 10px 0 8px;
+    border-radius: 22px;
+  }
+
+  body:not(.persona-page) .journey-shell::after {
+    content: "Balayez pour parcourir les 4 étapes  →";
+    display: block;
+    padding: 2px 16px 5px;
+    color: var(--text-3);
+    font-size: 11px;
+    text-align: right;
+  }
+
+  body:not(.persona-page) .journey-grid,
+  body:not(.persona-page) .matching-explanation,
+  body:not(.persona-page) .terrain-grid,
+  body:not(.persona-page) .audience-grid,
+  body:not(.persona-page) .mission-dossier-list,
+  body:not(.persona-page) .continuity-feature-list,
+  body:not(.persona-page) .continuity-handoff-list {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px var(--mobile-gutter) 12px;
+    margin-right: calc(var(--mobile-gutter) * -1);
+    margin-left: calc(var(--mobile-gutter) * -1);
+    scroll-padding-inline: var(--mobile-gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgba(26, 82, 160, .28) transparent;
+    scrollbar-width: thin;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body:not(.persona-page) .journey-grid {
+    padding-right: 10px;
+    padding-left: 10px;
+    margin: 0;
+  }
+
+  body:not(.persona-page) .journey-step,
+  body:not(.persona-page) .matching-explanation article,
+  body:not(.persona-page) .terrain-card,
+  body:not(.persona-page) .audience-card,
+  body:not(.persona-page) .mission-dossier-list > div,
+  body:not(.persona-page) .continuity-feature-list li,
+  body:not(.persona-page) .continuity-handoff-list li {
+    flex: 0 0 min(82vw, 310px);
+    scroll-snap-align: start;
+  }
+
+  body:not(.persona-page) .journey-step {
+    min-height: 340px;
+    gap: 16px;
+    padding: 22px 20px 21px;
+    border: 1px solid rgba(200, 210, 228, .78) !important;
+    border-radius: 18px;
+  }
+
+  body:not(.persona-page) .journey-step:not(:last-child)::after {
+    display: grid;
+    top: 28px;
+    right: -22px;
+    bottom: auto;
+    left: auto;
+    content: "→";
+  }
+
+  body:not(.persona-page) .journey-step h3 {
+    font-size: 25px;
+  }
+
+  body:not(.persona-page) .journey-step p {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  body:not(.persona-page) .journey-step-head span:not(.journey-number),
+  body:not(.persona-page) .journey-step-head strong,
+  body:not(.persona-page) .journey-list li {
+    font-size: 11px;
+  }
+
+  body:not(.persona-page) .matching-shell {
+    gap: 20px;
+  }
+
+  body:not(.persona-page) .matching-explanation article {
+    grid-template-columns: 42px minmax(0, 1fr);
+    min-height: 190px;
+    padding: 18px;
+  }
+
+  body:not(.persona-page) .matching-explanation .matching-level {
+    width: 42px;
+    height: 42px;
+  }
+
+  body:not(.persona-page) .matching-explanation h3 {
+    font-size: 21px;
+  }
+
+  body:not(.persona-page) .matching-explanation p {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  body:not(.persona-page) .product-window,
+  body:not(.persona-page) .message-panel,
+  body:not(.persona-page) .mission-center {
+    border-radius: 21px;
+  }
+
+  body:not(.persona-page) .score-summary {
+    display: grid;
+    grid-template-columns: minmax(105px, .8fr) minmax(0, 1.2fr);
+    min-height: 166px;
+    border-right: 0;
+    border-bottom: 1px solid var(--gray-2);
+  }
+
+  body:not(.persona-page) .score-profile-photo {
+    width: calc(100% - 12px);
+    min-width: 0;
+    height: auto;
+    min-height: 140px;
+    margin: 12px 0 12px 12px;
+  }
+
+  body:not(.persona-page) .score-profile-body {
+    min-width: 0;
+    padding: 18px 16px;
+  }
+
+  body:not(.persona-page) .score-profile-body h3 {
+    font-size: 23px;
+  }
+
+  body:not(.persona-page) .score-profile-role,
+  body:not(.persona-page) .score-value > span,
+  body:not(.persona-page) .score-row > div,
+  body:not(.persona-page) .score-note {
+    font-size: 11px;
+  }
+
+  body:not(.persona-page) .score-value {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 12px;
+    min-width: 0;
+  }
+
+  body:not(.persona-page) .score-value strong {
+    font-size: 42px;
+  }
+
+  body:not(.persona-page) .score-breakdown {
+    padding: 20px 18px 21px;
+  }
+
+  body:not(.persona-page) .score-breakdown h3 {
+    font-size: 23px;
+  }
+
+  body:not(.persona-page) .score-breakdown-kicker,
+  body:not(.persona-page) .status {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .conversation-flow {
+    display: flex;
+    min-height: 0;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 9px 12px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  body:not(.persona-page) .conversation-flow::-webkit-scrollbar {
+    display: none;
+  }
+
+  body:not(.persona-page) .conversation-flow > span {
+    flex: 0 0 158px;
+    min-height: 52px;
+    padding: 9px 10px;
+    border: 1px solid rgba(200, 210, 228, .7);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .72);
+    scroll-snap-align: start;
+  }
+
+  body:not(.persona-page) .conversation-flow > span:not(:last-child)::after {
+    display: none;
+  }
+
+  body:not(.persona-page) .conversation-flow small,
+  body:not(.persona-page) .conversation-flow strong {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .conversation-flow > span > i,
+  body:not(.persona-page) .message-context-label,
+  body:not(.persona-page) .context-document > span,
+  body:not(.persona-page) .context-document > i,
+  body:not(.persona-page) .conversation-day,
+  body:not(.persona-page) .conversation-event > span,
+  body:not(.persona-page) .proposal-action,
+  body:not(.persona-page) .conversation-footer i {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .message-context {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px 14px;
+    padding: 18px;
+  }
+
+  body:not(.persona-page) .message-context-label,
+  body:not(.persona-page) .message-context h3,
+  body:not(.persona-page) .message-context > p {
+    grid-column: 1;
+  }
+
+  body:not(.persona-page) .message-context h3 {
+    margin: 5px 0 2px;
+    font-size: 24px;
+  }
+
+  body:not(.persona-page) .message-context h3 br {
+    display: initial;
+  }
+
+  body:not(.persona-page) .context-details,
+  body:not(.persona-page) .context-confirmed,
+  body:not(.persona-page) .context-document {
+    grid-column: 1 / -1;
+  }
+
+  body:not(.persona-page) .context-details {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 14px;
+  }
+
+  body:not(.persona-page) .context-confirmed {
+    grid-column: 1;
+    margin-top: 12px;
+  }
+
+  body:not(.persona-page) .context-document {
+    grid-column: 2;
+    align-self: stretch;
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  body:not(.persona-page) .context-details dt,
+  body:not(.persona-page) .context-details dd,
+  body:not(.persona-page) .context-confirmed > span,
+  body:not(.persona-page) .context-confirmed li,
+  body:not(.persona-page) .context-document strong,
+  body:not(.persona-page) .context-document small {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .conversation-body {
+    min-height: 0;
+    gap: 11px;
+    padding: 17px 15px;
+  }
+
+  body:not(.persona-page) .proposal-card {
+    grid-template-columns: 30px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  body:not(.persona-page) .proposal-card-copy dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .proposal-action {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  body:not(.persona-page) .message-row {
+    max-width: 94%;
+  }
+
+  body:not(.persona-page) .bubble,
+  body:not(.persona-page) .conversation-event strong,
+  body:not(.persona-page) .proposal-card strong {
+    font-size: 11px;
+  }
+
+  body:not(.persona-page) .conversation-event small,
+  body:not(.persona-page) .message-row small,
+  body:not(.persona-page) .proposal-card span,
+  body:not(.persona-page) .proposal-card dt,
+  body:not(.persona-page) .proposal-card dd,
+  body:not(.persona-page) .conversation-footer {
+    font-size: 9.5px;
+  }
+
+  body:not(.persona-page) .mission-command,
+  body:not(.persona-page) .mission-progress,
+  body:not(.persona-page) .mission-dossier {
+    padding: 18px 16px;
+  }
+
+  body:not(.persona-page) .mission-command-data dt,
+  body:not(.persona-page) .mission-command-data dd,
+  body:not(.persona-page) .mission-route-copy > span,
+  body:not(.persona-page) .mission-route-copy small,
+  body:not(.persona-page) .mission-route-status,
+  body:not(.persona-page) .mission-live-copy p,
+  body:not(.persona-page) .mission-dossier-list small {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .mission-route-copy strong,
+  body:not(.persona-page) .mission-live-copy strong,
+  body:not(.persona-page) .mission-dossier-list strong {
+    font-size: 11.5px;
+  }
+
+  body:not(.persona-page) .mission-command-kicker,
+  body:not(.persona-page) .mission-parties small,
+  body:not(.persona-page) .mission-parties strong,
+  body:not(.persona-page) .mission-panel-head > div > span,
+  body:not(.persona-page) .mission-date span,
+  body:not(.persona-page) .mission-date small,
+  body:not(.persona-page) .mission-live-facts span,
+  body:not(.persona-page) .mission-dossier-score,
+  body:not(.persona-page) .mission-dossier-list > div > span:last-child,
+  body:not(.persona-page) .mission-next-action span,
+  body:not(.persona-page) .mission-next-action small {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .mission-dossier-list {
+    border-top: 0;
+  }
+
+  body:not(.persona-page) .mission-dossier-list > div {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    align-content: start;
+    min-height: 112px;
+    padding: 13px;
+    border: 1px solid rgba(200, 210, 228, .8);
+    border-radius: 13px;
+  }
+
+  body:not(.persona-page) .mission-dossier-list > div > span:last-child {
+    grid-column: 2;
+    margin-top: 5px;
+  }
+
+  body:not(.persona-page) .continuity-feature-list {
+    margin-top: 18px;
+  }
+
+  body:not(.persona-page) .continuity-feature-list li {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-content: start;
+    min-height: 145px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, .1) !important;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, .035);
+  }
+
+  body:not(.persona-page) .continuity-feature-list h4,
+  body:not(.persona-page) .continuity-feature-list p {
+    font-size: 11px;
+  }
+
+  body:not(.persona-page) .continuity-dashboard {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  body:not(.persona-page) .continuity-console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body:not(.persona-page) .continuity-features {
+    width: 100%;
+    min-width: 0;
+  }
+
+  body:not(.persona-page) .continuity-dashboard-head {
+    display: grid;
+    gap: 12px;
+  }
+
+  body:not(.persona-page) .continuity-sync-status {
+    width: fit-content;
+  }
+
+  body:not(.persona-page) .continuity-stats,
+  body:not(.persona-page) .continuity-stats:first-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .continuity-stats > article:first-child {
+    grid-column: 1 / -1;
+  }
+
+  body:not(.persona-page) .continuity-stat-head > span,
+  body:not(.persona-page) .continuity-stats > article > small,
+  body:not(.persona-page) .continuity-stat-foot,
+  body:not(.persona-page) .continuity-detail-head > div > span,
+  body:not(.persona-page) .continuity-detail-head > b,
+  body:not(.persona-page) .continuity-watch-list strong,
+  body:not(.persona-page) .continuity-watch-list small,
+  body:not(.persona-page) .continuity-watch-list article > b,
+  body:not(.persona-page) .continuity-handoff-list strong,
+  body:not(.persona-page) .continuity-handoff-list small,
+  body:not(.persona-page) .continuity-sources strong,
+  body:not(.persona-page) .continuity-sources small,
+  body:not(.persona-page) .continuity-sources li {
+    font-size: 9.5px;
+  }
+
+  body:not(.persona-page) .continuity-handoff-list li {
+    display: flex;
+    min-height: 74px;
+    align-items: flex-start;
+    padding: 12px;
+    border: 1px solid var(--gray-1);
+    border-radius: 12px;
+  }
+
+  body:not(.persona-page) .continuity-features-head > span,
+  body:not(.persona-page) .continuity-mission > span,
+  body:not(.persona-page) .continuity-mission > p,
+  body:not(.persona-page) .continuity-sync-status strong,
+  body:not(.persona-page) .continuity-sync-status small,
+  body:not(.persona-page) .continuity-handoff-list i {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .terrain-grid,
+  body:not(.persona-page) .audience-grid {
+    overflow-x: auto;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .terrain-card,
+  body:not(.persona-page) .audience-card {
+    min-height: 330px;
+    padding: 22px 20px;
+    border: 1px solid rgba(200, 210, 228, .82) !important;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .82);
+    box-shadow: 0 16px 38px rgba(11, 25, 41, .07);
+  }
+
+  body:not(.persona-page) .terrain-card:nth-child(2),
+  body:not(.persona-page) .audience-card:nth-child(2) {
+    background: rgba(229, 245, 242, .78);
+  }
+
+  body:not(.persona-page) .terrain-card p,
+  body:not(.persona-page) .audience-card p {
+    font-size: 12.5px;
+  }
+
+  body:not(.persona-page) .audience-points li {
+    font-size: 10.5px;
+  }
+
+  body:not(.persona-page) .terrain-card-head small,
+  body:not(.persona-page) .audience-card-head > span,
+  body:not(.persona-page) .audience-kicker {
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .cta-band {
+    width: calc(100% - 32px);
+    margin-bottom: 48px;
+    padding: 34px 20px 20px;
+  }
+
+  body:not(.persona-page) .cta-band h2 {
+    font-size: 31px;
+  }
+
+  body:not(.persona-page) .faq {
+    padding: 44px var(--mobile-gutter) 52px;
+  }
+
+  body:not(.persona-page) .faq-inner > .section-head {
+    margin-bottom: 22px;
+  }
+
+  body:not(.persona-page) .faq-item summary {
+    min-height: 58px;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  body:not(.persona-page) footer {
+    padding: 40px var(--mobile-gutter) calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  body:not(.persona-page) .hero h1 {
+    font-size: 35px;
+  }
+
+  body:not(.persona-page) .score-summary {
+    grid-template-columns: 112px minmax(0, 1fr);
+  }
+
+  body:not(.persona-page) .score-profile-body {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  body:not(.persona-page) .score-value strong {
+    font-size: 35px;
+  }
+
+  body:not(.persona-page) .score-value {
+    display: grid;
+    justify-content: start;
+    gap: 3px;
+  }
+
+  body:not(.persona-page) .continuity-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body:not(.persona-page) .message-context-label,
+  body:not(.persona-page) .message-context h3,
+  body:not(.persona-page) .message-context > p {
+    grid-column: 1 / -1;
+  }
+
+  body:not(.persona-page) .mission-command-data {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .mission-command-data > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  body:not(.persona-page) .mission-command-data > div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(200, 210, 228, .7);
+  }
+}
+
+/* Persona landings: same visual language, recomposed for touch screens. */
+@media (max-width: 900px) {
+  .persona-page .persona-hero {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+
+  .persona-page .persona-section,
+  .persona-page .persona-dark {
+    padding-top: 62px;
+    padding-bottom: 62px;
+  }
+
+  .persona-page .section-head,
+  .persona-page .dark-heading {
+    margin-bottom: 32px;
+  }
+
+  .persona-page .continuous-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .persona-page .continuous-card {
+    min-height: 300px;
+  }
+
+  .persona-page .continuous-card:nth-child(2) {
+    border-right: 0;
+  }
+
+  .persona-page .continuous-card:last-child {
+    grid-column: 1 / -1;
+    min-height: 0;
+    border-top: 1px solid rgba(200, 210, 228, .78);
+  }
+}
+
+@media (max-width: 640px) {
+  .persona-page {
+    --mobile-gutter: 16px;
+  }
+
+  .persona-page nav {
+    top: max(8px, env(safe-area-inset-top, 8px));
+    width: calc(100% - 20px);
+  }
+
+  .persona-page .nav-mobile-panel {
+    top: calc(100% + 8px);
+    max-height: calc(100dvh - 88px - env(safe-area-inset-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .persona-page .nav-mobile-panel > a,
+  .persona-page .nav-mobile-actions .btn,
+  .persona-page .hero-ctas .btn,
+  .persona-page .persona-cta .btn {
+    min-height: 46px;
+  }
+
+  .persona-page .persona-hero {
+    padding: 84px var(--mobile-gutter) 0;
+  }
+
+  .persona-page .persona-eyebrow {
+    margin-bottom: 13px;
+    font-size: 9.5px;
+  }
+
+  .persona-page .persona-hero h1 {
+    max-width: 520px;
+    font-size: clamp(36px, 10.7vw, 43px);
+    line-height: 1.01;
+  }
+
+  .persona-page .persona-hero-copy {
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.52;
+  }
+
+  .persona-page .persona-hero .hero-ctas {
+    width: 100%;
+    margin-top: 20px;
+    gap: 9px;
+  }
+
+  .persona-page .persona-stage {
+    margin-top: 20px;
+  }
+
+  .persona-page .persona-photo-frame {
+    height: 185px;
+    border-radius: 21px;
+  }
+
+  .persona-page .hero-action {
+    margin-top: -15px;
+  }
+
+  .persona-page .hero-action form,
+  .persona-page .hero-action .intent-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    padding: 9px;
+    border-radius: 16px;
+  }
+
+  .persona-page .hero-action .hero-field,
+  .persona-page .hero-action .hero-field:nth-of-type(n + 2) {
+    display: block;
+    min-height: 58px;
+    padding: 9px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--gray-2);
+  }
+
+  .persona-page .hero-action .hero-field:nth-of-type(odd) {
+    border-right: 1px solid var(--gray-2);
+  }
+
+  .persona-page .hero-action .hero-field:nth-last-of-type(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .persona-page .hero-action form:not(.intent-grid) .hero-field:nth-of-type(2) {
+    border-bottom: 1px solid var(--gray-2);
+  }
+
+  .persona-page .hero-action form:not(.intent-grid) .hero-field:nth-of-type(3) {
+    grid-column: 1 / -1;
+    border-right: 0;
+  }
+
+  .persona-page .hero-action .hero-field small {
+    font-size: 9px;
+  }
+
+  .persona-page .hero-action .hero-field input,
+  .persona-page .hero-action .hero-field select {
+    min-height: 24px;
+    font-size: 12px;
+  }
+
+  .persona-page .hero-action button {
+    grid-column: 1 / -1;
+    min-height: 48px;
+    margin: 9px 0 0;
+    font-size: 12px;
+  }
+
+  .persona-page .hero-action-note {
+    display: block;
+    grid-column: 1 / -1;
+    margin: 7px 7px 2px;
+    font-size: 10px;
+  }
+
+  .persona-page .persona-section,
+  .persona-page .persona-dark {
+    padding: 52px var(--mobile-gutter);
+  }
+
+  .persona-page .section-head,
+  .persona-page .dark-heading {
+    margin-bottom: 24px;
+  }
+
+  .persona-page .section-kicker,
+  .persona-page .dark-kicker {
+    margin-bottom: 12px;
+    font-size: 10px;
+  }
+
+  .persona-page .section-h,
+  .persona-page .dark-heading h2 {
+    font-size: clamp(32px, 9.2vw, 38px);
+    line-height: 1.04;
+  }
+
+  .persona-page .section-sub,
+  .persona-page .dark-heading p {
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  .persona-page .continuous-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-right: calc(var(--mobile-gutter) * -1);
+    margin-left: calc(var(--mobile-gutter) * -1);
+    padding: 2px var(--mobile-gutter) 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    scroll-padding-inline: var(--mobile-gutter);
+    scroll-snap-type: x mandatory;
+    scrollbar-color: color-mix(in srgb, var(--accent) 28%, transparent) transparent;
+    scrollbar-width: thin;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .persona-page .continuous-card {
+    flex: 0 0 min(84vw, 320px);
+    min-height: 360px;
+    padding: 22px 20px;
+    border: 1px solid rgba(200, 210, 228, .82) !important;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .86);
+    box-shadow: 0 16px 38px rgba(11, 25, 41, .07);
+    scroll-snap-align: start;
+  }
+
+  .persona-page .continuous-card:nth-child(2) {
+    background: color-mix(in srgb, var(--accent-soft) 70%, white);
+  }
+
+  .persona-page .continuous-card:last-child {
+    grid-column: auto;
+  }
+
+  .persona-page .continuous-card-head {
+    margin-bottom: 19px;
+  }
+
+  .persona-page .continuous-card small,
+  .persona-page .micro-list li {
+    font-size: 10.5px;
+  }
+
+  .persona-page .continuous-card h3 {
+    font-size: 25px;
+  }
+
+  .persona-page .continuous-card p {
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .persona-page .product-demo {
+    border-radius: 21px;
+  }
+
+  .persona-page .product-bar {
+    min-height: 50px;
+    padding: 0 14px;
+  }
+
+  .persona-page .product-path,
+  .persona-page .product-state {
+    font-size: 9.5px;
+  }
+
+  .persona-page .workspace-main,
+  .persona-page .pipeline-area,
+  .persona-page .candidate-drawer {
+    width: 100%;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .persona-page .candidate-workspace,
+  .persona-page .establishment-workspace {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .persona-page .workspace-head h3,
+  .persona-page .pipeline-heading h3 {
+    font-size: 24px;
+  }
+
+  .persona-page .workspace-head span,
+  .persona-page .workspace-head p,
+  .persona-page .pipeline-heading span {
+    font-size: 10.5px;
+  }
+
+  .persona-page .mission-stack,
+  .persona-page .pipeline-list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-right: -16px;
+    margin-left: -16px;
+    padding: 1px 16px 11px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    scroll-padding-inline: 16px;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: color-mix(in srgb, var(--accent) 28%, transparent) transparent;
+    scrollbar-width: thin;
+    overscroll-behavior-inline: contain;
+  }
+
+  .persona-page .mission-result,
+  .persona-page .pipeline-item {
+    flex: 0 0 min(78vw, 285px);
+    min-height: 128px;
+    align-content: center;
+    padding: 14px;
+    border: 1px solid var(--gray-2) !important;
+    border-radius: 15px;
+    background: #fff;
+    scroll-snap-align: start;
+  }
+
+  .persona-page .mission-result small,
+  .persona-page .pipeline-item small,
+  .persona-page .pipeline-item p,
+  .persona-page .status-pill {
+    font-size: 9.5px;
+  }
+
+  .persona-page .mission-result h4,
+  .persona-page .pipeline-item strong {
+    font-size: 15px;
+  }
+
+  .persona-page .mission-result p {
+    font-size: 11px;
+  }
+
+  .persona-page .candidate-drawer {
+    border-top: 1px solid var(--gray-2);
+  }
+
+  .persona-page .candidate-drawer > span,
+  .persona-page .drawer-person p,
+  .persona-page .drawer-score span,
+  .persona-page .drawer-facts li,
+  .persona-page .drawer-action {
+    font-size: 10.5px;
+  }
+
+  .persona-page .persona-dark {
+    padding-top: 52px;
+    padding-bottom: 54px;
+  }
+
+  .persona-page .dark-panel {
+    margin-top: 26px;
+    padding: 9px;
+    border-radius: 21px;
+  }
+
+  .persona-page .mission-file-main {
+    padding: 13px;
+  }
+
+  .persona-page .file-progress {
+    overflow-x: auto;
+    grid-template-columns: repeat(3, minmax(125px, 1fr));
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .persona-page .file-progress::-webkit-scrollbar {
+    display: none;
+  }
+
+  .persona-page .file-progress > div {
+    scroll-snap-align: start;
+  }
+
+  .persona-page .file-progress span,
+  .persona-page .file-progress strong,
+  .persona-page .file-event strong,
+  .persona-page .file-event small,
+  .persona-page .file-event > span {
+    font-size: 9.5px;
+  }
+
+  .persona-page .file-event {
+    grid-template-columns: 30px minmax(0, 1fr);
+    padding: 11px;
+  }
+
+  .persona-page .file-event > span {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .persona-page .persona-cta {
+    width: calc(100% - 32px);
+    margin: 48px auto;
+    padding: 34px 20px 20px;
+    border-radius: 22px;
+  }
+
+  .persona-page .persona-cta::after {
+    left: 20px;
+  }
+
+  .persona-page .persona-cta h2 {
+    font-size: 31px;
+  }
+
+  .persona-page .persona-cta p {
+    font-size: 13px;
+  }
+
+  .persona-page .persona-cta .cta-actions {
+    margin-top: 20px;
+  }
+
+  .persona-page .faq {
+    padding: 44px var(--mobile-gutter) 52px;
+  }
+
+  .persona-page .faq .section-head {
+    margin-bottom: 22px;
+  }
+
+  .persona-page .faq-item summary {
+    min-height: 58px;
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  .persona-page footer {
+    padding: 40px var(--mobile-gutter) calc(24px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 380px) {
+  .persona-page .persona-hero h1 {
+    font-size: 35px;
+  }
+
+  .persona-page .hero-action .hero-field input,
+  .persona-page .hero-action .hero-field select {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 381px) and (max-width: 400px) {
+  body:not(.persona-page) .mission-command-data {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .mission-command-data > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  body:not(.persona-page) .mission-command-data > div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(200, 210, 228, .7);
+  }
+}
+
+/* Readability pass: mobile copy stays comfortable instead of mimicking a scaled desktop UI. */
+@media (max-width: 640px) {
+  body:not(.persona-page) .hero-sub {
+    font-size: 16px;
+    line-height: 1.58;
+  }
+
+  body:not(.persona-page) .section-sub,
+  body:not(.persona-page) .trust-sub,
+  body:not(.persona-page) .continuity-intro p {
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  body:not(.persona-page) .journey-step-head span:not(.journey-number),
+  body:not(.persona-page) .journey-step-head strong,
+  body:not(.persona-page) .journey-list li {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .journey-step p,
+  body:not(.persona-page) .matching-explanation p,
+  body:not(.persona-page) .terrain-card p,
+  body:not(.persona-page) .audience-card p {
+    font-size: 14px;
+    line-height: 1.58;
+  }
+
+  body:not(.persona-page) .score-profile-role,
+  body:not(.persona-page) .score-value > span,
+  body:not(.persona-page) .score-row > div,
+  body:not(.persona-page) .score-note,
+  body:not(.persona-page) .score-breakdown-kicker,
+  body:not(.persona-page) .status {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .conversation-person strong {
+    font-size: 14px;
+  }
+
+  body:not(.persona-page) .conversation-person span,
+  body:not(.persona-page) .conversation-head-meta > span:first-child,
+  body:not(.persona-page) .conversation-flow small,
+  body:not(.persona-page) .conversation-flow strong,
+  body:not(.persona-page) .message-context-label,
+  body:not(.persona-page) .message-context > p,
+  body:not(.persona-page) .context-details dt,
+  body:not(.persona-page) .context-details dd,
+  body:not(.persona-page) .context-confirmed > span,
+  body:not(.persona-page) .context-confirmed li,
+  body:not(.persona-page) .context-document strong,
+  body:not(.persona-page) .context-document small,
+  body:not(.persona-page) .conversation-event strong,
+  body:not(.persona-page) .conversation-event small,
+  body:not(.persona-page) .message-row small,
+  body:not(.persona-page) .proposal-card span,
+  body:not(.persona-page) .proposal-card strong,
+  body:not(.persona-page) .proposal-card dt,
+  body:not(.persona-page) .proposal-card dd,
+  body:not(.persona-page) .proposal-action,
+  body:not(.persona-page) .conversation-footer {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .bubble {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  body:not(.persona-page) .mission-command-copy p,
+  body:not(.persona-page) .mission-command-data dt,
+  body:not(.persona-page) .mission-command-data dd,
+  body:not(.persona-page) .mission-parties small,
+  body:not(.persona-page) .mission-parties strong,
+  body:not(.persona-page) .mission-panel-head > div > span,
+  body:not(.persona-page) .mission-route-copy > span,
+  body:not(.persona-page) .mission-route-copy small,
+  body:not(.persona-page) .mission-route-status,
+  body:not(.persona-page) .mission-live-copy p,
+  body:not(.persona-page) .mission-live-facts span,
+  body:not(.persona-page) .mission-dossier-list small,
+  body:not(.persona-page) .mission-dossier-list > div > span:last-child,
+  body:not(.persona-page) .mission-next-action span,
+  body:not(.persona-page) .mission-next-action small {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .mission-route-copy strong,
+  body:not(.persona-page) .mission-live-copy strong,
+  body:not(.persona-page) .mission-dossier-list strong {
+    font-size: 13px;
+  }
+
+  body:not(.persona-page) .continuity-feature-list h4,
+  body:not(.persona-page) .continuity-feature-list p,
+  body:not(.persona-page) .continuity-mission > p,
+  body:not(.persona-page) .continuity-sync-status strong,
+  body:not(.persona-page) .continuity-sync-status small,
+  body:not(.persona-page) .continuity-stat-head > span,
+  body:not(.persona-page) .continuity-stats > article > small,
+  body:not(.persona-page) .continuity-stat-foot,
+  body:not(.persona-page) .continuity-detail-head > div > span,
+  body:not(.persona-page) .continuity-detail-head > b,
+  body:not(.persona-page) .continuity-watch-list strong,
+  body:not(.persona-page) .continuity-watch-list small,
+  body:not(.persona-page) .continuity-watch-list article > b,
+  body:not(.persona-page) .continuity-handoff-list strong,
+  body:not(.persona-page) .continuity-handoff-list small,
+  body:not(.persona-page) .continuity-sources strong,
+  body:not(.persona-page) .continuity-sources small,
+  body:not(.persona-page) .continuity-sources li {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  body:not(.persona-page) .terrain-card-head small,
+  body:not(.persona-page) .audience-card-head > span,
+  body:not(.persona-page) .audience-kicker,
+  body:not(.persona-page) .audience-points li {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .cta-band p,
+  body:not(.persona-page) .faq-answer,
+  body:not(.persona-page) .footer-brand p,
+  body:not(.persona-page) .footer-col a,
+  body:not(.persona-page) .footer-bottom {
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  body:not(.persona-page) .hero-sub,
+  body:not(.persona-page) .section-sub {
+    color: var(--text-2);
+  }
+
+  body:not(.persona-page) .section-kicker,
+  body:not(.persona-page) .trust-kicker,
+  body:not(.persona-page) .continuity-kicker,
+  body:not(.persona-page) .faq-group-title,
+  body:not(.persona-page) .footer-col h4 {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .nav-mobile-panel > a {
+    font-size: 13px;
+  }
+
+  body:not(.persona-page) .trust-sub,
+  body:not(.persona-page) .continuity-intro p {
+    color: #afc0d0;
+  }
+
+  body:not(.persona-page) .journey-shell::after,
+  body:not(.persona-page) .conversation-flow > span > i,
+  body:not(.persona-page) .context-document > span,
+  body:not(.persona-page) .context-document > i,
+  body:not(.persona-page) .conversation-day,
+  body:not(.persona-page) .conversation-event > span,
+  body:not(.persona-page) .conversation-footer i,
+  body:not(.persona-page) .mission-command-kicker,
+  body:not(.persona-page) .mission-date span,
+  body:not(.persona-page) .mission-date small,
+  body:not(.persona-page) .mission-dossier-score,
+  body:not(.persona-page) .continuity-features-head > span,
+  body:not(.persona-page) .continuity-mission > span,
+  body:not(.persona-page) .continuity-handoff-list i {
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .mission-live-label,
+  body:not(.persona-page) .mission-next-action strong,
+  body:not(.persona-page) .audience-card-foot span,
+  body:not(.persona-page) .audience-card-head > div > span,
+  body:not(.persona-page) .score-value small,
+  body:not(.persona-page) .conversation-compose,
+  body:not(.persona-page) .conversation-compose > span {
+    font-size: 12px;
+  }
+}
+
+/* The two audience landings use the same mobile reading scale. */
+@media (max-width: 640px) {
+  .persona-page .persona-eyebrow,
+  .persona-page .section-kicker,
+  .persona-page .dark-kicker {
+    font-size: 12px;
+  }
+
+  .persona-page .persona-hero-copy {
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.58;
+  }
+
+  .persona-page .section-sub,
+  .persona-page .dark-heading p {
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  .persona-page .section-sub {
+    color: var(--text-2);
+  }
+
+  .persona-page .dark-heading p {
+    color: #afc0d0;
+  }
+
+  .persona-page .hero-action .hero-field small {
+    font-size: 12px;
+  }
+
+  .persona-page .hero-action .hero-field input,
+  .persona-page .hero-action .hero-field select {
+    font-size: 16px;
+  }
+
+  .persona-page .hero-action button {
+    font-size: 14px;
+  }
+
+  .persona-page .hero-action-note {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .persona-page .continuous-card small,
+  .persona-page .micro-list li {
+    font-size: 12px;
+  }
+
+  .persona-page .continuous-card p {
+    color: var(--text-2);
+    font-size: 14px;
+    line-height: 1.58;
+  }
+
+  .persona-page .candidate-workspace {
+    min-height: 0;
+  }
+
+  .persona-page .nav-mobile-panel > a {
+    font-size: 13px;
+  }
+
+  .persona-page .persona-switch a,
+  .persona-page .footer-col h4 {
+    font-size: 12px;
+  }
+
+  .persona-page .product-path,
+  .persona-page .product-state,
+  .persona-page .workspace-head span,
+  .persona-page .workspace-head p,
+  .persona-page .pipeline-heading span {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .persona-page .mission-result small,
+  .persona-page .pipeline-item small,
+  .persona-page .pipeline-item p,
+  .persona-page .status-pill,
+  .persona-page .mission-result p,
+  .persona-page .candidate-drawer > span,
+  .persona-page .drawer-person p,
+  .persona-page .drawer-score span,
+  .persona-page .drawer-facts li,
+  .persona-page .drawer-action {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .persona-page .mission-result h4,
+  .persona-page .pipeline-item strong {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .persona-page .match-pill small {
+    font-size: 12px;
+  }
+
+  .persona-page .file-progress span,
+  .persona-page .file-progress strong,
+  .persona-page .file-event strong,
+  .persona-page .file-event small,
+  .persona-page .file-event > span {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .persona-page .file-event i {
+    font-size: 12px;
+  }
+
+  .persona-page .persona-cta p,
+  .persona-page .faq-answer,
+  .persona-page .footer-brand p,
+  .persona-page .footer-col a,
+  .persona-page .footer-bottom {
+    font-size: 14px;
+    line-height: 1.58;
+  }
+}
