@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#EEF3F8">
-  <title>MédiLink — Trouver un remplacement ne devrait pas être un parcours du combattant</title>
-  <meta name="description" content="MédiLink rassemble chaque étape au même endroit, pour vous aider à trouver plus simplement la mission ou le remplaçant qui vous correspond.">
-  <meta property="og:title" content="MédiLink — Trouver un remplacement ne devrait pas être un parcours du combattant">
-  <meta property="og:description" content="MédiLink rassemble chaque étape au même endroit, pour vous aider à trouver plus simplement la mission ou le remplaçant qui vous correspond.">
+  <title>MédiLink — Le bon remplacement. L’esprit plus libre.</title>
+  <meta name="description" content="MédiLink réunit médecins remplaçants et cabinets : des missions qui vous correspondent, des échanges centralisés et un suivi clair, jusqu’au bout.">
+  <meta property="og:title" content="MédiLink — Le bon remplacement. L’esprit plus libre.">
+  <meta property="og:description" content="MédiLink réunit médecins remplaçants et cabinets : des missions qui vous correspondent, des échanges centralisés et un suivi clair, jusqu’au bout.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MédiLink">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/landing-special.css">
   <link rel="stylesheet" href="/landing-main.css">
   <link rel="stylesheet" href="/landing-mobile.css">
+  <link rel="stylesheet" href="/landing-hero.css">
 </head>
 <body>
   <nav aria-label="Navigation principale">
@@ -44,15 +45,28 @@
   </nav>
 
   <main>
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-bg" aria-hidden="true"><div class="blob one"></div><div class="blob two"></div><div class="blob three"></div></div>
+    <section class="hero hero--structured" aria-labelledby="hero-title">
+      <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-layout-human">
         <div class="hero-copy">
-          <h1 id="hero-title">Trouver un remplacement ne devrait pas être <em>un parcours du combattant.</em></h1>
-          <p class="hero-sub">Entre les annonces dispersées, les informations manquantes, les échanges à retrouver et les démarches à suivre, organiser un remplacement peut vite devenir compliqué.<br><br>MédiLink rassemble chaque étape au même endroit, pour vous aider à trouver plus simplement la mission ou le remplaçant qui vous correspond.</p>
-          <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/landing-medecin.html">Trouver une mission</a><a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Trouver un remplaçant</a></div>
+          <p class="hero-eyebrow"><span aria-hidden="true"></span>Le remplacement médical, simplement</p>
+          <h1 id="hero-title"><span>Le bon remplacement.</span><em>L’esprit plus libre.</em></h1>
+          <p class="hero-sub">MédiLink réunit médecins remplaçants et cabinets : des missions qui vous correspondent, des échanges centralisés et un suivi clair, jusqu’au bout.</p>
+          <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/landing-medecin.html">Trouver une mission <span aria-hidden="true">↗</span></a><a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Trouver un remplaçant <span aria-hidden="true">↗</span></a></div>
         </div>
-        <div class="hero-human-wrap"><div class="hero-human-frame"><img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async"></div></div>
+        <div class="hero-human-wrap">
+          <div class="hero-story">
+            <figure class="hero-human-frame">
+              <img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async">
+              <figcaption class="hero-photo-caption"><span>Moins de démarches dispersées.</span><strong>Plus de place pour le soin.</strong></figcaption>
+            </figure>
+            <ol class="hero-path" aria-label="Votre remplacement, de la recherche au suivi">
+              <li><a href="#matching"><span class="hero-path-number" aria-hidden="true">01</span><span><strong>Trouvez votre correspondance</strong><small>Vos critères, votre façon d’exercer.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
+              <li><a href="#communication"><span class="hero-path-number" aria-hidden="true">02</span><span><strong>Échangez au même endroit</strong><small>Les bonnes informations, dans le même fil.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
+              <li><a href="#suivi"><span class="hero-path-number" aria-hidden="true">03</span><span><strong>Avancez l’esprit tranquille</strong><small>Chaque étape du remplacement, en clair.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
+            </ol>
+          </div>
+        </div>
       </div>
     </section>
 

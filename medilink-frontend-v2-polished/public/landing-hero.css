@@ -1,0 +1,136 @@
+/* Homepage hero: one promise, one photograph, one connected product journey.
+   Scoped to avoid changing the physician and practice landing pages. */
+body:not(.persona-page) .hero--structured {
+  height: auto;
+  min-height: 0;
+  padding: 132px 32px 24px;
+  background: linear-gradient(180deg, #e9f0f5 0%, #f0f5f2 55%, #f8f7f3 100%);
+}
+
+.hero--structured .hero-bg {
+  background: radial-gradient(ellipse at 15% 10%, rgba(133, 169, 208, .2), transparent 55%),
+    radial-gradient(ellipse at 90% 30%, rgba(146, 202, 183, .22), transparent 55%);
+}
+
+body:not(.persona-page) .hero--structured .hero-layout-human {
+  height: auto;
+  max-width: 1000px;
+  grid-template-rows: auto auto;
+  row-gap: 38px;
+}
+
+.hero--structured .hero-copy { width: 100%; max-width: 850px; }
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-bottom: 20px;
+  color: #3c5f68;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.hero-eyebrow > span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); }
+
+body:not(.persona-page) .hero--structured h1 {
+  max-width: 850px;
+  font-size: clamp(52px, 5.7vw, 76px);
+  line-height: .99;
+  letter-spacing: -.025em;
+}
+
+.hero--structured h1 > span, .hero--structured h1 > em { display: block; }
+.hero--structured h1 > em { margin-top: 5px; }
+
+body:not(.persona-page) .hero--structured .hero-sub {
+  max-width: 620px;
+  margin: 23px auto 25px;
+  color: #4b6174;
+  font-size: 16px;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.hero--structured .hero-ctas { gap: 12px; }
+.hero--structured .hero-ctas .btn { gap: 20px; min-height: 49px; padding: 12px 21px; font-size: 14px; }
+.hero--structured .btn-primary { color: #fff; box-shadow: 0 5px 12px rgba(11, 25, 41, .12); }
+.hero--structured .btn-outline { border: 1px solid #9badb9; background: rgba(255, 255, 255, .5); }
+.hero--structured .hero-ctas .btn > span { font-size: 18px; }
+.hero--structured .hero-human-wrap { height: auto; line-height: normal; }
+
+.hero-story {
+  width: 100%;
+  padding: 8px 8px 0;
+  border: 1px solid rgba(137, 163, 175, .28);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .8);
+  box-shadow: 0 18px 45px -24px rgba(24, 58, 71, .3);
+}
+
+body:not(.persona-page) .hero--structured .hero-human-frame {
+  position: relative;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  aspect-ratio: 1217 / 480;
+  margin: 0;
+  border-radius: 21px;
+  isolation: isolate;
+}
+
+.hero--structured .hero-human-photo { object-fit: cover; object-position: center 42%; }
+.hero--structured .hero-human-frame::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(18deg, rgba(8, 28, 37, .85), transparent 55%);
+  pointer-events: none;
+}
+
+.hero-photo-caption { position: absolute; z-index: 2; bottom: 28px; left: 30px; color: #fff; }
+.hero-photo-caption > span { display: block; margin-bottom: 5px; font-size: 12px; }
+.hero-photo-caption > strong { display: block; font: 34px/1.08 var(--serif); }
+.hero-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 9px 0; list-style: none; }
+.hero-path > li { min-width: 0; }
+.hero-path > li + li { border-left: 1px solid #dce5e7; }
+.hero-path a { display: flex; align-items: center; gap: 12px; height: 100%; padding: 17px 16px; color: var(--navy); text-decoration: none; border-radius: 12px; transition: background .2s; }
+.hero-path a:hover { background: #edf4f2; }
+.hero-path-number { align-self: flex-start; padding-top: 1px; color: var(--teal); font: 22px/1 var(--serif); }
+.hero-path strong { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; }
+.hero-path small { display: block; margin-top: 4px; color: #5d6d7b; font-size: 10px; line-height: 1.5; }
+.hero-path-arrow { margin-left: auto; color: #617e80; font-size: 16px; }
+
+@media (max-width: 900px) {
+  body:not(.persona-page) .hero--structured { padding: 116px 24px 24px; }
+  .hero-path a { padding: 13px 10px; gap: 8px; }
+  .hero-path-arrow { display: none; }
+}
+
+@media (max-width: 640px) {
+  body:not(.persona-page) .hero--structured { padding: 105px 16px 16px; }
+  body:not(.persona-page) .hero--structured .hero-layout-human { row-gap: 28px; }
+  .hero-eyebrow { gap: 7px; margin-bottom: 18px; font-size: 9px; letter-spacing: .08em; }
+  body:not(.persona-page) .hero--structured h1 { font-size: clamp(36px, 9.8vw, 58px); line-height: 1.04; }
+  body:not(.persona-page) .hero--structured .hero-sub { max-width: 440px; margin: 19px auto 22px; font-size: 14px; line-height: 1.6; }
+  .hero--structured .hero-ctas { display: grid; max-width: 380px; margin: auto; gap: 9px; }
+  .hero--structured .hero-ctas .btn { justify-content: space-between; padding-inline: 20px; }
+  .hero-story { padding: 6px 6px 0; border-radius: 23px; }
+  body:not(.persona-page) .hero--structured .hero-human-frame { aspect-ratio: 1.5; border-radius: 17px; }
+  .hero--structured .hero-human-photo { object-position: 54% center; }
+  .hero--structured .hero-human-frame::after { inset: 40% 0 0; background: linear-gradient(0deg, rgba(8, 28, 37, .8), transparent); }
+  .hero-photo-caption { left: 17px; right: 12px; bottom: 17px; }
+  .hero-photo-caption > span { font-size: 10px; }
+  .hero-photo-caption > strong { font-size: 27px; }
+  .hero-path { grid-template-columns: 1fr; padding: 5px 7px; }
+  .hero-path > li + li { border-left: 0; border-top: 1px solid #dce5e7; }
+  .hero-path a { gap: 13px; padding: 13px 7px; }
+  .hero-path-number { align-self: center; font-size: 23px; }
+  .hero-path strong { font-size: 12px; }
+  .hero-path small { margin-top: 2px; font-size: 10px; }
+  .hero-path-arrow { display: block; }
+}
