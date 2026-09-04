@@ -18,8 +18,9 @@
   <link rel="stylesheet" href="/landing-main.css">
   <link rel="stylesheet" href="/landing-mobile.css">
   <link rel="stylesheet" href="/landing-hero.css">
+  <link rel="stylesheet" href="/landing-theme.css">
 </head>
-<body>
+<body class="landing-home">
   <nav aria-label="Navigation principale">
     <a class="nav-logo" href="/landing.html" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
     <div class="nav-links">
@@ -36,10 +37,10 @@
       <span class="sr-only">Ouvrir le menu</span><span aria-hidden="true"><i></i><i></i></span>
     </button>
     <div class="nav-mobile-panel" id="mobileNavigation">
-      <a href="/landing-medecin.html">Médecin remplaçant <span aria-hidden="true">→</span></a>
-      <a href="/landing-etablissement.html">Cabinet / médecin installé <span aria-hidden="true">→</span></a>
-      <a href="#how-it-works">Comment ça marche <span aria-hidden="true">→</span></a>
-      <a href="#faq">Questions fréquentes <span aria-hidden="true">→</span></a>
+      <a href="/landing-medecin.html">Médecin remplaçant <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="/landing-etablissement.html">Cabinet / médecin installé <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="#how-it-works">Comment ça marche <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/register">Créer un compte</a></div>
     </div>
   </nav>
@@ -52,7 +53,7 @@
           <p class="hero-eyebrow"><span aria-hidden="true"></span>Le remplacement médical, simplement</p>
           <h1 id="hero-title"><span>Le bon remplacement.</span><em>L’esprit plus libre.</em></h1>
           <p class="hero-sub">MédiLink réunit médecins remplaçants et cabinets : des missions qui vous correspondent, des échanges centralisés et un suivi clair, jusqu’au bout.</p>
-          <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/landing-medecin.html">Trouver une mission <span aria-hidden="true">↗</span></a><a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Trouver un remplaçant <span aria-hidden="true">↗</span></a></div>
+          <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/landing-medecin.html">Trouver une mission <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a><a class="btn btn-outline btn-lg" href="/landing-etablissement.html">Trouver un remplaçant <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></div>
         </div>
         <div class="hero-human-wrap">
           <div class="hero-story">
@@ -61,9 +62,9 @@
               <figcaption class="hero-photo-caption"><span>Moins de démarches dispersées.</span><strong>Plus de place pour le soin.</strong></figcaption>
             </figure>
             <ol class="hero-path" aria-label="Votre remplacement, de la recherche au suivi">
-              <li><a href="#matching"><span class="hero-path-number" aria-hidden="true">01</span><span><strong>Trouvez votre correspondance</strong><small>Vos critères, votre façon d’exercer.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
-              <li><a href="#communication"><span class="hero-path-number" aria-hidden="true">02</span><span><strong>Échangez au même endroit</strong><small>Les bonnes informations, dans le même fil.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
-              <li><a href="#suivi"><span class="hero-path-number" aria-hidden="true">03</span><span><strong>Avancez l’esprit tranquille</strong><small>Chaque étape du remplacement, en clair.</small></span><span class="hero-path-arrow" aria-hidden="true">↗</span></a></li>
+              <li><a href="#matching"><span class="hero-path-number" aria-hidden="true">01</span><span><strong>Trouvez votre correspondance</strong><small>Vos critères, votre façon d’exercer.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
+              <li><a href="#communication"><span class="hero-path-number" aria-hidden="true">02</span><span><strong>Échangez au même endroit</strong><small>Les bonnes informations, dans le même fil.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
+              <li><a href="#suivi"><span class="hero-path-number" aria-hidden="true">03</span><span><strong>Avancez l’esprit tranquille</strong><small>Chaque étape du remplacement, en clair.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
             </ol>
           </div>
         </div>
@@ -123,21 +124,21 @@
             <span class="message-context-label">Mission rattachée</span><h3>Remplacement<br>Médecine générale</h3><p>Cabinet des Tilleuls · Paris 11e</p>
             <dl class="context-details"><div><dt>Dates</dt><dd>14–18 sept.</dd></div><div><dt>Horaires</dt><dd>08:30–18:30</dd></div><div><dt>Rétrocession</dt><dd>70 %</dd></div></dl>
             <div class="context-confirmed"><span>Contexte confirmé</span><ul><li>Secrétariat chaque jour</li><li>Logiciel Doctolib</li></ul></div>
-            <div class="context-document"><span aria-hidden="true">PDF</span><div><strong>Conditions de mission</strong><small>Version mise à jour · prête à relire</small></div><i aria-hidden="true">→</i></div>
+            <div class="context-document"><span aria-hidden="true">PDF</span><div><strong>Conditions de mission</strong><small>Version mise à jour · prête à relire</small></div><i aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></i></div>
           </aside>
           <div class="conversation-card"><div class="conversation-body">
             <span class="conversation-day">Aujourd’hui</span>
-            <div class="conversation-event"><span aria-hidden="true">↗</span><div><strong>Brief de mission mis à jour</strong><small>Horaires du secrétariat ajoutés par le cabinet · 09:52</small></div><span>Voir le brief</span></div>
+            <div class="conversation-event"><span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span><div><strong>Brief de mission mis à jour</strong><small>Horaires du secrétariat ajoutés par le cabinet · 09:52</small></div><span>Voir le brief</span></div>
             <div class="message-row received"><img src="/landing-assets/temoignage-sarah-bernard.png" width="28" height="28" alt=""><div><small>Sarah · 10:24</small><p class="bubble">Je vous confirme ma disponibilité sur toute la période. Le secrétariat est-il présent chaque jour&nbsp;?</p></div></div>
             <div class="message-row sent"><div><small>Cabinet · 10:31</small><p class="bubble">Oui, de 8 h 30 à 17 h 30. Je l’ajoute aux conditions de la mission.</p></div></div>
             <div class="proposal-card">
               <span class="proposal-card-icon" aria-hidden="true">✓</span>
               <div class="proposal-card-copy"><span>Décision enregistrée</span><strong>Les conditions de mission ont été mises à jour</strong><dl><div><dt>Secrétariat</dt><dd>Présent chaque jour</dd></div><div><dt>Accord</dt><dd>Prêt à relire</dd></div></dl></div>
-              <span class="proposal-action">Voir le récapitulatif <i aria-hidden="true">→</i></span>
+              <span class="proposal-action">Voir le récapitulatif <i aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></i></span>
             </div>
             <div class="message-row received message-row-confirmation"><img src="/landing-assets/temoignage-sarah-bernard.png" width="28" height="28" alt=""><div><small>Sarah · 10:34</small><p class="bubble">Parfait, merci. Je serai là à 8 h 15 pour prendre mes repères avant les premières consultations.</p></div></div>
             <div class="conversation-footer"><span><i aria-hidden="true">✓</i> Décision ajoutée à l’historique de la mission</span><span>Lu par les deux parties</span></div>
-            <div class="conversation-compose" aria-hidden="true"><span><i>＋</i> Écrire un message…</span><b>→</b></div>
+            <div class="conversation-compose" aria-hidden="true"><span><i>＋</i> Écrire un message…</span><b><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></b></div>
           </div></div>
         </div>
       </div>
@@ -254,7 +255,7 @@
 
             <div class="continuity-stats" aria-label="Résumé de la mission">
               <article>
-                <div class="continuity-stat-head"><span>Consultations</span><i aria-hidden="true">↗</i></div>
+                <div class="continuity-stat-head"><span>Consultations</span><i aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></i></div>
                 <strong>87</strong>
                 <small>réalisées depuis le début</small>
                 <div class="continuity-sparkline" aria-hidden="true"><i style="height:40%"></i><i style="height:62%"></i><i style="height:54%"></i><i style="height:88%"></i><i style="height:72%"></i></div>
@@ -334,8 +335,8 @@
     <section class="audiences" id="audiences" aria-labelledby="audiences-title"><div class="audiences-inner">
       <header class="section-head reveal"><div class="section-kicker">Deux parcours, un même dossier</div><h2 class="section-h" id="audiences-title">Commencez par ce que vous cherchez aujourd’hui.</h2></header>
       <div class="audience-grid">
-        <article class="audience-card reveal"><div class="audience-card-head"><span class="audience-index">01</span><div><span>Parcours 1 sur 2</span><div class="audience-kicker">Médecin remplaçant</div></div></div><h3>Vous cherchez une mission&nbsp;?</h3><p>Comparez les conditions, repérez les missions adaptées et gardez votre dossier prêt pour candidater.</p><ul class="audience-points"><li>Conditions visibles</li><li>Compatibilité expliquée</li><li>Dossier réutilisable</li></ul><a class="btn btn-primary" href="/landing-medecin.html">Découvrir l’espace médecin <span aria-hidden="true">→</span></a></article>
-        <article class="audience-card reveal"><div class="audience-card-head"><span class="audience-index">02</span><div><span>Parcours 2 sur 2</span><div class="audience-kicker">Cabinet / médecin installé</div></div></div><h3>Vous cherchez un remplaçant&nbsp;?</h3><p>Publiez un besoin complet, étudiez les candidatures adaptées et gardez chaque décision liée à la mission.</p><ul class="audience-points"><li>Besoin détaillé</li><li>Candidatures réunies</li><li>Suivi partagé</li></ul><a class="btn btn-teal" href="/landing-etablissement.html">Découvrir l’espace cabinet <span aria-hidden="true">→</span></a></article>
+        <article class="audience-card reveal"><div class="audience-card-head"><span class="audience-index">01</span><div><span>Parcours 1 sur 2</span><div class="audience-kicker">Médecin remplaçant</div></div></div><h3>Vous cherchez une mission&nbsp;?</h3><p>Comparez les conditions, repérez les missions adaptées et gardez votre dossier prêt pour candidater.</p><ul class="audience-points"><li>Conditions visibles</li><li>Compatibilité expliquée</li><li>Dossier réutilisable</li></ul><a class="btn btn-primary" href="/landing-medecin.html">Découvrir l’espace médecin <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></article>
+        <article class="audience-card reveal"><div class="audience-card-head"><span class="audience-index">02</span><div><span>Parcours 2 sur 2</span><div class="audience-kicker">Cabinet / médecin installé</div></div></div><h3>Vous cherchez un remplaçant&nbsp;?</h3><p>Publiez un besoin complet, étudiez les candidatures adaptées et gardez chaque décision liée à la mission.</p><ul class="audience-points"><li>Besoin détaillé</li><li>Candidatures réunies</li><li>Suivi partagé</li></ul><a class="btn btn-teal" href="/landing-etablissement.html">Découvrir l’espace cabinet <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a></article>
       </div>
     </div></section>
 
