@@ -1,4 +1,4 @@
-/* Shared art direction for the homepage. Content and product layouts stay intact. */
+/* Homepage art direction: editorial copy, generous product stages, alternating contrast. */
 body.landing-home {
   --text-3: #5d7080;
   --surface-line: #dce5e7;
@@ -10,7 +10,7 @@ body.landing-home .landing-arrow { display: inline-block; flex: 0 0 auto; vertic
 
 /* A quiet page rhythm, aligned with the framed photograph in the hero. */
 body.landing-home:not(.persona-page) :is(.matching, .communication, .followup, .continuity, .journey, .audiences, .faq) {
-  padding: 88px 32px;
+  padding: 100px 32px;
 }
 body.landing-home:not(.persona-page) :is(.matching-inner, .trust-inner, .preview-inner, .continuity-inner, .features-inner, .audiences-inner, .faq-inner, .footer-inner) {
   width: 100%;
@@ -18,10 +18,10 @@ body.landing-home:not(.persona-page) :is(.matching-inner, .trust-inner, .preview
   margin-inline: auto;
 }
 body.landing-home:not(.persona-page) :is(.matching, .followup, .journey) { background: var(--ivory); }
-body.landing-home:not(.persona-page) .communication { background: #edf3f1; color: var(--text); }
-body.landing-home:not(.persona-page) .continuity { background: linear-gradient(135deg, #e8eff4, #edf4ef); color: var(--text); }
-body.landing-home:not(.persona-page) .audiences { background: linear-gradient(180deg, var(--ivory), #f0f4f0); }
-body.landing-home:not(.persona-page) .faq { background: #f0f4f2; }
+body.landing-home:not(.persona-page) .communication { background: #e5efea; color: var(--text); }
+body.landing-home:not(.persona-page) .continuity { background: #102b3a; color: #fff; }
+body.landing-home:not(.persona-page) .audiences { background: var(--ivory); }
+body.landing-home:not(.persona-page) .faq { background: var(--ivory); }
 body.landing-home:not(.persona-page) :is(.communication, .continuity)::before,
 body.landing-home:not(.persona-page) :is(.communication, .continuity)::after { display: none; }
 
@@ -29,11 +29,15 @@ body.landing-home:not(.persona-page) :is(.section-head, .trust-heading, .preview
 body.landing-home:not(.persona-page) :is(.matching, .journey, .audiences) .section-head { max-width: 780px; }
 body.landing-home:not(.persona-page) :is(.section-h, .trust-heading h2, .continuity-title-block h2) {
   color: var(--navy);
-  font: 400 clamp(36px, 3.7vw, 48px)/1.06 var(--serif);
+  font: 400 clamp(38px, 4vw, 54px)/1.04 var(--serif);
   letter-spacing: -.02em;
   text-wrap: balance;
 }
-body.landing-home:not(.persona-page) .continuity-title-block h2 em { color: var(--blue); }
+body.landing-home:not(.persona-page) .section-emphasis { color: var(--blue); font-weight: 400; }
+body.landing-home:not(.persona-page) .continuity-title-block h2 { color: #f5f7f4; }
+body.landing-home:not(.persona-page) .continuity-title-block h2 em { color: #aad8cf; }
+body.landing-home:not(.persona-page) .continuity .continuity-kicker { color: #aad8cf; }
+body.landing-home:not(.persona-page) .continuity .continuity-intro p { color: #bdcdd3; }
 body.landing-home:not(.persona-page) :is(.section-kicker, .trust-kicker, .continuity-kicker) {
   display: inline-flex;
   align-items: center;
@@ -80,14 +84,14 @@ body.landing-home:not(.persona-page) .score-summary { background: linear-gradien
 body.landing-home:not(.persona-page) .score-profile-photo { box-shadow: none; }
 body.landing-home:not(.persona-page) .score-breakdown { background: #fff; }
 body.landing-home:not(.persona-page) .score-note { background: #edf4f1; color: #496762; }
-body.landing-home:not(.persona-page) .matching-explanation { background: #fff; }
-body.landing-home:not(.persona-page) .matching-explanation article { padding: 23px; border-color: var(--surface-line); }
-body.landing-home:not(.persona-page) .matching-explanation article:nth-child(2) { background: #edf4f1; }
-body.landing-home:not(.persona-page) .matching-explanation h3 { font-size: 23px; line-height: 1.14; }
+body.landing-home:not(.persona-page) .matching-explanation { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
+body.landing-home:not(.persona-page) .matching-explanation article { padding: 20px 0; border-color: var(--surface-line); background: transparent; }
+body.landing-home:not(.persona-page) .matching-explanation article:nth-child(2) { background: transparent; }
+body.landing-home:not(.persona-page) .matching-explanation h3 { font-size: 22px; line-height: 1.14; }
 body.landing-home:not(.persona-page) .matching-explanation p { font-size: 12px; line-height: 1.6; }
 body.landing-home:not(.persona-page) .matching-explanation .matching-level {
-  border: 1px solid #cddedb;
-  background: #edf4f1;
+  border: 0;
+  background: transparent;
   color: #23776c;
   box-shadow: none;
   border-radius: 13px;
@@ -108,18 +112,18 @@ body.landing-home:not(.persona-page) .mission-route-step.is-active { background:
 body.landing-home:not(.persona-page) .mission-live { background: #edf4f1; border-color: #d1e2dc; box-shadow: none; }
 
 /* A navy inset anchors the continuity preview in the same palette as the CTAs. */
-body.landing-home:not(.persona-page) .continuity .continuity-features { background: #183446; border-color: #27495a; }
+body.landing-home:not(.persona-page) .continuity .continuity-features { background: transparent; border: 0; border-radius: 0; box-shadow: none; padding-left: 0; }
 body.landing-home:not(.persona-page) .continuity-feature-list p { color: #b9ced4; font-size: 10px; line-height: 1.6; }
 body.landing-home:not(.persona-page) .continuity-feature-list h4 { color: #f2f7f6; font-size: 12px; }
 body.landing-home:not(.persona-page) .continuity .continuity-dashboard { background: #f9fbfa; border: 7px solid #fff; }
 body.landing-home:not(.persona-page) .continuity-stats > article { border-color: var(--surface-line); box-shadow: none; }
 body.landing-home:not(.persona-page) .continuity-detail-card { border-color: var(--surface-line); }
 
-body.landing-home:not(.persona-page) .journey-shell { background: #fff; }
+body.landing-home:not(.persona-page) .journey-shell { background: transparent; border: 0; border-radius: 0; box-shadow: none; }
 body.landing-home:not(.persona-page) .journey-shell::before { display: none; }
-body.landing-home:not(.persona-page) .journey-step:nth-child(even) { background: #edf4f1; }
+body.landing-home:not(.persona-page) .journey-step:nth-child(even) { background: transparent; }
 body.landing-home:not(.persona-page) .journey-step { border-color: var(--surface-line); }
-body.landing-home:not(.persona-page) .journey-step::after { box-shadow: none; border-color: var(--surface-line); background: #fff; }
+body.landing-home:not(.persona-page) .journey-step::after { display: none; }
 body.landing-home:not(.persona-page) :is(.journey-number, .audience-index) {
   border: 1px solid #cddedb;
   background: #edf4f1;
@@ -133,8 +137,9 @@ body.landing-home:not(.persona-page) .journey-list li { border: 0; padding: 5px 
 body.landing-home:not(.persona-page) .journey-list { display: grid; gap: 2px; }
 body.landing-home:not(.persona-page) .journey-list li::before { box-shadow: none; }
 
-body.landing-home:not(.persona-page) .audience-grid { background: #fff; }
-body.landing-home:not(.persona-page) .audience-card:nth-child(2) { background: #edf4f1; border-color: var(--surface-line); }
+body.landing-home:not(.persona-page) .audience-grid { gap: 24px; background: transparent; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+body.landing-home:not(.persona-page) .audience-card { background: #e8eff5; border: 1px solid #d5e1e9; border-radius: 26px; min-height: 410px; padding: 38px; }
+body.landing-home:not(.persona-page) .audience-card:nth-child(2) { background: #e7efe8; border: 1px solid #d5e2d7; }
 body.landing-home:not(.persona-page) .audience-card::after { display: none; }
 body.landing-home:not(.persona-page) .audience-card p { font-size: 14px; line-height: 1.65; }
 body.landing-home:not(.persona-page) .audience-points li { background: transparent; border-color: #d4e1df; font-size: 11px; }
@@ -144,22 +149,23 @@ body.landing-home:not(.persona-page) .audience-card .btn-teal { background: #183
 body.landing-home:not(.persona-page) .cta-band {
   width: min(1100px, calc(100% - 64px));
   margin: 32px auto 88px;
-  padding: 48px;
-  border: 7px solid #fff;
+  padding: 60px;
+  border: 0;
   border-radius: 28px;
-  background: linear-gradient(120deg, #e5edf4, #e9f2eb);
+  background: #102b3a;
   box-shadow: var(--surface-shadow);
 }
 body.landing-home:not(.persona-page) .cta-band::before,
 body.landing-home:not(.persona-page) .cta-band::after { display: none; }
-body.landing-home:not(.persona-page) .cta-band h2 { letter-spacing: -.02em; text-wrap: balance; }
-body.landing-home:not(.persona-page) .cta-band p { color: #4b6174; font-size: 14px; line-height: 1.65; }
-body.landing-home:not(.persona-page) .cta-band .btn-outline { border: 1px solid #9badb9; background: rgba(255, 255, 255, .5); }
+body.landing-home:not(.persona-page) .cta-band h2 { color: #f5f7f4; font-size: 44px; letter-spacing: -.02em; text-wrap: balance; }
+body.landing-home:not(.persona-page) .cta-band p { color: #bdcdd3; font-size: 14px; line-height: 1.65; }
+body.landing-home:not(.persona-page) .cta-band .btn-primary { color: #102b3a; background: #d4e9de; }
+body.landing-home:not(.persona-page) .cta-band .btn-outline { color: #fff; border: 1px solid #607b86; background: transparent; }
 
 body.landing-home:not(.persona-page) .faq-inner { gap: 72px; }
 body.landing-home:not(.persona-page) .faq-group-title { color: #3c5f68; line-height: 1.6; }
-body.landing-home:not(.persona-page) .faq-item { border: 1px solid var(--surface-line); border-radius: 17px; background: rgba(255, 255, 255, .8); box-shadow: none; }
-body.landing-home:not(.persona-page) .faq-item[open] { background: #fff; border-color: #b5cfca; }
+body.landing-home:not(.persona-page) .faq-item { border: 0; border-bottom: 1px solid #cfdcdb; border-radius: 0; background: transparent; box-shadow: none; }
+body.landing-home:not(.persona-page) .faq-item[open] { background: #edf3ef; border-color: #b5cfca; }
 body.landing-home:not(.persona-page) .faq-item summary { color: var(--navy); font-size: 14px; line-height: 1.5; }
 body.landing-home:not(.persona-page) .faq-answer { color: #4b6174; font-size: 13px; line-height: 1.75; }
 body.landing-home:not(.persona-page) footer { padding: 56px 32px 28px; border-top: 1px solid var(--surface-line); background: var(--ivory); }
@@ -169,6 +175,58 @@ body.landing-home:not(.persona-page) :is(.footer-brand p, .footer-col a, .footer
 body.landing-home:not(.persona-page) .footer-col h4 { color: #3c5f68; }
 body.landing-home:not(.persona-page) .footer-col a:hover { color: var(--blue); }
 body.landing-home:not(.persona-page) .footer-bottom { display: flex; flex-wrap: wrap; gap: 8px 24px; border-color: var(--surface-line); }
+
+/* Distinct compositions, rather than repeating a heading over a full-width panel. */
+body.landing-home:not(.persona-page) :is(.communication, .continuity) {
+  width: min(1280px, calc(100% - 48px));
+  margin-inline: auto;
+  padding-inline: 56px;
+  border-radius: 36px;
+}
+body.landing-home:not(.persona-page) .communication .trust-heading { grid-template-columns: 1fr 1fr; align-items: center; }
+body.landing-home:not(.persona-page) .communication .section-emphasis { color: #277b6e; }
+body.landing-home:not(.persona-page) .communication .message-panel { box-shadow: 0 28px 65px -36px rgba(15, 50, 44, .4); }
+body.landing-home:not(.persona-page) .journey-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+body.landing-home:not(.persona-page) .journey-step { min-height: 0; padding: 36px; border: 0; border-top: 1px solid #cddbd7; border-radius: 0; gap: 22px; }
+body.landing-home:not(.persona-page) .journey-step:nth-child(odd) { border-right: 1px solid #cddbd7; }
+body.landing-home:not(.persona-page) .journey-number { width: auto; flex: 0 0 38px; height: auto; background: transparent; border: 0; font-size: 35px; }
+body.landing-home:not(.persona-page) .journey-step h3 { max-width: 400px; font-size: 30px; }
+body.landing-home:not(.persona-page) .journey-step p { max-width: 440px; font-size: 14px; }
+body.landing-home:not(.persona-page) .journey-list { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+body.landing-home:not(.persona-page) .journey-list li { font-size: 11px; }
+body.landing-home:not(.persona-page) .audience-card h3 { font-size: 38px; }
+body.landing-home:not(.persona-page) .audience-index { background: transparent; border: 0; font-size: 36px; }
+
+@media (min-width: 1081px) {
+  body.landing-home:not(.persona-page) .matching-inner { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); column-gap: 56px; row-gap: 26px; }
+  body.landing-home:not(.persona-page) .matching .section-head { grid-column: 1; grid-row: 1; margin: 0; text-align: left; }
+  body.landing-home:not(.persona-page) .matching .section-h { font-size: 46px; text-wrap: pretty; }
+  body.landing-home:not(.persona-page) .matching-shell { display: contents; }
+  body.landing-home:not(.persona-page) .matching-explanation { grid-column: 1; grid-row: 2; }
+  body.landing-home:not(.persona-page) .matching .product-window { grid-column: 2; grid-row: 1 / 3; align-self: center; padding: 20px; border: 0; background: #e3edf0; box-shadow: none; }
+  body.landing-home:not(.persona-page) .matching .score-layout { min-height: 490px; background: #fff; box-shadow: 0 16px 36px -20px rgba(19, 53, 63, .22); }
+  body.landing-home:not(.persona-page) .matching .score-summary { border-right: 0; }
+  body.landing-home:not(.persona-page) .matching .score-profile-photo { margin: 12px 12px 0; height: 190px; flex-basis: 190px; }
+  body.landing-home:not(.persona-page) .matching .score-profile-body { padding: 18px 16px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown { padding: 25px 22px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown-head { flex-wrap: wrap; gap: 10px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown h3 { font-size: 28px; }
+  body.landing-home:not(.persona-page) .matching .score-row > div { font-size: 11px; }
+  body.landing-home:not(.persona-page) .followup .preview-inner { display: grid; grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 64px; align-items: center; }
+  body.landing-home:not(.persona-page) .followup .preview-head { margin: 0; }
+  body.landing-home:not(.persona-page) .followup .section-h { font-size: 50px; }
+  body.landing-home:not(.persona-page) .followup .mission-center { min-width: 0; margin: 0; padding: 16px; border-radius: 30px; background: #e6edf3; }
+  body.landing-home:not(.persona-page) .followup .mission-command { grid-template-columns: minmax(0, 1fr) auto; gap: 18px; padding: 22px; border: 0; border-radius: 18px; box-shadow: none; }
+  body.landing-home:not(.persona-page) .followup .mission-command-copy h3 { font-size: 26px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-data { grid-row: 2; grid-column: 1 / -1; }
+  body.landing-home:not(.persona-page) .followup .mission-parties > span:last-child { display: grid; }
+  body.landing-home:not(.persona-page) .followup .mission-progress { padding: 22px; border: 0; border-radius: 18px; box-shadow: none; }
+  body.landing-home:not(.persona-page) .followup .mission-route-copy strong { font-size: 12px; }
+  body.landing-home:not(.persona-page) .followup .mission-route-copy small { font-size: 10px; }
+  body.landing-home:not(.persona-page) .followup .mission-live { grid-template-columns: 54px minmax(0, 1fr); gap: 12px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-facts { grid-column: 2; display: flex; flex-wrap: wrap; gap: 8px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-copy p { font-size: 10px; }
+}
 
 @media (min-width: 641px) {
   body.landing-home:not(.persona-page) .score-breakdown { display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
@@ -180,6 +238,9 @@ body.landing-home:not(.persona-page) .footer-bottom { display: flex; flex-wrap: 
   body.landing-home:not(.persona-page) :is(.trust-heading, .continuity-heading, .faq-inner) { gap: 28px; }
   body.landing-home:not(.persona-page) .matching-explanation article { padding: 19px; }
   body.landing-home:not(.persona-page) .cta-band { width: calc(100% - 48px); margin: 24px auto 64px; padding: 36px; }
+  body.landing-home:not(.persona-page) .communication .trust-heading { grid-template-columns: 1fr; }
+  body.landing-home:not(.persona-page) :is(.communication, .continuity) { width: calc(100% - 32px); padding-inline: 24px; border-radius: 28px; }
+  body.landing-home:not(.persona-page) .audience-card { padding: 28px; }
 }
 
 @media (max-width: 640px) {
@@ -204,4 +265,17 @@ body.landing-home:not(.persona-page) .footer-bottom { display: flex; flex-wrap: 
   body.landing-home:not(.persona-page) .cta-band { width: calc(100% - 32px); margin: 16px auto 52px; padding: 28px 20px; border-width: 5px; border-radius: 23px; }
   body.landing-home:not(.persona-page) .cta-band h2 { font-size: 33px; }
   body.landing-home:not(.persona-page) footer { padding: 42px 20px 24px; }
+  body.landing-home:not(.persona-page) :is(.communication, .continuity) { width: calc(100% - 20px); padding: 44px 16px; border-radius: 25px; }
+  body.landing-home:not(.persona-page) .matching-explanation { border-radius: 0; }
+  body.landing-home:not(.persona-page) .matching-explanation article { padding: 19px 0; }
+  body.landing-home:not(.persona-page) .journey-grid { display: grid; grid-template-columns: 1fr; padding: 0; margin: 0; overflow: visible; }
+  body.landing-home:not(.persona-page) .journey-shell { padding: 0; border-radius: 0; overflow: visible; }
+  body.landing-home:not(.persona-page) .journey-shell::after { display: none; }
+  body.landing-home:not(.persona-page) .journey-step { padding: 26px 0; min-height: 0; border: 0 !important; border-top: 1px solid #cddbd7 !important; border-radius: 0; }
+  body.landing-home:not(.persona-page) .journey-step:not(:last-child)::after { display: none; }
+  body.landing-home:not(.persona-page) .journey-step h3 { font-size: 28px; }
+  body.landing-home:not(.persona-page) .audience-grid { gap: 16px; border-radius: 0; }
+  body.landing-home:not(.persona-page) .audience-card { min-height: 0; padding: 28px 24px; }
+  body.landing-home:not(.persona-page) .audience-card h3 { font-size: 32px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-features { padding: 0; border-radius: 0; }
 }
