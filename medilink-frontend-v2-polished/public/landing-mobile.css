@@ -2626,3 +2626,31 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Continuity: keep the explainer detached from the dashboard on phones too. */
+@media (max-width: 640px) {
+  body:not(.persona-page) .continuity .continuity-console {
+    gap: 14px;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .continuity .continuity-features,
+  body:not(.persona-page) .continuity .continuity-dashboard {
+    width: 100%;
+    min-width: 0;
+    border-radius: 22px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, .22);
+  }
+
+  body:not(.persona-page) .continuity .continuity-features {
+    border: 1px solid rgba(255, 255, 255, .14);
+  }
+
+  body:not(.persona-page) .continuity .continuity-dashboard {
+    border: 1px solid rgba(189, 203, 220, .5);
+  }
+}
