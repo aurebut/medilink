@@ -1032,7 +1032,7 @@ export function AppShell({
         </nav>
       ) : null}
 
-      <main className="main">
+      <main className="main workspace-design">
         {area === 'admin' ? (
           <header className="topbar">
             <div className="topbar-title">

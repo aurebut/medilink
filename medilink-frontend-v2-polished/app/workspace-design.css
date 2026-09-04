@@ -1,0 +1,372 @@
+/* Landing materials, scoped to connected content. Navigation keeps its own styles. */
+@font-face {
+  font-family: 'Workspace Sans';
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('/landing-assets/dm-sans-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Workspace Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/landing-assets/instrument-serif-regular.woff2') format('woff2');
+}
+
+.workspace-design {
+  --sans: 'Workspace Sans', 'DM Sans', sans-serif;
+  --serif: 'Workspace Serif', Georgia, serif;
+  --line: #dce3eb;
+  --line-strong: #bccbd9;
+  --surface-soft: #f3f6f7;
+  --surface-blue: #edf3f9;
+  --radius: 24px;
+  --radius-sm: 14px;
+  --shadow-soft: 0 12px 32px rgba(11, 25, 41, .045);
+  --workspace-panel: linear-gradient(145deg, #fff, #fdfdfb);
+  font-family: var(--sans);
+  background:
+    radial-gradient(ellipse 65% 440px at 0 0, rgba(26, 82, 160, .075), transparent 75%),
+    radial-gradient(ellipse 50% 520px at 100% 0, rgba(14, 138, 122, .07), transparent 75%),
+    #f8f7f3;
+}
+
+.workspace-design .page-header {
+  gap: 20px;
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  border-color: rgba(26, 82, 160, .13);
+}
+.workspace-design .page-header::before {
+  width: 48px;
+  background: var(--teal);
+}
+.workspace-design .page-header h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(36px, 3.7vw, 52px);
+  letter-spacing: -.025em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+.workspace-design .page-header p {
+  max-width: 660px;
+  margin-top: 10px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+/* One outer frame, quieter inset surfaces — the same hierarchy as the landing. */
+.workspace-design .card.card,
+.workspace-design .mission-card,
+.workspace-design .establishment-item-card,
+.workspace-design .table-wrap {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--workspace-panel);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+.workspace-design .card {
+  padding: 26px;
+}
+.workspace-design .card .card {
+  border-radius: 16px;
+  box-shadow: none;
+}
+.workspace-design .card h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 28px;
+  letter-spacing: -.015em;
+  line-height: 1.15;
+}
+.workspace-design .card h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 1.2;
+}
+.workspace-design :is(.dashboard-section-head, .agenda-calendar-head) h2 {
+  font-size: 27px;
+}
+.workspace-design .dashboard-section-head {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+.workspace-design :is(.dashboard-command-grid, .dashboard-operations-grid) {
+  gap: 20px;
+}
+.workspace-design .card.dashboard-hero {
+  border-radius: 27px;
+  background:
+    radial-gradient(ellipse at 100% 0, rgba(14, 138, 122, .11), transparent 60%),
+    linear-gradient(125deg, #f0f5fa, #f6f8f3);
+}
+.workspace-design .dashboard-hero::after,
+.workspace-design .stat-card::before {
+  display: none;
+}
+.workspace-design .dashboard-stat-grid .stat-card,
+.workspace-design .card.stat-card {
+  background: linear-gradient(145deg, #fff, #edf3f8);
+}
+.workspace-design .dashboard-stat-grid .stat-card:nth-child(3n + 2) {
+  background: linear-gradient(145deg, #fff, #eaf5f1);
+}
+.workspace-design .stat strong {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -.035em;
+}
+.workspace-design .stat span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .075em;
+}
+.workspace-design :is(.dashboard-empty, .dashboard-feature, .dashboard-notification,
+  .dashboard-next-event, .workspace-metrics > div, .dashboard-readiness,
+  .choice-section, .profile-preferences-section, .establishment-command-strip) {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #f3f6f9, #f0f6f3);
+  box-shadow: none;
+}
+.workspace-design .dashboard-empty {
+  padding: 22px;
+}
+.workspace-design :is(.dashboard-empty, .dashboard-feature) p {
+  line-height: 1.65;
+}
+.workspace-design :is(.dashboard-date-tile, .empty-illustration) {
+  border: 1px solid rgba(26, 82, 160, .12);
+  border-radius: 14px;
+  background: var(--navy);
+  color: #d5e7f5;
+  box-shadow: 0 8px 20px rgba(11, 25, 41, .1);
+}
+.workspace-design .dashboard-date-tile span {
+  color: #d5e7f5;
+}
+.workspace-design .toolbar {
+  padding: 14px;
+  border-radius: 16px;
+  border-color: var(--line);
+  background: #f5f7f7;
+}
+.workspace-design :is(.input, .select, .textarea) {
+  border-color: #cfd9e3;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(11, 25, 41, .025);
+}
+.workspace-design :is(.input, .select, .textarea):focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(14, 138, 122, .12);
+}
+.workspace-design :is(.input, .select, .textarea)[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+.workspace-design .label {
+  font-weight: 600;
+  color: #34475b;
+}
+.workspace-design .btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.workspace-design .btn-primary {
+  color: #e0eef9;
+  background: var(--navy);
+  border: 1px solid var(--navy);
+  box-shadow: 0 5px 12px rgba(11, 25, 41, .1);
+}
+.workspace-design .btn-secondary {
+  color: #174c85;
+  background: #edf3f8;
+  border-color: #d1deea;
+}
+.workspace-design .btn-light {
+  background: #fff;
+  border-color: var(--line);
+}
+.workspace-design :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}
+.workspace-design .badge {
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.workspace-design .badge.neutral {
+  color: #405976;
+  background: #eef3f8;
+  border-color: #d7e1ec;
+}
+.workspace-design .badge.success {
+  color: #086859;
+  background: #eaf5f0;
+  border-color: #c7e5d9;
+}
+.workspace-design .alert {
+  border-radius: 16px;
+  line-height: 1.6;
+}
+.workspace-design .table-wrap {
+  scrollbar-width: thin;
+  scrollbar-color: #bccbd9 #f3f6f7;
+}
+.workspace-design th {
+  background: #f1f5f7;
+  color: #506278;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .055em;
+}
+.workspace-design td {
+  border-color: #e6ebef;
+}
+.workspace-design :is(.week-panel, .agenda-calendar) {
+  border-color: var(--line);
+  border-radius: 18px;
+  background: #fff;
+}
+.workspace-design .week-panel-head {
+  color: var(--navy);
+  border-color: var(--line);
+}
+.workspace-design .week-day {
+  border-color: #e1e7ed;
+  background: #f8fafb;
+  border-radius: 12px;
+}
+.workspace-design .week-day.today {
+  background: #eaf5f1;
+  border-color: #98cbbd;
+}
+.workspace-design .week-day.today .week-day-head strong {
+  color: #087363;
+}
+.workspace-design .mission-pay {
+  border-radius: 14px;
+  background: #edf6f1;
+  border-color: #d0e6dc;
+}
+.workspace-design .mission-top .actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.workspace-design .mission-top .badge {
+  width: fit-content;
+  flex: 0 1 auto;
+}
+.workspace-design .mission-card-image {
+  border-radius: 16px;
+  background: #edf3f7;
+}
+.workspace-design :is(.profile-photo-preview, .establishment-photo-item img) {
+  border: 4px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 0 0 1px var(--line), 0 10px 24px rgba(11, 25, 41, .07);
+}
+.workspace-design .conversation-button {
+  border-radius: 14px;
+  border-color: var(--line);
+}
+.workspace-design .conversation-button.active {
+  background: linear-gradient(130deg, #edf3f9, #edf6f2);
+  border-color: #a8c5cf;
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+.workspace-design .message:not(.system) {
+  border-radius: 17px 17px 17px 5px;
+  background: #f1f4f7;
+  border-color: #dfe6ec;
+}
+.workspace-design .message.mine:not(.system) {
+  border-radius: 17px 17px 5px 17px;
+  background: #eaf4f1;
+  border-color: #cde2db;
+}
+
+@media (hover: hover) {
+  .workspace-design .btn-primary:hover:not(:disabled) {
+    background: #1a3355;
+    box-shadow: 0 7px 18px rgba(11, 25, 41, .15);
+  }
+  .workspace-design :is(.btn-secondary, .btn-light):hover:not(:disabled) {
+    background: #eaf1f5;
+    border-color: #b9ccdb;
+  }
+  .workspace-design .mission-card:hover {
+    border-color: #acc4d3;
+    box-shadow: 0 16px 36px rgba(11, 25, 41, .075);
+  }
+}
+
+@media (max-width: 760px) {
+  .workspace-design {
+    --radius: 20px;
+  }
+  .workspace-design .page-header {
+    gap: 16px;
+    padding-bottom: 20px;
+    margin-bottom: 22px;
+  }
+  .workspace-design .page-header h1 {
+    font-size: clamp(32px, 8vw, 40px);
+  }
+  .workspace-design .page-header p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .workspace-design .card {
+    padding: 18px;
+  }
+  .workspace-design :is(.card h2, .dashboard-section-head h2, .agenda-calendar-head h2) {
+    font-size: 25px;
+  }
+  .workspace-design .card h3 {
+    font-size: 22px;
+  }
+  .workspace-design :is(.dashboard-command-grid, .dashboard-operations-grid) {
+    gap: 16px;
+  }
+  .workspace-design :is(.dashboard-empty, .toolbar) {
+    padding: 14px;
+    border-radius: 14px;
+  }
+  .workspace-design :is(.input, .select) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .workspace-design .textarea {
+    font-size: 16px;
+  }
+  .workspace-design .btn {
+    min-height: 44px;
+  }
+  .workspace-design .mission-share.icon-share .actions {
+    min-width: 44px;
+  }
+  .workspace-design .btn.icon-action-button {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    padding: 0;
+  }
+  .workspace-design :is(.message-pane, .conversation-list) {
+    border-radius: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workspace-design :is(.btn, .card, .mission-card, .conversation-button) {
+    transition: none;
+  }
+}
