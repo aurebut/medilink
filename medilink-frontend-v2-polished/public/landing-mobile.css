@@ -2211,3 +2211,412 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Mission follow-up: a compact, legible mobile status board. */
+@media (max-width: 640px) {
+  body:not(.persona-page) .followup {
+    padding-top: 54px;
+    padding-bottom: 58px;
+  }
+
+  body:not(.persona-page) .followup .preview-head {
+    margin-bottom: 28px;
+  }
+
+  body:not(.persona-page) .followup .section-kicker {
+    margin-bottom: 13px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  body:not(.persona-page) .followup .section-h {
+    max-width: 12ch;
+    font-size: clamp(35px, 10.4vw, 42px);
+    line-height: 1.02;
+  }
+
+  body:not(.persona-page) .followup .section-sub {
+    max-width: none;
+    margin-top: 17px;
+    color: var(--text-2);
+    font-size: 16px;
+    line-height: 1.62;
+  }
+
+  body:not(.persona-page) .followup .mission-center {
+    display: grid;
+    gap: 12px;
+    margin-top: 0;
+  }
+
+  body:not(.persona-page) .followup .mission-command {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+    padding: 19px 16px 16px;
+    border: 1px solid rgba(189, 203, 220, .9);
+    border-radius: 22px;
+    background: linear-gradient(145deg, #fff 0%, #f4f8f9 62%, #e9f5f1 100%);
+    box-shadow: 0 18px 42px rgba(11, 25, 41, .1);
+  }
+
+  body:not(.persona-page) .followup .mission-command-copy {
+    min-width: 0;
+  }
+
+  body:not(.persona-page) .followup .mission-command-kicker {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 30px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 6px 9px;
+    border: 1px solid rgba(14, 138, 122, .14);
+    border-radius: 999px;
+    background: rgba(229, 245, 242, .84);
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: .07em;
+  }
+
+  body:not(.persona-page) .followup .mission-command-kicker::before {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+  }
+
+  body:not(.persona-page) .followup .mission-command-copy h3 {
+    max-width: 13ch;
+    font-size: 28px;
+    line-height: 1.04;
+  }
+
+  body:not(.persona-page) .followup .mission-command-copy p {
+    margin-top: 8px;
+    color: var(--text-2);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  body:not(.persona-page) .followup .mission-command-data {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: hidden;
+    width: 100%;
+    border: 1px solid rgba(200, 210, 228, .78);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .78);
+  }
+
+  body:not(.persona-page) .followup .mission-command-data > div {
+    min-width: 0;
+    padding: 11px 8px;
+  }
+
+  body:not(.persona-page) .followup .mission-command-data dt {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  body:not(.persona-page) .followup .mission-command-data dd {
+    overflow: hidden;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body:not(.persona-page) .followup .mission-parties {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid rgba(200, 210, 228, .72);
+  }
+
+  body:not(.persona-page) .followup .mission-parties > img,
+  body:not(.persona-page) .followup .mission-party {
+    width: 40px;
+    height: 40px;
+  }
+
+  body:not(.persona-page) .followup .mission-parties > span:last-child {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    margin-left: 10px;
+  }
+
+  body:not(.persona-page) .followup .mission-parties small {
+    color: var(--text-3);
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  body:not(.persona-page) .followup .mission-parties strong {
+    margin-top: 0;
+    color: var(--navy);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  body:not(.persona-page) .followup .mission-center-body {
+    display: block;
+    background: transparent;
+  }
+
+  body:not(.persona-page) .followup .mission-progress {
+    overflow: hidden;
+    padding: 19px 15px 15px;
+    border: 1px solid rgba(189, 203, 220, .9);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, .92);
+    box-shadow: 0 18px 42px rgba(11, 25, 41, .1);
+  }
+
+  body:not(.persona-page) .followup .mission-panel-head {
+    align-items: center;
+    gap: 12px;
+  }
+
+  body:not(.persona-page) .followup .mission-panel-head > div {
+    min-width: 0;
+  }
+
+  body:not(.persona-page) .followup .mission-panel-head > div > span {
+    margin-bottom: 5px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  body:not(.persona-page) .followup .mission-panel-head h4 {
+    font-size: 27px;
+    line-height: 1.05;
+  }
+
+  body:not(.persona-page) .followup .mission-progress-count {
+    display: inline-flex;
+    min-width: 64px;
+    height: 42px;
+    flex: 0 0 auto;
+    align-items: baseline;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 9px;
+    border: 1px solid rgba(26, 82, 160, .11);
+    border-radius: 999px;
+    background: #f2f6fb;
+    font-size: 12px;
+  }
+
+  body:not(.persona-page) .followup .mission-progress-count b {
+    font-size: 24px;
+    line-height: 1;
+  }
+
+  body:not(.persona-page) .followup .mission-route {
+    display: grid;
+    gap: 0;
+    overflow: hidden;
+    margin: 18px 0 13px;
+    border: 1px solid rgba(200, 210, 228, .78);
+    border-radius: 16px;
+    background: rgba(248, 250, 252, .82);
+  }
+
+  body:not(.persona-page) .followup .mission-route-step {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    min-height: 0;
+    align-items: center;
+    gap: 0 11px;
+    padding: 14px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .followup .mission-route-step:not(:last-child) {
+    border-bottom: 1px solid rgba(200, 210, 228, .72);
+  }
+
+  body:not(.persona-page) .followup .mission-route-step:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .followup .mission-route-step.is-active {
+    border-color: transparent;
+    background: linear-gradient(135deg, #f3f7fc, #edf4fb);
+    box-shadow: inset 3px 0 0 rgba(26, 82, 160, .72);
+  }
+
+  body:not(.persona-page) .followup .mission-route-step:not(:last-child)::after {
+    top: 43px;
+    bottom: -15px;
+    left: 27px;
+    width: 2px;
+    height: auto;
+  }
+
+  body:not(.persona-page) .followup .mission-route-marker {
+    grid-row: 1 / 3;
+    width: 31px;
+    height: 31px;
+    margin-top: 0;
+    font-size: 11px;
+  }
+
+  body:not(.persona-page) .followup .mission-route-copy > span {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  body:not(.persona-page) .followup .mission-route-copy strong {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.3;
+  }
+
+  body:not(.persona-page) .followup .mission-route-copy small {
+    margin-top: 4px;
+    color: var(--text-2);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  body:not(.persona-page) .followup .mission-route-status {
+    grid-column: 2;
+    grid-row: 2;
+    width: fit-content;
+    min-height: 27px;
+    align-self: end;
+    justify-self: start;
+    margin-top: 8px;
+    padding: 5px 8px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  body:not(.persona-page) .followup .mission-live {
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border-radius: 17px;
+    background: linear-gradient(120deg, #edf8f5, #f7fbfa);
+    box-shadow: inset 3px 0 0 rgba(14, 138, 122, .72);
+  }
+
+  body:not(.persona-page) .followup .mission-date {
+    width: 60px;
+    height: 78px;
+    align-self: start;
+    border-radius: 12px;
+  }
+
+  body:not(.persona-page) .followup .mission-date span {
+    padding: 5px 0;
+    font-size: 9px;
+  }
+
+  body:not(.persona-page) .followup .mission-date strong {
+    padding-top: 6px;
+    font-size: 29px;
+  }
+
+  body:not(.persona-page) .followup .mission-date small {
+    padding: 3px 0 6px;
+    font-size: 10px;
+  }
+
+  body:not(.persona-page) .followup .mission-live-copy {
+    align-self: center;
+  }
+
+  body:not(.persona-page) .followup .mission-live-label {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  body:not(.persona-page) .followup .mission-live-copy > strong {
+    margin-top: 6px;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  body:not(.persona-page) .followup .mission-live-copy p {
+    margin-top: 5px;
+    color: var(--text-2);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  body:not(.persona-page) .followup .mission-live-facts {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 2px;
+    padding-left: 0;
+  }
+
+  body:not(.persona-page) .followup .mission-live-facts span {
+    min-width: 0;
+    min-height: 36px;
+    padding: 8px;
+    border: 1px solid rgba(14, 138, 122, .1);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .78);
+    font-size: 11px;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  body:not(.persona-page) .followup .mission-live-facts span::before {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  body:not(.persona-page) .followup .section-h {
+    font-size: 34px;
+  }
+
+  body:not(.persona-page) .followup .mission-command-copy h3 {
+    font-size: 26px;
+  }
+
+  body:not(.persona-page) .followup .mission-command-data {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .followup .mission-command-data > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  body:not(.persona-page) .followup .mission-command-data > div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(200, 210, 228, .7);
+  }
+
+  body:not(.persona-page) .followup .mission-live {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px;
+    padding: 12px;
+  }
+
+  body:not(.persona-page) .followup .mission-date {
+    width: 56px;
+  }
+
+  body:not(.persona-page) .followup .mission-live-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
