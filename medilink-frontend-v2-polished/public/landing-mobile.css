@@ -1527,22 +1527,255 @@
   }
 }
 
-/* The mission dossier remains a simple vertical stack on every phone. */
+/* Main landing: a compact vertical phone layout, without horizontal rails. */
 @media (max-width: 640px) {
-  body:not(.persona-page) .followup .mission-dossier-list {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-    overflow: visible;
-    margin: 20px 0 0;
-    padding: 0;
-    scroll-snap-type: none;
+  body:not(.persona-page) {
+    --mobile-gutter: 18px;
   }
 
-  body:not(.persona-page) .followup .mission-dossier-list > div {
+  body:not(.persona-page) .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  body:not(.persona-page) .matching,
+  body:not(.persona-page) .journey,
+  body:not(.persona-page) .communication,
+  body:not(.persona-page) .followup,
+  body:not(.persona-page) .continuity,
+  body:not(.persona-page) .audiences,
+  body:not(.persona-page) .terrain {
+    padding: 48px var(--mobile-gutter);
+  }
+
+  body:not(.persona-page) .section-head,
+  body:not(.persona-page) .trust-heading,
+  body:not(.persona-page) .preview-head,
+  body:not(.persona-page) .continuity-heading {
+    margin-bottom: 26px;
+  }
+
+  body:not(.persona-page) .journey-shell {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  body:not(.persona-page) .journey-shell::after {
+    display: none;
+    content: none;
+  }
+
+  body:not(.persona-page) .journey-grid,
+  body:not(.persona-page) .matching-explanation,
+  body:not(.persona-page) .terrain-grid,
+  body:not(.persona-page) .audience-grid,
+  body:not(.persona-page) .mission-dossier-list,
+  body:not(.persona-page) .continuity-feature-list,
+  body:not(.persona-page) .continuity-handoff-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
+    max-width: 100%;
+    gap: 0;
+    overflow-x: visible;
+    overflow-y: visible;
+    margin-right: 0;
+    margin-left: 0;
+    padding: 0;
+    scroll-padding-inline: 0;
+    scroll-snap-type: none;
+    scrollbar-width: auto;
+    overscroll-behavior-inline: auto;
+  }
+
+  body:not(.persona-page) .journey-step,
+  body:not(.persona-page) .matching-explanation article,
+  body:not(.persona-page) .terrain-card,
+  body:not(.persona-page) .audience-card,
+  body:not(.persona-page) .mission-dossier-list > div,
+  body:not(.persona-page) .continuity-feature-list li,
+  body:not(.persona-page) .continuity-handoff-list li {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
     min-height: 0;
     flex: none;
     scroll-snap-align: none;
+  }
+
+  body:not(.persona-page) .journey-step {
+    gap: 17px;
+    padding: 21px 20px 22px;
+    border: 0 !important;
+    border-radius: 0;
+  }
+
+  body:not(.persona-page) .journey-step:not(:last-child) {
+    border-bottom: 1px solid rgba(200, 210, 228, .78) !important;
+  }
+
+  body:not(.persona-page) .journey-step:not(:last-child)::after {
+    display: grid;
+    top: auto;
+    right: auto;
+    bottom: -15px;
+    left: 27px;
+    content: "↓";
+  }
+
+  body:not(.persona-page) .journey-step h3 {
+    max-width: none;
+  }
+
+  body:not(.persona-page) .matching-explanation,
+  body:not(.persona-page) .terrain-grid,
+  body:not(.persona-page) .audience-grid {
+    overflow: hidden;
+    border: 1px solid rgba(200, 210, 228, .86);
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .8);
+    box-shadow: 0 16px 38px rgba(11, 25, 41, .07);
+  }
+
+  body:not(.persona-page) .matching-explanation article {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 13px;
+    padding: 17px;
+    border: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .matching-explanation article:not(:last-child) {
+    border-bottom: 1px solid rgba(200, 210, 228, .76) !important;
+  }
+
+  body:not(.persona-page) .matching-explanation .matching-level {
+    width: 42px;
+    height: 42px;
+  }
+
+  body:not(.persona-page) .matching-explanation h3 {
+    font-size: 21px;
+  }
+
+  body:not(.persona-page) .matching-explanation p {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  body:not(.persona-page) .conversation-flow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    overflow: visible;
+    padding: 10px 12px;
+    scroll-snap-type: none;
+  }
+
+  body:not(.persona-page) .conversation-flow > span {
+    width: 100%;
+    min-height: 0;
+    flex: none;
+    padding: 10px 12px;
+    scroll-snap-align: none;
+  }
+
+  body:not(.persona-page) .context-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body:not(.persona-page) .context-details > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  body:not(.persona-page) .context-confirmed,
+  body:not(.persona-page) .context-document {
+    grid-column: 1 / -1;
+    align-self: auto;
+  }
+
+  body:not(.persona-page) .mission-dossier-list {
+    gap: 10px;
+    overflow: visible;
+    margin: 20px 0 0;
+  }
+
+  body:not(.persona-page) .mission-dossier-list > div {
+    grid-template-columns: 30px minmax(0, 1fr);
+    padding: 14px;
+  }
+
+  body:not(.persona-page) .mission-dossier-list > div > span:last-child {
+    grid-column: 2;
+    margin-top: 4px;
+  }
+
+  body:not(.persona-page) .continuity-feature-list {
+    gap: 0;
+    margin-top: 20px;
+  }
+
+  body:not(.persona-page) .continuity-feature-list li {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px 0;
+    border: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, .1) !important;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  body:not(.persona-page) .continuity-handoff-list {
+    gap: 8px;
+  }
+
+  body:not(.persona-page) .continuity-handoff-list li {
+    min-height: 0;
+  }
+
+  body:not(.persona-page) .continuity-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body:not(.persona-page) .continuity-stats > article:first-child {
+    grid-column: auto;
+  }
+
+  body:not(.persona-page) .continuity-stats > article {
+    display: flex;
+    min-height: 0;
+    overflow: visible;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  body:not(.persona-page) .continuity-sparkline,
+  body:not(.persona-page) .continuity-stat-foot {
+    position: static;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    margin-top: 14px;
+  }
+
+  body:not(.persona-page) .terrain-card,
+  body:not(.persona-page) .audience-card {
+    padding: 22px 20px;
+    border: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  body:not(.persona-page) .terrain-card:not(:last-child),
+  body:not(.persona-page) .audience-card:not(:last-child) {
+    border-bottom: 1px solid rgba(200, 210, 228, .78) !important;
+  }
+
+  body:not(.persona-page) .terrain-card p,
+  body:not(.persona-page) .audience-card p {
+    font-size: 14px;
+    line-height: 1.58;
   }
 }
