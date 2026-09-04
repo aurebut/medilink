@@ -348,14 +348,14 @@ nav.nav-scrolled{top:10px;background:rgba(248,247,243,.97);box-shadow:0 16px 42p
 }
 .followup .mission-center::after{display:none}
 .followup .mission-command{
-  width:calc(100% - 48px);
+  width:100%;
   margin-inline:auto;
   border:1px solid rgba(189,203,220,.88);
   border-radius:24px;
   box-shadow:0 20px 48px rgba(11,25,41,.1);
 }
 .followup .mission-center-body{
-  grid-template-columns:minmax(0,1.42fr) minmax(280px,.78fr);
+  grid-template-columns:minmax(0,1fr);
   gap:20px;
   align-items:stretch;
   background:transparent;
@@ -372,6 +372,23 @@ nav.nav-scrolled{top:10px;background:rgba(248,247,243,.97);box-shadow:0 16px 42p
 }
 .followup .mission-dossier{
   background:linear-gradient(155deg,#F2F6F9 0%,#EAF4F1 100%);
+}
+.followup .mission-dossier-list{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:12px;
+  border-top:0;
+}
+.followup .mission-dossier-list>div{
+  grid-template-columns:30px minmax(0,1fr) auto;
+  padding:14px;
+  border:1px solid rgba(200,210,228,.82);
+  border-radius:14px;
+  background:rgba(255,255,255,.72);
+}
+.followup .mission-dossier-list>div>span:last-child{
+  grid-column:auto;
+  margin-top:0;
 }
 
 @media(max-width:900px){

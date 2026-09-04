@@ -1526,3 +1526,23 @@
     line-height: 1.58;
   }
 }
+
+/* The mission dossier remains a simple vertical stack on every phone. */
+@media (max-width: 640px) {
+  body:not(.persona-page) .followup .mission-dossier-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    overflow: visible;
+    margin: 20px 0 0;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  body:not(.persona-page) .followup .mission-dossier-list > div {
+    width: 100%;
+    min-height: 0;
+    flex: none;
+    scroll-snap-align: none;
+  }
+}
