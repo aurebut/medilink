@@ -456,3 +456,18 @@ nav.nav-scrolled{top:10px;background:rgba(248,247,243,.97);box-shadow:0 16px 42p
     box-shadow:0 20px 48px rgba(0,0,0,.22);
   }
 }
+
+/* Matching card — keep the profile gradient flush with the stretched frame. */
+@media(min-width:641px){
+  .matching .product-window{
+    display:flex;
+    flex-direction:column;
+  }
+  .matching .score-layout{
+    width:100%;
+    flex:1 1 auto;
+  }
+  .matching .score-summary{
+    align-self:stretch;
+  }
+}
