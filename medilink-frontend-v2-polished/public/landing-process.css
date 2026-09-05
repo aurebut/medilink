@@ -5,12 +5,18 @@
 .ml-process h2 { font: 400 clamp(36px, 4vw, 54px)/1.08 var(--serif); letter-spacing: -.025em; text-wrap: balance; }
 .ml-process h2 em { color: #16786d; font-weight: 400; }
 .ml-process-head > p { max-width: 740px; margin: 22px auto 0; color: #4b6174; font-size: 15px; line-height: 1.75; text-wrap: pretty; }
-.ml-process-tabs { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; padding: 8px; margin-bottom: 24px; border: 1px solid #e4e9e5; border-radius: 22px; background: #fff; }
+.ml-process-nav { margin-bottom: 24px; border: 1px solid #e4e9e5; border-radius: 22px; background: #fff; padding: 8px 8px 10px; box-shadow: 0 4px 18px rgba(11,25,41,.03); }
+.ml-process-tabs { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 6px; padding: 0; margin: 0 0 8px; border: 0; background: transparent; }
 .ml-process-tab { display: flex; align-items: center; gap: 14px; padding: 18px 16px; border: 0; border-radius: 15px; color: #526474; background: transparent; cursor: pointer; font: 500 14px/1.4 var(--sans); text-align: left; transition: background .25s, color .25s; }
 .ml-process-tab > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 50%; background: #f0f3ef; font-size: 11px; }
 .ml-process-tab:hover { background: #f3f6f2; }
 .ml-process-tab[aria-selected="true"] { background: #e8f0eb; color: #124c46; }
 .ml-process-tab[aria-selected="true"] > span { background: #176b60; color: #fff; }
+.ml-process-autoplay-bar { display: flex; align-items: center; gap: 14px; padding: 2px 14px 2px; }
+.ml-process-progress-track { flex: 1; height: 7px; background: #e8eee9; border-radius: 999px; overflow: hidden; position: relative; }
+.ml-process-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #176b60, #2c8068); border-radius: 999px; }
+.ml-process-autoplay-btn { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; border: 0; border-radius: 50%; background: #f0f4f1; color: #526474; cursor: pointer; padding: 0; transition: background .2s, color .2s, transform .15s; }
+.ml-process-autoplay-btn:hover { background: #e2ede5; color: #176b60; transform: scale(1.06); }
 .ml-process-panel { display: grid; grid-template-columns: .86fr 1.14fr; min-height: 520px; padding: 10px; border-radius: 28px; background: #fff; animation: ml-panel-in .35s ease both; }
 .ml-process-panel[hidden] { display: none; }
 .ml-process-copy { display: flex; flex-direction: column; align-items: flex-start; padding: 42px 34px; }
@@ -62,22 +68,26 @@
 @keyframes ml-panel-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 850px) {
   .ml-process { padding: 64px 24px; }
+  .ml-process-nav {
+    padding: 7px 7px 9px;
+    margin-bottom: 20px;
+    border-radius: 20px;
+  }
   .ml-process-tabs {
     display: flex;
     align-items: center;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: 7px;
+    scroll-padding-inline: 4px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
     gap: 8px;
-    padding: 7px;
-    margin-bottom: 20px;
-    border: 1px solid #e4e9e5;
-    border-radius: 20px;
-    background: #fff;
+    padding: 2px 2px 4px;
+    margin-bottom: 6px;
+    border: 0;
+    background: transparent;
     -webkit-user-select: none;
     user-select: none;
   }
@@ -104,6 +114,13 @@
     font-size: 11px;
     font-weight: 600;
   }
+  .ml-process-autoplay-bar {
+    gap: 10px;
+    padding: 4px 8px 2px;
+  }
+  .ml-process-progress-track {
+    height: 6px;
+  }
   .ml-process-panel { grid-template-columns: 1fr; }
   .ml-process-copy { padding: 28px; }
   .ml-process-benefits { grid-template-columns: 1fr 1fr; padding-top: 24px; }
@@ -114,11 +131,15 @@
   .ml-process { padding: 52px 16px; }
   .ml-process-head { margin-bottom: 28px; }
   .ml-process-head > p { font-size: 14px; }
+  .ml-process-nav {
+    padding: 6px 6px 8px;
+    border-radius: 18px;
+  }
   .ml-process-tabs {
     gap: 6px;
-    padding: 6px;
-    border-radius: 18px;
-    scroll-padding-inline: 6px;
+    padding: 2px;
+    margin-bottom: 5px;
+    scroll-padding-inline: 4px;
   }
   .ml-process-tab {
     flex: 0 0 auto;
@@ -138,6 +159,13 @@
     height: 28px;
     font-size: 11px;
   }
+  .ml-process-autoplay-bar {
+    gap: 8px;
+    padding: 4px 6px 2px;
+  }
+  .ml-process-progress-track {
+    height: 5.5px;
+  }
   .ml-process-panel { padding: 6px; border-radius: 20px; }
   .ml-process-copy { padding: 24px 18px; }
   .ml-process-copy > p { font-size: 14px; }
@@ -154,7 +182,7 @@
 .ml-process { padding-block: 64px 72px; }
 .ml-process-head { margin-bottom: 30px; }
 .ml-process-head > p { margin-top: 16px; }
-.ml-process-tabs { margin-bottom: 18px; }
+.ml-process-nav { margin-bottom: 18px; }
 .ml-process-panel { grid-template-columns: .78fr 1.22fr; min-height: 560px; }
 .ml-process-copy { padding: 38px 28px; justify-content: center; }
 .ml-process-copy h3 { font-size: clamp(30px,3vw,38px); }

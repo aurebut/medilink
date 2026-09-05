@@ -4,6 +4,24 @@
   var tabsContainer = section.querySelector('.ml-process-tabs');
   var tabs = Array.from(section.querySelectorAll('[role="tab"]'));
   var panels = Array.from(section.querySelectorAll('[role="tabpanel"]'));
+  var progressFill = section.querySelector('.ml-process-progress-fill');
+  var playPauseBtn = section.querySelector('.ml-process-autoplay-btn');
+  var iconPause = section.querySelector('.ml-icon-pause');
+  var iconPlay = section.querySelector('.ml-icon-play');
+
+  var STEP_DURATION = 5500; // 5.5 seconds per step
+  var currentIndex = 0;
+  var isPlaying = true;
+  var isHovered = false;
+  var isInView = false;
+  var startTime = null;
+  var elapsedBeforePause = 0;
+  var animationFrameId = null;
+
+  var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    isPlaying = false;
+  }
 
   function centerTab(tab) {
     if (!tab || !tabsContainer) return;
@@ -14,7 +32,16 @@
     tabsContainer.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
   }
 
+  function resetProgress() {
+    elapsedBeforePause = 0;
+    startTime = null;
+    if (progressFill) {
+      progressFill.style.width = '0%';
+    }
+  }
+
   function select(index, shouldCenter) {
+    currentIndex = index;
     tabs.forEach(function (tab, i) {
       tab.setAttribute('aria-selected', String(i === index));
       tab.tabIndex = i === index ? 0 : -1;
@@ -23,6 +50,61 @@
     if (shouldCenter !== false) {
       centerTab(tabs[index]);
     }
+    resetProgress();
+  }
+
+  function setButtonState(playing) {
+    if (!playPauseBtn) return;
+    if (iconPause && iconPlay) {
+      iconPause.style.display = playing ? 'block' : 'none';
+      iconPlay.style.display = playing ? 'none' : 'block';
+    }
+    playPauseBtn.setAttribute('aria-label', playing ? 'Mettre en pause le défilement automatique' : 'Activer le défilement automatique');
+    playPauseBtn.setAttribute('title', playing ? 'Mettre en pause' : 'Lecture automatique');
+  }
+
+  function step(timestamp) {
+    if (isPlaying && !isHovered && isInView) {
+      if (!startTime) {
+        startTime = timestamp - elapsedBeforePause;
+      }
+      var elapsed = timestamp - startTime;
+      var progress = Math.min(elapsed / STEP_DURATION, 1);
+
+      if (progressFill) {
+        progressFill.style.width = (progress * 100).toFixed(2) + '%';
+      }
+
+      if (progress >= 1) {
+        var next = (currentIndex + 1) % tabs.length;
+        select(next, true);
+      }
+    }
+    animationFrameId = requestAnimationFrame(step);
+  }
+
+  function pauseTimer() {
+    if (startTime) {
+      elapsedBeforePause = performance.now() - startTime;
+      startTime = null;
+    }
+  }
+
+  function togglePlayPause() {
+    isPlaying = !isPlaying;
+    if (isPlaying) {
+      startTime = null;
+    } else {
+      pauseTimer();
+    }
+    setButtonState(isPlaying);
+  }
+
+  if (playPauseBtn) {
+    playPauseBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      togglePlayPause();
+    });
   }
 
   tabs.forEach(function (tab, index) {
@@ -40,22 +122,47 @@
     });
   });
 
+  // Pause on hover over process section on desktop
+  section.addEventListener('mouseenter', function () {
+    isHovered = true;
+    pauseTimer();
+  });
+  section.addEventListener('mouseleave', function () {
+    isHovered = false;
+    startTime = null;
+  });
+
+  // IntersectionObserver: only run auto-play when visible on screen
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        isInView = entry.isIntersecting;
+        if (isInView && isPlaying && !isHovered) {
+          startTime = null;
+        } else {
+          pauseTimer();
+        }
+      });
+    }, { threshold: 0.2 });
+    observer.observe(section);
+  } else {
+    isInView = true;
+  }
+
   // Touch swipe support on process panels
   var touchStartX = 0;
   var touchStartY = 0;
   section.addEventListener('touchstart', function (e) {
-    if (e.target.closest('.ml-process-tabs')) return;
+    if (e.target.closest('.ml-process-nav')) return;
     touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
   }, { passive: true });
 
   section.addEventListener('touchend', function (e) {
-    if (e.target.closest('.ml-process-tabs')) return;
+    if (e.target.closest('.ml-process-nav')) return;
     var deltaX = e.changedTouches[0].screenX - touchStartX;
     var deltaY = e.changedTouches[0].screenY - touchStartY;
     if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
-      var currentIndex = tabs.findIndex(function (t) { return t.getAttribute('aria-selected') === 'true'; });
-      if (currentIndex === -1) currentIndex = 0;
       if (deltaX < 0 && currentIndex < tabs.length - 1) {
         select(currentIndex + 1, true);
       } else if (deltaX > 0 && currentIndex > 0) {
@@ -96,5 +203,8 @@
       }
     }, true);
   }
+
+  setButtonState(isPlaying);
+  animationFrameId = requestAnimationFrame(step);
 })();
 
