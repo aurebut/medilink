@@ -1,5 +1,7 @@
 'use client';
 
+import { WorkspaceWelcome } from '@/components/WorkspaceWelcome';
+
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
@@ -251,7 +253,8 @@ export default function EstablishmentDashboardPage() {
 
   return (
     <>
-      <PageHeader
+      <WorkspaceWelcome
+        area="establishment"
         title={primary.name}
         description="Votre cockpit recruteur pour prioriser les candidatures, maintenir les missions ouvertes et garder votre fiche établissement solide."
       />

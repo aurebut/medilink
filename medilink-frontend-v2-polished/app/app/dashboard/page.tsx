@@ -12,8 +12,9 @@ import { confirmNotificationRead, normalizeNotifications, primeNotificationsCach
 import { formatNotificationText } from '@/lib/notification-text';
 import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
-import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
+import { Alert, Badge, Button, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { userFacingError } from '@/lib/user-facing';
+import { WorkspaceWelcome } from '@/components/WorkspaceWelcome';
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -226,7 +227,8 @@ export default function CandidateDashboardPage() {
 
   return (
     <>
-      <PageHeader
+      <WorkspaceWelcome
+        area="candidate"
         title={`Bonjour ${firstName}`}
         description={`Votre espace ${gendered(profile, 'connecté', 'connectée')} pour prioriser les missions, garder un dossier solide et suivre les réponses.`}
       />
