@@ -6,9 +6,10 @@
   var panels = Array.from(section.querySelectorAll('[role="tabpanel"]'));
 
   var STEP_DURATION = 5500; // 5.5 seconds per step
+  var INTERACTION_DELAY = 4000; // Give users time to read before resuming.
   var currentIndex = 0;
   var isPlaying = true;
-  var isHovered = false;
+  var resumeAt = 0;
   var isInView = false;
   var startTime = null;
   var elapsedBeforePause = 0;
@@ -63,8 +64,8 @@
   }
 
   function step(timestamp) {
-    if (isPlaying && !isHovered && isInView) {
-      if (!startTime) {
+    if (isPlaying && isInView && !document.hidden && timestamp >= resumeAt) {
+      if (startTime === null) {
         startTime = timestamp - elapsedBeforePause;
       }
       var elapsed = timestamp - startTime;
@@ -81,15 +82,25 @@
   }
 
   function pauseTimer() {
-    if (startTime) {
+    if (startTime !== null) {
       elapsedBeforePause = performance.now() - startTime;
       startTime = null;
     }
   }
 
+  function delayPlayback() {
+    pauseTimer();
+    resumeAt = performance.now() + INTERACTION_DELAY;
+  }
+
+  function selectManually(index) {
+    select(index, true);
+    delayPlayback();
+  }
+
   tabs.forEach(function (tab, index) {
     tab.addEventListener('click', function () {
-      select(index, true);
+      selectManually(index);
     });
     tab.addEventListener('keydown', function (event) {
       var next = index;
@@ -99,22 +110,15 @@
       else if (event.key === 'End') next = tabs.length - 1;
       else return;
       event.preventDefault();
-      select(next, true);
+      selectManually(next);
       tabs[next].focus();
     });
   });
 
-  // Pause on hover over tabs nav so users can click or inspect tabs without sudden switching
+  // A bounded hover pause also resumes when the pointer stays over a clicked tab.
   var nav = section.querySelector('.ml-process-nav') || tabsContainer;
   if (nav) {
-    nav.addEventListener('mouseenter', function () {
-      isHovered = true;
-      pauseTimer();
-    });
-    nav.addEventListener('mouseleave', function () {
-      isHovered = false;
-      startTime = null;
-    });
+    nav.addEventListener('mouseenter', delayPlayback);
   }
 
   // IntersectionObserver: run auto-play only when visible on screen
@@ -122,7 +126,7 @@
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         isInView = entry.isIntersecting;
-        if (isInView && isPlaying && !isHovered) {
+        if (isInView && isPlaying) {
           startTime = null;
         } else {
           pauseTimer();
@@ -133,6 +137,8 @@
   } else {
     isInView = true;
   }
+
+  document.addEventListener('visibilitychange', pauseTimer);
 
   // Touch swipe support on process panels
   var touchStartX = 0;
@@ -149,9 +155,9 @@
     var deltaY = e.changedTouches[0].screenY - touchStartY;
     if (Math.abs(deltaX) > 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.4) {
       if (deltaX < 0 && currentIndex < tabs.length - 1) {
-        select(currentIndex + 1, true);
+        selectManually(currentIndex + 1);
       } else if (deltaX > 0 && currentIndex > 0) {
-        select(currentIndex - 1, true);
+        selectManually(currentIndex - 1);
       }
     }
   }, { passive: true });
@@ -168,20 +174,21 @@
       hasMoved = false;
       startX = e.pageX - tabsContainer.offsetLeft;
       scrollLeft = tabsContainer.scrollLeft;
-      pauseTimer();
+      delayPlayback();
     });
     tabsContainer.addEventListener('mouseleave', function () {
       isDown = false;
     });
     tabsContainer.addEventListener('mouseup', function () {
       isDown = false;
-      startTime = null;
+      delayPlayback();
     });
     tabsContainer.addEventListener('mousemove', function (e) {
       if (!isDown) return;
       var x = e.pageX - tabsContainer.offsetLeft;
       var walk = x - startX;
       if (Math.abs(walk) > 4) {
+        delayPlayback();
         hasMoved = true;
         e.preventDefault();
         tabsContainer.scrollLeft = scrollLeft - walk;
