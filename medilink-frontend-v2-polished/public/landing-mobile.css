@@ -193,7 +193,7 @@
   }
 
   body:not(.persona-page) .journey-shell::after {
-    content: "Balayez pour parcourir les 4 étapes  →";
+    content: "Balayez pour parcourir les 4 étapes  " var(--landing-arrow-right);
     display: block;
     padding: 2px 16px 5px;
     color: var(--text-3);
@@ -255,7 +255,7 @@
     right: -22px;
     bottom: auto;
     left: auto;
-    content: "→";
+    content: var(--landing-arrow-right);
   }
 
   body:not(.persona-page) .journey-step h3 {
@@ -1621,7 +1621,7 @@
     right: auto;
     bottom: -15px;
     left: 27px;
-    content: "↓";
+    content: var(--landing-arrow-down);
   }
 
   body:not(.persona-page) .journey-step h3 {

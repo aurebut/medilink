@@ -1,0 +1,11 @@
+/* Shared vector icons: stable rendering on mobile, independent of emoji fonts. */
+:root {
+  --landing-check: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23347c68%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m5%2012%204%204L19%206%22%2F%3E%3C%2Fsvg%3E");
+  --landing-arrow-right: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23347c68%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2012h14m-6-6%206%206-6%206%22%2F%3E%3C%2Fsvg%3E");
+  --landing-arrow-down: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23347c68%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205v14m-6-6%206%206%206-6%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.landing-icon { display: inline-block; width: 1em; height: 1em; flex: 0 0 auto; vertical-align: -.125em; }
+.landing-icon--double-check { width: 1.25em; }
+.ml-dossier-symbol > span { display: grid; place-items: center; }
+.ml-dossier-symbol > span .landing-icon { width: 12px; height: 12px; }
