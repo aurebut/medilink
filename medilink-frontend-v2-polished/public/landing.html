@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="/landing-hero.css">
   <link rel="stylesheet" href="/landing-theme.css">
   <link rel="stylesheet" href="/landing-previews.css">
+  <link rel="stylesheet" href="/landing-process.css">
 </head>
 <body class="landing-home">
   <nav aria-label="Navigation principale">
@@ -27,7 +28,7 @@
     <div class="nav-links">
       <a class="nav-link" href="/landing-medecin.html">Médecin remplaçant</a>
       <a class="nav-link" href="/landing-etablissement.html">Cabinet / médecin installé</a>
-      <a class="nav-link" href="#how-it-works">Comment ça marche</a>
+      <a class="nav-link" href="#matching">Comment ça marche</a>
       <a class="nav-link" href="#faq">FAQ</a>
     </div>
     <div class="nav-right">
@@ -40,7 +41,7 @@
     <div class="nav-mobile-panel" id="mobileNavigation">
       <a href="/landing-medecin.html">Médecin remplaçant <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <a href="/landing-etablissement.html">Cabinet / médecin installé <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
-      <a href="#how-it-works">Comment ça marche <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="#matching">Comment ça marche <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/demo">Demander une démo</a></div>
     </div>
@@ -72,39 +73,64 @@
       </div>
     </section>
 
-    <section class="matching" id="matching" aria-labelledby="matching-title">
-      <div class="matching-inner">
-        <header class="section-head reveal"><div class="section-kicker">Une compatibilité expliquée</div><h2 class="section-h" id="matching-title">Trouvez ce qui vous correspond, <em class="section-emphasis">sans passer des heures à chercher.</em></h2><p class="section-sub">Plus besoin de parcourir les annonces une par une pour trouver la bonne opportunité.<br><br>Renseignez vos critères et retrouvez plus facilement les missions ou les profils qui correspondent réellement à ce que vous recherchez.</p></header>
-        <div class="matching-shell reveal">
-          <div class="matching-explanation">
-            <article><span class="matching-level">01</span><div><h3>Renseignez ce que vous recherchez</h3><p>Disponibilités, localisation, conditions de pratique, organisation du cabinet… indiquez les critères qui comptent réellement pour vous.</p></div></article>
-            <article><span class="matching-level">02</span><div><h3>MédiLink identifie les meilleures correspondances</h3><p>Notre système de matching compare vos critères avec les missions ou profils disponibles et fait remonter ceux qui correspondent le mieux à votre recherche.</p></div></article>
-            <article><span class="matching-level">03</span><div><h3>Choisissez parmi les profils ou missions qui vous correspondent</h3><p>Vous gardez toujours la main. Consultez les correspondances proposées, comparez-les et choisissez celles avec lesquelles vous souhaitez avancer.</p></div></article>
-          </div>
-          <figure class="product-window">
-            <figcaption class="sr-only">Exemple d’une candidature recommandée avec un score de compatibilité de 92 sur 100 expliqué par quatre groupes de critères.</figcaption>
-            <div class="score-layout">
-              <div class="score-summary">
-                <div class="score-profile-photo"><img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait de la Dre Sarah Bernard, médecin généraliste remplaçante"></div>
-                <div class="score-profile-body"><h3>Dre Sarah Bernard</h3><p class="score-profile-role">Médecin généraliste remplaçante</p><div class="score-value"><span>Compatibilité</span><strong>92<small>/100</small></strong></div></div>
-              </div>
-              <div class="score-breakdown">
-                <div class="score-breakdown-head">
-                  <div>
-                    <span class="score-breakdown-kicker">Compatibilité expliquée</span>
-                    <h3 id="matching-card-title">Ce qui rend ce profil compatible</h3>
-                  </div>
-                  <span class="status good">Recommandée</span>
-                </div>
-                <div class="score-row"><div><span>Éligibilité &amp; spécialité</span><strong>35 / 35</strong></div><i><b style="width:100%"></b></i></div>
-                <div class="score-row"><div><span>Créneaux &amp; préférences</span><strong>22 / 22</strong></div><i><b style="width:100%"></b></i></div>
-                <div class="score-row"><div><span>Cadre d’exercice</span><strong>27 / 30</strong></div><i><b style="width:90%"></b></i></div>
-                <div class="score-row"><div><span>Mobilité</span><strong>8 / 13</strong></div><i><b style="width:62%"></b></i></div>
-                <p class="score-note"><span aria-hidden="true">✓</span> Le score explique la recommandation. La décision reste humaine et bilatérale.</p>
-              </div>
-            </div>
-          </figure>
+    <section class="ml-process" id="matching" aria-labelledby="ml-process-title">
+      <div class="ml-process-inner">
+        <header class="ml-process-head">
+          <span class="ml-process-kicker">Le remplacement, du besoin au suivi</span>
+          <h2 id="ml-process-title">Des médecins disponibles. Des missions adaptées. <em>Un match.</em></h2>
+          <p>MédiLink connecte les médecins qui ont besoin d’être remplacés avec les médecins disponibles pour des missions correspondant à leurs critères.</p>
+        </header>
+        <div class="ml-process-tabs" role="tablist" aria-label="Les trois étapes du remplacement">
+          <button class="ml-process-tab" type="button" role="tab" id="ml-tab-criteria" aria-controls="ml-panel-criteria" aria-selected="true"><span aria-hidden="true">01</span>Renseignement de critères</button>
+          <button class="ml-process-tab" type="button" role="tab" id="ml-tab-matching" aria-controls="ml-panel-matching" aria-selected="false" tabindex="-1"><span aria-hidden="true">02</span>Matching intelligent</button>
+          <button class="ml-process-tab" type="button" role="tab" id="ml-tab-report" aria-controls="ml-panel-report" aria-selected="false" tabindex="-1"><span aria-hidden="true">03</span>Compte rendu journalier automatique</button>
         </div>
+        <div class="ml-process-panel" id="ml-panel-criteria" role="tabpanel" aria-labelledby="ml-tab-criteria" tabindex="0">
+          <div class="ml-process-copy">
+            <span class="ml-process-kicker">01 · Vos critères</span>
+            <h3>Deux médecins.<br>Des attentes qui se rencontrent.</h3>
+            <p>Les médecins remplacés comme les médecins remplaçants renseignent leurs critères : disponibilités, localisation, type de mission, spécialité, durée et préférences.</p>
+            <ul class="ml-process-benefits"><li>Un besoin précis, un profil complet</li><li>Vos conditions d’exercice prises en compte</li></ul>
+          </div>
+          <figure class="ml-stage ml-human-stage ml-human-stage--criteria"><img class="ml-human-photo" src="/landing-assets/process-criteria.png" width="800" height="1000" alt="Une médecin prépare ses disponibilités au cabinet" loading="lazy" decoding="async"><div class="ml-float ml-float--criteria-0"><div class="ml-persona ml-value-persona"><div class="ml-ui-head"><span class="ml-ui-icon" aria-hidden="true">+</span><div><small>DR THOMAS MARTIN · LYON 6e</small><h4>Médecin à remplacer</h4></div><span class="ml-ui-dot" aria-label="Critères enregistrés"></span></div><dl>
+                    <div class="ml-field"><dt>Date</dt><dd>14 – 18 sept. 2026</dd></div>
+                    <div class="ml-field"><dt>Besoin</dt><dd>Remplacement en cabinet</dd></div>
+                    <div class="ml-field"><dt>Spécialité</dt><dd>Médecine générale</dd></div>
+                    <div class="ml-field"><dt>Durée</dt><dd>5 jours · Temps plein</dd></div>
+                    <div class="ml-field"><dt>Localisation</dt><dd>Lyon 6e</dd></div>
+                  </dl><div class="ml-value-calendar"><div><span>5 jours à couvrir</span><b>SEPT. 2026</b></div><ol aria-label="Du 14 au 18 septembre"><li><small>L</small><b>14</b></li><li><small>M</small><b>15</b></li><li><small>M</small><b>16</b></li><li><small>J</small><b>17</b></li><li><small>V</small><b>18</b></li></ol></div></div></div><div class="ml-float ml-float--criteria-1"><div class="ml-persona ml-persona--locum ml-value-persona"><div class="ml-ui-head"><span class="ml-ui-icon ml-ui-icon--blue" aria-hidden="true">✓</span><div><small>DRE SARAH BERNARD</small><h4>Médecin remplaçant</h4></div><span class="ml-ui-dot" aria-label="Critères enregistrés"></span></div><dl>
+                    <div class="ml-field"><dt>Disponibilités</dt><dd>14 – 25 sept. 2026</dd></div>
+                    <div class="ml-field"><dt>Zone géographique</dt><dd>Lyon · Rayon de 15 km</dd></div>
+                    <div class="ml-field"><dt>Spécialité</dt><dd>Médecine générale</dd></div>
+                    <div class="ml-field"><dt>Préférences</dt><dd>Cabinet de groupe</dd></div>
+                    <div class="ml-field"><dt>Durée souhaitée</dt><dd>1 à 2 semaines</dd></div>
+                  </dl><div class="ml-value-calendar"><div><span>Disponible du 14 au 25</span><b>SEPT.</b></div><ol aria-label="Du 14 au 18 septembre"><li><small>L</small><b>14</b></li><li><small>M</small><b>15</b></li><li><small>M</small><b>16</b></li><li><small>J</small><b>17</b></li><li><small>V</small><b>18</b></li></ol></div></div></div><figcaption class="ml-human-caption">Illustration MédiLink · Données fictives</figcaption></figure>
+        </div>
+        <div class="ml-process-panel" id="ml-panel-matching" role="tabpanel" aria-labelledby="ml-tab-matching" tabindex="0" hidden>
+          <div class="ml-process-copy">
+            <span class="ml-process-kicker">02 · La bonne correspondance</span>
+            <h3>Le bon profil.<br>La bonne mission.<br>Au bon moment.</h3>
+            <p>MédiLink croise automatiquement les critères des deux côtés pour proposer rapidement les profils et les missions les plus pertinents.</p>
+            <ul class="ml-process-benefits"><li>Des correspondances faciles à comprendre</li><li>Le choix reste entre vos mains</li></ul>
+          </div>
+          <figure class="ml-stage ml-human-stage ml-human-stage--matching"><img class="ml-human-photo" src="/landing-assets/process-matching.png" width="800" height="1000" alt="Deux médecins échangent autour d’une tablette au cabinet" loading="lazy" decoding="async"><div class="ml-float ml-float--score"><span>Les critères s’alignent</span><div class="ml-ui-score-ring"><strong>98<small>%</small></strong></div><b>✓ Match trouvé</b></div><div class="ml-float ml-float--matches ml-value-match">
+<div class="ml-ui-head"><span class="ml-ui-icon" aria-hidden="true">↔</span><div><small>UNE CORRESPONDANCE EXPLIQUÉE</small><h4>Pourquoi ce match ?</h4></div><span class="ml-ui-count">98 %</span></div>
+<div class="ml-value-pair"><div><span class="ml-ui-avatar" aria-hidden="true">SB</span><strong>Dre Sarah Bernard<small>Médecin remplaçante</small></strong></div><span aria-hidden="true">↔</span><div><strong>Dr Thomas Martin<small>Cabinet des Brotteaux</small></strong></div></div>
+<dl class="ml-value-reasons"><div><dt><i aria-hidden="true">✓</i> Disponibilités</dt><dd>5 jours sur 5 couverts</dd></div><div><dt><i aria-hidden="true">✓</i> Spécialité</dt><dd>Médecine générale</dd></div><div><dt><i aria-hidden="true">✓</i> Distance</dt><dd>3 km · dans votre zone</dd></div><div><dt><i aria-hidden="true">✓</i> Cadre d’exercice</dt><dd>Cabinet de groupe souhaité</dd></div></dl>
+<div class="ml-value-secondary"><span class="ml-ui-avatar" aria-hidden="true">AM</span><span><strong>Dr Adam Morel ↔ Cabinet Bellecour</strong><small>21–25 sept. · Disponible · 7 km</small></span><b>94 %</b></div>
+<div class="ml-value-footer"><span aria-hidden="true">✓</span> Une recommandation. La décision reste la vôtre.</div>
+</div><figcaption class="ml-human-caption">Illustration MédiLink · Données fictives</figcaption></figure>
+        </div>
+        <div class="ml-process-panel" id="ml-panel-report" role="tabpanel" aria-labelledby="ml-tab-report" tabindex="0" hidden>
+          <div class="ml-process-copy">
+            <span class="ml-process-kicker">03 · Le suivi simplifié</span>
+            <h3>La journée se termine.<br>Le suivi est déjà prêt.</h3>
+            <p>Une fois la mission réalisée, MédiLink génère un compte rendu journalier automatique pour simplifier le suivi de mission et faire gagner du temps.</p>
+            <ul class="ml-process-benefits"><li>Le remplaçant gagne du temps sur le suivi</li><li>Le médecin remplacé retrouve l’essentiel</li></ul>
+          </div>
+          <figure class="ml-stage ml-human-stage ml-human-stage--report"><img class="ml-human-photo" src="/landing-assets/process-report.png" width="800" height="1000" alt="Une médecin consulte le bilan de sa journée" loading="lazy" decoding="async"><div class="ml-float ml-float--done"><b>✓</b><div><strong>Le relais est assuré</strong><span>Un compte rendu pour les deux médecins</span></div></div><div class="ml-float ml-float--report"><div class="ml-ui-head"><span class="ml-ui-icon" aria-hidden="true">≡</span><div><small>MISSION #ML-0428</small><h4>Compte rendu journalier</h4></div><span class="ml-ui-dot"></span></div><div class="ml-ui-report-date"><time datetime="2026-09-14">14 septembre 2026</time><span>✓ Généré automatiquement</span></div><div class="ml-ui-professional"><span class="ml-ui-avatar" aria-hidden="true">SB</span><div><strong>Dre Sarah Bernard</strong><small>Remplace le Dr Thomas Martin</small></div></div><dl class="ml-ui-report-facts"><div><dt>Mission</dt><dd>Médecine générale · Brotteaux</dd></div><div><dt>Horaires</dt><dd>09:00–12:30 · 14:00–18:00</dd></div></dl><div class="ml-value-metrics"><div><strong>24</strong><span>consultations</span></div><div><strong>2</strong><span>points à reprendre</span></div><div><strong>3</strong><span>transmissions</span></div></div><div class="ml-ui-summary"><strong>À retrouver à votre retour</strong><p>Activité réalisée, points de vigilance et transmissions regroupés dans le dossier de mission.</p><div class="ml-value-handoff"><span aria-hidden="true">↗</span><span>2 résultats attendus à vérifier<strong>Transmis au médecin remplacé</strong></span></div></div></div><figcaption class="ml-human-caption">Illustration MédiLink · Données fictives</figcaption></figure>
+        </div>
+        <p class="ml-process-note">MédiLink ne se contente pas d’afficher des annonces : <strong>la plateforme organise tout le parcours du remplacement, du besoin jusqu’au suivi de mission.</strong></p>
       </div>
     </section>
 
@@ -372,8 +398,8 @@
     <div class="footer-brand"><strong>Médi<em>Link</em></strong><p>Des remplacements médicaux mieux choisis, avec un dossier commun du premier contact à la clôture.</p></div>
     <div class="footer-col"><h4>Médecin remplaçant</h4><a href="/landing-medecin.html">Découvrir le parcours</a><a href="/search">Voir les missions</a><a href="/register?type=candidate">Créer un profil</a></div>
     <div class="footer-col"><h4>Cabinet / médecin installé</h4><a href="/landing-etablissement.html">Découvrir le parcours</a><a href="/register?type=establishment">Créer un espace</a><a href="/login">Se connecter</a></div>
-    <div class="footer-col"><h4>MédiLink</h4><a href="#how-it-works">Comment ça marche</a><a href="#matching">Le matching</a><a href="#faq">Questions fréquentes</a></div>
+    <div class="footer-col"><h4>MédiLink</h4><a href="#matching">Comment ça marche</a><a href="#matching">Le matching</a><a href="#faq">Questions fréquentes</a></div>
   </div><div class="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div></footer>
-  <script src="/landing-special.js"></script><script src="/landing-main.js"></script>
+  <script src="/landing-special.js"></script><script src="/landing-main.js"></script><script src="/landing-process.js"></script>
 </body>
 </html>
