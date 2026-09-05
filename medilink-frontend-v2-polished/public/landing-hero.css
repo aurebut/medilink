@@ -134,3 +134,40 @@ body:not(.persona-page) .hero--structured .hero-human-frame {
   .hero-path small { margin-top: 2px; font-size: 10px; }
   .hero-path-arrow { display: block; }
 }
+
+/* Keep both account actions available before opening the phone menu. */
+@media (max-width: 640px) {
+  body.landing-home > nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 42px;
+    gap: 8px;
+    height: auto;
+    min-height: 108px;
+    padding: 8px 10px 10px;
+  }
+  body.landing-home > nav .nav-logo { grid-column: 1; grid-row: 1; padding-left: 5px; }
+  body.landing-home > nav .nav-mobile-toggle { grid-column: 2; grid-row: 1; margin: 0; }
+  body.landing-home > nav .nav-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+  }
+  body.landing-home > nav .nav-right .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 10px 6px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  body.landing-home > nav .nav-right .btn-ghost { border: 1px solid #d3dedf; background: #fff; }
+  body.landing-home > nav .nav-mobile-actions { display: none; }
+  body.landing-home:not(.persona-page) .hero--structured { padding-top: 105px; }
+  body.landing-home main > section[id] { scroll-margin-top: 60px; }
+  body.landing-home > nav .nav-mobile-panel { max-height: calc(100dvh - 156px); overflow-y: auto; }
+}
