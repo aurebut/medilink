@@ -5,9 +5,6 @@
   var tabs = Array.from(section.querySelectorAll('[role="tab"]'));
   var panels = Array.from(section.querySelectorAll('[role="tabpanel"]'));
   var progressFill = section.querySelector('.ml-process-progress-fill');
-  var playPauseBtn = section.querySelector('.ml-process-autoplay-btn');
-  var iconPause = section.querySelector('.ml-icon-pause');
-  var iconPlay = section.querySelector('.ml-icon-play');
 
   var STEP_DURATION = 5500; // 5.5 seconds per step
   var currentIndex = 0;
@@ -53,16 +50,6 @@
     resetProgress();
   }
 
-  function setButtonState(playing) {
-    if (!playPauseBtn) return;
-    if (iconPause && iconPlay) {
-      iconPause.style.display = playing ? 'block' : 'none';
-      iconPlay.style.display = playing ? 'none' : 'block';
-    }
-    playPauseBtn.setAttribute('aria-label', playing ? 'Mettre en pause le défilement automatique' : 'Activer le défilement automatique');
-    playPauseBtn.setAttribute('title', playing ? 'Mettre en pause' : 'Lecture automatique');
-  }
-
   function step(timestamp) {
     if (isPlaying && !isHovered && isInView) {
       if (!startTime) {
@@ -88,23 +75,6 @@
       elapsedBeforePause = performance.now() - startTime;
       startTime = null;
     }
-  }
-
-  function togglePlayPause() {
-    isPlaying = !isPlaying;
-    if (isPlaying) {
-      startTime = null;
-    } else {
-      pauseTimer();
-    }
-    setButtonState(isPlaying);
-  }
-
-  if (playPauseBtn) {
-    playPauseBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      togglePlayPause();
-    });
   }
 
   tabs.forEach(function (tab, index) {
@@ -204,7 +174,7 @@
     }, true);
   }
 
-  setButtonState(isPlaying);
   animationFrameId = requestAnimationFrame(step);
 })();
+
 

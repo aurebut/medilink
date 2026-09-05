@@ -12,11 +12,9 @@
 .ml-process-tab:hover { background: #f3f6f2; }
 .ml-process-tab[aria-selected="true"] { background: #e8f0eb; color: #124c46; }
 .ml-process-tab[aria-selected="true"] > span { background: #176b60; color: #fff; }
-.ml-process-autoplay-bar { display: flex; align-items: center; gap: 14px; padding: 2px 14px 2px; }
-.ml-process-progress-track { flex: 1; height: 7px; background: #e8eee9; border-radius: 999px; overflow: hidden; position: relative; }
+.ml-process-autoplay-bar { display: flex; align-items: center; padding: 2px 14px 2px; }
+.ml-process-progress-track { width: 100%; height: 7px; background: #e8eee9; border-radius: 999px; overflow: hidden; position: relative; }
 .ml-process-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #176b60, #2c8068); border-radius: 999px; }
-.ml-process-autoplay-btn { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; border: 0; border-radius: 50%; background: #f0f4f1; color: #526474; cursor: pointer; padding: 0; transition: background .2s, color .2s, transform .15s; }
-.ml-process-autoplay-btn:hover { background: #e2ede5; color: #176b60; transform: scale(1.06); }
 .ml-process-panel { display: grid; grid-template-columns: .86fr 1.14fr; min-height: 520px; padding: 10px; border-radius: 28px; background: #fff; animation: ml-panel-in .35s ease both; }
 .ml-process-panel[hidden] { display: none; }
 .ml-process-copy { display: flex; flex-direction: column; align-items: flex-start; padding: 42px 34px; }
@@ -115,7 +113,6 @@
     font-weight: 600;
   }
   .ml-process-autoplay-bar {
-    gap: 10px;
     padding: 4px 8px 2px;
   }
   .ml-process-progress-track {
@@ -160,7 +157,6 @@
     font-size: 11px;
   }
   .ml-process-autoplay-bar {
-    gap: 8px;
     padding: 4px 6px 2px;
   }
   .ml-process-progress-track {
