@@ -1,0 +1,142 @@
+/* Product previews: readable at phone scale, with mission context on demand. */
+body.landing-home .mission-context-disclosure { width: 100%; }
+body.landing-home .mission-context-disclosure > summary { display: none; }
+body.landing-home .mission-context-content { display: flex; flex-direction: column; }
+body.landing-home .mission-context-content > p { color: var(--text-3); font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 640px) {
+  /* Matching: a compact identity block and an unmistakable compatibility score. */
+  body.landing-home:not(.persona-page) .matching .product-window { padding: 0; border: 1px solid #d8e3e4; border-radius: 24px; }
+  body.landing-home:not(.persona-page) .matching .score-layout { border-radius: 23px; }
+  body.landing-home:not(.persona-page) .matching .score-summary { grid-template-columns: 80px minmax(0, 1fr); gap: 14px; min-height: 0; padding: 18px !important; background: #edf4f1; }
+  body.landing-home:not(.persona-page) .matching .score-profile-photo { height: 100px; min-height: 100px; margin: 0 !important; border: 3px solid #fff; border-radius: 15px; }
+  body.landing-home:not(.persona-page) .matching .score-profile-body { padding: 0 !important; }
+  body.landing-home:not(.persona-page) .matching .score-profile-body h3 { font-size: 24px; line-height: 1.05; }
+  body.landing-home:not(.persona-page) .matching .score-profile-role { margin-top: 5px; font-size: 11px; line-height: 1.45; }
+  body.landing-home:not(.persona-page) .matching .score-value { display: flex; align-items: center; gap: 8px; margin-top: 13px; padding-top: 10px; }
+  body.landing-home:not(.persona-page) .matching .score-value > span { font-size: 9px; letter-spacing: .035em; padding: 0; }
+  body.landing-home:not(.persona-page) .matching .score-value strong { color: #176b5f; font-size: 40px; line-height: 1; }
+  body.landing-home:not(.persona-page) .matching .score-value strong small { font-size: 12px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown { padding: 23px 20px 20px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown-head { margin-bottom: 24px; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown-head h3 { font-size: 27px; line-height: 1.12; }
+  body.landing-home:not(.persona-page) .matching .score-breakdown-head > div > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .matching .score-row { margin-bottom: 19px; }
+  body.landing-home:not(.persona-page) .matching .score-row > div { font-size: 12px; margin-bottom: 8px; }
+  body.landing-home:not(.persona-page) .matching .score-row > i { height: 7px; background: #e8eef0; }
+  body.landing-home:not(.persona-page) .matching .score-row > i b { background: #377968; }
+  body.landing-home:not(.persona-page) .matching .score-note { margin-top: 23px; padding: 12px; font-size: 12px; line-height: 1.6; }
+
+  /* Conversation: the thread comes first, with a real expandable mission brief. */
+  body.landing-home:not(.persona-page) .communication .message-panel { border: 1px solid #d9e3e0; border-radius: 23px; }
+  body.landing-home:not(.persona-page) .communication .conversation-head { padding: 16px 13px; flex-wrap: wrap; gap: 10px; }
+  body.landing-home:not(.persona-page) .communication .conversation-person { gap: 10px; }
+  body.landing-home:not(.persona-page) .communication .conversation-person > img { width: 36px; height: 36px; flex-basis: 36px; }
+  body.landing-home:not(.persona-page) .communication .conversation-person strong { font-size: 14px; white-space: normal; }
+  body.landing-home:not(.persona-page) .communication .conversation-person span { font-size: 11px; }
+  body.landing-home:not(.persona-page) .communication .conversation-head-meta { margin: 0 0 0 46px; }
+  body.landing-home:not(.persona-page) .communication .conversation-head-meta .status { padding: 4px 8px; font-size: 10px; }
+  body.landing-home:not(.persona-page) .communication .message-context { padding: 0; background: #edf4f1; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 72px; padding: 14px; color: #244f49; cursor: pointer; list-style: none; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure > summary::-webkit-details-marker { display: none; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure > summary strong { display: block; font-size: 12px; font-weight: 600; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure > summary small { display: block; margin-top: 3px; color: #56776f; font-size: 11px; line-height: 1.4; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure > summary svg { flex: 0 0 18px; transition: transform .2s; }
+  body.landing-home:not(.persona-page) .mission-context-disclosure[open] > summary svg { transform: rotate(180deg); }
+  body.landing-home:not(.persona-page) .mission-context-content { padding: 0 14px 16px; }
+  body.landing-home:not(.persona-page) .mission-context-content > p { font-size: 12px; }
+  body.landing-home:not(.persona-page) .communication .message-context h3 { font-size: 25px; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 14px 10px; background: #fff; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow::before,
+  body.landing-home:not(.persona-page) .communication .conversation-flow > span::after { display: none; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow > span { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; width: auto; padding: 0 3px; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow > span > i { width: 21px; height: 21px; flex-basis: 21px; font-size: 9px; box-shadow: none; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow > .is-done > i { background: #0e8a7a; border-color: #0e8a7a; color: #fff; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow small { display: none; }
+  body.landing-home:not(.persona-page) .communication .conversation-flow strong { font-size: 10px; line-height: 1.35; }
+  body.landing-home:not(.persona-page) .communication .conversation-body { gap: 17px; padding: 17px 12px; background: #f6f8f7; }
+  body.landing-home:not(.persona-page) .communication .conversation-event { grid-template-columns: 24px minmax(0, 1fr); padding: 10px; gap: 8px; border: 0; background: #eaf0f2; }
+  body.landing-home:not(.persona-page) .communication .conversation-event strong { font-size: 11px; line-height: 1.4; }
+  body.landing-home:not(.persona-page) .communication .conversation-event small { font-size: 10px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .communication .conversation-event > span:last-child { display: none; }
+  body.landing-home:not(.persona-page) .communication .message-row { max-width: 100%; gap: 7px; }
+  body.landing-home:not(.persona-page) .communication .message-row > img { width: 22px; height: 22px; flex-basis: 22px; }
+  body.landing-home:not(.persona-page) .communication .message-row small { font-size: 10px; }
+  body.landing-home:not(.persona-page) .communication .bubble { padding: 12px; font-size: 12px; line-height: 1.65; }
+  body.landing-home:not(.persona-page) .communication .message-row.sent { max-width: 92%; }
+  body.landing-home:not(.persona-page) .communication .proposal-card { grid-template-columns: 25px minmax(0, 1fr); gap: 9px; padding: 13px 10px; background: #e7f2ec; border-color: #c8e0d1; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-icon { width: 24px; height: 24px; border-radius: 8px; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-copy > strong { font-size: 12px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-copy > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-copy dl { grid-template-columns: 1fr; gap: 7px; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-copy dt { font-size: 9px; }
+  body.landing-home:not(.persona-page) .communication .proposal-card-copy dd { font-size: 11px; }
+  body.landing-home:not(.persona-page) .communication .proposal-action { grid-column: 2; justify-self: start; font-size: 10px; }
+  body.landing-home:not(.persona-page) .communication .conversation-footer { flex-wrap: wrap; gap: 7px; font-size: 10px; line-height: 1.45; }
+
+  /* Mission timeline: distinct active step, less chrome around each row. */
+  body.landing-home:not(.persona-page) .followup .mission-center { gap: 12px; }
+  body.landing-home:not(.persona-page) .followup .mission-command { padding: 20px 16px; border-radius: 22px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-copy h3 { max-width: none; font-size: 27px; line-height: 1.1; }
+  body.landing-home:not(.persona-page) .followup .mission-command-kicker { font-size: 9px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-data { gap: 0; border-radius: 12px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-data > div { padding: 10px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-data dt { font-size: 9px; }
+  body.landing-home:not(.persona-page) .followup .mission-command-data dd { font-size: 12px; }
+  body.landing-home:not(.persona-page) .followup .mission-progress { padding: 21px 15px 15px; border-radius: 22px; }
+  body.landing-home:not(.persona-page) .followup .mission-panel-head h4 { font-size: 26px; line-height: 1.1; }
+  body.landing-home:not(.persona-page) .followup .mission-panel-head > div > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .followup .mission-route { gap: 0; margin: 20px 0; }
+  body.landing-home:not(.persona-page) .followup .mission-route-step { grid-template-columns: 28px minmax(0, 1fr); gap: 10px; padding: 14px 10px; border: 0; border-radius: 12px; background: transparent; }
+  body.landing-home:not(.persona-page) .followup .mission-route-step.is-active { background: #edf2f8; }
+  body.landing-home:not(.persona-page) .followup .mission-route-step::after { display: none; }
+  body.landing-home:not(.persona-page) .followup .mission-route-marker { width: 26px; height: 26px; align-self: start; margin-top: 2px; box-shadow: none; }
+  body.landing-home:not(.persona-page) .followup .mission-route-copy > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .followup .mission-route-copy strong { font-size: 13px; }
+  body.landing-home:not(.persona-page) .followup .mission-route-copy small { font-size: 11px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .followup .mission-route-status { grid-column: 2; justify-self: start; margin: 0; font-size: 9px; }
+  body.landing-home:not(.persona-page) .followup .mission-live { padding: 13px; grid-template-columns: 48px minmax(0, 1fr); gap: 10px; border-radius: 14px; }
+  body.landing-home:not(.persona-page) .followup .mission-date { width: 48px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-copy > strong { font-size: 14px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-copy p { font-size: 11px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-facts { display: flex; flex-wrap: wrap; gap: 5px; }
+  body.landing-home:not(.persona-page) .followup .mission-live-facts span { min-height: 0; padding: 5px 7px; font-size: 10px; }
+
+  /* Continuity: show the actual dashboard first, followed by its explanation. */
+  body.landing-home:not(.persona-page) .continuity .continuity-console { display: flex; flex-direction: column; gap: 30px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-dashboard { order: 1; padding: 17px 13px; border: 1px solid #e0e8e5; border-radius: 22px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-features { order: 2; }
+  body.landing-home:not(.persona-page) .continuity .continuity-dashboard-head { display: grid; gap: 12px; padding-bottom: 16px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-mission > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-mission h3 { font-size: 30px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-mission p { font-size: 11px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sync-status { width: fit-content; padding: 7px 10px; border: 0; border-radius: 8px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sync-status strong { font-size: 10px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 16px 0; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article { min-width: 0; padding: 13px; border-radius: 14px; background: #fff; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article:first-child { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; background: #eaf2ef; border-color: #d6e4de; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stat-head > span { font-size: 9px; letter-spacing: .03em; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article > strong { font-size: 38px; margin-top: 12px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article > small { font-size: 10px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article:first-child > .continuity-stat-head { grid-column: 1 / -1; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stats > article:first-child > small { grid-column: 1; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sparkline { grid-column: 2; grid-row: 2 / 4; position: static; height: 42px; align-self: end; margin: 0 0 3px 15px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-stat-foot { position: static; display: flex; flex-direction: column; gap: 4px; margin-top: 12px; font-size: 9px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-grid { gap: 18px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-card { padding: 0; border: 0; border-radius: 0; background: transparent; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-head { margin-bottom: 12px; gap: 8px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-head h4 { font-size: 24px; line-height: 1.1; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-head > div > span { font-size: 9px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-detail-head > b { font-size: 9px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-watch-list article { grid-template-columns: 25px minmax(0, 1fr); gap: 8px; padding: 12px 10px; border-radius: 12px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-watch-list strong { font-size: 12px; line-height: 1.45; }
+  body.landing-home:not(.persona-page) .continuity .continuity-watch-list small { font-size: 10px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .continuity .continuity-watch-list article > b { grid-column: 2; font-size: 10px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-handoff-list li { padding: 11px 0; border: 0; border-bottom: 1px solid #dce5e2; border-radius: 0; background: transparent; }
+  body.landing-home:not(.persona-page) .continuity .continuity-handoff-list strong { white-space: normal; font-size: 12px; line-height: 1.45; }
+  body.landing-home:not(.persona-page) .continuity .continuity-handoff-list small { font-size: 10px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sources { margin-top: 18px; padding: 12px; border: 0; border-radius: 13px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sources strong { font-size: 11px; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sources small { font-size: 10px; line-height: 1.5; }
+  body.landing-home:not(.persona-page) .continuity .continuity-sources li { font-size: 10px; }
+}

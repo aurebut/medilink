@@ -17,4 +17,13 @@
   document.addEventListener('click', function (event) { if (nav && nav.classList.contains('mobile-open') && !nav.contains(event.target)) setMenu(false); });
   window.addEventListener('resize', function () { if (window.innerWidth > 640) setMenu(false); });
   window.addEventListener('scroll', function () { if (nav) nav.classList.toggle('nav-scrolled', window.scrollY > 40); }, { passive: true });
+
+  // Keep the full mission alongside the desktop thread; let mobile readers expand it.
+  var missionContext = document.querySelector('.mission-context-disclosure');
+  if (missionContext) {
+    var compactPreview = window.matchMedia('(max-width: 640px)');
+    function arrangeMissionContext() { missionContext.open = !compactPreview.matches; }
+    arrangeMissionContext();
+    compactPreview.addEventListener('change', arrangeMissionContext);
+  }
 })();
