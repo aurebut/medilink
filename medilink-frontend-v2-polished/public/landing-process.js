@@ -4,7 +4,6 @@
   var tabsContainer = section.querySelector('.ml-process-tabs');
   var tabs = Array.from(section.querySelectorAll('[role="tab"]'));
   var panels = Array.from(section.querySelectorAll('[role="tabpanel"]'));
-  var progressFill = section.querySelector('.ml-process-progress-fill');
 
   var STEP_DURATION = 5500; // 5.5 seconds per step
   var currentIndex = 0;
@@ -29,20 +28,33 @@
     tabsContainer.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
   }
 
+  function updateTabProgress(index, progress) {
+    tabs.forEach(function (tab, i) {
+      var fill = tab.querySelector('.ml-tab-fill');
+      if (!fill) return;
+      if (i === index) {
+        fill.style.width = (progress * 100).toFixed(2) + '%';
+      } else {
+        fill.style.width = '0%';
+      }
+    });
+  }
+
   function resetProgress() {
     elapsedBeforePause = 0;
     startTime = null;
-    if (progressFill) {
-      progressFill.style.width = '0%';
-    }
+    updateTabProgress(currentIndex, 0);
   }
 
   function select(index, shouldCenter) {
     currentIndex = index;
     tabs.forEach(function (tab, i) {
-      tab.setAttribute('aria-selected', String(i === index));
-      tab.tabIndex = i === index ? 0 : -1;
-      panels[i].hidden = i !== index;
+      var isSelected = (i === index);
+      tab.setAttribute('aria-selected', String(isSelected));
+      tab.tabIndex = isSelected ? 0 : -1;
+      if (panels[i]) {
+        panels[i].hidden = !isSelected;
+      }
     });
     if (shouldCenter !== false) {
       centerTab(tabs[index]);
@@ -58,9 +70,7 @@
       var elapsed = timestamp - startTime;
       var progress = Math.min(elapsed / STEP_DURATION, 1);
 
-      if (progressFill) {
-        progressFill.style.width = (progress * 100).toFixed(2) + '%';
-      }
+      updateTabProgress(currentIndex, progress);
 
       if (progress >= 1) {
         var next = (currentIndex + 1) % tabs.length;
@@ -78,7 +88,9 @@
   }
 
   tabs.forEach(function (tab, index) {
-    tab.addEventListener('click', function () { select(index, true); });
+    tab.addEventListener('click', function () {
+      select(index, true);
+    });
     tab.addEventListener('keydown', function (event) {
       var next = index;
       if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
@@ -92,17 +104,20 @@
     });
   });
 
-  // Pause on hover over process section on desktop
-  section.addEventListener('mouseenter', function () {
-    isHovered = true;
-    pauseTimer();
-  });
-  section.addEventListener('mouseleave', function () {
-    isHovered = false;
-    startTime = null;
-  });
+  // Pause on hover over tabs nav so users can click or inspect tabs without sudden switching
+  var nav = section.querySelector('.ml-process-nav') || tabsContainer;
+  if (nav) {
+    nav.addEventListener('mouseenter', function () {
+      isHovered = true;
+      pauseTimer();
+    });
+    nav.addEventListener('mouseleave', function () {
+      isHovered = false;
+      startTime = null;
+    });
+  }
 
-  // IntersectionObserver: only run auto-play when visible on screen
+  // IntersectionObserver: run auto-play only when visible on screen
   if ('IntersectionObserver' in window) {
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
@@ -113,7 +128,7 @@
           pauseTimer();
         }
       });
-    }, { threshold: 0.2 });
+    }, { threshold: 0.15 });
     observer.observe(section);
   } else {
     isInView = true;
@@ -153,9 +168,15 @@
       hasMoved = false;
       startX = e.pageX - tabsContainer.offsetLeft;
       scrollLeft = tabsContainer.scrollLeft;
+      pauseTimer();
     });
-    tabsContainer.addEventListener('mouseleave', function () { isDown = false; });
-    tabsContainer.addEventListener('mouseup', function () { isDown = false; });
+    tabsContainer.addEventListener('mouseleave', function () {
+      isDown = false;
+    });
+    tabsContainer.addEventListener('mouseup', function () {
+      isDown = false;
+      startTime = null;
+    });
     tabsContainer.addEventListener('mousemove', function (e) {
       if (!isDown) return;
       var x = e.pageX - tabsContainer.offsetLeft;
@@ -174,6 +195,8 @@
     }, true);
   }
 
+  // Initialize initial state
+  select(0, false);
   animationFrameId = requestAnimationFrame(step);
 })();
 
