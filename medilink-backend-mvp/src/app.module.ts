@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { DemoRequestsModule } from './modules/demo-requests/demo-requests.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
@@ -30,6 +31,7 @@ import { WorkspaceNotesModule } from './modules/workspace-notes/workspace-notes.
       ],
     }),
     PrismaModule,
+    DemoRequestsModule,
     AuditModule,
     NotificationsModule,
     PermissionsModule,

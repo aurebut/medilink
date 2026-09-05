@@ -77,6 +77,7 @@ export class EmailService {
           subject: params.subject,
           html: params.html,
         });
+        if (result.error) throw new Error(result.error.message);
         providerMessageId = result.data?.id;
       } else {
         this.logger.warn(

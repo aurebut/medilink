@@ -101,3 +101,8 @@ https://YOUR_RENDER_SERVICE.onrender.com/api/billing/webhooks/stripe
 ```
 
 Listen at minimum to `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, and `invoice.payment_failed`, then copy the webhook signing secret into `STRIPE_WEBHOOK_SECRET`.
+# Demandes de démo
+
+La page publique `/demo` envoie les demandes à `POST /api/demo-requests`. La migration `20260905100000_add_demo_requests` crée la table `DemoRequest` (appliquée par `prisma migrate deploy` au démarrage Render). Les coordonnées et le consentement sont enregistrés avant la notification email.
+
+Pour recevoir les notifications sur une boîte dédiée, définir `DEMO_REQUEST_EMAIL` sur le backend. Sinon, les administrateurs MédiLink actifs reçoivent les demandes via le service Resend existant. Une erreur de notification ne supprime pas la demande : elle reste consultable dans `DemoRequest` via Prisma Studio. L’endpoint est public, valide les champs et limite les envois à 5 demandes par IP sur 10 minutes.
