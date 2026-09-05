@@ -7,6 +7,8 @@ import {
   Building2,
   CalendarDays,
   ClipboardList,
+  ChevronDown,
+  ChevronRight,
   FileText,
   LayoutDashboard,
   MessageCircle,
@@ -720,7 +722,7 @@ export function AppShell({
                   onClick={() => setMobileNavOpen(false)}
                 >
                   <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
-                  <span className="menu-arrow">&gt;</span>
+                  <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
                 </Link>
               ) : null}
               <Link
@@ -731,17 +733,17 @@ export function AppShell({
                 onClick={() => setMobileNavOpen(false)}
               >
                 <span>Paramètres du compte</span>
-                <span className="menu-arrow">&gt;</span>
+                <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
               </Link>
               {area !== 'admin' ? (
                 <Link href={area === 'candidate' ? "/app/notifications" : "/establishment/notifications"} className="account-menu-item" onClick={() => setMobileNavOpen(false)}>
                   <span>Notifications</span>
-                  <span className="menu-arrow">&gt;</span>
+                  <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
                 </Link>
               ) : null}
               <button type="button" className="account-menu-item danger" onClick={onLogout}>
                 <span>Déconnexion</span>
-                <span className="menu-arrow">&gt;</span>
+                <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -945,7 +947,7 @@ export function AppShell({
                     onClick={() => setAccountMenuOpen(false)}
                   >
                     <span>{area === 'establishment' ? 'Information établissement' : 'Mon profil'}</span>
-                    <span className="menu-arrow">&gt;</span>
+                    <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
                   </Link>
                 ) : null}
                 <Link
@@ -957,7 +959,7 @@ export function AppShell({
                   onClick={() => setAccountMenuOpen(false)}
                 >
                   <span>Paramètres du compte</span>
-                  <span className="menu-arrow">&gt;</span>
+                  <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
                 </Link>
                 <Link
                   href={userAccountHref}
@@ -968,12 +970,12 @@ export function AppShell({
                   onClick={() => setAccountMenuOpen(false)}
                 >
                   <span>Sécurité et mot de passe</span>
-                  <span className="menu-arrow">&gt;</span>
+                  <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
                 </Link>
               </div>
               <button type="button" className="account-menu-item danger" role="menuitem" onClick={onLogout}>
                 <span>Déconnexion</span>
-                <span className="menu-arrow">&gt;</span>
+                <ChevronRight className="menu-arrow" size={15} aria-hidden="true" />
               </button>
             </div>
           ) : null}
@@ -997,7 +999,7 @@ export function AppShell({
               <br />
               <span>{roleLabel(user?.role, candidateProfile)}</span>
             </span>
-            <span className="user-chip-arrow">v</span>
+            <ChevronDown className="user-chip-arrow" size={16} aria-hidden="true" />
           </button>
         </div>
       </aside>
