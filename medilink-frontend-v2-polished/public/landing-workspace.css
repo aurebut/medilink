@@ -1,0 +1,115 @@
+.ml-workspace { width: calc(100% - 48px); margin: 0 auto 80px; padding: 76px 40px 54px; border-radius: 36px; background: #e6efe9; color: #17362e; }
+.ml-workspace-inner { max-width: 1100px; margin: auto; }
+.ml-workspace-heading { display: grid; grid-template-columns: 1.3fr 1fr; align-items: end; gap: 58px; margin-bottom: 36px; }
+.ml-workspace-kicker { display: block; margin-bottom: 18px; font-size: 10px; letter-spacing: .13em; text-transform: uppercase; font-weight: 500; color: #507568; }
+.ml-workspace-heading h2 { font: 400 clamp(34px,3.6vw,49px)/1.08 var(--serif); letter-spacing: -.025em; color: var(--navy); text-wrap: balance; }
+.ml-workspace-heading h2 em { font-weight: 400; color: #347c68; }
+.ml-workspace-heading > p { color: #566e64; font-size: 14px; line-height: 1.8; padding-bottom: 3px; }
+.ml-dossier { background: #fff; border: 1px solid #d8e4db; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px -36px #193d365c; }
+.ml-dossier-head { display: flex; justify-content: space-between; gap: 20px; align-items: center; padding: 24px 28px 20px; }
+.ml-dossier-identity { display: flex; align-items: center; gap: 14px; }
+.ml-dossier-symbol { position: relative; width: 43px; height: 43px; border: 1px solid #dce9e0; border-radius: 12px; background: #edf5ef; display: grid; place-items: center; font: 27px var(--serif); }
+.ml-dossier-symbol > span { position: absolute; bottom: -4px; right: -4px; border-radius: 50%; background: #2f765f; color: white; border: 2px solid white; width: 19px; height: 19px; font: 12px var(--sans); text-align: center; }
+.ml-dossier-eyebrow { font-size: 8px; letter-spacing: .11em; color: #7b8e81; }
+.ml-dossier-head h3 { font: 500 16px/1.4 var(--sans); margin: 4px 0; color: #203c32; }
+.ml-dossier-head p { font-size: 11px; color: #6f8178; }
+.ml-dossier-status { display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid #d6e8dc; border-radius: 20px; background: #edf6f0; font-size: 10px; white-space: nowrap; color: #317455; }
+.ml-dossier-status i { width: 5px; height: 5px; border-radius: 50%; background: #488f68; }
+.ml-dossier-facts { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 24px; padding: 12px 28px; background: #f7f9f7; border-block: 1px solid #e8eee9; color: #64776c; font-size: 10px; }
+.ml-dossier-facts strong { font-weight: 500; color: #375b47; }
+.ml-dossier-members { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+.ml-dossier-members img { border-radius: 50%; object-fit: cover; }
+.ml-dossier-body { display: grid; grid-template-columns: .78fr 1.22fr; }
+.ml-dossier-progress { padding: 26px; background: #fbfcfa; border-right: 1px solid #e5ece6; scroll-margin-top: 110px; }
+.ml-dossier-label { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.ml-dossier-label h4,.ml-chat-head h4 { font: 500 12px/1.4 var(--sans); }
+.ml-dossier-label > span { font-size: 9px; color: #879489; }
+.ml-dossier-timeline { list-style: none; margin-top: 26px; }
+.ml-dossier-timeline li { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding-bottom: 26px; }
+.ml-dossier-timeline li:not(:last-child)::before { content: ''; position: absolute; width: 1px; background: #dbe6dc; left: 13px; top: 29px; bottom: 0; }
+.ml-dossier-timeline li:last-child { padding-bottom: 0; }
+.ml-timeline-dot { display: grid; place-items: center; width: 28px; height: 28px; background: #f1f4ef; border: 1px solid #e1e8df; border-radius: 50%; font-size: 9px; color: #8c998c; }
+.is-complete .ml-timeline-dot { color: #3e8161; background: #e7f2e9; border-color: #d4e6d8; }
+.is-current .ml-timeline-dot { color: white; background: #34755d; border-color: #34755d; box-shadow: 0 0 0 4px #edf4ed; }
+.ml-dossier-timeline li > div > span { display: block; font-size: 8px; letter-spacing: .06em; color: #879387; text-transform: uppercase; margin: 2px 0 6px; }
+.ml-dossier-timeline strong { display: block; font-size: 12px; font-weight: 500; color: #334d3d; }
+.ml-dossier-timeline p { font-size: 10px; line-height: 1.65; color: #7b887d; margin-top: 7px; max-width: 220px; }
+.ml-dossier-timeline small { display: inline-block; font-size: 8px; margin-top: 8px; color: #438062; }
+.ml-dossier-timeline .is-current small { padding: 4px 7px; background: #e9f2e9; border-radius: 5px; }
+.ml-dossier-today { display: flex; align-items: center; gap: 12px; margin-top: 25px; padding: 13px; border: 1px solid #e3e9df; border-radius: 10px; background: #f1f5ed; }
+.ml-dossier-today > div { flex: 0 0 37px; text-align: center; }
+.ml-dossier-today small { display: block; font-size: 7px; letter-spacing: .08em; color: #7a8c75; }
+.ml-dossier-today > div strong { font-size: 25px; font-weight: 400; line-height: 1.15; }
+.ml-dossier-today p strong { display: block; font-size: 11px; font-weight: 500; }
+.ml-dossier-today p span { display: block; font-size: 8px; margin-top: 4px; color: #71836c; }
+.ml-dossier-chat { min-width: 0; display: flex; flex-direction: column; background: #fff; }
+.ml-chat-head { padding: 20px 24px; display: flex; justify-content: space-between; gap: 12px; align-items: center; border-bottom: 1px solid #edf1ed; }
+.ml-chat-head > div { display: flex; align-items: center; gap: 9px; }
+.ml-chat-icon { color: #4f846f; font-size: 19px; }
+.ml-chat-head > span { font-size: 8px; color: #8b988e; }
+.ml-chat-content { padding: 17px 24px 12px; flex: 1; }
+.ml-chat-date { display: flex; align-items: center; gap: 12px; justify-content: center; font-size: 8px; color: #8d9a8f; margin: 0 0 15px; }
+.ml-chat-date::before,.ml-chat-date::after { content: ''; height: 1px; background: #edf1ed; flex: 1; }
+.ml-chat-message { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 14px; }
+.ml-chat-message > img { border-radius: 50%; object-fit: cover; flex: 0 0 30px; }
+.ml-chat-message > div { max-width: 86%; }
+.ml-chat-message > div > span { display: block; color: #8a978d; font-size: 8px; margin: 0 0 5px 2px; }
+.ml-chat-message p { padding: 11px 13px; border: 1px solid #e4ebe5; background: #f5f8f5; border-radius: 12px 12px 12px 3px; font-size: 11px; line-height: 1.65; color: #4d6154; }
+.ml-chat-message.is-cabinet { justify-content: flex-end; }
+.ml-chat-message.is-cabinet > div > span { text-align: right; }
+.ml-chat-message.is-cabinet p { border-color: #dce9e4; background: #eaf3ee; color: #335e48; border-radius: 12px 12px 3px 12px; }
+.ml-chat-decision { display: flex; align-items: center; gap: 10px; border: 1px solid #dbe8dd; background: #f8fbf7; border-radius: 10px; padding: 13px; margin: 16px 0 20px 38px; }
+.ml-chat-decision > span { color: #34755d; display: grid; place-items: center; border-radius: 50%; background: #e8f2e6; width: 25px; height: 25px; flex-shrink: 0; }
+.ml-chat-decision small { display: block; font-size: 7px; letter-spacing: .05em; color: #7b9179; }
+.ml-chat-decision strong { display: block; font-size: 10px; font-weight: 500; margin-top: 5px; color: #3c6948; }
+.ml-chat-decision p { font-size: 8px; color: #81917f; margin-top: 5px; line-height: 1.5; }
+.ml-chat-read { text-align: right; font-size: 8px; color: #8c9a8e; margin-top: -5px; }
+.ml-chat-read span { color: #478b68; margin-left: 4px; }
+.ml-chat-compose { display: flex; align-items: center; gap: 12px; margin: 10px 24px 22px; padding: 10px 12px; border: 1px solid #e5ebe5; border-radius: 9px; color: #99a498; font-size: 10px; }
+.ml-chat-compose > span:first-child { font-size: 17px; }
+.ml-chat-compose > span:last-child { margin-left: auto; color: white; background: #37765e; width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; font-size: 16px; }
+.ml-dossier-bottom { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid #e8eee7; padding: 13px 26px; font-size: 9px; color: #6e846e; }
+.ml-dossier-bottom i { font-style: normal; margin-right: 7px; color: #3d8661; }
+.ml-dossier-bottom > span:last-child { color: #94a08f; font-size: 8px; }
+.ml-workspace-benefits { display: grid; grid-template-columns: repeat(3,1fr); gap: 25px; margin-top: 26px; }
+.ml-workspace-benefits p { display: grid; grid-template-columns: 22px 1fr; gap: 6px 8px; font-size: 10px; line-height: 1.5; color: #7a8b7b; }
+.ml-workspace-benefits span { grid-row: 1 / 3; font-size: 9px; color: #8d9f8b; padding-top: 2px; }
+.ml-workspace-benefits strong { font-weight: 500; font-size: 12px; color: #486750; }
+@media (max-width: 850px) {
+ .ml-workspace { width: calc(100% - 32px); padding: 48px 24px 32px; border-radius: 28px; margin-bottom: 56px; }
+ .ml-workspace-heading { grid-template-columns: 1fr; gap: 20px; }
+ .ml-workspace-heading > p { max-width: 600px; }
+ .ml-dossier-head { padding: 20px; }
+ .ml-dossier-facts { padding: 12px 20px; gap: 10px 16px; }
+ .ml-dossier-members { margin-left: 0; }
+ .ml-dossier-body { grid-template-columns: .85fr 1.15fr; }
+ .ml-dossier-progress { padding: 20px 16px; }
+ .ml-chat-content { padding-inline: 16px; }
+ .ml-chat-head { padding: 18px 16px; }
+ .ml-chat-head > span { display: none; }
+ .ml-chat-compose { margin-inline: 16px; }
+ .ml-chat-decision { margin-left: 0; }
+}
+@media (max-width: 600px) {
+ .ml-workspace { width: calc(100% - 20px); padding: 38px 14px 28px; border-radius: 24px; }
+ .ml-workspace-heading { padding-inline: 5px; margin-bottom: 25px; }
+ .ml-workspace-heading h2 { font-size: 35px; }
+ .ml-workspace-heading > p { font-size: 13px; }
+ .ml-dossier { border-radius: 16px; }
+ .ml-dossier-head { flex-wrap: wrap; padding: 17px; gap: 12px; }
+ .ml-dossier-head h3 { font-size: 13px; }
+ .ml-dossier-symbol { width: 35px; height: 35px; flex: 0 0 35px; }
+ .ml-dossier-identity { gap: 10px; }
+ .ml-dossier-status { font-size: 9px; margin-left: 45px; padding: 5px 8px; }
+ .ml-dossier-facts { padding: 12px 17px; font-size: 9px; }
+ .ml-dossier-body { grid-template-columns: 1fr; }
+ .ml-dossier-progress { border-right: 0; border-bottom: 1px solid #e5ece6; padding: 20px; }
+ .ml-dossier-timeline { margin-top: 20px; }
+ .ml-dossier-timeline li { padding-bottom: 17px; }
+ .ml-dossier-timeline p { max-width: none; }
+ .ml-dossier-today { margin-top: 18px; }
+ .ml-chat-content { padding: 18px 16px; }
+ .ml-chat-message > div { max-width: 89%; }
+ .ml-dossier-bottom { padding: 12px 17px; line-height: 1.5; }
+ .ml-workspace-benefits { grid-template-columns: 1fr; gap: 17px; padding-inline: 6px; }
+}
