@@ -810,8 +810,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
             </div>
           </div>
         </div>
-        {isMobile ? (
-          <div className="conversation-mobile-search">
+        <div className="conversation-mobile-search">
             <label className="sr-only" htmlFor="conversation-search">Rechercher une conversation</label>
             <span aria-hidden="true" />
             <input
@@ -822,8 +821,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
               onChange={(event) => setConversationQuery(event.target.value)}
               placeholder="Rechercher une discussion"
             />
-          </div>
-        ) : null}
+        </div>
         {error ? <Alert type="error">{error}</Alert> : null}
         <div className="conversation-items">
           {visibleConversations.map((conv) => {
@@ -835,6 +833,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
               <button
                 key={conv.id}
                 className={`conversation-button ${conv.id === activeId ? 'active' : ''}`}
+                aria-current={conv.id === activeId ? 'true' : undefined}
                 onClick={() => setActiveId(conv.id)}
               >
                 <span className="conversation-mobile-avatar" aria-hidden="true">{initial}</span>
@@ -846,16 +845,13 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
                   <span className="conversation-mobile-mission">{conv.mission?.title || conv.mission?.city || 'Mission'}</span>
                   <span className="conversation-mobile-preview">{preview}</span>
                 </span>
-                <strong>{title}</strong>
-                <div className="small">{conv.mission?.title}</div>
-                <div className="small">{last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise à jour du suivi' : last?.body || 'Aucun message'} - {formatDateTime(conv.lastMessageAt)}</div>
               </button>
             );
           })}
           {visibleConversations.length === 0 ? (
             <div className="conversation-mobile-empty">
-              <strong>Aucune conversation trouvee</strong>
-              <span>Essayez un nom, une ville ou une mission.</span>
+              <strong>{conversationQuery ? 'Aucune conversation trouvée' : 'Vos échanges commencent ici'}</strong>
+              <span>{conversationQuery ? 'Essayez un nom, une ville ou une mission.' : 'Les discussions liées à vos missions apparaîtront ici.'}</span>
             </div>
           ) : null}
         </div>

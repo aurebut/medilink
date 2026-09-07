@@ -336,7 +336,6 @@ export default function EstablishmentAgendaPage() {
                               <button
                                 key={`${segment.key}-${segment.startIndex}-${segment.endIndex}`}
                                 type="button"
-                                tabIndex={-1}
                                 className={`agenda-span-event is-${establishmentMissionTone(segment.item)} ${segment.isStart ? 'starts' : 'continues'} ${segment.isEnd ? 'ends' : 'continues'}`}
                                 style={{
                                   gridColumn: `${segment.startIndex + 1} / ${segment.endIndex + 2}`,

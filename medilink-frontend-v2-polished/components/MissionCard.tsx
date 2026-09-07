@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Building2, CalendarDays, Clock3, MapPin } from 'lucide-react';
 import type { Mission } from '@/lib/types';
 import { formatCompensation, formatDate } from '@/lib/format';
 import { missionTypeLabel, requiredLevelLabels, statusLabel } from '@/lib/labels';
@@ -68,22 +69,18 @@ export function MissionCard({
 
       <p>{mission.description || 'Aucune description pour cette mission.'}</p>
 
-      <div className="mission-meta">
-        <span>{mission.establishment?.name || 'Établissement'}</span>
-        <span>-</span>
-        <span>{mission.city}</span>
+      <div className="mission-meta mission-facts">
+        <span><Building2 size={15} aria-hidden="true" />{mission.establishment?.name || 'Établissement'}</span>
+        <span><MapPin size={15} aria-hidden="true" />{mission.city}</span>
         {mission.sector ? (
           <>
-            <span>-</span>
             <span>{sectorLabel(mission.sector)}</span>
           </>
         ) : null}
-        <span>-</span>
-        <span>{formatDate(mission.startDate)}</span>
+        <span><CalendarDays size={15} aria-hidden="true" />{formatDate(mission.startDate)}{mission.endDate && mission.endDate !== mission.startDate ? ` — ${formatDate(mission.endDate)}` : ''}</span>
         {mission.startTime ? (
           <>
-            <span>-</span>
-            <span>{mission.startTime}{mission.endTime ? ` - ${mission.endTime}` : ''}</span>
+            <span><Clock3 size={15} aria-hidden="true" />{mission.startTime}{mission.endTime ? ` — ${mission.endTime}` : ''}</span>
           </>
         ) : null}
       </div>
@@ -97,7 +94,7 @@ export function MissionCard({
         </div>
       ) : null}
 
-      <div className="actions">
+      <div className="actions mission-card-actions">
         {isDraftManager ? (
           <Link className="btn btn-primary" href={missionDetailHref}>Reprendre le brouillon</Link>
         ) : canDelete || mission.status === 'PUBLISHED' ? (
