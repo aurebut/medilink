@@ -1,5 +1,7 @@
 # Premier lot SEO MédiLink — 8 septembre 2026
 
+Ce document décrit le premier lot. Le [deuxième lot éditorial du même jour](CONTENU_2026-09-08.md) porte désormais le total à six guides et dix URL publiques dans le sitemap.
+
 ## Périmètre
 
 Domaine canonique : https://medilink-web.com. Cible prioritaire : médecins généralistes remplaçants en France. Conversion principale : création d’un profil candidat ; parcours cabinet complémentaire.

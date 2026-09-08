@@ -9,7 +9,7 @@ export const publicMetadata: Metadata = {
   title: { default: 'MédiLink — Remplacement médical', template: '%s — MédiLink' },
   applicationName: 'MédiLink',
   icons: { icon: '/favicon.svg' },
-  robots: { index: !isPreview, follow: true },
+  robots: { index: !isPreview, follow: true, googleBot: { index: !isPreview, follow: true, 'max-image-preview': 'large' } },
 };
 
 export function pageMetadata(title: string, description: string, path: string): Metadata {
