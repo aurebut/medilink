@@ -34,11 +34,19 @@ const contentSecurityPolicy = [
 
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: '/landing.html', destination: '/', permanent: true },
+      { source: '/landing-medecin.html', destination: '/remplacement-medical', permanent: true },
+      { source: '/landing-etablissement.html', destination: '/trouver-medecin-remplacant', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
         source: '/:path*',
         headers: [
+          ...(process.env.VERCEL_ENV === 'preview' ? [{ key: 'X-Robots-Tag', value: 'noindex' }] : []),
           { key: 'Content-Security-Policy', value: contentSecurityPolicy },
           { key: 'Referrer-Policy', value: 'no-referrer' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },

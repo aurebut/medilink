@@ -1,0 +1,148 @@
+{
+  "observedAt": "2026-09-08T21:58:16.6785158+02:00",
+  "locale": "fr",
+  "countryParameter": "fr",
+  "method": "Public Google autocomplete; not search volume or ranking data",
+  "queries": [
+    {
+      "seed": "remplacement médecin",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=remplacement%20m%C3%A9decin",
+      "suggestions": [
+        "remplacement médecin généraliste",
+        "remplacement médecine vasculaire",
+        "remplacement médecin",
+        "remplacement médecin du travail",
+        "remplacement médecin urgentiste",
+        "remplacement médecine nucléaire",
+        "remplacement médecin polynésie française",
+        "remplacement médecine générale interne",
+        "remplacement médecin luxembourg",
+        "remplacement médecin généraliste maroc"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "remplacement médecine générale",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=remplacement%20m%C3%A9decine%20g%C3%A9n%C3%A9rale",
+      "suggestions": [
+        "remplacement médecine générale",
+        "remplacement médecine générale interne",
+        "remplacement médecine générale paris",
+        "remplacement médecine générale île de france",
+        "remplacement médecine générale la réunion",
+        "remplacement médecine générale bordeaux",
+        "remplacement médecine générale nouvelle calédonie",
+        "remplacement médecine générale toulouse",
+        "remplacement médecine générale contrat",
+        "remplacement médecine générale guadeloupe"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "médecin remplaçant",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=m%C3%A9decin%20rempla%C3%A7ant",
+      "suggestions": [
+        "médecin remplaçant",
+        "médecin remplaçant urssaf",
+        "médecin remplaçant déclaration impots",
+        "médecin remplaçant salaire",
+        "médecin remplaçant remboursement",
+        "médecin remplaçant non thésé",
+        "médecin remplaçant en france",
+        "médecin remplaçant cfe",
+        "médecin remplaçant régime simplifié",
+        "médecin remplaçant cpam"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "trouver un remplaçant",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=trouver%20un%20rempla%C3%A7ant",
+      "suggestions": [
+        "trouver un remplaçant infirmier libéral",
+        "trouver un remplaçant",
+        "trouver un remplaçant kiné",
+        "trouver un remplaçant en medecine generale",
+        "trouver un pharmacien remplaçant",
+        "trouver un médecin remplaçant"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "contrat remplacement médecin",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=contrat%20remplacement%20m%C3%A9decin",
+      "suggestions": [
+        "contrat remplacement médecin généraliste",
+        "contrat remplacement médecin",
+        "contrat remplacement médecin word",
+        "contrat remplacement médecin en ligne",
+        "contrat remplacement médecin thésé",
+        "contrat remplacement médecin ordre",
+        "contrat remplacement médecin généraliste non thésé",
+        "contrat remplacement médecin non thésé",
+        "contrat remplacement médecin pdf",
+        "contrat remplacement médecin libéral"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "rétrocession remplacement",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=r%C3%A9trocession%20remplacement",
+      "suggestions": [
+        "rétrocession remplacement orthophoniste",
+        "rétrocession remplacement kiné",
+        "retrocession remplacement",
+        "retrocession remplacement infirmier",
+        "retrocession remplacement medecine generale",
+        "retrocession remplacement dentiste",
+        "retrocession remplacement idel",
+        "retrocession remplacement medecin",
+        "pourcentage retrocession remplacement infirmier liberal",
+        "pourcentage rétrocession remplacement dentiste"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "annonce remplacement médical",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=annonce%20remplacement%20m%C3%A9dical",
+      "suggestions": [
+        "annonce médicale remplacement",
+        "annonce remplacement medecine generale",
+        "annonces médicales remplacement infirmier libéral",
+        "annonce remplacement medecin"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "premier remplacement médecine",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=premier%20remplacement%20m%C3%A9decine",
+      "suggestions": [
+        "premier remplacement médecine générale"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "remplacement médecin généraliste",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=remplacement%20m%C3%A9decin%20g%C3%A9n%C3%A9raliste",
+      "suggestions": [
+        "remplacement médecin généraliste",
+        "remplacement médecin généraliste maroc",
+        "emploi médecin généraliste",
+        "poste médecin généraliste",
+        "emploi médecin généraliste suisse",
+        "emploi medecin generaliste maroc",
+        "poste medecin generaliste salarié",
+        "poste medecin generaliste caen",
+        "remplacement médecine générale interne",
+        "remplacement medecine generale paris"
+      ],
+      "monthlyVolume": null
+    },
+    {
+      "seed": "trouver médecin remplaçant",
+      "source": "https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&gl=fr&q=trouver%20m%C3%A9decin%20rempla%C3%A7ant",
+      "suggestions": [],
+      "monthlyVolume": null
+    }
+  ]
+}

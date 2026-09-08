@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- Returning to marketing intentionally loads its isolated root document. */
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
@@ -38,7 +39,7 @@ export default function DemoForm() {
     <span className="demo-success-icon" aria-hidden="true">✓</span>
     <h3>Merci, votre demande est bien reçue.</h3>
     <p>Notre équipe vous recontactera pour convenir d’un créneau et préparer une démo adaptée à vos besoins.</p>
-    <a className="demo-submit" href="/landing.html">Revenir à l’accueil <span aria-hidden="true">↗</span></a>
+    <a className="demo-submit" href="/">Revenir à l’accueil <span aria-hidden="true">↗</span></a>
   </div>;
   return <form onSubmit={submit} className="demo-form" aria-busy={status === 'sending'}>
     <p className="demo-required">Les champs marqués d’un * sont obligatoires.</p>

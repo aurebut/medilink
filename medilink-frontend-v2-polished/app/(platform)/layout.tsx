@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from 'next';
-import './globals.css';
-import './workspace-navigation.css';
-import './workspace-design.css';
+import '../globals.css';
+import '../workspace-navigation.css';
+import '../workspace-design.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
+  robots: { index: false, follow: true },
   title: 'MédiLink — Missions médicales courtes',
   description:
     'MédiLink centralise les missions courtes, candidatures, documents et suivi des rétrocessions entre établissements et professionnels de santé.',

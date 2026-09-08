@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- Returning to marketing intentionally loads its isolated root document. */
 import type { Metadata } from 'next';
 import DemoForm from './DemoForm';
 import './demo.css';
@@ -10,8 +11,8 @@ export const metadata: Metadata = {
 export default function DemoPage() {
   return <div className="demo-page">
     <header className="demo-nav">
-      <a className="demo-logo" href="/landing.html" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
-      <a className="demo-back" href="/landing.html">← <span>Retour à l’accueil</span></a>
+      <a className="demo-logo" href="/" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
+      <a className="demo-back" href="/">← <span>Retour à l’accueil</span></a>
     </header>
     <main className="demo-layout">
       <section className="demo-intro" aria-labelledby="demo-title">
@@ -32,6 +33,6 @@ export default function DemoPage() {
         <DemoForm />
       </section>
     </main>
-    <footer className="demo-footer"><span>MédiLink · Le remplacement médical, simplement.</span><a href="/landing.html">Découvrir la plateforme ↗</a></footer>
+    <footer className="demo-footer"><span>MédiLink · Le remplacement médical, simplement.</span><a href="/">Découvrir la plateforme ↗</a></footer>
   </div>;
 }
