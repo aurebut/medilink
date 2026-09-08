@@ -1,11 +1,13 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- Full document navigation preserves isolated marketing and workspace root layouts. */
 /* eslint-disable @next/next/no-head-element -- Shared App Router root document; next/head is for the Pages Router. */
+/* eslint-disable @next/next/no-page-custom-font -- Preserve the original home typography in its isolated App Router root document. */
 import type { ReactNode } from 'react';
 import Script from 'next/script';
+import { landingShell } from '@/content/landing-shell';
 
 export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides';
 
-const homeStyles = ['main', 'mobile', 'hero', 'theme', 'previews', 'process', 'workspace', 'continuity'];
+const homeStyles = ['main', 'mobile', 'hero', 'theme', 'previews', 'process', 'workspace', 'continuity', 'testimonials'];
 const links = [
   { href: '/remplacement-medical', label: 'Médecin remplaçant' },
   { href: '/trouver-medecin-remplacant', label: 'Cabinet médical' },
@@ -37,15 +39,16 @@ export function PublicDocument({ variant, children }: { variant: PublicVariant; 
   const persona = variant === 'candidate' || variant === 'establishment';
   const styles = persona ? ['persona', 'mobile'] : variant === 'home' ? homeStyles : ['main', 'mobile'];
   const bodyClass = persona ? `persona-page ${variant}` : variant === 'home' ? 'landing-home' : 'guides-page';
+  const restored = variant === 'guides' ? null : landingShell[variant];
   return <html lang="fr"><head>
-    {['special', ...styles, 'icons', 'seo'].map(name => <link key={name} rel="stylesheet" href={`/landing-${name}.css`} />)}
+    {variant === 'home' && <><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" /><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" /></>}
+    {['special', ...styles, 'icons', ...(variant === 'guides' ? ['seo'] : [])].map(name => <link key={name} rel="stylesheet" href={`/landing-${name}.css`} />)}
   </head><body className={bodyClass}>
-    <a className="skip-link" href="#main-content">Aller au contenu</a>
-    <PublicNavigation variant={variant} />
+    {restored ? <nav aria-label="Navigation principale" dangerouslySetInnerHTML={{ __html: restored.navigation }} /> : <><a className="skip-link" href="#main-content">Aller au contenu</a><PublicNavigation variant={variant} /></>}
     {children}
-    <PublicFooter />
+    {restored ? <footer dangerouslySetInnerHTML={{ __html: restored.footer }} /> : <PublicFooter />}
+    {restored && <Script src="/landing-special.js" strategy="afterInteractive" />}
     <Script src="/landing-main.js" strategy="afterInteractive" />
-    {variant === 'establishment' && <Script src="/landing-special.js" strategy="afterInteractive" />}
     {variant === 'home' && <Script src="/landing-process.js" strategy="afterInteractive" />}
   </body></html>;
 }

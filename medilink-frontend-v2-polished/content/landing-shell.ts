@@ -1,0 +1,61 @@
+// Original landing presentation restored from Git 60c8e06 at the user’s request.
+// Only legacy hrefs use the canonical routes; visible markup is preserved. No user content.
+export const landingShell = {
+  home: {
+    navigation: `
+    <a class="nav-logo" href="/" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
+    <div class="nav-links">
+      <a class="nav-link" href="/remplacement-medical">Médecin remplaçant</a>
+      <a class="nav-link" href="/trouver-medecin-remplacant">Cabinet / médecin installé</a>
+      <a class="nav-link" href="#matching">Comment ça marche</a>
+      <a class="nav-link" href="#faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <a class="btn btn-ghost" href="/login">Se connecter</a>
+      <a class="btn btn-primary" href="/demo">Demander une démo</a>
+    </div>
+    <button class="nav-mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileNavigation">
+      <span class="sr-only">Ouvrir le menu</span><span aria-hidden="true"><i></i><i></i></span>
+    </button>
+    <div class="nav-mobile-panel" id="mobileNavigation">
+      <a href="/remplacement-medical">Médecin remplaçant <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="/trouver-medecin-remplacant">Cabinet / médecin installé <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="#matching">Comment ça marche <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
+      <div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/demo">Demander une démo</a></div>
+    </div>
+  `,
+    footer: `<div class="footer-inner"><div class="footer-top">
+    <div class="footer-brand"><strong>Médi<em>Link</em></strong><p>MédiLink réunit médecins remplaçants et cabinets pour trouver, préparer et suivre leurs remplacements.</p></div>
+    <div class="footer-col"><h4>Médecin remplaçant</h4><a href="/remplacement-medical">Découvrir le parcours</a><a href="/search">Voir les missions</a><a href="/register?type=candidate">Créer un profil</a></div>
+    <div class="footer-col"><h4>Cabinet / médecin installé</h4><a href="/trouver-medecin-remplacant">Découvrir le parcours</a><a href="/register?type=establishment">Créer un espace</a><a href="/login">Se connecter</a></div>
+    <div class="footer-col"><h4>MédiLink</h4><a href="#matching">Comment ça marche</a><a href="#matching">Le matching</a><a href="#faq">Questions fréquentes</a></div>
+  </div><div class="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div>`,
+  },
+  candidate: {
+    navigation: `
+    <a class="nav-logo" href="/" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
+    <div class="nav-links"><a class="nav-link" href="#parcours">Comment ça marche</a><a class="nav-link" href="#apercu">L’espace mission</a><a class="nav-link" href="#faq">FAQ</a></div>
+    <div class="nav-right">
+      <div class="persona-switch" aria-label="Choisir un parcours"><a class="active" href="/remplacement-medical">Médecin remplaçant</a><a href="/trouver-medecin-remplacant">Cabinet / médecin installé</a></div>
+      <a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/register?type=candidate">Créer mon profil</a>
+    </div>
+    <button class="nav-mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileNavigation"><span class="sr-only">Ouvrir le menu</span><span aria-hidden="true"><i></i><i></i></span></button>
+    <div class="nav-mobile-panel" id="mobileNavigation"><a href="#parcours">Comment ça marche <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="#apercu">L’espace mission <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="/trouver-medecin-remplacant">Je cherche un remplaçant <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/register?type=candidate">Créer mon profil</a></div></div>
+  `,
+    footer: `<div class="footer-inner"><div class="footer-top"><div class="footer-brand"><strong>Médi<em>Link</em></strong><p>Le matching et le suivi des remplacements médicaux, de la recherche jusqu’à la clôture.</p></div><div class="footer-col"><h4>Médecin remplaçant</h4><a href="#parcours">Comment ça marche</a><a href="/search">Voir les missions</a><a href="/register?type=candidate">Créer un profil</a></div><div class="footer-col"><h4>Cabinet / médecin installé</h4><a href="/trouver-medecin-remplacant">Découvrir le parcours</a><a href="/register?type=establishment">Créer un espace</a><a href="/login">Se connecter</a></div><div class="footer-col"><h4>MédiLink</h4><a href="/">Accueil</a><a href="#faq">Questions fréquentes</a><a href="/login">Connexion</a></div></div><div class="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div>`,
+  },
+  establishment: {
+    navigation: `
+    <a class="nav-logo" href="/" aria-label="MédiLink — Accueil">Médi<em>Link</em></a>
+    <div class="nav-links"><a class="nav-link" href="#parcours">Comment ça marche</a><a class="nav-link" href="#apercu">Le suivi</a><a class="nav-link" href="#faq">FAQ</a></div>
+    <div class="nav-right">
+      <div class="persona-switch" aria-label="Choisir un parcours"><a href="/remplacement-medical">Médecin remplaçant</a><a class="active" href="/trouver-medecin-remplacant">Cabinet / médecin installé</a></div>
+      <a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-teal" href="/register?type=establishment">Créer mon espace</a>
+    </div>
+    <button class="nav-mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileNavigation"><span class="sr-only">Ouvrir le menu</span><span aria-hidden="true"><i></i><i></i></span></button>
+    <div class="nav-mobile-panel" id="mobileNavigation"><a href="#parcours">Comment ça marche <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="#apercu">Le suivi <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="/remplacement-medical">Je cherche une mission <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-teal" href="/register?type=establishment">Créer mon espace</a></div></div>
+  `,
+    footer: `<div class="footer-inner"><div class="footer-top"><div class="footer-brand"><strong>Médi<em>Link</em></strong><p>Un espace commun pour organiser les remplacements médicaux, du besoin jusqu’à la clôture.</p></div><div class="footer-col"><h4>Cabinet / médecin installé</h4><a href="#parcours">Comment ça marche</a><a href="/register?type=establishment">Créer un espace</a><a href="/login">Se connecter</a></div><div class="footer-col"><h4>Médecin remplaçant</h4><a href="/remplacement-medical">Découvrir le parcours</a><a href="/search">Voir les missions</a><a href="/register?type=candidate">Créer un profil</a></div><div class="footer-col"><h4>MédiLink</h4><a href="/">Accueil</a><a href="#faq">Questions fréquentes</a><a href="/login">Connexion</a></div></div><div class="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div>`,
+  }
+};

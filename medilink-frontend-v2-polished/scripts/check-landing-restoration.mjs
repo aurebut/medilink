@@ -1,0 +1,33 @@
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+
+// Compare the visible markup to the last user-approved landing, not to a new snapshot.
+const reference = '60c8e06';
+const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
+const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
+const originalAssets = new Set();
+const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
+for (const [path, file] of Object.entries(pages)) {
+  const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
+  const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
+  assert.equal(response.status, 200, path);
+  const actual = await response.text();
+  for (const tag of ['nav', 'main', 'footer']) {
+    const pattern = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`);
+    assert.equal(normalize(actual.match(pattern)?.[1] || ''), normalize(original.match(pattern)?.[1] || ''), `${path}: original ${tag} restored`);
+  }
+  const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
+  assert.deepEqual(styles(actual), styles(original), `${path}: original stylesheet order`);
+  styles(original).forEach(asset => originalAssets.add(asset));
+  [...original.matchAll(/<script src="(\/landing-[^"]+\.js)"/g)].forEach(match => originalAssets.add(match[1]));
+  assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
+  assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
+  console.log(`PASS restored ${path}: nav, main, footer, styles and animations match ${reference}`);
+}
+for (const asset of originalAssets) {
+  const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });
+  const response = await fetch(base + asset, { signal: AbortSignal.timeout(20000) });
+  assert.equal(response.status, 200, asset);
+  assert.equal((await response.text()).replaceAll('\r\n', '\n'), original.replaceAll('\r\n', '\n'), `${asset}: unchanged from original`);
+}
+console.log(`PASS ${originalAssets.size} original stylesheets and scripts unchanged`);

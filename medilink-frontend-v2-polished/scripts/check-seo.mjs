@@ -31,7 +31,9 @@ for (const path of publicPages) {
   assert.match(html, /<meta name="description" content="[^"]+"/, `${path}: description`);
   assert.match(html, /property="og:image"/, `${path}: social image`);
   assert.doesNotMatch(html, /<meta name="robots" content="[^"]*noindex/, `${path}: indexable`);
-  assert.doesNotMatch(html, /\[Prénom Nom\]|Dr \[|landing(?:-medecin|-etablissement)?\.html/, `${path}: no placeholders or legacy links`);
+  assert.doesNotMatch(html, /landing(?:-medecin|-etablissement)?\.html/, `${path}: no legacy links`);
+  // The home page intentionally preserves the user's original contributor placeholders.
+  if (path !== '/') assert.doesNotMatch(html, /\[Prénom Nom\]|Dr \[/, `${path}: no editorial placeholders`);
   assert.match(html, /<main id="main-content"/, `${path}: server-rendered main`);
   const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]));
   for (const match of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.has(match[1]), `${path}: missing anchor #${match[1]}`);

@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Landing pages and SEO
+
+The user explicitly requires the landing presentation from Git `60c8e06` to be preserved. SEO and article work must not redesign the home, doctor or cabinet landing pages, rewrite their visible copy, change their navigation or calls to action, or add/remove sections unless the user explicitly requests that change. Keep guide styles isolated from the landing styles. `node scripts/check-landing-restoration.mjs` checks the original markup and assets against a running site.

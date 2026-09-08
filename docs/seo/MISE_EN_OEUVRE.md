@@ -2,6 +2,8 @@
 
 Ce document décrit le premier lot. Le [deuxième lot éditorial du même jour](CONTENU_2026-09-08.md) porte désormais le total à six guides et dix URL publiques dans le sitemap.
 
+Le 9 septembre, la [présentation d’origine des landings a été restaurée](RESTAURATION_LANDING_2026-09-09.md) à la demande de l’utilisateur ; les descriptions des modifications visuelles ci-dessous sont donc historiques.
+
 ## Périmètre
 
 Domaine canonique : https://medilink-web.com. Cible prioritaire : médecins généralistes remplaçants en France. Conversion principale : création d’un profil candidat ; parcours cabinet complémentaire.
