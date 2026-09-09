@@ -15,3 +15,7 @@ Les URL des anciens liens HTML pointent vers les routes canoniques équivalentes
 - Le menu mobile s’ouvre et se ferme ; les onglets de présentation du matching changent correctement de panneau.
 
 Après déploiement, les deux scripts de contrôle peuvent être exécutés avec `https://medilink-web.com` comme argument. Le périmètre des futurs travaux SEO est rappelé dans le fichier `AGENTS.md` du frontend.
+
+## Complément demandé après la restauration
+
+L’utilisateur a ensuite demandé un accès aux articles depuis la navigation. Un lien « Guides pratiques » vers `/guides` est donc ajouté dans la zone droite du menu sur ordinateur et dans le menu mobile des trois landings. Aucun style, texte de section ou bouton d’action existant n’est modifié. Le contrôle de restauration vérifie les deux nouveaux liens puis compare le reste à la version d’origine. La compilation et les contrôles HTTP ont été exécutés ; le navigateur de test n’était pas disponible pour ce complément.
