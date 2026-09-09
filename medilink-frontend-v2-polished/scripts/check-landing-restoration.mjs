@@ -9,7 +9,7 @@ const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
 function normalizeProcessFigures(html, updated) {
   for (const key of ['criteria', 'matching', 'report']) {
-    const className = updated ? `ml-process-art ml-process-art--${key}` : `ml-stage ml-human-stage ml-human-stage--${key}`;
+    const className = updated ? `ml-process-art ml-process-art--${key} ml-process-art--v2` : `ml-stage ml-human-stage ml-human-stage--${key}`;
     const pattern = new RegExp(`<figure class="${className}">[\\s\\S]*?<\\/figure>`, 'g');
     const figures = [...html.matchAll(pattern)];
     assert.equal(figures.length, 1, `${key}: exactly one process illustration`);
@@ -37,7 +37,7 @@ for (const [path, file] of Object.entries(pages)) {
       assert.equal(css.status, 200, href);
       return css.text();
     }));
-    const artStyles = compiledContents.find(css => css.includes('.ml-process-art{') || css.includes('.ml-process-art {'));
+    const artStyles = compiledContents.find(css => css.includes('.ml-process-art.ml-process-art--v2'));
     assert.ok(artStyles, 'versioned stylesheet includes the process illustration styles');
     assert.match(artStyles, /prefers-reduced-motion:\s*no-preference/, 'illustration animations respect reduced motion');
     assert.match(artStyles, /max-width:\s*360px/, 'illustrations cover narrow mobile screens');
