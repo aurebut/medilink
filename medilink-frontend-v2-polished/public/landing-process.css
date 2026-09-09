@@ -355,3 +355,128 @@
  .ml-float--report .ml-value-metrics { margin: 12px 0; }
  .ml-float--report .ml-ui-summary { padding-top: 10px; border-top: 1px solid #e8eee9; }
 }
+
+/* Process illustrations: requested replacement of the three product previews. */
+.ml-process-art {
+  --art-ink: #245b50;
+  --art-muted: #526c60;
+  --art-line: #a2b8a4;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+  min-height: 610px;
+  margin: 0;
+  padding: 28px 24px 32px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid #e3e8dd;
+  border-radius: 20px;
+  color: var(--art-ink);
+  background: radial-gradient(ellipse at 15% 18%, #fcfcf5 0, transparent 64%), #edf1e6;
+}
+.ml-process-art--matching {
+  background: radial-gradient(ellipse at 80% 12%, #f4f7ef 0, transparent 64%), #e8eee3;
+}
+.ml-process-art--report {
+  background: radial-gradient(ellipse at 15% 18%, #fffdf5 0, transparent 64%), #f0eee1;
+}
+.ml-process-art::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  background-image: radial-gradient(#3c654419 .7px, transparent .7px);
+  background-size: 8px 8px;
+  opacity: .42;
+  pointer-events: none;
+}
+.ml-art-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  color: var(--art-muted);
+  font: 500 11px/1.5 var(--sans);
+  letter-spacing: .065em;
+}
+.ml-art-index {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 auto;
+  border: 1px solid #52745b40;
+  border-radius: 50%;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.ml-art-mark { margin-left: auto; color: #66826b; font-size: 25px; line-height: 1; }
+.ml-art-diagram { display: block; width: 100%; max-width: 480px; height: auto; margin-block: 15px 12px; overflow: visible; }
+.ml-art-diagram :is(path, circle, ellipse, rect) { vector-effect: non-scaling-stroke; }
+.ml-art-orbit { stroke-width: 1; }
+.ml-art-orbit--sage { fill: #b6c8a82b; stroke: #71885c38; }
+.ml-art-orbit--sand { fill: #dbd3a927; stroke: #a39b6440; }
+.ml-art-link-base { fill: none; stroke: #a1b39c52; stroke-width: 1.4; }
+.ml-art-links { fill: none; }
+.ml-art-link { fill: none; stroke: #638366; stroke-width: 1.5; stroke-linecap: round; }
+.ml-art-link--journey { stroke: #497b63; stroke-width: 2; }
+.ml-art-quiet-line { fill: none; stroke: #849b7b; stroke-width: 1; stroke-dasharray: 3 6; stroke-linecap: round; }
+.ml-art-small-dot { fill: #75916c; }
+.ml-art-orbit-dot { fill: #7f9874; stroke: #eff3e8; stroke-width: 3; }
+.ml-art-orbit-dot--sand { fill: #a49b71; }
+.ml-art-detail { fill: none; stroke: #7b947766; stroke-width: 1; }
+.ml-art-person-halo { fill: #f6f7ee57; stroke: #60806932; stroke-width: 1; }
+.ml-art-person-disc { fill: #fffef6; stroke: #73917699; stroke-width: 1.2; }
+.ml-art-person--doctor .ml-art-person-disc { fill: #f7f2e3; stroke: #a19b6e99; }
+.ml-art-person--doctor { color: #6d714b; }
+.ml-art-person-disc, .ml-art-paper { filter: drop-shadow(0 5px 5px #344b3010); }
+.ml-art-label { fill: var(--art-muted); font: 400 20px var(--sans); text-anchor: middle; }
+.ml-art-label--person { fill: var(--art-ink); font-weight: 500; }
+.ml-art-criterion > circle, .ml-art-note > circle { fill: #fdfdf5; stroke: #9daf937d; stroke-width: 1; }
+.ml-art-match-point > circle { fill: #638566; stroke: #f0f3e8; stroke-width: 4; }
+.ml-art-match-point > svg { color: #fffdf5; }
+.ml-art-connection-halo { fill: #87a17d1c; stroke: #63856640; stroke-width: 1; }
+.ml-art-connection-core { fill: #245b50; stroke: #f9fcf2; stroke-width: 4; }
+.ml-art-connection rect { fill: none; stroke: #f5f8ec; stroke-width: 1.7; }
+.ml-art-paper-back { fill: #dfdfc8; stroke: #a4ad8a; stroke-width: 1; }
+.ml-art-paper { fill: #fffef5; stroke: #879977; stroke-width: 1.2; }
+.ml-art-paper-line { fill: none; stroke: #acb69c; stroke-width: 1.4; stroke-linecap: round; }
+.ml-art-seal { fill: #48785e; stroke: #fffef5; stroke-width: 3; }
+.ml-art-document > svg:last-child { color: #fffef5; }
+.ml-art-endpoint > circle { fill: #fffef5; stroke: #8d9f7e; stroke-width: 1.2; }
+.ml-art-endpoint--finish > circle { fill: #e0e7d4; }
+.ml-art-caption { width: 100%; text-align: center; }
+.ml-art-caption strong { display: block; color: #2c5546; font: 400 clamp(23px, 2.4vw, 29px)/1.2 var(--serif); letter-spacing: -.025em; text-wrap: balance; }
+.ml-art-caption > span { display: block; margin-top: 10px; color: var(--art-muted); font: 400 12px/1.6 var(--sans); text-wrap: balance; }
+@media (prefers-reduced-motion: no-preference) {
+  .ml-process-panel:not([hidden]) .ml-art-link { stroke-dasharray: 1; animation: ml-art-draw 1.25s cubic-bezier(.25,.1,.25,1) .12s both; }
+  .ml-process-panel:not([hidden]) .ml-art-link:nth-child(2) { animation-delay: .25s; }
+  .ml-process-panel:not([hidden]) .ml-art-link:nth-child(3) { animation-delay: .4s; }
+  .ml-process-panel:not([hidden]) .ml-art-link:nth-child(4) { animation-delay: .55s; }
+  .ml-process-panel:not([hidden]) :is(.ml-art-match-point, .ml-art-connection, .ml-art-document) { animation: ml-art-reveal .7s ease .4s both; }
+}
+@keyframes ml-art-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes ml-art-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 850px) {
+  .ml-process-art { width: 100%; max-width: 620px; min-height: 0; margin-inline: auto; padding: 24px; }
+  .ml-art-diagram { max-width: 450px; margin-block: 24px 20px; }
+  .ml-art-caption strong { font-size: 28px; }
+}
+@media (max-width: 480px) {
+  .ml-process-art { padding: 20px 10px 26px; border-radius: 15px; }
+  .ml-art-heading { padding-inline: 6px; gap: 8px; font-size: 10px; letter-spacing: .02em; }
+  .ml-art-index { width: 24px; height: 24px; }
+  .ml-art-mark { font-size: 23px; }
+  .ml-art-diagram { margin-block: 28px 20px; }
+  .ml-art-caption { padding-inline: 10px; }
+  .ml-art-caption strong { font-size: 25px; }
+  .ml-art-caption > span { max-width: 250px; margin-inline: auto; font-size: 12px; }
+}
+@media (max-width: 360px) {
+  .ml-art-label { font-size: 23px; }
+  .ml-art-heading { font-size: 9px; }
+  .ml-art-caption strong { font-size: 23px; }
+}
