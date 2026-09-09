@@ -185,7 +185,7 @@ test('the first scene waits for its artwork and preserves its position when paus
   assert.equal(ui.active(), 0);
 });
 
-test('Piloter owns its full sequence and pauses independently before returning to the original final tab', () => {
+test('Pilotez owns its full sequence and pauses independently before returning to the original final tab', () => {
   let ready = false;
   let rendered = -1;
   let firstResets = 0;

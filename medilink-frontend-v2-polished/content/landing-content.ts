@@ -46,7 +46,7 @@ export const landingContent = {
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-matching" aria-controls="ml-panel-matching" aria-selected="false" tabindex="-1">
               <span class="ml-tab-fill" aria-hidden="true"></span>
               <span class="ml-tab-num" aria-hidden="true">02</span>
-              <span class="ml-tab-text">Piloter</span>
+              <span class="ml-tab-text">Pilotez</span>
             </button>
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-report" aria-controls="ml-panel-report" aria-selected="false" tabindex="-1">
               <span class="ml-tab-fill" aria-hidden="true"></span>
@@ -71,7 +71,7 @@ export const landingContent = {
         <div class="ml-process-panel" id="ml-panel-matching" role="tabpanel" aria-labelledby="ml-tab-matching" tabindex="0" hidden>
           <div class="ml-process-copy ml-pilot-copy-panel">
             <span class="ml-process-kicker">02 · Le remplacement</span>
-            <h3>Piloter</h3>
+            <h3>Pilotez</h3>
             <p class="ml-pilot-intro">Un seul endroit pour un remplacement serein.</p>
             <div class="ml-pilot-explainer">
               <p><strong>Documents :</strong> préparez et partagez les pièces nécessaires.</p>

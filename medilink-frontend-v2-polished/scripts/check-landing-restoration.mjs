@@ -32,7 +32,7 @@ function normalizeFirstStepCopy(html, updated) {
   return html.replace(copy, '$1<!-- first step copy -->');
 }
 function normalizePilotCopy(html, updated) {
-  const label = updated ? 'Piloter' : 'Comparez les possibilités';
+  const label = updated ? 'Pilotez' : 'Comparez les possibilités';
   assert.ok(html.includes(`<span class="ml-tab-text">${label}</span>`), 'second step label');
   html = html.replace(`<span class="ml-tab-text">${label}</span>`, '<span class="ml-tab-text">SECOND_STEP</span>');
   const copy = /(<div class="ml-process-panel" id="ml-panel-matching"[^>]*>)\s*<div class="ml-process-copy(?: ml-pilot-copy-panel)?">[\s\S]*?<\/div>\s*(?=<!-- process illustration: matching -->)/g;
