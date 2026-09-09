@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
-All three process steps now play at 1.5x speed, as explicitly requested. Keep that rate in the shared navigation clock, including the manual interaction delay, so every movement, transformation, reading hold and tab progression stays synchronized. Individual scene timings remain authored at 1x; do not speed them up again. Pause and reduced-motion controls remain available.
+All three process steps now play at 2.5x the original speed, as explicitly requested (replacing the previous 1.5x rate). Keep that rate in the shared navigation clock, including the manual interaction delay, so every movement, transformation, reading hold and tab progression stays synchronized. Individual scene timings remain authored at 1x; do not speed them up again. Pause and reduced-motion controls remain available.
 
 The user subsequently requested redesigning step 03 as “Concluez”: validate the payment, animate money from the establishment to the locum, then transform those same banknotes into a concise report of the whole mission. This supersedes the earlier instruction to leave step 03 intact. Keep the current steps 01 and 02 unchanged. `process-conclude-scene.ts` controls the two-state sequence, pause, visibility and reduced-motion navigation; `process-conclude-geometry.ts` shares the payment route between the markup and motion. The report uses explicitly illustrative figures, with no real payment action. Keep the left-hand copy short (payment and overall report).
 

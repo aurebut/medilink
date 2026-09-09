@@ -54,8 +54,8 @@ function setup(reducedMotion = false, firstScene, pilotScene, concludeScene) {
   observe([{ isIntersecting: true }]);
   return {
     tabs, panels, nav, section,
-    // Existing scenarios use authored scene time, played 1.5 times faster.
-    tick(time) { now = time / 1.5; frame(now); },
+    // Existing scenarios use authored scene time, played 2.5 times faster.
+    tick(time) { now = time / 2.5; frame(now); },
     tickWallTime(time) { now = time; frame(now); },
     active() { return tabs.findIndex(tab => tab['aria-selected'] === 'true'); },
     progress(index) { return parseFloat(tabs[index].fill.style.width); },
@@ -241,7 +241,7 @@ test('Concluez finishes payment and summary before looping, preserving its time 
   assert.equal(rendered, 0, 'a manual return restarts at payment');
 });
 
-test('all three scenes and their tab progress run at 1.5x wall-clock speed', () => {
+test('all three scenes and their tab progress run at 2.5x the original wall-clock speed', () => {
   for (let index = 0; index < 3; index++) {
     const rendered = [0, 0, 0];
     const scenes = [22000, 33800, 19000].map((duration, sceneIndex) => ({
@@ -251,15 +251,15 @@ test('all three scenes and their tab progress run at 1.5x wall-clock speed', () 
     }));
     const ui = setup(false, ...scenes);
     ui.tabs[index].fire('click');
-    ui.tickWallTime(2666);
+    ui.tickWallTime(1599);
     assert.equal(rendered[index], 0, 'shortened manual reading delay');
-    ui.tickWallTime(2700);
-    ui.tickWallTime(3700);
-    assert.equal(rendered[index], 1500, 'one real second advances every animation by 1.5 seconds');
-    assert.ok(Math.abs(ui.progress(index) - 1500 / scenes[index].duration * 100) < .01);
-    ui.tickWallTime(2700 + scenes[index].duration / 1.5 - 1);
+    ui.tickWallTime(1600);
+    ui.tickWallTime(2600);
+    assert.equal(rendered[index], 2500, 'one real second advances every animation by 2.5 original seconds');
+    assert.ok(Math.abs(ui.progress(index) - 2500 / scenes[index].duration * 100) < .01);
+    ui.tickWallTime(1600 + scenes[index].duration / 2.5 - 1);
     assert.equal(ui.active(), index, 'keep the final frame before advancing');
-    ui.tickWallTime(2700 + scenes[index].duration / 1.5 + 1);
-    assert.equal(ui.active(), (index + 1) % 3, 'the complete step also finishes 1.5 times faster');
+    ui.tickWallTime(1600 + scenes[index].duration / 2.5 + 1);
+    assert.equal(ui.active(), (index + 1) % 3, 'the complete step also finishes 2.5 times faster');
   }
 });

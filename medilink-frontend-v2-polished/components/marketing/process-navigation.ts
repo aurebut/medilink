@@ -13,7 +13,7 @@ export function initializeProcessNavigation(firstScene?: ProcessScene, pilotScen
   const tabsContainer = section.querySelector<HTMLElement>('.ml-process-tabs');
   const tabs = Array.from(section.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
   const panels = Array.from(section.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
-  const PLAYBACK_RATE = 1.5;
+  const PLAYBACK_RATE = 2.5;
   const STEP_DURATION = 5500;
   const INTERACTION_DELAY = 4000 / PLAYBACK_RATE;
   const listeners = new AbortController();
