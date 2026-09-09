@@ -7,7 +7,6 @@ const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
 const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
-const artMarker = '/* Process illustrations: requested replacement of the three product previews. */';
 function normalizeProcessFigures(html, updated) {
   for (const key of ['criteria', 'matching', 'report']) {
     const className = updated ? `ml-process-art ml-process-art--${key}` : `ml-stage ml-human-stage ml-human-stage--${key}`;
@@ -17,6 +16,7 @@ function normalizeProcessFigures(html, updated) {
     if (updated) {
       assert.match(figures[0][0], new RegExp(`aria-labelledby="ml-art-${key}-title ml-art-${key}-desc"`), `${key}: accessible diagram`);
       assert.match(figures[0][0], /<figcaption class="ml-art-caption">/, `${key}: visible caption`);
+      assert.match(figures[0][0], /<svg class="ml-art-diagram"[^>]*fill="none"/, `${key}: never default to opaque black shapes if CSS is unavailable`);
       assert.doesNotMatch(figures[0][0], /<img|ml-float/, `${key}: replaces the old photograph and UI preview`);
     }
     html = html.replace(pattern, `<!-- process illustration: ${key} -->`);
@@ -28,6 +28,20 @@ for (const [path, file] of Object.entries(pages)) {
   const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
   assert.equal(response.status, 200, path);
   const actual = await response.text();
+  if (path === '/') {
+    const compiledStyles = [...actual.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^\"]+)"[^>]*>/g)]
+      .map(match => match[1].replaceAll('&amp;', '&')).filter(href => href.startsWith('/_next/static/css/'));
+    assert.ok(compiledStyles.length, 'homepage styles use versioned Next.js assets');
+    const compiledContents = await Promise.all(compiledStyles.map(async href => {
+      const css = await fetch(new URL(href, base), { signal: AbortSignal.timeout(20000) });
+      assert.equal(css.status, 200, href);
+      return css.text();
+    }));
+    const artStyles = compiledContents.find(css => css.includes('.ml-process-art{') || css.includes('.ml-process-art {'));
+    assert.ok(artStyles, 'versioned stylesheet includes the process illustration styles');
+    assert.match(artStyles, /prefers-reduced-motion:\s*no-preference/, 'illustration animations respect reduced motion');
+    assert.match(artStyles, /max-width:\s*360px/, 'illustrations cover narrow mobile screens');
+  }
   for (const tag of ['nav', 'main', 'footer']) {
     const pattern = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`);
     let rendered = actual.match(pattern)?.[1] || '';
@@ -60,14 +74,6 @@ for (const asset of originalAssets) {
   const response = await fetch(base + asset, { signal: AbortSignal.timeout(20000) });
   assert.equal(response.status, 200, asset);
   const rendered = (await response.text()).replaceAll('\r\n', '\n');
-  if (asset === '/landing-process.css') {
-    const parts = rendered.split(artMarker);
-    assert.equal(parts.length, 2, 'one isolated process illustration stylesheet extension');
-    assert.equal(parts[0].trimEnd(), original.replaceAll('\r\n', '\n').trimEnd(), `${asset}: original layout styles unchanged`);
-    assert.match(parts[1], /prefers-reduced-motion: no-preference/, 'illustration animations respect reduced motion');
-    assert.match(parts[1], /max-width: 360px/, 'illustrations cover narrow mobile screens');
-  } else {
-    assert.equal(rendered, original.replaceAll('\r\n', '\n'), `${asset}: unchanged from original`);
-  }
+  assert.equal(rendered.trimEnd(), original.replaceAll('\r\n', '\n').trimEnd(), `${asset}: unchanged from original`);
 }
-console.log(`PASS ${originalAssets.size} original stylesheets and scripts preserved; scoped process art styles appended`);
+console.log(`PASS ${originalAssets.size} original stylesheets and scripts preserved; process art stylesheet versioned with the page`);

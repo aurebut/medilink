@@ -31,8 +31,8 @@ function criterion(name: 'calendar' | 'location' | 'clock', x: number, y: number
 
 function figure(id: string, number: string, eyebrow: string, title: string, caption: string, description: string, drawing: string) {
   return `<figure class="ml-process-art ml-process-art--${id}">
-    <div class="ml-art-heading" aria-hidden="true"><span class="ml-art-index">${number}</span><span>${eyebrow}</span><span class="ml-art-mark">✳</span></div>
-    <svg class="ml-art-diagram" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-${id}-title ml-art-${id}-desc" focusable="false">
+    <div class="ml-art-heading" aria-hidden="true"><span class="ml-art-index">${number}</span><span>${eyebrow}</span><svg class="ml-art-mark" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" focusable="false"><path d="M12 2v20M2 12h20M5 5l14 14M5 19 19 5"/></svg></div>
+    <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-${id}-title ml-art-${id}-desc" focusable="false">
       <title id="ml-art-${id}-title">${title}</title><desc id="ml-art-${id}-desc">${description}</desc>
       ${drawing}
     </svg>
