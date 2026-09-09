@@ -41,7 +41,7 @@ export const landingContent = {
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-criteria" aria-controls="ml-panel-criteria" aria-selected="true">
               <span class="ml-tab-fill" aria-hidden="true"></span>
               <span class="ml-tab-num" aria-hidden="true">01</span>
-              <span class="ml-tab-text">Précisez vos attentes</span>
+              <span class="ml-tab-text">Matchez</span>
             </button>
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-matching" aria-controls="ml-panel-matching" aria-selected="false" tabindex="-1">
               <span class="ml-tab-fill" aria-hidden="true"></span>
@@ -56,11 +56,26 @@ export const landingContent = {
           </div>
         </div>
         <div class="ml-process-panel" id="ml-panel-criteria" role="tabpanel" aria-labelledby="ml-tab-criteria" tabindex="0">
-          <div class="ml-process-copy">
+          <div class="ml-process-copy ml-match-copy">
             <span class="ml-process-kicker">01 · Vos critères</span>
-            <h3>Ce que vous cherchez.<br>Ce que le cabinet propose.</h3>
-            <p>Le cabinet décrit le remplacement : dates, horaires, spécialité et organisation. Le médecin remplaçant indique ses disponibilités, sa zone de recherche et ses préférences d’exercice.</p>
-            <ul class="ml-process-benefits"><li>Des conditions connues avant de prendre contact.</li><li>Des critères que chacun peut comparer à ses attentes.</li></ul>
+            <h3>Matchez</h3>
+            <div class="ml-match-audience">
+              <h4>Côté remplaçant</h4>
+              <ul>
+                <li>Renseignez vos disponibilités, votre zone de recherche, votre spécialité et les logiciels maîtrisés.</li>
+                <li>Précisez vos attentes : organisation, rétrocession et conditions d’exercice.</li>
+                <li>Échangez avec l’établissement pour ajuster les derniers détails et préparer les documents nécessaires.</li>
+              </ul>
+            </div>
+            <div class="ml-match-audience">
+              <h4>Côté établissement</h4>
+              <ul>
+                <li>Décrivez votre besoin : dates, lieu, spécialité, logiciel et fonctionnement de la structure.</li>
+                <li>Précisez les conditions proposées : rémunération, modalités de versement et organisation du remplacement.</li>
+                <li>Préparez ensemble le contrat, les justificatifs et les démarches applicables à votre structure.</li>
+              </ul>
+            </div>
+            <p class="ml-match-summary">MédiLink croise vos critères pour vous proposer des correspondances adaptées, puis vous accompagne dans la préparation du remplacement.</p>
           </div>
           ${processIllustrations.criteria}
         </div>

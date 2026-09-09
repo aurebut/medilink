@@ -23,6 +23,14 @@ function normalizeProcessFigures(html, updated) {
   }
   return html;
 }
+function normalizeFirstStepCopy(html, updated) {
+  const label = updated ? 'Matchez' : 'Précisez vos attentes';
+  assert.ok(html.includes(`<span class="ml-tab-text">${label}</span>`), 'first step label');
+  html = html.replace(`<span class="ml-tab-text">${label}</span>`, '<span class="ml-tab-text">FIRST_STEP</span>');
+  const copy = /(<div class="ml-process-panel" id="ml-panel-criteria"[^>]*>)\s*<div class="ml-process-copy(?: ml-match-copy)?">[\s\S]*?<\/div>\s*(?=<!-- process illustration: criteria -->)/g;
+  assert.equal([...html.matchAll(copy)].length, 1, 'only the first step copy is replaced');
+  return html.replace(copy, '$1<!-- first step copy -->');
+}
 for (const [path, file] of Object.entries(pages)) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
   const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
@@ -59,6 +67,8 @@ for (const [path, file] of Object.entries(pages)) {
     if (path === '/' && tag === 'main') {
       rendered = normalizeProcessFigures(rendered, true);
       expected = normalizeProcessFigures(expected, false);
+      rendered = normalizeFirstStepCopy(rendered, true);
+      expected = normalizeFirstStepCopy(expected, false);
     }
     assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links and process illustrations`);
   }
