@@ -29,10 +29,9 @@ function documentPose(time: number, index: number, still: boolean): Pose {
   if (still) return { x: 260, y: 134 + index * 51, scale: 1, angle: [-2, 1, -1, 1, -1][index], alpha: 1 };
   const local = documentTime(time, index);
   const appear = phase(local, 0, 480);
-  // Let the sheet become small before it leaves its reading position. The next
-  // document enters only after this one has cleared the centre of the scene.
-  const shrink = phase(local, 1400, 2450);
-  const departure = phase(local, 1800, 2700);
+  // Fold the same sheet into an envelope before shrinking and dispatching it.
+  const shrink = phase(local, 2100, 2700);
+  const departure = phase(local, 2200, 2700);
   const send = phase(local, 2700, 4400);
   const { route, recipient } = pilotDeliveries[index];
   const point = curve(route, send);
@@ -75,8 +74,6 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
   const control = find<HTMLButtonElement>('.ml-sequence-control');
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const events = new AbortController();
-  const routes = find<SVGGElement>('.ml-pilot-routes');
-  const activeRoutes = Array.from(routes.querySelectorAll<SVGPathElement>('.ml-pilot-route-active'));
   const daily = find<SVGGElement>('.ml-pilot-daily');
   const dailyRows = Array.from(daily.querySelectorAll<SVGGElement>('.ml-pilot-stat, .ml-pilot-day-row'));
   const cabinet = find<SVGGElement>('.ml-pilot-cabinet');
@@ -88,6 +85,7 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
     face: group.querySelector<SVGRectElement>('.ml-pilot-paper-face')!,
     back: group.querySelector<SVGRectElement>('.ml-pilot-paper-back')!,
     document: group.querySelector<SVGGElement>('.ml-pilot-document-content'),
+    envelope: group.querySelector<SVGGElement>('.ml-pilot-envelope'),
     info: group.querySelector<SVGGElement>('.ml-pilot-info-content')!,
   }));
   const dailyPositions = [[260, 207, 412, 332], [165, 172, 174, 96], [355, 172, 174, 96], [260, 278, 352, 1], [260, 323, 352, 1], [260, 368, 352, 1]];
@@ -123,11 +121,6 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
       element.style.transform = `translateY(${(index ? 7 : -5) * (1 - copyProgress[index])}px)`;
       element.setAttribute('aria-hidden', String(copyProgress[index] < .5));
     }));
-    opacity(routes, 1 - phase(infoTime, 0, 600));
-    activeRoutes.forEach((route, index) => {
-      const local = documentTime(time, index);
-      opacity(route, motion.matches ? 0 : .65 * phase(local, 1800, 2700) * (1 - phase(local, 4400, 4750)));
-    });
     opacity(documentNote, 1 - phase(infoTime, 0, 400));
     opacity(cabinet, phase(infoTime, 1100, 2100));
     actors.forEach(actor => {
@@ -149,7 +142,7 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
       opacity(actor, order ? 1 - phase(infoTime, 0, 900) : 1 - phase(recapTime, 0, 1000));
     });
 
-    tiles.forEach(({ group, face, back, document, info }, index) => {
+    tiles.forEach(({ group, face, back, document, envelope, info }, index) => {
       const target = dailyPositions[index];
       const isDocuments = time < INFORMATION_START;
       const pose = isDocuments
@@ -162,9 +155,11 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
       group.setAttribute('transform', `translate(${x} ${y}) rotate(${pose.angle * (1 - gather)}) scale(${scale})`);
       const streamArrival = isDocuments ? 1 : phase(infoTime, 200, 1500);
       opacity(group, mix(pose.alpha * streamArrival, 1, gather));
-      const width = isDocuments ? motion.matches ? 232 : 264 : mix(48, target[2], gather);
-      const height = isDocuments ? motion.matches ? 46 : 114 : mix(48, target[3], gather);
-      const radius = isDocuments ? 12 : mix(16, index === 0 ? 22 : index < 3 ? 13 : .5, gather);
+      const local = documentTime(time, index);
+      const fold = isDocuments && !motion.matches ? phase(local, 1400, 2100) : 0;
+      const width = isDocuments ? motion.matches ? 232 : mix(264, 210, fold) : mix(48, target[2], gather);
+      const height = isDocuments ? motion.matches ? 46 : mix(114, 130, fold) : mix(48, target[3], gather);
+      const radius = isDocuments ? mix(12, 5, fold) : mix(16, index === 0 ? 22 : index < 3 ? 13 : .5, gather);
       for (const [rect, offset] of [[face, 0], [back, mix(6, index < 3 ? 5 : 0, gather)]] as const) {
         rect.setAttribute('x', String(-width / 2 + (rect === back ? 3 * (1 - gather) : 0)));
         rect.setAttribute('y', String(-height / 2 + offset));
@@ -179,15 +174,20 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
       opacity(face, paperVisible);
       opacity(back, paperVisible * (index === 0 || isDocuments ? 1 : 1 - gather));
       if (document) {
-        opacity(document, isDocuments ? 1 : 0);
+        opacity(document, isDocuments ? 1 - phase(local, 1400, 1750) * (motion.matches ? 0 : 1) : 0);
         document.querySelector('.ml-relay-fold')!.setAttribute('d', `M${width / 2 - 24} ${-height / 2}v13q0 9 10 9h14`);
         document.querySelector('.ml-pilot-paper-title')!.setAttribute('y', String(motion.matches ? 10 : -4));
         document.querySelector('.ml-pilot-paper-title')!.setAttribute('x', String(motion.matches ? -68 : -80));
         document.querySelector('svg')!.setAttribute('y', String(motion.matches ? -12.5 : -25));
         document.querySelector('svg')!.setAttribute('x', String(motion.matches ? -103.5 : -115.5));
         opacity(document.querySelector<SVGGElement>('.ml-pilot-document-details')!, motion.matches ? 0 : 1);
-        const local = documentTime(time, index);
-        group.dataset.documentPhase = motion.matches ? 'overview' : local < 0 ? 'waiting' : local < 1400 ? 'reading' : local < 2700 ? 'shrinking' : local < 4400 ? 'sending' : 'received';
+        group.dataset.documentPhase = motion.matches ? 'overview' : local < 0 ? 'waiting' : local < 1400 ? 'reading' : local < 2100 ? 'folding' : local < 2700 ? 'shrinking' : local < 4400 ? 'sending' : 'received';
+      }
+      if (envelope) {
+        opacity(envelope, fold);
+        envelope.querySelector('.ml-pilot-envelope-seams')!.setAttribute('d', `M${-width / 2} ${height / 2}L-18 -4M${width / 2} ${height / 2}L18 -4`);
+        const tip = mix(-height / 2, 16, phase(local, 1700, 2100));
+        envelope.querySelector('.ml-pilot-envelope-flap')!.setAttribute('d', `M${-width / 2} ${-height / 2}L0 ${tip}L${width / 2} ${-height / 2}`);
       }
       opacity(info, isDocuments ? 0 : 1 - phase(recapTime, 150 + index * 40, 750 + index * 40));
     });

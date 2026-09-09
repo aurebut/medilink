@@ -209,7 +209,7 @@
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-control[data-mode="paused"] .ml-sequence-play-icon,
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-control[data-mode="static"] .ml-sequence-next-icon { display: initial; }
 
-/* Piloter: the actual sheets travel, bare icons flow, then the recap takes shape. */
+/* Piloter: sheets fold into envelopes, bare icons flow, then the recap takes shape. */
 .ml-process-copy.ml-pilot-copy-panel { justify-content: center; padding: 30px 26px; }
 .ml-pilot-copy-panel .ml-process-kicker { margin-bottom: 12px; }
 .ml-pilot-copy-panel > .ml-pilot-intro { margin-top: 16px; color: #36554f; font-size: 18px; line-height: 1.5; }
@@ -229,9 +229,8 @@
 .ml-pilot-eyebrow { display: flex; align-items: center; gap: 8px; }
 .ml-pilot-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 .ml-process-art--matching .ml-art-caption .ml-pilot-captions { margin: 0; max-width: none; font: inherit; color: inherit; text-wrap: wrap; }
-.ml-pilot-routes { fill: none; stroke-linecap: round; }
-.ml-pilot-route-base { stroke: #c5d0b9; stroke-width: 1.1; }
-.ml-pilot-route-active { stroke: #77946b; stroke-width: 1.7; }
+.ml-pilot-envelope { fill: none; stroke: #829b70; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.ml-pilot-envelope-flap { fill: #edf1e3; }
 .ml-pilot-received { fill: none; stroke: #93ae7d; stroke-width: 1.2; }
 .ml-pilot-actor { color: var(--pilot-actor-ink); }
 .ml-pilot-actor-shadow { fill: #cdd7bf; opacity: .55; }

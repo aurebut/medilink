@@ -1,6 +1,6 @@
 // Small, repository-authored diagrams; illustration CSS ships in a versioned Next.js asset.
 import { curvePath, mapRoute, pinOutline } from './process-sequence-geometry';
-import { pilotActors, pilotDeliveries, pilotLinks } from './process-pilot-geometry';
+import { pilotActors } from './process-pilot-geometry';
 import { conclusionActors, paymentRoute } from './process-conclude-geometry';
 
 const marks = {
@@ -244,6 +244,7 @@ function pilotTile(index: number, mark: keyof typeof marks, label: string) {
     <rect class="ml-pilot-paper-back" x="${-width / 2 + 3}" y="-18" width="${width}" height="46" rx="12"/>
     <rect class="ml-pilot-paper-face" x="${-width / 2}" y="-23" width="${width}" height="46" rx="12"/>
     ${doc ? `<g class="ml-pilot-document-content"><path class="ml-relay-fold" d="M92-23V-10Q92-1 102-1H116"/>${icon('document', -91, 0, 25)}<text class="ml-pilot-paper-title" x="-68" y="10">${documents[index]}</text><g class="ml-pilot-document-details" opacity="0">${index === 1 || index === 2 ? '<text class="ml-v2-label ml-pilot-condition" x="-80" y="26">Si nécessaire</text>' : '<path class="ml-pilot-paper-rule" d="M-80 24H51"/>'}<path class="ml-pilot-paper-rule" d="M-103 44H9"/>${index === 0 ? '<path class="ml-pilot-signature" d="M22 42q10-12 12-4t10 0q8-5 17-1"/>' : '<path class="ml-pilot-paper-rule" d="M24 44H72"/>'}</g></g>` : ''}
+    ${doc ? '<g class="ml-pilot-envelope" opacity="0"><path class="ml-pilot-envelope-seams"/><path class="ml-pilot-envelope-flap"/></g>' : ''}
     <g class="ml-pilot-info-content" data-info="${label}" opacity="0">${icon(mark, 0, 0, 48)}</g>
   </g>`;
 }
@@ -260,10 +261,9 @@ function pilotFigure() {
     <div class="ml-pilot-copies ml-v2-title" aria-hidden="true">${copy(1, 'ml-pilot-headline')}</div>
     <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-matching-title ml-art-matching-desc" focusable="false">
       <title id="ml-art-matching-title">Pilotez le remplacement, des documents au récapitulatif quotidien</title>
-      <desc id="ml-art-matching-desc">Illustration : cinq documents apparaissent, se réduisent puis circulent eux-mêmes entre les interlocuteurs : contrat, licence, autorisation, attestation et justificatif, selon la situation. Des icônes libres de parking, codes d’accès, logiciel, café, téléphone et horaires circulent ensuite en continu du titulaire et de l’établissement vers le remplaçant. Elles se rassemblent enfin en un exemple de récapitulatif avec 18 consultations et 3 points à transmettre.</desc>
+      <desc id="ml-art-matching-desc">Illustration : cinq documents apparaissent, se transforment en enveloppes puis sont envoyés aux interlocuteurs, sans traits de liaison : contrat, licence, autorisation, attestation et justificatif, selon la situation. Des icônes libres de parking, codes d’accès, logiciel, café, téléphone et horaires circulent ensuite en continu du titulaire et de l’établissement vers le remplaçant. Elles se rassemblent enfin en un exemple de récapitulatif avec 18 consultations et 3 points à transmettre.</desc>
       <defs><pattern id="ml-pilot-grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r=".9" fill="currentColor" opacity=".15"/></pattern></defs>
       <rect width="520" height="400" fill="url(#ml-pilot-grid)" class="ml-v2-grid"/>
-      <g class="ml-pilot-routes">${Object.values(pilotLinks).map(route => `<path class="ml-pilot-route-base" d="${curvePath(route)}"/>`).join('')}${pilotDeliveries.map(({ route }, index) => `<path class="ml-pilot-route-active" data-pilot-route="${index}" d="${curvePath(route)}" opacity="0"/>`).join('')}</g>
       ${pilotTile(0, 'parking', 'Parking')}${pilotTile(1, 'login', 'Logiciel')}${pilotTile(2, 'phone', 'Contacts')}${pilotTile(3, 'lock', 'Codes')}${pilotTile(4, 'coffee', 'Café')}${pilotTile(5, 'clock', 'Horaires')}
       <text class="ml-v2-label ml-v2-label--center ml-pilot-document-note" x="260" y="388">Selon votre situation</text>
       <g class="ml-pilot-daily" opacity="0">

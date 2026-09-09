@@ -1,5 +1,5 @@
-// The visible connections and the travelling sheets share these exact curves.
-// Endpoints meet the rounded faces; labels sit outside the triangle.
+// Invisible delivery trajectories for the envelopes between the three actors.
+// Endpoints meet the rounded faces; no connecting lines are rendered.
 export const pilotActors = {
   order: { x: 260, y: 69 },
   holder: { x: 65, y: 267 },
