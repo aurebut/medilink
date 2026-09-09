@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
-The user approved renaming homepage step 01 to “Matchez” and replacing its left-hand copy with three points each for “Côté remplaçant” and “Côté établissement”, followed by the shared matching summary. This exception covers preparing the contract, supporting documents and applicable procedures, without promising automatic legal compliance. Keep steps 02/03 and the illustrations unchanged when editing this copy.
+The user approved renaming homepage step 01 to “Matchez”, then shortened its left-hand copy to “Vos critères vous rapprochent.”, one sentence each for “Remplaçant” and “Établissement”, and “Échangez pour préciser vos conditions et préparer le contrat.” Keep this copy concise, without promising automatic legal compliance. Keep steps 02/03 and the illustrations unchanged when editing this copy.
 
 The user explicitly requires the landing presentation from Git `60c8e06` to be preserved. SEO and article work must not redesign the home, doctor or cabinet landing pages, rewrite their visible copy, change their navigation or calls to action, or add/remove sections unless the user explicitly requests that change. Keep guide styles isolated from the landing styles. `node scripts/check-landing-restoration.mjs` checks the original markup and assets against a running site.
 

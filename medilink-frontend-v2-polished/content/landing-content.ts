@@ -59,23 +59,12 @@ export const landingContent = {
           <div class="ml-process-copy ml-match-copy">
             <span class="ml-process-kicker">01 · Vos critères</span>
             <h3>Matchez</h3>
+            <p class="ml-match-intro">Vos critères vous rapprochent.</p>
             <div class="ml-match-audience">
-              <h4>Côté remplaçant</h4>
-              <ul>
-                <li>Renseignez vos disponibilités, votre zone de recherche, votre spécialité et les logiciels maîtrisés.</li>
-                <li>Précisez vos attentes : organisation, rétrocession et conditions d’exercice.</li>
-                <li>Échangez avec l’établissement pour ajuster les derniers détails et préparer les documents nécessaires.</li>
-              </ul>
+              <p><strong>Remplaçant :</strong> indiquez vos disponibilités et vos préférences.</p>
+              <p><strong>Établissement :</strong> décrivez votre besoin et vos critères d’exercice.</p>
             </div>
-            <div class="ml-match-audience">
-              <h4>Côté établissement</h4>
-              <ul>
-                <li>Décrivez votre besoin : dates, lieu, spécialité, logiciel et fonctionnement de la structure.</li>
-                <li>Précisez les conditions proposées : rémunération, modalités de versement et organisation du remplacement.</li>
-                <li>Préparez ensemble le contrat, les justificatifs et les démarches applicables à votre structure.</li>
-              </ul>
-            </div>
-            <p class="ml-match-summary">MédiLink croise vos critères pour vous proposer des correspondances adaptées, puis vous accompagne dans la préparation du remplacement.</p>
+            <p class="ml-match-summary">Échangez pour préciser vos conditions et préparer le contrat.</p>
           </div>
           ${processIllustrations.criteria}
         </div>
