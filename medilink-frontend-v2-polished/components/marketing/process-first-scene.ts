@@ -34,8 +34,14 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
   const linkBed = find<SVGPathElement>('.ml-sequence-link-bed');
   const waypoints = find<SVGGElement>('.ml-sequence-waypoints');
   const reel = matching.querySelector<SVGGElement>('.ml-check-reel')!;
-  const thumb = matching.querySelector<SVGPathElement>('.ml-check-scroll-thumb')!;
   const rows = Array.from(matching.querySelectorAll<SVGGElement>('.ml-check-row'));
+  // A second identical set fills the viewport across the loop boundary.
+  const loop = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  loop.setAttribute('aria-hidden', 'true');
+  loop.setAttribute('transform', `translate(0 ${rows.length * 58})`);
+  rows.forEach(row => loop.append(row.cloneNode(true)));
+  reel.append(loop);
+  const repeatedRows = Array.from(loop.querySelectorAll<SVGGElement>('.ml-check-row'));
   const mapCopy = Array.from(figure.querySelectorAll<HTMLElement>('.ml-sequence-copy--map'));
   const matchCopy = Array.from(figure.querySelectorAll<HTMLElement>('.ml-sequence-copy--match'));
   const discussionCopy = Array.from(figure.querySelectorAll<HTMLElement>('.ml-sequence-copy--discussion'));
@@ -80,9 +86,6 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
     // Hold the reading positions without rewriting the SVG on every frame.
     if (!motion.matches) {
       if (time >= 1500 && time < 2800) time = 1500;
-      else if (time >= 5000 && time < 6440) time = 5000;
-      else if (time >= 7400 && time < 8120) time = 7400;
-      else if (time >= 9080 && time < 11000) time = 9080;
       else if (time >= 12900 && time < 14200) time = 12900;
       else if (time >= 15200 && time < 16500) time = 15200;
       else if (time >= 17500) time = 17500;
@@ -182,12 +185,12 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
       matchLabel.style.fill = color('#e0eddb', '#3d634d', chatTravel);
     });
 
-    // The original four-row reading rhythm begins after the map has transformed.
-    const reading = clamp((time - 5000) / 4800);
-    const scroll = motion.matches ? 0 : -58 * (phase(reading, .3, .5) + phase(reading, .65, .85));
+    // Linear motion never pauses or reverses; identical rows make the wrap seamless.
+    const scroll = motion.matches ? 0 : -(Math.max(0, time - 3750) * .05 % (rows.length * 58));
     reel.style.transform = `translateY(${scroll}px)`;
-    thumb.style.transform = `translateY(${-scroll * 142 / 116}px)`;
-    rows.forEach((row, index) => {
+    loop.style.display = motion.matches ? 'none' : '';
+    [...rows, ...repeatedRows].forEach((row, position) => {
+      const index = position % rows.length;
       row.style.transform = `translateY(${motion.matches ? 0 : index * 18}px)`;
       const checked = phase(time, 4200 + index * 65, 4650 + index * 65);
       row.querySelector<SVGElement>('.ml-check-badge')!.style.opacity = String(checked);
@@ -245,6 +248,7 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
     destroy() {
       events.abort();
       observer?.disconnect();
+      loop.remove();
       control.hidden = true;
       delete figure.dataset.sequenceReady;
     },

@@ -178,6 +178,7 @@
 .ml-process-art--criteria .ml-sequence-match .ml-v2-grid { display: block; }
 .ml-process-art--criteria .ml-sequence-label--match { opacity: 0; stroke: none; font-weight: 400; }
 .ml-process-art--criteria .ml-art-diagram :is(.ml-v2-tag, .ml-map-route, .ml-check-reel, .ml-check-scroll-thumb) { animation: none; }
+.ml-process-art--criteria .ml-check-scrollbar { display: none; }
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-actions { position: relative; display: flex; align-items: center; }
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-control {
   appearance: none;

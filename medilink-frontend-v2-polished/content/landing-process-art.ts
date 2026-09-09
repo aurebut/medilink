@@ -63,7 +63,7 @@ function matchCriterion(index: number, label: string) {
     <text class="ml-v2-label ml-check-label" x="135" y="${y + 8}">${label}</text>
     <circle class="ml-check-badge" cx="369" cy="${y}" r="16"/>
     ${icon('check', 369, y, 22)}
-    ${index < 5 ? `<path class="ml-check-rule ml-check-row-rule" d="M135 ${y + 28}H386"/>` : ''}
+    <path class="ml-check-rule ml-check-row-rule" d="M135 ${y + 28}H386"/>
   </g>`;
 }
 
@@ -205,7 +205,7 @@ function sequenceFigure() {
     <div class="ml-sequence-titles"><p class="ml-v2-title ml-sequence-copy--map" aria-hidden="true">${mapTitle}</p><p class="ml-v2-title ml-sequence-copy--match" aria-hidden="true">${matchTitle}</p><p class="ml-v2-title ml-sequence-copy--discussion" aria-hidden="true">Les derniers détails,<br><em>ensemble.</em></p></div>
     <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-criteria-title ml-art-criteria-desc" focusable="false">
       <title id="ml-art-criteria-title">De la rencontre aux derniers détails</title>
-      <desc id="ml-art-criteria-desc">Dans cette même première étape, une carte présente trois cabinets et trois médecins. Une seule paire est reliée. Ces deux repères deviennent les interlocuteurs d’une liste de critères : dates, lieu, spécialité, logiciel, horaires et conditions, chacun accompagné d’une coche. Puis la liste devient une discussion : le cabinet propose de préciser la rétrocession, le médecin demande aussi le délai de versement, et un contrat est partagé pour être relu ensemble. Cet exemple illustre la préparation d’un accord, sans signature automatique.</desc>
+      <desc id="ml-art-criteria-desc">Dans cette même première étape, une carte présente trois cabinets et trois médecins. Une seule paire est reliée. Ces deux repères deviennent les interlocuteurs d’une liste de critères qui défile en boucle continue : dates, lieu, spécialité, logiciel, horaires et conditions, chacun accompagné d’une coche. Sans animation, les six critères restent visibles. Puis la liste devient une discussion : le cabinet propose de préciser la rétrocession, le médecin demande aussi le délai de versement, et un contrat est partagé pour être relu ensemble. Cet exemple illustre la préparation d’un accord, sans signature automatique.</desc>
       <g class="ml-sequence-map">${mapDrawing}</g>
       <path class="ml-map-route-bed ml-sequence-link-bed" d="${curvePath(mapRoute)}"/>
       <path class="ml-map-route ml-sequence-link" pathLength="1" d="${curvePath(mapRoute)}"/>
