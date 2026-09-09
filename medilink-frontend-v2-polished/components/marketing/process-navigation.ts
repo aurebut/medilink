@@ -1,20 +1,21 @@
-export type FirstProcessScene = {
+export type ProcessScene = {
   duration: number;
   render: (elapsed: number) => void;
   reset: () => void;
   canPlay: () => boolean;
 };
 
-// The original process navigation, now bundled with the page. Steps 02 and 03
-// retain their 5.5-second cadence; only the first illustration owns a longer scene.
-export function initializeProcessNavigation(firstScene?: FirstProcessScene) {
+// Each animated illustration owns its reading time before the next tab starts.
+export function initializeProcessNavigation(firstScene?: ProcessScene, pilotScene?: ProcessScene, concludeScene?: ProcessScene) {
+  const scenes = [firstScene, pilotScene, concludeScene];
   const section = document.querySelector<HTMLElement>('.ml-process');
   if (!section) return;
   const tabsContainer = section.querySelector<HTMLElement>('.ml-process-tabs');
   const tabs = Array.from(section.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
   const panels = Array.from(section.querySelectorAll<HTMLElement>('[role="tabpanel"]'));
+  const PLAYBACK_RATE = 1.5;
   const STEP_DURATION = 5500;
-  const INTERACTION_DELAY = 4000;
+  const INTERACTION_DELAY = 4000 / PLAYBACK_RATE;
   const listeners = new AbortController();
   const signal = listeners.signal;
   const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -58,18 +59,21 @@ export function initializeProcessNavigation(firstScene?: FirstProcessScene) {
     elapsedBeforePause = 0;
     startTime = null;
     updateTabProgress(currentIndex, 0);
-    if (index === 0) firstScene?.reset();
+    scenes[index]?.reset();
   }
 
   function step(timestamp: number) {
-    const sceneReady = currentIndex !== 0 || !firstScene || firstScene.canPlay();
+    const scene = scenes[currentIndex];
+    const sceneReady = !scene || scene.canPlay();
     if (isPlaying && isInView && !document.hidden && sceneReady && timestamp >= resumeAt) {
       if (startTime === null) startTime = timestamp - elapsedBeforePause;
-      const elapsed = timestamp - startTime;
-      const duration = currentIndex === 0 && firstScene ? firstScene.duration : STEP_DURATION;
+      // Scale the shared scene clock so movement, transformations, reading holds
+      // and tab progress accelerate together. Pause bookkeeping stays in wall time.
+      const elapsed = (timestamp - startTime) * PLAYBACK_RATE;
+      const duration = scene?.duration ?? STEP_DURATION;
       const progress = Math.min(elapsed / duration, 1);
       updateTabProgress(currentIndex, progress);
-      if (currentIndex === 0) firstScene?.render(Math.min(elapsed, duration));
+      scene?.render(Math.min(elapsed, duration));
       if (progress >= 1) select((currentIndex + 1) % tabs.length);
     } else {
       pauseTimer();

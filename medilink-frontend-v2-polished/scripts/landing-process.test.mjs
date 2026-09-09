@@ -8,7 +8,7 @@ const source = ts.transpileModule(readFileSync(new URL('../components/marketing/
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText;
 
-function setup(reducedMotion = false, firstScene) {
+function setup(reducedMotion = false, firstScene, pilotScene, concludeScene) {
   let now = 0;
   let frame;
   let observe;
@@ -41,8 +41,8 @@ function setup(reducedMotion = false, firstScene) {
     constructor(callback) { observe = callback; }
     observe() {}
   }
-  runInNewContext(source + '\nexports.initializeProcessNavigation(firstScene);', {
-    exports: {}, firstScene, AbortController,
+  runInNewContext(source + '\nexports.initializeProcessNavigation(firstScene, pilotScene, concludeScene);', {
+    exports: {}, firstScene, pilotScene, concludeScene, AbortController,
     Element: class { static [Symbol.hasInstance](value) { return typeof value?.closest === 'function'; } },
     document,
     window: { matchMedia: () => ({ matches: reducedMotion }), IntersectionObserver },
@@ -54,7 +54,9 @@ function setup(reducedMotion = false, firstScene) {
   observe([{ isIntersecting: true }]);
   return {
     tabs, panels, nav, section,
-    tick(time) { now = time; frame(now); },
+    // Existing scenarios use authored scene time, played 1.5 times faster.
+    tick(time) { now = time / 1.5; frame(now); },
+    tickWallTime(time) { now = time; frame(now); },
     active() { return tabs.findIndex(tab => tab['aria-selected'] === 'true'); },
     progress(index) { return parseFloat(tabs[index].fill.style.width); },
     visible(value) { observe([{ isIntersecting: value }]); },
@@ -62,7 +64,7 @@ function setup(reducedMotion = false, firstScene) {
   };
 }
 
-test('click resumes after four seconds even while the pointer stays over navigation', () => {
+test('click resumes after the accelerated reading delay even while the pointer stays over navigation', () => {
   const ui = setup();
   ui.tick(0);
   ui.nav.fire('mouseenter');
@@ -121,7 +123,7 @@ test('time offscreen or in a hidden tab does not advance the step', () => {
     else ui.hidden(false);
     ui.tick(20000);
     assert.equal(ui.progress(0), 50);
-    ui.tick(22750);
+    ui.tick(22751);
     assert.equal(ui.active(), 1);
   }
 });
@@ -155,7 +157,7 @@ test('map, criteria and discussion finish inside tab 01 while later tabs keep th
   ui.tick(22000);
   ui.tick(24750);
   assert.equal(ui.progress(1), 50);
-  ui.tick(27500);
+  ui.tick(27501);
   assert.equal(ui.active(), 2);
 });
 
@@ -181,4 +183,83 @@ test('the first scene waits for its artwork and preserves its position when paus
   ui.tick(93000);
   assert.equal(rendered, 6000);
   assert.equal(ui.active(), 0);
+});
+
+test('Piloter owns its full sequence and pauses independently before returning to the original final tab', () => {
+  let ready = false;
+  let rendered = -1;
+  let firstResets = 0;
+  const first = { duration: 22000, canPlay: () => true, render() {}, reset: () => firstResets++ };
+  const pilot = { duration: 32000, canPlay: () => ready, render: time => { rendered = time; }, reset: () => { rendered = 0; } };
+  const ui = setup(false, first, pilot);
+  ui.tabs[1].fire('click');
+  ui.tick(60000);
+  assert.equal(rendered, 0);
+  assert.equal(ui.active(), 1);
+  ready = true;
+  ui.tick(60000);
+  ui.tick(76000);
+  assert.equal(ui.progress(1), 50);
+  assert.ok(Math.abs(rendered - 16000) < .001);
+  ready = false;
+  ui.tick(76000);
+  ui.tick(100000);
+  assert.ok(Math.abs(rendered - 16000) < .001);
+  ready = true;
+  ui.tick(100000);
+  ui.tick(115999);
+  assert.equal(ui.active(), 1);
+  ui.tick(116001);
+  assert.equal(ui.active(), 2);
+  ui.tick(116001);
+  ui.tick(121502);
+  assert.equal(ui.active(), 0);
+  assert.equal(firstResets, 2);
+});
+
+test('Concluez finishes payment and summary before looping, preserving its time while paused', () => {
+  let ready = true;
+  let rendered = 0;
+  const scene = { duration: 19000, canPlay: () => ready, render: time => { rendered = time; }, reset: () => { rendered = 0; } };
+  const ui = setup(false, undefined, undefined, scene);
+  ui.tabs[2].fire('click');
+  ui.tick(4000);
+  ui.tick(9500);
+  assert.equal(ui.active(), 2, 'the previous 5.5-second cadence must not cut the payment short');
+  assert.equal(rendered, 5500);
+  ready = false;
+  ui.tick(9500);
+  ui.tick(30000);
+  assert.equal(rendered, 5500);
+  ready = true;
+  ui.tick(30000);
+  ui.tick(43499);
+  assert.equal(ui.active(), 2, 'allow the complete mission report to be read');
+  ui.tick(43500);
+  assert.equal(ui.active(), 0);
+  ui.tabs[2].fire('click');
+  assert.equal(rendered, 0, 'a manual return restarts at payment');
+});
+
+test('all three scenes and their tab progress run at 1.5x wall-clock speed', () => {
+  for (let index = 0; index < 3; index++) {
+    const rendered = [0, 0, 0];
+    const scenes = [22000, 33800, 19000].map((duration, sceneIndex) => ({
+      duration, canPlay: () => true,
+      render: time => { rendered[sceneIndex] = time; },
+      reset: () => { rendered[sceneIndex] = 0; },
+    }));
+    const ui = setup(false, ...scenes);
+    ui.tabs[index].fire('click');
+    ui.tickWallTime(2666);
+    assert.equal(rendered[index], 0, 'shortened manual reading delay');
+    ui.tickWallTime(2700);
+    ui.tickWallTime(3700);
+    assert.equal(rendered[index], 1500, 'one real second advances every animation by 1.5 seconds');
+    assert.ok(Math.abs(ui.progress(index) - 1500 / scenes[index].duration * 100) < .01);
+    ui.tickWallTime(2700 + scenes[index].duration / 1.5 - 1);
+    assert.equal(ui.active(), index, 'keep the final frame before advancing');
+    ui.tickWallTime(2700 + scenes[index].duration / 1.5 + 1);
+    assert.equal(ui.active(), (index + 1) % 3, 'the complete step also finishes 1.5 times faster');
+  }
 });

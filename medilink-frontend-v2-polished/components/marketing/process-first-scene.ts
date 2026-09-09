@@ -1,5 +1,5 @@
 import { discussionRoute, mapRoute, morphPath, pinOutline, straightRoute, tileOutline } from '@/content/process-sequence-geometry';
-import type { FirstProcessScene } from './process-navigation';
+import type { ProcessScene } from './process-navigation';
 
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
 const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
@@ -16,7 +16,7 @@ function color(from: string, to: string, progress: number) {
   return `rgb(${channels(from).map((value, index) => Math.round(mix(value, target[index], progress))).join(', ')})`;
 }
 
-export function createFirstProcessScene(): (FirstProcessScene & { destroy: () => void }) | undefined {
+export function createFirstProcessScene(): (ProcessScene & { destroy: () => void }) | undefined {
   const figure = document.querySelector<HTMLElement>('.ml-process-art--criteria');
   if (!figure?.querySelector('.ml-sequence-map')) return;
   const find = <T extends Element>(selector: string) => figure.querySelector<T>(selector)!;

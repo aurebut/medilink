@@ -31,6 +31,22 @@ function normalizeFirstStepCopy(html, updated) {
   assert.equal([...html.matchAll(copy)].length, 1, 'only the first step copy is replaced');
   return html.replace(copy, '$1<!-- first step copy -->');
 }
+function normalizePilotCopy(html, updated) {
+  const label = updated ? 'Piloter' : 'Comparez les possibilités';
+  assert.ok(html.includes(`<span class="ml-tab-text">${label}</span>`), 'second step label');
+  html = html.replace(`<span class="ml-tab-text">${label}</span>`, '<span class="ml-tab-text">SECOND_STEP</span>');
+  const copy = /(<div class="ml-process-panel" id="ml-panel-matching"[^>]*>)\s*<div class="ml-process-copy(?: ml-pilot-copy-panel)?">[\s\S]*?<\/div>\s*(?=<!-- process illustration: matching -->)/g;
+  assert.equal([...html.matchAll(copy)].length, 1, 'only the second step copy is replaced');
+  return html.replace(copy, '$1<!-- second step copy -->');
+}
+function normalizeConclusionCopy(html, updated) {
+  const label = updated ? 'Concluez' : 'Suivez le remplacement';
+  assert.ok(html.includes(`<span class="ml-tab-text">${label}</span>`), 'third step label');
+  html = html.replace(`<span class="ml-tab-text">${label}</span>`, '<span class="ml-tab-text">THIRD_STEP</span>');
+  const copy = /(<div class="ml-process-panel" id="ml-panel-report"[^>]*>)\s*<div class="ml-process-copy(?: ml-close-copy-panel)?">[\s\S]*?<\/div>\s*(?=<!-- process illustration: report -->)/g;
+  assert.equal([...html.matchAll(copy)].length, 1, 'only the third step copy is replaced');
+  return html.replace(copy, '$1<!-- third step copy -->');
+}
 for (const [path, file] of Object.entries(pages)) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
   const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
@@ -69,6 +85,10 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizeProcessFigures(expected, false);
       rendered = normalizeFirstStepCopy(rendered, true);
       expected = normalizeFirstStepCopy(expected, false);
+      rendered = normalizePilotCopy(rendered, true);
+      expected = normalizePilotCopy(expected, false);
+      rendered = normalizeConclusionCopy(rendered, true);
+      expected = normalizeConclusionCopy(expected, false);
     }
     assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links and process illustrations`);
   }

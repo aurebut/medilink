@@ -1,5 +1,7 @@
 // Small, repository-authored diagrams; illustration CSS ships in a versioned Next.js asset.
 import { curvePath, mapRoute, pinOutline } from './process-sequence-geometry';
+import { pilotActors, pilotDeliveries, pilotLinks } from './process-pilot-geometry';
+import { conclusionActors, paymentRoute } from './process-conclude-geometry';
 
 const marks = {
   cabinet: '<path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M9 21v-5h6v5M9 7h6M12 4v6M8 13h1m6 0h1"/>',
@@ -13,6 +15,11 @@ const marks = {
   note: '<path d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/>',
   money: '<rect x="2" y="5" width="20" height="14" rx="3"/><circle cx="12" cy="12" r="3"/><path d="M7 9H5v2m12 4h2v-2"/>',
   legal: '<path d="m3 9 9-6 9 6ZM5 10v8m5-8v8m4-8v8m5-8v8M3 21h18M3 18h18"/>',
+  parking: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>',
+  lock: '<rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>',
+  login: '<rect x="3" y="3" width="18" height="15" rx="3"/><path d="M8 21h8M12 18v3M8 10h8m-3-3 3 3-3 3"/>',
+  coffee: '<path d="M4 8h12v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5ZM16 9h2a3 3 0 0 1 0 6h-2M3 22h15M7 3v2m5-2v2"/>',
+  phone: '<path d="m8 3 2 5-3 2a15 15 0 0 0 7 7l2-3 5 2v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2Z"/>',
 };
 
 function icon(name: keyof typeof marks, x: number, y: number, size = 24) {
@@ -60,42 +67,7 @@ function matchCriterion(index: number, label: string) {
   </g>`;
 }
 
-function relayEntity(x: number, mark: 'cabinet' | 'person', label: string) {
-  return `<g class="ml-relay-entity${mark === 'person' ? ' ml-relay-entity--doctor' : ''}">
-    <rect class="ml-relay-entity-shadow" x="${x - 36}" y="184" width="72" height="72" rx="23"/>
-    <rect class="ml-relay-entity-face" x="${x - 36}" y="178" width="72" height="72" rx="23"/>
-    ${icon(mark, x, 214, 33)}
-    <text class="ml-v2-label ml-v2-label--center" x="${x}" y="282">${label}</text>
-  </g>`;
-}
-
-function relayPaper(x: number, y: number, width: number, mark: 'document' | 'money' | 'legal', label: string, angle: number, secondLine = '') {
-  const height = secondLine ? 80 : 64;
-  return `<g class="ml-relay-file" transform="rotate(${angle} ${x + width / 2} ${y + height / 2})">
-    <rect class="ml-relay-paper-back" x="${x + 4}" y="${y + 5}" width="${width}" height="${height}" rx="11"/>
-    <rect class="ml-relay-paper" x="${x}" y="${y}" width="${width}" height="${height}" rx="11"/>
-    <path class="ml-relay-fold" d="M${x + width - 25} ${y}V${y + 14}Q${x + width - 25} ${y + 23} ${x + width - 16} ${y + 23}H${x + width}"/>
-    ${icon(mark, x + 26, y + height / 2, 24)}
-    <text class="ml-relay-title" x="${x + 48}" y="${y + (secondLine ? 32 : 42)}">${label}</text>
-    ${secondLine ? `<text class="ml-relay-title" x="${x + 48}" y="${y + 61}">${secondLine}</text>` : ''}
-  </g>`;
-}
-
-function figure(id: string, number: string, eyebrow: string, headline: string, caption: string, description: string, drawing: string) {
-  return `<figure class="ml-process-art ml-process-art--${id} ml-process-art--v2">
-    <div class="ml-v2-heading"><span class="ml-v2-eyebrow"><i aria-hidden="true"></i>${eyebrow}</span><span class="ml-v2-index" aria-hidden="true">${number} / 03</span></div>
-    <p class="ml-v2-title" aria-hidden="true">${headline}</p>
-    <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-${id}-title ml-art-${id}-desc" focusable="false">
-      <title id="ml-art-${id}-title">${headline.replaceAll('<br>', ' ').replaceAll(/<\/?em>/g, '')}</title><desc id="ml-art-${id}-desc">${description}</desc>
-      <defs><pattern id="ml-v2-grid-${id}" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r=".9" fill="currentColor" opacity=".15"/></pattern></defs>
-      <rect x="0" y="0" width="520" height="400" fill="url(#ml-v2-grid-${id})" class="ml-v2-grid"/>
-      ${drawing}
-    </svg>
-    <figcaption class="ml-art-caption"><span class="ml-v2-caption-line" aria-hidden="true"></span>${caption}</figcaption>
-  </figure>`;
-}
-
-function design(...parts: Parameters<typeof figure>) { return parts; }
+function design(...parts: [id: string, number: string, eyebrow: string, headline: string, caption: string, description: string, drawing: string]) { return parts; }
 
 const processDesigns = {
   criteria: design('criteria', '01', 'Poser les bases', 'Deux besoins.<br><em>Un même cadre.</em>', 'Deux profils, un territoire en commun.',
@@ -169,29 +141,6 @@ const processDesigns = {
     <text class="ml-v2-label ml-v2-label--center ml-checklist-foot" x="260" y="385">Une compatibilité expliquée.</text>
   `),
 
-  report: design('report', '03', 'Assurer la continuité', 'Le relais,<br><em>sans perdre le fil.</em>', 'Documents et informations passent le relais.',
-    'Le cabinet et le médecin remplaçant échangent dans les deux sens. Le contrat, les informations de rémunération et les déclarations légales composent une pile de documents partagés. Une seconde boucle transmet les informations, notes et consignes, pour préparer le remplacement et faciliter la reprise.', `
-    <path class="ml-relay-path-bed" d="M118 200C155 200 130 91 184 91H336C390 91 365 200 402 200M402 227C365 227 390 314 336 314H184C130 314 155 227 118 227"/>
-    <path class="ml-relay-path ml-relay-path--out" pathLength="1" d="M118 200C155 200 130 91 184 91H336C390 91 365 200 402 200"/>
-    <path class="ml-relay-path ml-relay-path--back" pathLength="1" d="M402 227C365 227 390 314 336 314H184C130 314 155 227 118 227"/>
-    <g class="ml-relay-arrows"><path d="m391 194 10 6-10 6"/><path d="m129 221-10 6 10 6"/></g>
-    <g class="ml-relay-document">
-      ${relayPaper(151, 16, 220, 'document', 'Contrat', -5)}
-      ${relayPaper(137, 80, 246, 'money', 'Rémunération', 2)}
-      ${relayPaper(144, 142, 238, 'legal', 'Déclarations', -3, 'légales')}
-    </g>
-    <g class="ml-relay-note">
-      <path class="ml-relay-note-back" d="M181 278H353Q371 278 371 296V345Q371 363 353 363H207L181 377V363Q168 363 168 347V296Q168 278 181 278Z"/>
-      <path class="ml-relay-note-face" d="M177 270H349Q367 270 367 288V337Q367 355 349 355H203L177 369V355Q164 355 164 339V288Q164 270 177 270Z"/>
-      ${icon('note', 191, 299, 22)}
-      <text class="ml-relay-title" x="214" y="308">Infos &amp; notes</text>
-      <path class="ml-relay-rule" d="M185 331H283M185 341H251"/>
-      ${icon('check', 339, 333, 22)}
-    </g>
-    ${relayEntity(82, 'cabinet', 'Cabinet')}
-    ${relayEntity(438, 'person', 'Remplaçant')}
-    <text class="ml-v2-label ml-v2-label--center" x="260" y="391">Le contexte circule, lui aussi.</text>
-  `),
 };
 
 function sequenceActor(mark: 'cabinet' | 'person', x: number, y: number) {
@@ -274,8 +223,129 @@ function sequenceFigure() {
   </figure>`;
 }
 
+function pilotActor(id: string, mark: keyof typeof marks, x: number, y: number, label: string) {
+  return `<g class="ml-pilot-actor ml-pilot-actor--${id}" data-pilot-actor="${id}" transform="translate(${x} ${y})">
+    <rect class="ml-pilot-received" x="-39" y="-39" width="78" height="78" rx="27" opacity="0"/>
+    <rect class="ml-pilot-actor-shadow" x="-33" y="-28" width="66" height="66" rx="21"/>
+    <rect class="ml-pilot-actor-face" x="-33" y="-33" width="66" height="66" rx="21"/>
+    ${icon(mark, 0, 0, 30)}
+    <text class="ml-v2-label ml-v2-label--center ml-pilot-actor-label" x="${id === 'locum' ? -8 : 0}" y="${id === 'order' ? -44 : -51}">${label}</text>
+    ${id === 'holder' ? `<g class="ml-pilot-cabinet" opacity="0"><circle cx="25" cy="-24" r="17"/>${icon('cabinet', 25, -24, 21)}<text class="ml-v2-label ml-v2-label--center" x="0" y="89">&amp; cabinet</text></g>` : ''}
+  </g>`;
+}
+
+function pilotTile(index: number, mark: keyof typeof marks, label: string) {
+  const documents = ['Contrat', 'Licence', 'Autorisation', 'Attestation', 'Justificatif'];
+  const width = 232;
+  const doc = index < documents.length;
+  const x = 260;
+  const y = 134 + index * 51;
+  return `<g class="ml-pilot-tile" data-pilot-tile="${index}" transform="translate(${x} ${y}) rotate(${[-2, 1, -1, 1, -1, 0][index]})"${doc ? '' : ' opacity="0"'}>
+    <rect class="ml-pilot-paper-back" x="${-width / 2 + 3}" y="-18" width="${width}" height="46" rx="12"/>
+    <rect class="ml-pilot-paper-face" x="${-width / 2}" y="-23" width="${width}" height="46" rx="12"/>
+    ${doc ? `<g class="ml-pilot-document-content"><path class="ml-relay-fold" d="M92-23V-10Q92-1 102-1H116"/>${icon('document', -91, 0, 25)}<text class="ml-pilot-paper-title" x="-68" y="10">${documents[index]}</text><g class="ml-pilot-document-details" opacity="0">${index === 1 || index === 2 ? '<text class="ml-v2-label ml-pilot-condition" x="-80" y="26">Si nécessaire</text>' : '<path class="ml-pilot-paper-rule" d="M-80 24H51"/>'}<path class="ml-pilot-paper-rule" d="M-103 44H9"/>${index === 0 ? '<path class="ml-pilot-signature" d="M22 42q10-12 12-4t10 0q8-5 17-1"/>' : '<path class="ml-pilot-paper-rule" d="M24 44H72"/>'}</g></g>` : ''}
+    <g class="ml-pilot-info-content" data-info="${label}" opacity="0">${icon(mark, 0, 0, 48)}</g>
+  </g>`;
+}
+
+function pilotFigure() {
+  const copies = [
+    ['documents', 'Préparer les documents', 'Les documents,<br><em>au bon endroit.</em>', 'Chaque pièce rejoint le bon interlocuteur.'],
+    ['information', 'Transmettre les repères', 'Les bonnes infos,<br><em>avant d’arriver.</em>', 'Les repères du quotidien passent le relais.'],
+    ['daily', 'Faire le point chaque jour', 'Votre journée,<br><em>en un regard.</em>', 'Exemple de récapitulatif quotidien.'],
+  ];
+  const copy = (column: number, className: string) => copies.map(([state, ...texts], i) => `<span class="${className} ml-pilot-copy" data-pilot-copy="${state}"${i ? ' aria-hidden="true"' : ''}>${texts[column]}</span>`).join('');
+  return `<figure class="ml-process-art ml-process-art--matching ml-process-art--v2">
+    <div class="ml-v2-heading"><span class="ml-pilot-copies ml-v2-eyebrow">${copy(0, 'ml-pilot-eyebrow')}</span><span class="ml-sequence-actions"><button class="ml-sequence-control" type="button" aria-label="Mettre l’animation en pause" title="Mettre l’animation en pause" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="ml-sequence-pause-icon" d="M9 5v14M15 5v14"/><path class="ml-sequence-play-icon" d="m9 5 10 7-10 7Z"/><path class="ml-sequence-next-icon" d="M5 12h14m-6-6 6 6-6 6"/></svg></button><span class="ml-v2-index" aria-hidden="true">02 / 03</span></span></div>
+    <div class="ml-pilot-copies ml-v2-title" aria-hidden="true">${copy(1, 'ml-pilot-headline')}</div>
+    <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-matching-title ml-art-matching-desc" focusable="false">
+      <title id="ml-art-matching-title">Piloter le remplacement, des documents au récapitulatif quotidien</title>
+      <desc id="ml-art-matching-desc">Illustration : cinq documents apparaissent, se réduisent puis circulent eux-mêmes entre les interlocuteurs : contrat, licence, autorisation, attestation et justificatif, selon la situation. Des icônes libres de parking, codes d’accès, logiciel, café, téléphone et horaires circulent ensuite en continu du titulaire et de l’établissement vers le remplaçant. Elles se rassemblent enfin en un exemple de récapitulatif avec 18 consultations et 3 points à transmettre.</desc>
+      <defs><pattern id="ml-pilot-grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r=".9" fill="currentColor" opacity=".15"/></pattern></defs>
+      <rect width="520" height="400" fill="url(#ml-pilot-grid)" class="ml-v2-grid"/>
+      <g class="ml-pilot-routes">${Object.values(pilotLinks).map(route => `<path class="ml-pilot-route-base" d="${curvePath(route)}"/>`).join('')}${pilotDeliveries.map(({ route }, index) => `<path class="ml-pilot-route-active" data-pilot-route="${index}" d="${curvePath(route)}" opacity="0"/>`).join('')}</g>
+      ${pilotTile(0, 'parking', 'Parking')}${pilotTile(1, 'login', 'Logiciel')}${pilotTile(2, 'phone', 'Contacts')}${pilotTile(3, 'lock', 'Codes')}${pilotTile(4, 'coffee', 'Café')}${pilotTile(5, 'clock', 'Horaires')}
+      <text class="ml-v2-label ml-v2-label--center ml-pilot-document-note" x="260" y="388">Selon votre situation</text>
+      <g class="ml-pilot-daily" opacity="0">
+        <text class="ml-pilot-daily-title" x="83" y="88">Votre journée</text><text class="ml-v2-label ml-pilot-today" x="438" y="86" text-anchor="end">Aujourd’hui</text>
+        <g class="ml-pilot-stat"><text class="ml-pilot-value" x="94" y="177">18</text><text class="ml-v2-label" x="94" y="207">consultations</text><path class="ml-pilot-spark" d="M160 165v-9m13 9v-17m13 17v-26m13 26v-21m13 21v-35m13 35v-28"/></g>
+        <g class="ml-pilot-stat"><text class="ml-pilot-value" x="286" y="177">3</text><text class="ml-v2-label" x="286" y="207">à transmettre</text>${icon('note', 416, 155, 25)}</g>
+        <g class="ml-pilot-day-row">${icon('check', 96, 253, 24)}<text class="ml-v2-label" x="122" y="260">Journée renseignée</text></g>
+        <g class="ml-pilot-day-row">${icon('note', 96, 298, 24)}<text class="ml-v2-label" x="122" y="305">3 points à transmettre</text></g>
+        <g class="ml-pilot-day-row">${icon('arrow', 96, 343, 24)}<text class="ml-v2-label" x="122" y="350">La suite à préparer</text></g>
+      </g>
+      ${pilotActor('order', 'legal', pilotActors.order.x, pilotActors.order.y, 'Ordre des médecins')}${pilotActor('holder', 'person', pilotActors.holder.x, pilotActors.holder.y, 'Titulaire')}${pilotActor('locum', 'person', pilotActors.locum.x, pilotActors.locum.y, 'Remplaçant')}
+    </svg>
+    <figcaption class="ml-art-caption"><span class="ml-v2-caption-line" aria-hidden="true"></span><span class="ml-pilot-copies ml-pilot-captions">${copy(2, '')}</span></figcaption>
+  </figure>`;
+}
+
+function concludeActor(id: keyof typeof conclusionActors, label: string) {
+  const [x, y] = conclusionActors[id];
+  return `<g class="ml-close-actor ml-close-actor--${id}" data-close-actor="${id}" transform="translate(${x} ${y})">
+    <rect class="ml-close-actor-halo" x="-39" y="-39" width="78" height="78" rx="27" opacity="0"/>
+    <rect class="ml-close-actor-shadow" x="-33" y="-27" width="66" height="66" rx="21"/>
+    <rect class="ml-close-actor-face" x="-33" y="-33" width="66" height="66" rx="21"/>
+    ${icon(id === 'establishment' ? 'cabinet' : 'person', 0, 0, 30)}
+    <text class="ml-v2-label ml-v2-label--center" x="0" y="67">${label}</text>
+  </g>`;
+}
+
+function banknote(index: number) {
+  return `<g class="ml-close-sheet" data-close-sheet="${index}" transform="translate(${[188, 260, 332][index]} ${[186, 167, 186][index]}) rotate(${[-8, 0, 8][index]})">
+    <rect class="ml-close-sheet-shadow" x="-61" y="-30" width="128" height="70" rx="8"/>
+    <rect class="ml-close-sheet-face" x="-64" y="-35" width="128" height="70" rx="8"/>
+    <g class="ml-close-banknote-ink">
+      <path class="ml-close-banknote-frame" d="M-45-25H45a9 9 0 0 0 9 9V16a9 9 0 0 0-9 9H-45a9 9 0 0 0-9-9V-16a9 9 0 0 0 9-9Z"/>
+      <ellipse cx="0" cy="0" rx="20" ry="26"/>
+      <text class="ml-close-euro" x="0" y="13" text-anchor="middle">€</text>
+      <path d="M-44-6h12m-12 6h12m-12 6h12m64-12h12m-12 6h12m-12 6h12"/>
+    </g>
+  </g>`;
+}
+
+function concludeFigure() {
+  const copies = [
+    ['payment', 'Valider le paiement', 'Le paiement,<br><em>en toute clarté.</em>', 'De l’établissement au médecin remplaçant.'],
+    ['summary', 'Retrouver le bilan', 'Toute la mission,<br><em>en un regard.</em>', 'Exemple de bilan partagé de fin de mission.'],
+  ];
+  const copy = (column: number) => copies.map(([state, ...texts], index) => `<span class="ml-close-copy" data-close-copy="${state}"${index ? ' aria-hidden="true"' : ''}>${texts[column]}</span>`).join('');
+  return `<figure class="ml-process-art ml-process-art--report ml-process-art--v2">
+    <div class="ml-v2-heading"><span class="ml-close-copies ml-v2-eyebrow">${copy(0)}</span><span class="ml-sequence-actions"><button class="ml-sequence-control" type="button" aria-label="Mettre l’animation en pause" title="Mettre l’animation en pause" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="ml-sequence-pause-icon" d="M9 5v14M15 5v14"/><path class="ml-sequence-play-icon" d="m9 5 10 7-10 7Z"/><path class="ml-sequence-next-icon" d="M5 12h14m-6-6 6 6-6 6"/></svg></button><span class="ml-v2-index" aria-hidden="true">03 / 03</span></span></div>
+    <div class="ml-close-copies ml-v2-title" aria-hidden="true">${copy(1)}</div>
+    <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-report-title ml-art-report-desc" focusable="false">
+      <title id="ml-art-report-title">Conclure le remplacement : paiement et bilan global</title>
+      <desc id="ml-art-report-desc">Illustration : le paiement est validé, puis des billets passent de l’établissement au médecin remplaçant. Les mêmes billets deviennent les feuillets d’un bilan de toute la mission. Exemple sur cinq jours, du 14 au 18 septembre : 90 consultations, paiement confirmé et transmissions réunies.</desc>
+      <defs><pattern id="ml-close-grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r=".9" fill="currentColor" opacity=".15"/></pattern></defs>
+      <rect width="520" height="400" fill="url(#ml-close-grid)" class="ml-v2-grid"/>
+      <g class="ml-close-payment-path">
+        <text class="ml-v2-label ml-v2-label--center ml-close-payment-name" x="260" y="85">Rétrocession</text>
+        <path class="ml-close-route-bed" d="${curvePath(paymentRoute)}"/>
+        <path class="ml-close-route" d="${curvePath(paymentRoute)}"/>
+      </g>
+      ${banknote(0)}${banknote(1)}${banknote(2)}
+      <g class="ml-close-summary" opacity="0">
+        <g class="ml-close-summary-head"><text class="ml-close-summary-title" x="83" y="89">Bilan de la mission</text><text class="ml-v2-label ml-close-period" x="83" y="119">14–18 septembre</text></g>
+        <g class="ml-close-total"><text class="ml-close-value" x="94" y="189">5</text><text class="ml-v2-label" x="94" y="217">jours</text></g>
+        <g class="ml-close-total"><text class="ml-close-value" x="274" y="189">90</text><text class="ml-v2-label" x="274" y="217">consultations</text></g>
+        <path class="ml-close-summary-rule" d="M245 151V216M83 245H437M83 300H437"/>
+        <g class="ml-close-summary-row">${icon('check', 96, 272, 24)}<text class="ml-v2-label" x="120" y="279">Paiement confirmé</text></g>
+        <g class="ml-close-summary-row">${icon('note', 96, 331, 24)}<text class="ml-v2-label" x="120" y="338">Transmissions réunies</text></g>
+      </g>
+      ${concludeActor('establishment', 'Établissement')}${concludeActor('doctor', 'Remplaçant')}
+      <g class="ml-close-status" transform="translate(260 329)">
+        <rect class="ml-close-status-face" x="-124" y="-23" width="248" height="46" rx="23"/>
+        <g class="ml-close-status-clock" transform="translate(-99 0)" opacity="0">${icon('clock', 0, 0, 21)}</g>
+        <g class="ml-close-status-check" transform="translate(-99 0)"><path d="m-6 0 4 4 8-8" pathLength="1"/></g>
+        <g class="ml-close-status-labels"><text class="ml-v2-label ml-v2-label--center" data-payment-status="pending" x="13" y="7" opacity="0">Paiement à valider</text><text class="ml-v2-label ml-v2-label--center" data-payment-status="validated" x="13" y="7">Paiement validé</text><text class="ml-v2-label ml-v2-label--center" data-payment-status="received" x="13" y="7" opacity="0">Paiement confirmé</text></g>
+      </g>
+    </svg>
+    <figcaption class="ml-art-caption"><span class="ml-v2-caption-line" aria-hidden="true"></span><span class="ml-close-copies ml-close-captions">${copy(2)}</span></figcaption>
+  </figure>`;
+}
+
 export const processIllustrations = {
   criteria: sequenceFigure(),
-  matching: figure(...processDesigns.matching),
-  report: figure(...processDesigns.report),
+  matching: pilotFigure(),
+  report: concludeFigure(),
 };

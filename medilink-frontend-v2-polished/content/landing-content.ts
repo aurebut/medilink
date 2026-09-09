@@ -46,12 +46,12 @@ export const landingContent = {
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-matching" aria-controls="ml-panel-matching" aria-selected="false" tabindex="-1">
               <span class="ml-tab-fill" aria-hidden="true"></span>
               <span class="ml-tab-num" aria-hidden="true">02</span>
-              <span class="ml-tab-text">Comparez les possibilités</span>
+              <span class="ml-tab-text">Piloter</span>
             </button>
             <button class="ml-process-tab" type="button" role="tab" id="ml-tab-report" aria-controls="ml-panel-report" aria-selected="false" tabindex="-1">
               <span class="ml-tab-fill" aria-hidden="true"></span>
               <span class="ml-tab-num" aria-hidden="true">03</span>
-              <span class="ml-tab-text">Suivez le remplacement</span>
+              <span class="ml-tab-text">Concluez</span>
             </button>
           </div>
         </div>
@@ -59,7 +59,7 @@ export const landingContent = {
           <div class="ml-process-copy ml-match-copy">
             <span class="ml-process-kicker">01 · Vos critères</span>
             <h3>Matchez</h3>
-            <p class="ml-match-intro">Vos critères vous rapprochent.</p>
+            <p class="ml-match-intro">Nous vous rapprochons selon vos critères.</p>
             <div class="ml-match-audience">
               <p><strong>Remplaçant :</strong> indiquez vos disponibilités et vos préférences.</p>
               <p><strong>Établissement :</strong> décrivez votre besoin et vos critères d’exercice.</p>
@@ -69,20 +69,27 @@ export const landingContent = {
           ${processIllustrations.criteria}
         </div>
         <div class="ml-process-panel" id="ml-panel-matching" role="tabpanel" aria-labelledby="ml-tab-matching" tabindex="0" hidden>
-          <div class="ml-process-copy">
-            <span class="ml-process-kicker">02 · Les recommandations</span>
-            <h3>Comprenez pourquoi un profil ou une mission vous est proposé.</h3>
-            <p>MédiLink croise les informations des deux côtés et détaille les points de compatibilité. Vous pouvez examiner la recommandation, puis échanger pour préciser ce qui compte avant de vous engager.</p>
-            <ul class="ml-process-benefits"><li>Des recommandations expliquées.</li><li>Un accord à construire entre les deux médecins.</li></ul>
+          <div class="ml-process-copy ml-pilot-copy-panel">
+            <span class="ml-process-kicker">02 · Le remplacement</span>
+            <h3>Piloter</h3>
+            <p class="ml-pilot-intro">Un seul endroit pour un remplacement serein.</p>
+            <div class="ml-pilot-explainer">
+              <p><strong>Documents :</strong> préparez et partagez les pièces nécessaires.</p>
+              <p><strong>Informations :</strong> transmettez les accès et les repères utiles.</p>
+              <p><strong>Suivi :</strong> retrouvez le récapitulatif de chaque journée.</p>
+            </div>
           </div>
           ${processIllustrations.matching}
         </div>
         <div class="ml-process-panel" id="ml-panel-report" role="tabpanel" aria-labelledby="ml-tab-report" tabindex="0" hidden>
-          <div class="ml-process-copy">
-            <span class="ml-process-kicker">03 · Le suivi du remplacement</span>
-            <h3>Préparez aussi ce qu’il faudra transmettre.</h3>
-            <p>Le compte rendu réunit l’activité du remplacement, les points de vigilance et les transmissions. Les deux médecins disposent d’un support commun, mis à jour en temps réel, pour faire le point quand ils en ont besoin.</p>
-            <ul class="ml-process-benefits"><li>Les points à reprendre identifiés.</li><li>Les transmissions consultables pendant et après le remplacement.</li></ul>
+          <div class="ml-process-copy ml-close-copy-panel">
+            <span class="ml-process-kicker">03 · La fin de mission</span>
+            <h3>Concluez</h3>
+            <p class="ml-close-intro">Terminez le remplacement l’esprit tranquille.</p>
+            <div class="ml-close-explainer">
+              <p><strong>Paiement :</strong> validez le règlement du remplacement.</p>
+              <p><strong>Bilan :</strong> retrouvez toute la mission dans un récapitulatif clair.</p>
+            </div>
           </div>
           ${processIllustrations.report}
         </div>
