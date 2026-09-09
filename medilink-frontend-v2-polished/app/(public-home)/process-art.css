@@ -142,3 +142,56 @@
   .ml-process-art--v2 .ml-v2-heading { font-size: 8px; }
   .ml-process-art--v2 .ml-art-caption { min-height: 48.1px; max-width: 220px; }
 }
+
+/* The first tab follows the same pair from the map through criteria and discussion. */
+.ml-process-art--criteria .ml-sequence-eyebrows,
+.ml-process-art--criteria .ml-sequence-titles,
+.ml-process-art--criteria .ml-sequence-captions { display: grid; min-width: 0; }
+.ml-process-art--criteria .ml-sequence-copy--map,
+.ml-process-art--criteria .ml-sequence-copy--match,
+.ml-process-art--criteria .ml-sequence-copy--discussion { grid-area: 1 / 1; }
+.ml-process-art--criteria .ml-sequence-copy--match,
+.ml-process-art--criteria .ml-sequence-copy--discussion { opacity: 0; visibility: hidden; }
+.ml-process-art--criteria .ml-art-caption .ml-sequence-captions { max-width: none; margin: 0; color: inherit; font: inherit; text-wrap: wrap; }
+.ml-process-art--criteria .ml-sequence-copy--match em { color: #c7e89b; }
+.ml-process-art--criteria .ml-sequence-match { opacity: 0; visibility: hidden; }
+.ml-process-art--criteria .ml-sequence-discussion { opacity: 0; visibility: hidden; }
+.ml-process-art--criteria .ml-sequence-message { fill: #315942; }
+.ml-process-art--criteria .ml-sequence-question-tail { fill: #fffef7; stroke: #b9c7ad; stroke-width: 1; stroke-linejoin: round; }
+.ml-process-art--criteria .ml-sequence-reply-shadow { fill: #d7dfc7; }
+.ml-process-art--criteria .ml-sequence-reply-face { fill: #e9efdc; stroke: #bfcdaa; stroke-width: 1; }
+.ml-process-art--criteria .ml-sequence-contract-link { fill: none; stroke: #b9c7aa; stroke-width: 1.5; stroke-linecap: round; }
+.ml-process-art--criteria .ml-sequence-contract-note { fill: #5c7658; }
+.ml-process-art--criteria .ml-sequence-match .ml-v2-grid { display: block; }
+.ml-process-art--criteria .ml-sequence-label--match { opacity: 0; stroke: none; font-weight: 400; }
+.ml-process-art--criteria .ml-art-diagram :is(.ml-v2-tag, .ml-map-route, .ml-check-reel, .ml-check-scroll-thumb) { animation: none; }
+.ml-process-art--criteria .ml-sequence-actions { position: relative; display: flex; align-items: center; }
+.ml-process-art--criteria .ml-sequence-control {
+  appearance: none;
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--v2-muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ml-process-art--criteria .ml-sequence-control::before { content: ''; position: absolute; inset: -6px; }
+.ml-process-art--criteria .ml-sequence-control:hover { color: var(--v2-ink); border-color: currentColor; }
+.ml-process-art--criteria .ml-sequence-control:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.ml-process-art--criteria .ml-sequence-control[hidden],
+.ml-process-art--criteria .ml-sequence-play-icon,
+.ml-process-art--criteria .ml-sequence-next-icon { display: none; }
+.ml-process-art--criteria .ml-sequence-control[data-mode="paused"] .ml-sequence-pause-icon,
+.ml-process-art--criteria .ml-sequence-control[data-mode="static"] .ml-sequence-pause-icon { display: none; }
+.ml-process-art--criteria .ml-sequence-control[data-mode="paused"] .ml-sequence-play-icon,
+.ml-process-art--criteria .ml-sequence-control[data-mode="static"] .ml-sequence-next-icon { display: initial; }

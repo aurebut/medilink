@@ -4,6 +4,7 @@
 import type { ReactNode } from 'react';
 import Script from 'next/script';
 import { landingShell } from '@/content/landing-shell';
+import { LandingProcess } from './LandingProcess';
 
 export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides';
 
@@ -49,6 +50,6 @@ export function PublicDocument({ variant, children }: { variant: PublicVariant; 
     {restored ? <footer dangerouslySetInnerHTML={{ __html: restored.footer }} /> : <PublicFooter />}
     {restored && <Script src="/landing-special.js" strategy="afterInteractive" />}
     <Script src="/landing-main.js" strategy="afterInteractive" />
-    {variant === 'home' && <Script src="/landing-process.js" strategy="afterInteractive" />}
+    {variant === 'home' && <LandingProcess />}
   </body></html>;
 }

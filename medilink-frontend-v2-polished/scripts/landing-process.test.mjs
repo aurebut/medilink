@@ -2,10 +2,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
+import ts from 'typescript';
 
-const source = readFileSync(new URL('../public/landing-process.js', import.meta.url), 'utf8');
+const source = ts.transpileModule(readFileSync(new URL('../components/marketing/process-navigation.ts', import.meta.url), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText;
 
-function setup(reducedMotion = false) {
+function setup(reducedMotion = false, firstScene) {
   let now = 0;
   let frame;
   let observe;
@@ -38,12 +41,15 @@ function setup(reducedMotion = false) {
     constructor(callback) { observe = callback; }
     observe() {}
   }
-  runInNewContext(source, {
+  runInNewContext(source + '\nexports.initializeProcessNavigation(firstScene);', {
+    exports: {}, firstScene, AbortController,
+    Element: class { static [Symbol.hasInstance](value) { return typeof value?.closest === 'function'; } },
     document,
     window: { matchMedia: () => ({ matches: reducedMotion }), IntersectionObserver },
     IntersectionObserver,
     performance: { now: () => now },
     requestAnimationFrame(callback) { frame = callback; return 1; },
+    cancelAnimationFrame() {},
   });
   observe([{ isIntersecting: true }]);
   return {
@@ -127,4 +133,52 @@ test('reduced motion keeps autoplay disabled after manual selection', () => {
   ui.tick(20000);
   assert.equal(ui.active(), 2);
   assert.equal(ui.progress(2), 0);
+});
+
+test('map, criteria and discussion finish inside tab 01 while later tabs keep their original cadence', () => {
+  const rendered = [];
+  const scene = { duration: 22000, canPlay: () => true, render: time => rendered.push(time), reset: () => rendered.push(0) };
+  const ui = setup(false, scene);
+  ui.tick(0);
+  ui.tick(11000);
+  assert.equal(ui.active(), 0);
+  assert.equal(ui.progress(0), 50);
+  assert.equal(rendered.at(-1), 11000);
+  ui.tick(13000);
+  assert.equal(ui.active(), 0);
+  ui.tick(18000);
+  assert.equal(ui.active(), 0);
+  ui.tick(21999);
+  assert.equal(ui.active(), 0);
+  ui.tick(22000);
+  assert.equal(ui.active(), 1);
+  ui.tick(22000);
+  ui.tick(24750);
+  assert.equal(ui.progress(1), 50);
+  ui.tick(27500);
+  assert.equal(ui.active(), 2);
+});
+
+test('the first scene waits for its artwork and preserves its position when paused', () => {
+  let ready = false;
+  let rendered = 0;
+  const scene = { duration: 22000, canPlay: () => ready, render: time => { rendered = time; }, reset: () => { rendered = 0; } };
+  const ui = setup(false, scene);
+  ui.tick(60000);
+  assert.equal(ui.active(), 0);
+  assert.equal(rendered, 0);
+  ready = true;
+  ui.tick(60000);
+  ui.tick(63000);
+  assert.equal(rendered, 3000);
+  ready = false;
+  ui.tick(63000);
+  ui.tick(90000);
+  assert.equal(rendered, 3000);
+  ready = true;
+  ui.tick(90000);
+  assert.equal(rendered, 3000);
+  ui.tick(93000);
+  assert.equal(rendered, 6000);
+  assert.equal(ui.active(), 0);
 });

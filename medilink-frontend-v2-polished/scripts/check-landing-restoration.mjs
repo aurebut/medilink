@@ -29,6 +29,7 @@ for (const [path, file] of Object.entries(pages)) {
   assert.equal(response.status, 200, path);
   const actual = await response.text();
   if (path === '/') {
+    assert.doesNotMatch(actual, /(?:href|src)="\/landing-process\.js(?:\?|"|&)/, 'use the bundled scene controller without a second legacy autoplay timer');
     const compiledStyles = [...actual.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^\"]+)"[^>]*>/g)]
       .map(match => match[1].replaceAll('&amp;', '&')).filter(href => href.startsWith('/_next/static/css/'));
     assert.ok(compiledStyles.length, 'homepage styles use versioned Next.js assets');

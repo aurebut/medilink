@@ -1,4 +1,6 @@
 // Small, repository-authored diagrams; illustration CSS ships in a versioned Next.js asset.
+import { curvePath, mapRoute, pinOutline } from './process-sequence-geometry';
+
 const marks = {
   cabinet: '<path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M9 21v-5h6v5M9 7h6M12 4v6M8 13h1m6 0h1"/>',
   person: '<circle cx="12" cy="8" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',
@@ -93,8 +95,10 @@ function figure(id: string, number: string, eyebrow: string, headline: string, c
   </figure>`;
 }
 
-export const processIllustrations = {
-  criteria: figure('criteria', '01', 'Poser les bases', 'Deux besoins.<br><em>Un même cadre.</em>', 'Deux profils, un territoire en commun.',
+function design(...parts: Parameters<typeof figure>) { return parts; }
+
+const processDesigns = {
+  criteria: design('criteria', '01', 'Poser les bases', 'Deux besoins.<br><em>Un même cadre.</em>', 'Deux profils, un territoire en commun.',
     'Vue élargie d’un territoire fictif : trois cabinets et trois médecins sont répartis entre plusieurs communes. Un seul lien vert relie un cabinet et un médecin remplaçant mis en évidence ; les quatre autres repères restent indépendants.', `
     <defs><clipPath id="ml-map-clip"><rect x="3" y="10" width="514" height="380" rx="24"/></clipPath></defs>
     <g class="ml-map-ground" clip-path="url(#ml-map-clip)">
@@ -137,7 +141,7 @@ export const processIllustrations = {
     <g class="ml-map-compass" transform="translate(39 349)"><circle r="17"/><path d="M0-10 5 6 0 3-5 6Z"/></g>
   `),
 
-  matching: figure('matching', '02', 'Rapprocher les attentes', 'La bonne rencontre<br><em>se dessine.</em>', 'Des critères communs. Une décision à deux.',
+  matching: design('matching', '02', 'Rapprocher les attentes', 'La bonne rencontre<br><em>se dessine.</em>', 'Des critères communs. Une décision à deux.',
     'Exemple de correspondance entre le cabinet et le médecin remplaçant : dates, lieu, spécialité, logiciel, horaires et conditions. La liste défile pour montrer les six critères, chacun accompagné d’une coche verte. Sans animation, tous restent visibles. Cette illustration présente des critères compatibles, pas un accord conclu.', `
     <defs>
       <clipPath id="ml-check-clip"><rect x="126" y="89" width="265" height="252"/></clipPath>
@@ -165,7 +169,7 @@ export const processIllustrations = {
     <text class="ml-v2-label ml-v2-label--center ml-checklist-foot" x="260" y="385">Une compatibilité expliquée.</text>
   `),
 
-  report: figure('report', '03', 'Assurer la continuité', 'Le relais,<br><em>sans perdre le fil.</em>', 'Documents et informations passent le relais.',
+  report: design('report', '03', 'Assurer la continuité', 'Le relais,<br><em>sans perdre le fil.</em>', 'Documents et informations passent le relais.',
     'Le cabinet et le médecin remplaçant échangent dans les deux sens. Le contrat, les informations de rémunération et les déclarations légales composent une pile de documents partagés. Une seconde boucle transmet les informations, notes et consignes, pour préparer le remplacement et faciliter la reprise.', `
     <path class="ml-relay-path-bed" d="M118 200C155 200 130 91 184 91H336C390 91 365 200 402 200M402 227C365 227 390 314 336 314H184C130 314 155 227 118 227"/>
     <path class="ml-relay-path ml-relay-path--out" pathLength="1" d="M118 200C155 200 130 91 184 91H336C390 91 365 200 402 200"/>
@@ -188,4 +192,90 @@ export const processIllustrations = {
     ${relayEntity(438, 'person', 'Remplaçant')}
     <text class="ml-v2-label ml-v2-label--center" x="260" y="391">Le contexte circule, lui aussi.</text>
   `),
+};
+
+function sequenceActor(mark: 'cabinet' | 'person', x: number, y: number) {
+  const label = mark === 'cabinet' ? 'Cabinet' : 'Remplaçant';
+  return `<g class="ml-map-pin ml-map-pin--${mark}${mark === 'person' ? ' ml-map-pin--dark' : ''} ml-map-pin--connected ml-sequence-actor" data-entity="${mark}" transform="translate(${x} ${y})">
+    <ellipse class="ml-map-pin-shadow" cx="0" cy="43" rx="17" ry="4"/>
+    <path class="ml-map-pin-face ml-sequence-face" d="${curvePath(pinOutline, true)}"/>
+    ${icon(mark, 0, 0, 27)}
+    <text class="ml-v2-label ml-v2-label--center ml-v2-label--strong ml-sequence-label--map" x="0" y="-42">${label}</text>
+    <text class="ml-v2-label ml-v2-label--center ml-sequence-label--match" x="0" y="-42">${mark === 'cabinet' ? 'Cabinet' : 'Médecin'}</text>
+  </g>`;
+}
+
+function sequenceDiscussion() {
+  return `<g class="ml-sequence-discussion">
+    <g class="ml-sequence-question">
+      <path class="ml-sequence-question-tail" d="M116 83 99 94 116 105"/>
+      <text class="ml-v2-label ml-sequence-message" x="140" y="82">On précise la</text>
+      <text class="ml-v2-label ml-sequence-message" x="140" y="113">rétrocession ?</text>
+    </g>
+    <g class="ml-sequence-reply">
+      <path class="ml-sequence-reply-shadow" d="M155 180H385Q405 180 405 200V212L420 224 405 236V260Q405 280 385 280H155Q135 280 135 260V200Q135 180 155 180Z"/>
+      <path class="ml-sequence-reply-face" d="M155 174H385Q405 174 405 194V206L420 218 405 230V254Q405 274 385 274H155Q135 274 135 254V194Q135 174 155 174Z"/>
+      <text class="ml-v2-label ml-sequence-message" x="158" y="213">Oui, et le délai</text>
+      <text class="ml-v2-label ml-sequence-message" x="158" y="244">de versement.</text>
+    </g>
+    <g class="ml-sequence-contract">
+      <path class="ml-sequence-contract-link" d="M260 274V306"/>
+      <g transform="rotate(-3 260 339)">
+        <rect class="ml-relay-paper-back" x="154" y="307" width="222" height="73" rx="12"/>
+        <rect class="ml-relay-paper" x="149" y="301" width="222" height="73" rx="12"/>
+        <path class="ml-relay-fold" d="M347 301V315Q347 324 357 324H371"/>
+        ${icon('document', 175, 327, 24)}
+        <text class="ml-relay-title" x="198" y="333">Contrat</text>
+        <text class="ml-v2-label ml-sequence-contract-note" x="172" y="358">À relire ensemble</text>
+      </g>
+    </g>
+  </g>`;
+}
+
+function sequenceFigure() {
+  const [, number, mapEyebrow, mapTitle, mapCaption, , originalMap] = processDesigns.criteria;
+  const [, , matchEyebrow, matchTitle, matchCaption, , originalMatch] = processDesigns.matching;
+  // Reuse the existing artwork. Only the two selected entities and their link are shared.
+  const waypoints = originalMap.match(/<g class="ml-map-waypoints">[\s\S]*?<\/g>/)?.[0] || '';
+  const mapDrawing = originalMap
+    .replace(mapPin(112, 188, 'cabinet', 'Cabinet'), '')
+    .replace(mapPin(407, 293, 'person', 'Remplaçant'), '')
+    .replace(/<path class="ml-map-route(?:-bed)?"[^>]*\/>/g, '')
+    .replace(waypoints, '');
+  const matchDrawing = originalMatch
+    .replace(matchEntity(52, 'cabinet', 'Cabinet'), '')
+    .replace(matchEntity(468, 'person', 'Médecin'), '')
+    .replace(/<path class="ml-v2-connection(?:-shadow)?"[^>]*\/>/g, '')
+    .replaceAll(/(id="|url\(#)ml-check-/g, '$1ml-sequence-check-')
+    .replace('<g class="ml-checklist">', '<g class="ml-checklist" clip-path="url(#ml-sequence-unfold)">');
+  return `<figure class="ml-process-art ml-process-art--criteria ml-process-art--v2">
+    <div class="ml-v2-heading">
+      <span class="ml-sequence-eyebrows"><span class="ml-v2-eyebrow ml-sequence-copy--map"><i aria-hidden="true"></i>${mapEyebrow}</span><span class="ml-v2-eyebrow ml-sequence-copy--match" aria-hidden="true"><i aria-hidden="true"></i>${matchEyebrow}</span><span class="ml-v2-eyebrow ml-sequence-copy--discussion" aria-hidden="true"><i aria-hidden="true"></i>Préciser les derniers détails</span></span>
+      <span class="ml-sequence-actions"><button class="ml-sequence-control" type="button" aria-label="Mettre l’animation en pause" title="Mettre l’animation en pause" hidden><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="ml-sequence-pause-icon" d="M9 5v14M15 5v14"/><path class="ml-sequence-play-icon" d="m9 5 10 7-10 7Z"/><path class="ml-sequence-next-icon" d="M5 12h14m-6-6 6 6-6 6"/></svg></button><span class="ml-v2-index" aria-hidden="true">${number} / 03</span></span>
+    </div>
+    <div class="ml-sequence-titles"><p class="ml-v2-title ml-sequence-copy--map" aria-hidden="true">${mapTitle}</p><p class="ml-v2-title ml-sequence-copy--match" aria-hidden="true">${matchTitle}</p><p class="ml-v2-title ml-sequence-copy--discussion" aria-hidden="true">Les derniers détails,<br><em>ensemble.</em></p></div>
+    <svg class="ml-art-diagram" width="100%" fill="none" viewBox="0 0 520 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ml-art-criteria-title ml-art-criteria-desc" focusable="false">
+      <title id="ml-art-criteria-title">De la rencontre aux derniers détails</title>
+      <desc id="ml-art-criteria-desc">Dans cette même première étape, une carte présente trois cabinets et trois médecins. Une seule paire est reliée. Ces deux repères deviennent les interlocuteurs d’une liste de critères : dates, lieu, spécialité, logiciel, horaires et conditions, chacun accompagné d’une coche. Puis la liste devient une discussion : le cabinet propose de préciser la rétrocession, le médecin demande aussi le délai de versement, et un contrat est partagé pour être relu ensemble. Cet exemple illustre la préparation d’un accord, sans signature automatique.</desc>
+      <g class="ml-sequence-map">${mapDrawing}</g>
+      <path class="ml-map-route-bed ml-sequence-link-bed" d="${curvePath(mapRoute)}"/>
+      <path class="ml-map-route ml-sequence-link" pathLength="1" d="${curvePath(mapRoute)}"/>
+      <g class="ml-sequence-waypoints">${waypoints}</g>
+      <g class="ml-sequence-match">
+        <defs><pattern id="ml-sequence-grid" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r=".9" fill="currentColor" opacity=".15"/></pattern><clipPath id="ml-sequence-unfold"><rect x="103" y="193.5" width="314" height="0" rx="22"/></clipPath></defs>
+        <rect x="0" y="0" width="520" height="400" fill="url(#ml-sequence-grid)" class="ml-v2-grid"/>
+        ${matchDrawing}
+      </g>
+      ${sequenceDiscussion()}
+      ${sequenceActor('cabinet', 112, 148)}
+      ${sequenceActor('person', 407, 253)}
+    </svg>
+    <figcaption class="ml-art-caption"><span class="ml-v2-caption-line" aria-hidden="true"></span><span class="ml-sequence-captions"><span class="ml-sequence-copy--map">${mapCaption}</span><span class="ml-sequence-copy--match" aria-hidden="true">${matchCaption}</span><span class="ml-sequence-copy--discussion" aria-hidden="true">L’accord se construit dans l’échange.</span></span></figcaption>
+  </figure>`;
+}
+
+export const processIllustrations = {
+  criteria: sequenceFigure(),
+  matching: figure(...processDesigns.matching),
+  report: figure(...processDesigns.report),
 };
