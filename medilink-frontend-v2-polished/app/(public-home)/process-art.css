@@ -210,7 +210,7 @@
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-control[data-mode="paused"] .ml-sequence-play-icon,
 :is(.ml-process-art--criteria, .ml-process-art--matching, .ml-process-art--report) .ml-sequence-control[data-mode="static"] .ml-sequence-next-icon { display: initial; }
 
-/* Piloter: sheets fold into envelopes, bare icons flow, then the recap takes shape. */
+/* Pilotez: a folio folds and travels; two waves of glyphs resolve into an open recap. */
 .ml-process-copy.ml-pilot-copy-panel { justify-content: center; padding: 30px 26px; }
 .ml-pilot-copy-panel .ml-process-kicker { margin-bottom: 12px; }
 .ml-pilot-copy-panel > .ml-pilot-intro { margin-top: 16px; color: #36554f; font-size: 18px; line-height: 1.5; }
@@ -219,7 +219,7 @@
 .ml-pilot-explainer strong { color: #245c53; font-weight: 600; }
 #ml-panel-matching > .ml-process-art { align-self: center; }
 .ml-process-art--v2.ml-process-art--matching {
-  --v2-surface: #f5f2e9; --v2-ink: #164c41; --v2-muted: #577368; --v2-thread: #87a789;
+  --v2-surface: #f5f2e9; --v2-ink: #164c41; --v2-muted: #64776a; --v2-thread: #a5b99a;
   --pilot-em: #618775; --pilot-actor-fill: #fffef7; --pilot-actor-stroke: #b9c7ad; --pilot-actor-ink: #3d634d;
 }
 .ml-process-art--matching .ml-v2-title em { color: var(--pilot-em); }
@@ -230,37 +230,40 @@
 .ml-pilot-eyebrow { display: flex; align-items: center; gap: 8px; }
 .ml-pilot-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 .ml-process-art--matching .ml-art-caption .ml-pilot-captions { margin: 0; max-width: none; font: inherit; color: inherit; text-wrap: wrap; }
-.ml-pilot-envelope { fill: none; stroke: #829b70; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-.ml-pilot-envelope-flap { fill: #edf1e3; }
+.ml-pilot-envelope { fill: none; stroke: #9bad8b; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+.ml-pilot-envelope-flap { fill: #edf2e5; }
 .ml-pilot-received { fill: none; stroke: #93ae7d; stroke-width: 1.2; }
 .ml-pilot-actor { color: var(--pilot-actor-ink); }
-.ml-pilot-actor-shadow { fill: #cdd7bf; opacity: .55; }
-.ml-pilot-actor-face { fill: var(--pilot-actor-fill); stroke: var(--pilot-actor-stroke); stroke-width: 1.1; }
+.ml-pilot-actor-face { fill: var(--pilot-actor-fill); stroke: var(--pilot-actor-stroke); stroke-width: 1; }
 .ml-pilot-actor-label, .ml-pilot-cabinet text { fill: var(--v2-ink); }
 .ml-pilot-actor--locum > .ml-pilot-actor-face { fill: #3a6550; stroke: #325d47; }
 .ml-pilot-actor--locum > svg { color: #f1f5e9; }
-.ml-pilot-cabinet circle { fill: #dce9cd; stroke: #8ca67c; stroke-width: 1; }
+.ml-pilot-cabinet circle { fill: #f5f7ef; stroke: #a9be9b; stroke-width: 1; }
 .ml-pilot-cabinet svg { color: #315942; }
-.ml-pilot-paper-back { fill: #d9dfca; }
-.ml-pilot-paper-face { fill: #fffef7; stroke: #c4cfb9; stroke-width: 1; filter: drop-shadow(0 5px 6px #31482b12); }
+.ml-pilot-paper-back { fill: #d3ddc7; }
+.ml-pilot-paper-face { fill: #fffef9; stroke: #c4d0b8; stroke-width: 1; }
+.ml-pilot-paper-fold { fill: #edf1e5; stroke: #c4d0b8; stroke-width: 1; stroke-linejoin: round; }
 .ml-pilot-document-content { color: #315942; }
-.ml-pilot-info-content { color: #dcebc9; }
-.ml-pilot-tile:nth-of-type(2n) .ml-pilot-info-content { color: #c7e89b; }
-.ml-pilot-paper-title, .ml-pilot-daily-title { fill: #315642; font: 400 31px var(--serif); letter-spacing: -.02em; }
+.ml-pilot-info-content { color: #315f4d; }
+.ml-pilot-tile:nth-of-type(2n) .ml-pilot-info-content { color: #749569; }
+.ml-pilot-paper-title { fill: #315642; font: 400 33px var(--serif); letter-spacing: -.02em; }
+.ml-pilot-folio { fill: #7a8b6f; font-variant-numeric: tabular-nums; }
 .ml-pilot-condition { fill: #66785c; }
 .ml-pilot-document-note { fill: #66785c; }
-.ml-pilot-paper-rule { fill: none; stroke: #c3ceb7; stroke-width: 1.2; stroke-linecap: round; }
+.ml-pilot-paper-rule { fill: none; stroke: #d0dac5; stroke-width: 1; stroke-linecap: round; }
 .ml-pilot-signature { fill: none; stroke: #82946f; stroke-width: 1.2; stroke-linecap: round; }
-.ml-pilot-daily { color: #315942; }
-.ml-pilot-value { fill: #214d3a; font: 400 49px var(--serif); letter-spacing: -.04em; }
-.ml-pilot-today { fill: #66785c; }
-.ml-pilot-spark { fill: none; stroke: #8fad74; stroke-width: 5; stroke-linecap: round; }
-.ml-pilot-day-row { color: #55744a; }
+.ml-pilot-contact { color: #315f4d; }
+.ml-pilot-contact-link { fill: none; stroke: #a8bd9c; stroke-width: 1.2; stroke-linecap: round; }
+.ml-pilot-contact-pulse { fill: #668958; }
+.ml-pilot-contact-bubble { fill: #fffef9; stroke: #d0ddc6; stroke-width: 1; stroke-linejoin: round; }
+.ml-pilot-contact-message--locum { color: #eef5e6; }
+.ml-pilot-contact-message--locum .ml-pilot-contact-bubble { fill: #3a6550; stroke: #3a6550; }
 @media (max-width: 480px) {
   .ml-process-copy.ml-pilot-copy-panel { padding: 24px 18px; }
+  .ml-process-art--matching .ml-v2-label { font-size: 25px; }
 }
 
-/* Concluez: a payment travels, then those same notes open into a mission report. */
+/* Concluez: a fan of banknotes opens into a full-width editorial report. */
 .ml-process-copy.ml-close-copy-panel { justify-content: center; padding: 30px 26px; }
 .ml-close-copy-panel .ml-process-kicker { margin-bottom: 12px; }
 .ml-close-copy-panel > .ml-close-intro { margin-top: 16px; color: #36554f; font-size: 18px; line-height: 1.5; }
@@ -269,44 +272,44 @@
 .ml-close-explainer strong { color: #245c53; font-weight: 600; }
 #ml-panel-report > .ml-process-art { align-self: center; }
 .ml-process-art--v2.ml-process-art--report {
-  --v2-surface: #153e34; --v2-ink: #eef5e9; --v2-muted: #b6cbbb; --v2-thread: #c7e89b; --close-em: #c7e89b;
+  --v2-surface: #f5f2e9; --v2-ink: #164c41; --v2-muted: #64776a; --v2-thread: #a5b99a; --close-em: #618775;
 }
 .ml-process-art--report .ml-v2-title em { color: var(--close-em); }
 .ml-process-art--report .ml-close-copies { display: grid; min-width: 0; }
 .ml-process-art--report .ml-v2-heading > .ml-close-copies { padding-right: 42px; }
-.ml-close-copy { grid-area: 1 / 1; }
-.ml-close-copy[data-close-copy="payment"] { color: #eef5e9; }
-.ml-close-copy[data-close-copy="summary"] { color: #164c41; }
-.ml-process-art--report .ml-close-copy[data-close-copy="payment"] em { color: #c7e89b; }
-.ml-process-art--report .ml-close-copy[data-close-copy="summary"] em { color: var(--close-summary-em, #618775); }
+.ml-close-copy { grid-area: 1 / 1; color: inherit; }
 .ml-close-copy[data-close-copy="summary"] { opacity: 0; visibility: hidden; }
 .ml-close-copies.ml-v2-eyebrow .ml-close-copy { display: flex; align-items: center; gap: 8px; }
 .ml-close-copies.ml-v2-eyebrow .ml-close-copy::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 .ml-process-art--report .ml-art-caption .ml-close-captions { margin: 0; max-width: none; font: inherit; color: inherit; text-wrap: wrap; }
-.ml-close-payment-name { fill: #b6cbbb; }
-.ml-close-route-bed { fill: none; stroke: #315b47; stroke-width: 6; opacity: .4; }
-.ml-close-route { fill: none; stroke: #9fbc85; stroke-width: 1.3; stroke-linecap: round; }
-.ml-close-actor { color: #e0eddb; }
-.ml-close-actor-shadow { fill: #0e2e24; opacity: .55; }
-.ml-close-actor-face { fill: #224b3e; stroke: #618363; stroke-width: 1.1; }
-.ml-close-actor--doctor .ml-close-actor-face { fill: #dce9cd; stroke: #b1c798; }
-.ml-close-actor--doctor > svg { color: #315942; }
-.ml-close-actor-halo { fill: none; stroke: #c7e89b; stroke-width: 1.3; }
-.ml-close-sheet-shadow { fill: #08281c; opacity: .2; }
-.ml-close-sheet-face { fill: #eef4df; stroke: #b6cb99; stroke-width: 1.1; }
-.ml-close-banknote-ink { fill: none; stroke: #90a975; stroke-width: .8; }
-.ml-close-banknote-ink ellipse { fill: #e0ebcd; }
-.ml-close-euro { fill: #315d40; stroke: none; font: 400 41px var(--serif); }
+.ml-close-payment-name { fill: #64776a; }
+.ml-close-route { fill: none; stroke: #a5b799; stroke-width: 1; stroke-linecap: round; opacity: .28; }
+.ml-close-actor { color: #3d634d; }
+.ml-close-actor > text { fill: var(--v2-ink); }
+.ml-close-actor-face { fill: #fffef7; stroke: #b5c8a8; stroke-width: 1; }
+.ml-close-actor--doctor .ml-close-actor-face { fill: #3a6550; stroke: #325d47; }
+.ml-close-actor--doctor > svg { color: #f1f5e9; }
+.ml-close-actor-halo { fill: none; stroke: #90ab7f; stroke-width: 1; }
+.ml-close-sheet-shadow { fill: #728663; opacity: .08; }
+.ml-close-sheet-face { fill: #e0e8d4; stroke: #afc39d; stroke-width: 1; }
+.ml-close-sheet[data-close-sheet="1"] .ml-close-sheet-face { fill: #baceb0; stroke: #a5bb96; }
+.ml-close-sheet[data-close-sheet="2"] .ml-close-sheet-face { fill: #315f4d; stroke: #315f4d; }
+.ml-close-banknote-ink { fill: none; stroke: #829d70; stroke-width: .8; stroke-linecap: round; }
+.ml-close-banknote-ink ellipse { fill: none; opacity: .45; }
+.ml-close-euro { fill: #537645; stroke: none; font: 400 58px var(--serif); }
+.ml-close-sheet[data-close-sheet="2"] .ml-close-banknote-ink { stroke: #b5cca3; }
+.ml-close-sheet[data-close-sheet="2"] .ml-close-euro { fill: #e0edc8; }
 .ml-close-summary { color: #315942; }
-.ml-close-summary-title { fill: #315642; font: 400 31px var(--serif); letter-spacing: -.02em; }
-.ml-close-period { fill: #66785c; }
-.ml-close-value { fill: #214d3a; font: 400 49px var(--serif); letter-spacing: -.04em; }
-.ml-close-summary-rule { fill: none; stroke: #d9e1d0; stroke-width: 1; }
+.ml-close-period, .ml-close-stat-label { fill: #6a7b64; }
+.ml-close-value { fill: #214d3a; font: 400 148px/.85 var(--serif); letter-spacing: -.065em; }
+.ml-close-value--secondary { fill: #61816b; font-size: 88px; }
+.ml-close-days { fill: none; stroke: #88a578; stroke-width: 3; stroke-linecap: round; }
 .ml-close-summary-row { color: #416848; }
-.ml-close-status { color: #c7e89b; }
-.ml-close-status-face { fill: #244c3e; stroke: #57765a; stroke-width: 1; }
+.ml-close-status { color: #557b50; }
+.ml-close-status-face { fill: #e1ead7; stroke: none; }
 .ml-close-status-check path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.ml-close-status-labels { fill: #e4efd8; }
+.ml-close-status-labels { color: #456440; }
 @media (max-width: 480px) {
   .ml-process-copy.ml-close-copy-panel { padding: 24px 18px; }
+  .ml-process-art--report .ml-v2-label { font-size: 25px; }
 }

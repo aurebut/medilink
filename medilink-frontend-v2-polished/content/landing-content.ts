@@ -76,7 +76,7 @@ export const landingContent = {
             <div class="ml-pilot-explainer">
               <p><strong>Documents :</strong> préparez et partagez les pièces nécessaires.</p>
               <p><strong>Informations :</strong> transmettez les accès et les repères utiles.</p>
-              <p><strong>Suivi :</strong> retrouvez le récapitulatif de chaque journée.</p>
+              <p><strong>Échanges :</strong> gardez le contact tout au long de la mission.</p>
             </div>
           </div>
           ${processIllustrations.matching}

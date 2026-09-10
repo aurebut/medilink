@@ -2,14 +2,21 @@
 // Endpoints meet the rounded faces; no connecting lines are rendered.
 export const pilotActors = {
   order: { x: 260, y: 69 },
-  holder: { x: 65, y: 267 },
-  locum: { x: 455, y: 267 },
+  holder: { x: 70, y: 285 },
+  locum: { x: 450, y: 285 },
 };
 
+export const pilotInformationActors = { holder: { x: 70, y: 251 }, locum: { x: 450, y: 140 } };
+
+// Keep the same two doctors as the practical information becomes a conversation.
+export const pilotContactActors = { holder: { x: 104, y: 291 }, locum: { x: 416, y: 291 } };
+export const pilotContactOrigin = { x: 260, y: 162 };
+export const pilotContactRoute = [139, 291, 196, 339, 324, 339, 381, 291];
+
 export const pilotLinks = {
-  left: [89, 238, 120, 160, 185, 114, 236, 98],
-  right: [284, 98, 335, 114, 400, 160, 431, 238],
-  bottom: [98, 276, 178, 342, 342, 342, 422, 276],
+  left: [90, 264, 120, 185, 185, 118, 239, 90],
+  right: [281, 90, 335, 118, 400, 185, 430, 264],
+  bottom: [99, 292, 178, 351, 342, 351, 421, 292],
 };
 
 function reverse(points: number[]) {

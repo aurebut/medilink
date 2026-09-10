@@ -1,8 +1,9 @@
-// One curve drives both the payment connection and the travelling banknotes.
-export const paymentRoute = [86, 215, 172, 125, 348, 125, 434, 215];
-export const conclusionActors = { establishment: [86, 215], doctor: [434, 215] } as const;
+// The same notes travel on this curve, then become the report's three rules.
+export const paymentRoute = [90, 246, 178, 246, 316, 126, 430, 126];
+export const conclusionActors = { establishment: [90, 246], doctor: [430, 126] } as const;
+export const conclusionPaper = { sealX: 54, sealY: 318 };
 export const conclusionSheets = [
-  { x: 251, y: 215, width: 380, height: 316, angle: -3 },
-  { x: 269, y: 215, width: 388, height: 322, angle: 3 },
-  { x: 260, y: 211, width: 408, height: 334, angle: 0 },
+  { x: 260, y: 80, width: 440, height: 1, angle: 0 },
+  { x: 323, y: 178, width: 140, height: 1, angle: 90 },
+  { x: 260, y: 279, width: 440, height: 1, angle: 0 },
 ];
