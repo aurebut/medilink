@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-// Preserve the original landing outside the explicitly requested guides links and process art.
+// Preserve the original landing outside the explicitly requested guides links, process art and two homepage previews.
 const reference = '60c8e06';
 const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
@@ -47,6 +47,44 @@ function normalizeConclusionCopy(html, updated) {
   assert.equal([...html.matchAll(copy)].length, 1, 'only the third step copy is replaced');
   return html.replace(copy, '$1<!-- third step copy -->');
 }
+function normalizeEditorialPreviews(html, updated) {
+  const previews = [
+    { section: 'ml-workspace', id: 'communication', title: 'ml-workspace-title', tag: 'div', preview: 'ml-dossier' },
+    { section: 'ml-continuity', id: 'continuite', title: 'continuity-title', tag: 'figure', preview: 'ml-continuity-preview' },
+  ];
+  for (const { section, id, title, tag, preview } of previews) {
+    const originalSection = `<section class="${section}" id="${id}" aria-labelledby="${title}">`;
+    const openingSection = updated ? originalSection.replace(`class="${section}"`, `class="${section} ${section}--editorial"`) : originalSection;
+    assert.equal(html.split(openingSection).length - 1, 1, `${id}: exactly one section with its original anchor and accessible heading`);
+    html = html.replace(openingSection, originalSection);
+
+    const opening = new RegExp(`<${tag}\\b[^>]*\\bclass="${preview}(?: [^"]+)?"[^>]*>`, 'g');
+    const matches = [...html.matchAll(opening)];
+    assert.equal(matches.length, 1, `${id}: exactly one requested interface preview`);
+    const start = matches[0].index;
+    // The dossier contains nested divs; counting matching tags keeps the surrounding copy in the comparison.
+    const tags = new RegExp(`<\\/?${tag}\\b[^>]*>`, 'g');
+    tags.lastIndex = start;
+    let depth = 0;
+    let end = -1;
+    for (let token; (token = tags.exec(html));) {
+      depth += token[0].startsWith('</') ? -1 : 1;
+      if (depth === 0) {
+        end = tags.lastIndex;
+        break;
+      }
+    }
+    assert.ok(end > start, `${id}: preview has a matching closing tag`);
+    const markup = html.slice(start, end);
+    if (updated) {
+      assert.match(markup, /Aperçu illustratif · Données fictives/, `${id}: preview data remains clearly illustrative`);
+      if (tag === 'figure') assert.match(markup, /<figcaption\b[^>]*>/, `${id}: preview retains its visible caption`);
+      else assert.match(matches[0][0], /aria-label="Exemple du dossier partagé d’un remplacement"/, `${id}: shared dossier retains its accessible label`);
+    }
+    html = html.slice(0, start) + `<!-- requested interface preview: ${id} -->` + html.slice(end);
+  }
+  return html;
+}
 for (const [path, file] of Object.entries(pages)) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
   const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
@@ -66,6 +104,10 @@ for (const [path, file] of Object.entries(pages)) {
     assert.ok(artStyles, 'versioned stylesheet includes the process illustration styles');
     assert.match(artStyles, /prefers-reduced-motion:\s*no-preference/, 'illustration animations respect reduced motion');
     assert.match(artStyles, /max-width:\s*360px/, 'illustrations cover narrow mobile screens');
+    const compiledCss = compiledContents.join('\n');
+    for (const section of ['workspace', 'continuity']) {
+      assert.ok(compiledCss.includes(`.ml-${section}--editorial`), `${section}: requested interface styles use versioned Next.js assets`);
+    }
   }
   for (const tag of ['nav', 'main', 'footer']) {
     const pattern = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`);
@@ -89,8 +131,10 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizePilotCopy(expected, false);
       rendered = normalizeConclusionCopy(rendered, true);
       expected = normalizeConclusionCopy(expected, false);
+      rendered = normalizeEditorialPreviews(rendered, true);
+      expected = normalizeEditorialPreviews(expected, false);
     }
-    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links and process illustrations`);
+    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations and interface previews`);
   }
   const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
   assert.deepEqual(styles(actual), styles(original), `${path}: original stylesheet order`);
@@ -98,7 +142,7 @@ for (const [path, file] of Object.entries(pages)) {
   [...original.matchAll(/<script src="(\/landing-[^"]+\.js)"/g)].forEach(match => originalAssets.add(match[1]));
   assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
-  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links and homepage illustrations`);
+  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations and interface previews`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });
@@ -107,4 +151,4 @@ for (const asset of originalAssets) {
   const rendered = (await response.text()).replaceAll('\r\n', '\n');
   assert.equal(rendered.trimEnd(), original.replaceAll('\r\n', '\n').trimEnd(), `${asset}: unchanged from original`);
 }
-console.log(`PASS ${originalAssets.size} original stylesheets and scripts preserved; process art stylesheet versioned with the page`);
+console.log(`PASS ${originalAssets.size} original stylesheets and scripts preserved; process art and interface stylesheets versioned with the page`);

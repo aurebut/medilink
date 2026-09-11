@@ -1,4 +1,6 @@
 import { processIllustrations } from './landing-process-art';
+import { workspacePreview } from './landing-workspace-preview';
+import { continuityPreview } from './landing-continuity-preview';
 
 // Original landing restored from Git 60c8e06, with user-requested process illustrations.
 // Legacy hrefs use canonical routes. All markup is repository-authored, never user content.
@@ -97,49 +99,18 @@ export const landingContent = {
       </div>
     </section>
 
-    <section class="ml-workspace" id="communication" aria-labelledby="ml-workspace-title">
+    <section class="ml-workspace ml-workspace--editorial" id="communication" aria-labelledby="ml-workspace-title">
       <div class="ml-workspace-inner">
         <header class="ml-workspace-heading">
           <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2></div>
           <p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>
         </header>
-        <div class="ml-dossier" aria-label="Exemple du dossier partagé d’un remplacement">
-          <header class="ml-dossier-head">
-            <div class="ml-dossier-identity"><span class="ml-dossier-symbol" aria-hidden="true">M<span><svg class="landing-icon landing-icon--exchange" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16M8 8l-4 4 4 4m8-8 4 4-4 4"/></svg></span></span><div><span class="ml-dossier-eyebrow">DOSSIER PARTAGÉ · ML-0428</span><h3>Remplacement en médecine générale</h3><p>Cabinet des Tilleuls · Paris 11e</p></div></div>
-            <span class="ml-dossier-status"><i aria-hidden="true"></i>Mission en cours</span>
-          </header>
-          <div class="ml-dossier-facts"><span>14–18 septembre 2026</span><span>08:30–18:30</span><span>Rétrocession <strong>70 %</strong></span><span class="ml-dossier-members"><img src="/landing-assets/temoignage-sarah-bernard.png" width="24" height="24" alt="">Cabinet &amp; Dre Sarah Bernard</span></div>
-          <div class="ml-dossier-body">
-            <aside class="ml-dossier-progress" id="suivi" aria-labelledby="ml-progress-title">
-              <div class="ml-dossier-label"><h4 id="ml-progress-title">Votre mission, en clair</h4><span>02 / 03</span></div>
-              <ol class="ml-dossier-timeline">
-                <li class="is-complete"><span class="ml-timeline-dot" aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span><div><span>01 · Accord</span><strong>Conditions confirmées</strong><p>Horaires et rétrocession validés par les deux médecins.</p><small>Accord enregistré</small></div></li>
-                <li class="is-current"><span class="ml-timeline-dot" aria-hidden="true">02</span><div><span>02 · Remplacement</span><strong>Mission en cours</strong><p>Le brief et les échanges restent accessibles à tout moment.</p><small>Vous êtes ici</small></div></li>
-                <li><span class="ml-timeline-dot" aria-hidden="true">03</span><div><span>03 · Clôture</span><strong>Bilan de fin de mission</strong><p>Compte rendu, justificatifs et suivi réunis dans le dossier.</p></div></li>
-              </ol>
-              <div class="ml-dossier-today"><div><small>SEPT.</small><strong>15</strong></div><p><strong>Journée 2 sur 5</strong><span>Mardi · Le remplacement avance.</span></p></div>
-            </aside>
-            <div class="ml-dossier-chat" aria-labelledby="ml-chat-title">
-              <header class="ml-chat-head"><div><span class="ml-chat-icon" aria-hidden="true"><svg class="landing-icon landing-icon--exchange" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12h16M8 8l-4 4 4 4m8-8 4 4-4 4"/></svg></span><h4 id="ml-chat-title">Le fil de la mission</h4></div><span>Visible par les deux parties</span></header>
-              <div class="ml-chat-content">
-                <div class="ml-chat-date">Avant le remplacement</div>
-                <div class="ml-chat-message"><img src="/landing-assets/temoignage-sarah-bernard.png" width="30" height="30" alt=""><div><span>Sarah · Médecin remplaçante</span><p>Je vous confirme ma disponibilité du 14 au 18. Le secrétariat est-il présent chaque jour ?</p></div></div>
-                <div class="ml-chat-message is-cabinet"><div><span>Cabinet des Tilleuls</span><p>Oui, de 8 h 30 à 17 h 30. Je l’ajoute au brief pour que vous ayez toutes les informations.</p></div></div>
-                <div class="ml-chat-decision"><span aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span><div><small>DÉCISION CONSERVÉE DANS LE DOSSIER</small><strong>Conditions confirmées par les deux parties</strong><p>Secrétariat chaque jour · Mission du 14 au 18 septembre</p></div></div>
-                <div class="ml-chat-date">Aujourd’hui · 15 septembre</div>
-                <div class="ml-chat-message"><img src="/landing-assets/temoignage-sarah-bernard.png" width="30" height="30" alt=""><div><span>Sarah · 08:15</span><p>Bien arrivée pour cette deuxième journée. J’ai retrouvé le brief et les horaires dans le dossier, merci !</p></div></div>
-                <div class="ml-chat-read">Lu par le cabinet <span aria-hidden="true"><svg class="landing-icon landing-icon--double-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m2 12 4 4L16 6m-5 9 1 1L22 6"/></svg></span></div>
-              </div>
-              <div class="ml-chat-compose" aria-hidden="true"><span><svg class="landing-icon landing-icon--plus" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span><span>Écrire dans le fil de la mission…</span><span><svg class="landing-icon landing-icon--arrow-up-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></div>
-            </div>
-          </div>
-          <div class="ml-dossier-bottom"><span><i aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></i>Chaque décision reste liée à la bonne mission.</span><span>Aperçu illustratif · Données fictives</span></div>
-        </div>
+        ${workspacePreview}
         <div class="ml-workspace-benefits"><p><span aria-hidden="true">01</span><strong>Reprenez la conversation</strong>Retrouvez les échanges liés à ce remplacement.</p><p><span aria-hidden="true">02</span><strong>Vérifiez les conditions convenues</strong>Dates, horaires et rétrocession restent consultables.</p><p><span aria-hidden="true">03</span><strong>Identifiez ce qui reste à confirmer</strong>Repérez l’étape en cours et la suite à donner.</p></div>
       </div>
     </section>
 
-    <section class="ml-continuity" id="continuite" aria-labelledby="continuity-title">
+    <section class="ml-continuity ml-continuity--editorial" id="continuite" aria-labelledby="continuity-title">
       <div class="ml-continuity-inner">
         <div class="ml-continuity-copy">
           <header>
@@ -155,39 +126,7 @@ export const landingContent = {
           <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span></p>
         </div>
 
-        <figure class="ml-continuity-preview">
-          <div class="ml-continuity-preview-label"><span>Le compte rendu du remplacement</span><span aria-hidden="true"><svg class="landing-icon landing-icon--arrow-up-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></div>
-          <div class="ml-continuity-report">
-            <header class="ml-continuity-report-head">
-              <div class="ml-continuity-report-meta"><span>Mission ML-0428</span><span class="ml-continuity-status"><i aria-hidden="true"></i>En cours</span></div>
-              <h3>Le point sur le remplacement</h3>
-              <p>Cabinet des Tilleuls <span aria-hidden="true">·</span> Jour 3 sur 5</p>
-            </header>
-            <dl class="ml-continuity-metrics" aria-label="Résumé de la mission">
-              <div><dt>Consultations</dt><dd>87</dd></div>
-              <div><dt>À surveiller</dt><dd>2</dd></div>
-              <div><dt>Transmissions</dt><dd>4</dd></div>
-            </dl>
-            <section class="ml-continuity-watch" aria-labelledby="watch-title">
-              <div class="ml-continuity-report-label"><h4 id="watch-title">Les points à suivre</h4><span>02</span></div>
-              <ul>
-                <li><span class="ml-continuity-attention" aria-hidden="true">!</span><div><strong>Suivi clinique à poursuivre</strong><p>Dossier #2841 · Contrôle sous 7 jours</p></div><span class="ml-continuity-priority">Prioritaire</span></li>
-                <li><span class="ml-continuity-attention" aria-hidden="true">!</span><div><strong>Résultat attendu</strong><p>Dossier #1976 · Compte rendu à vérifier</p></div></li>
-              </ul>
-            </section>
-            <section class="ml-continuity-handoff" aria-labelledby="handoff-title">
-              <div class="ml-continuity-report-label"><h4 id="handoff-title">Les transmissions réunies</h4><span>04</span></div>
-              <ul>
-                <li><span aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span>Compte rendu de spécialiste</li>
-                <li><span aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span>Renouvellement à confirmer</li>
-                <li><span aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span>Appel de suivi programmé</li>
-                <li><span aria-hidden="true"><svg class="landing-icon landing-icon--check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 12 4 4L19 6"/></svg></span>Consignes de suivi</li>
-              </ul>
-            </section>
-            <div class="ml-continuity-report-footer"><span aria-hidden="true"><svg class="landing-icon landing-icon--refresh" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 7v5h-5M20 12a8 8 0 1 0-2 5M20 7v5"/></svg></span><div><strong>Un compte rendu qui évolue avec la mission.</strong><p>Activité, points à reprendre et consignes partagées.</p></div></div>
-          </div>
-          <figcaption>Aperçu illustratif · Données fictives</figcaption>
-        </figure>
+        ${continuityPreview}
       </div>
     </section>
 

@@ -1,0 +1,155 @@
+/* Homepage only. Compiled with the page to keep markup and styles in sync. */
+.ml-workspace.ml-workspace--editorial {
+  --dossier-ink: #153e34;
+  --dossier-muted: #577368;
+  --dossier-line: #dfe5da;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 32px 72px;
+  border-radius: 0;
+  background: var(--ivory);
+  color: var(--dossier-ink);
+}
+.ml-workspace--editorial .ml-workspace-heading { display: block; max-width: 900px; margin: 0 auto 44px; text-align: center; }
+.ml-workspace--editorial .ml-workspace-kicker { color: #376d66; font-size: 10px; font-weight: 600; letter-spacing: .14em; }
+.ml-workspace--editorial .ml-workspace-heading h2 { font-size: clamp(36px, 4vw, 54px); line-height: 1.08; }
+.ml-workspace--editorial .ml-workspace-heading h2 em { color: #16786d; }
+.ml-workspace--editorial .ml-workspace-heading > p { max-width: 690px; margin: 22px auto 0; padding: 0; font-size: 15px; line-height: 1.75; color: #4b6174; text-wrap: pretty; }
+.ml-workspace--editorial .ml-dossier { border: 1px solid #e0e5dc; border-radius: 24px; background: #fffefa; box-shadow: 0 20px 48px -35px #153e3438; }
+.ml-workspace--editorial .ml-dossier-masthead { display: flex; align-items: center; gap: 15px; margin: 0 36px; padding: 23px 0 18px; border-bottom: 1px solid var(--dossier-line); color: var(--dossier-muted); font: 400 10px/1.5 var(--sans); }
+.ml-workspace--editorial .ml-dossier-wordmark { color: var(--dossier-ink); font: 25px/1 var(--serif); letter-spacing: -.05em; }
+.ml-workspace--editorial .ml-dossier-wordmark em { color: #527a63; }
+.ml-workspace--editorial .ml-dossier-wordmark > span { margin-left: 18px; color: #c4d0bf; font: 300 21px var(--sans); }
+.ml-workspace--editorial .ml-dossier-reference { margin-left: auto; font-size: 9px; letter-spacing: .09em; text-transform: uppercase; }
+.ml-workspace--editorial .ml-dossier-overview { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 30px 36px 32px; }
+.ml-workspace--editorial .ml-editorial-eyebrow { display: block; color: var(--dossier-muted); font: 500 9px/1.6 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
+.ml-workspace--editorial .ml-dossier-overview h3 { margin-top: 12px; color: var(--dossier-ink); font: 400 clamp(30px, 3vw, 38px)/1.02 var(--serif); letter-spacing: -.025em; }
+.ml-workspace--editorial .ml-dossier-overview h3 em { color: #62816c; font-weight: 400; }
+.ml-workspace--editorial .ml-dossier-people { display: flex; align-items: center; gap: 13px; }
+.ml-workspace--editorial .ml-dossier-avatars { display: flex; flex-shrink: 0; }
+.ml-workspace--editorial .ml-dossier-avatars > * { display: grid; place-items: center; width: 40px; height: 40px; border: 2px solid #fffefa; border-radius: 50%; background: #e3eadb; color: var(--dossier-ink); font: 500 10px var(--sans); object-fit: cover; }
+.ml-workspace--editorial .ml-dossier-avatars img { margin-left: -10px; }
+.ml-workspace--editorial .ml-dossier-people p { color: var(--dossier-muted); font-size: 10px; line-height: 1.75; }
+.ml-workspace--editorial .ml-dossier-people strong { color: var(--dossier-ink); font-weight: 500; }
+.ml-workspace--editorial .ml-dossier-columns { display: grid; grid-template-columns: minmax(240px, .74fr) minmax(0, 1.26fr); gap: 0; padding: 0 10px 10px; }
+.ml-workspace--editorial .ml-dossier-agenda { padding: 28px; border-radius: 16px; background: #153e34; color: #eef5e9; scroll-margin-top: 110px; }
+.ml-workspace--editorial .ml-agenda-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ml-workspace--editorial .ml-agenda-heading h4 { max-width: 90px; color: #eef5e9; font: 400 11px/1.5 var(--sans); }
+.ml-workspace--editorial .ml-agenda-status { display: flex; align-items: center; gap: 7px; color: #c7e89b; font-size: 9px; white-space: nowrap; }
+.ml-workspace--editorial .ml-agenda-status i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.ml-workspace--editorial .ml-agenda-period { margin-top: 34px; }
+.ml-workspace--editorial .ml-agenda-period > span { color: #c0d2c3; font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+.ml-workspace--editorial .ml-agenda-period > strong { display: block; margin: 9px 0 8px; color: #eef5e9; font: 400 clamp(56px, 5.5vw, 74px)/1 var(--serif); letter-spacing: -.045em; white-space: nowrap; }
+.ml-workspace--editorial .ml-agenda-period > strong span { margin: 0 8px; color: #a1be91; font-size: .65em; vertical-align: 9%; }
+.ml-workspace--editorial .ml-agenda-period p { color: #bdcfc1; font-size: 11px; }
+.ml-workspace--editorial .ml-agenda-conditions { display: grid; grid-template-columns: 1.2fr 1fr; gap: 16px; margin-top: 25px; padding: 22px 0; border-block: 1px solid #416054; }
+.ml-workspace--editorial .ml-agenda-conditions dt { margin-bottom: 9px; color: #bdcfc1; font-size: 9px; }
+.ml-workspace--editorial .ml-agenda-conditions dd { color: #eef5e9; font-size: 12px; font-variant-numeric: tabular-nums; }
+.ml-workspace--editorial .ml-agenda-conditions dd span { color: #c7e89b; }
+.ml-workspace--editorial .ml-agenda-steps { display: grid; gap: 24px; margin-top: 28px; list-style: none; }
+.ml-workspace--editorial .ml-agenda-steps li { position: relative; display: flex; align-items: center; gap: 13px; }
+.ml-workspace--editorial .ml-agenda-steps li:not(:last-child)::after { content: ''; position: absolute; left: 12px; top: 34px; width: 1px; height: 16px; background: #416054; }
+.ml-workspace--editorial .ml-agenda-steps li > span { display: grid; place-items: center; flex: 0 0 25px; height: 25px; border: 1px solid #557265; border-radius: 50%; color: #b4c8ba; font-size: 9px; }
+.ml-workspace--editorial .ml-agenda-steps svg { width: 14px; height: 14px; }
+.ml-workspace--editorial .ml-agenda-steps .is-complete > span { border-color: #76956f; color: #c7e89b; }
+.ml-workspace--editorial .ml-agenda-steps .is-current > span { border-color: #c7e89b; background: #c7e89b; color: #153e34; }
+.ml-workspace--editorial .ml-agenda-steps strong { display: block; color: #e4ede2; font-size: 11px; font-weight: 400; line-height: 1.5; }
+.ml-workspace--editorial .ml-agenda-steps small { display: block; margin-top: 4px; color: #b4c8ba; font-size: 9px; line-height: 1.5; }
+.ml-workspace--editorial .ml-agenda-steps .is-current small { color: #c7e89b; }
+.ml-workspace--editorial .ml-agenda-note { margin-top: 28px; padding-top: 19px; border-top: 1px solid #416054; color: #b4c8ba; font-size: 10px; line-height: 1.65; }
+.ml-workspace--editorial .ml-dossier-conversation { min-width: 0; padding: 22px 28px 14px 34px; }
+.ml-workspace--editorial .ml-conversation-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.ml-workspace--editorial .ml-conversation-heading h4 { margin-top: 8px; font: 400 30px/1.1 var(--serif); color: var(--dossier-ink); letter-spacing: -.02em; }
+.ml-workspace--editorial .ml-conversation-shared { max-width: 75px; font-size: 9px; line-height: 1.6; color: var(--dossier-muted); text-align: right; }
+.ml-workspace--editorial .ml-conversation-date { display: flex; align-items: center; gap: 12px; margin: 26px 0 22px; color: var(--dossier-muted); font-size: 9px; }
+.ml-workspace--editorial .ml-conversation-date::after { content: ''; flex: 1; height: 1px; background: var(--dossier-line); }
+.ml-workspace--editorial .ml-conversation-message { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; }
+.ml-workspace--editorial .ml-conversation-avatar { display: grid; place-items: center; flex: 0 0 28px; height: 28px; border: 1px solid #cdd9c6; border-radius: 50%; color: #46664e; background: #eef2e6; font-size: 8px; }
+.ml-workspace--editorial .ml-conversation-message > div { flex: 1; min-width: 0; }
+.ml-workspace--editorial .ml-conversation-author { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding-top: 4px; color: var(--dossier-ink); font-size: 11px; font-weight: 500; }
+.ml-workspace--editorial .ml-conversation-author small { color: var(--dossier-muted); font-size: 9px; font-weight: 400; }
+.ml-workspace--editorial .ml-conversation-message p { margin-top: 8px; color: #425e50; font-size: 12px; line-height: 1.75; text-wrap: pretty; }
+.ml-workspace--editorial .ml-conversation-message--cabinet { margin-left: 40px; padding: 16px; border-radius: 2px 14px 14px; background: #edf2e6; }
+.ml-workspace--editorial .ml-conversation-message--cabinet .ml-conversation-avatar { background: transparent; border-color: #bacdb2; }
+.ml-workspace--editorial .ml-conversation-agreement { display: flex; align-items: center; gap: 12px; margin: 0 0 20px 40px; }
+.ml-workspace--editorial .ml-conversation-agreement > span { display: grid; place-items: center; flex: 0 0 23px; height: 23px; border-radius: 50%; background: #e7eedb; color: #416d42; }
+.ml-workspace--editorial .ml-conversation-agreement svg { width: 13px; height: 13px; }
+.ml-workspace--editorial .ml-conversation-agreement strong { display: block; color: #416447; font-size: 10px; font-weight: 500; line-height: 1.5; }
+.ml-workspace--editorial .ml-conversation-agreement small { display: block; margin-top: 4px; color: var(--dossier-muted); font-size: 9px; line-height: 1.5; }
+.ml-workspace--editorial .ml-conversation-files { margin-left: 40px; border-block: 1px solid var(--dossier-line); }
+.ml-workspace--editorial .ml-conversation-file { display: flex; align-items: center; gap: 11px; padding: 14px 0; }
+.ml-workspace--editorial .ml-conversation-file + .ml-conversation-file { border-top: 1px solid #e9ece3; }
+.ml-workspace--editorial .ml-file-symbol { display: grid; place-items: center; flex: 0 0 26px; color: #608155; }
+.ml-workspace--editorial .ml-file-symbol svg { width: 24px; height: 28px; }
+.ml-workspace--editorial .ml-conversation-file strong { display: block; font-size: 11px; font-weight: 500; color: var(--dossier-ink); }
+.ml-workspace--editorial .ml-conversation-file div > span { display: block; margin-top: 4px; color: var(--dossier-muted); font-size: 9px; line-height: 1.5; }
+.ml-workspace--editorial .ml-file-format { margin-left: auto; color: var(--dossier-muted); font-size: 8px; letter-spacing: .06em; }
+.ml-workspace--editorial .ml-conversation-arrival { display: flex; align-items: flex-start; gap: 10px; margin: 21px 0 0 40px; color: #425e50; }
+.ml-workspace--editorial .ml-arrival-dot { flex: 0 0 5px; height: 5px; margin-top: 6px; border-radius: 50%; background: #6f925a; }
+.ml-workspace--editorial .ml-conversation-arrival p { font-size: 11px; line-height: 1.65; }
+.ml-workspace--editorial .ml-conversation-arrival p > span { display: block; margin-bottom: 5px; color: var(--dossier-muted); font-size: 9px; }
+.ml-workspace--editorial .ml-arrival-read { display: flex; align-items: center; gap: 4px; margin-left: auto; color: var(--dossier-muted); font-size: 9px; }
+.ml-workspace--editorial .ml-arrival-read svg { width: 14px; height: 14px; }
+.ml-workspace--editorial .ml-dossier-caption { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 36px; border-top: 1px solid var(--dossier-line); color: var(--dossier-muted); font-size: 9px; line-height: 1.6; }
+.ml-workspace--editorial .ml-dossier-caption > span:first-child { display: flex; align-items: center; gap: 8px; }
+.ml-workspace--editorial .ml-dossier-caption svg { flex: 0 0 15px; width: 15px; height: 15px; color: #527c49; }
+.ml-workspace--editorial .ml-workspace-benefits { gap: 32px; margin-top: 32px; }
+.ml-workspace--editorial .ml-workspace-benefits p { grid-template-columns: 25px 1fr; gap: 7px 12px; font-size: 11px; color: var(--dossier-muted); line-height: 1.65; }
+.ml-workspace--editorial .ml-workspace-benefits span { padding-top: 0; color: #719264; font: 400 24px/1.2 var(--serif); }
+.ml-workspace--editorial .ml-workspace-benefits strong { color: var(--dossier-ink); font-size: 13px; }
+
+@media (max-width: 1000px) {
+  .ml-workspace--editorial .ml-dossier-overview { gap: 24px; }
+  .ml-workspace--editorial .ml-dossier-people { flex-direction: column; align-items: flex-start; gap: 7px; }
+  .ml-workspace--editorial .ml-dossier-columns { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr); }
+  .ml-workspace--editorial .ml-dossier-agenda { padding: 24px 20px; }
+  .ml-workspace--editorial .ml-dossier-conversation { padding: 18px 20px 14px 24px; }
+  .ml-workspace--editorial .ml-conversation-message--cabinet { margin-left: 0; }
+  .ml-workspace--editorial :is(.ml-conversation-agreement, .ml-conversation-files, .ml-conversation-arrival) { margin-left: 0; }
+}
+@media (max-width: 760px) {
+  .ml-workspace.ml-workspace--editorial { padding: 24px 24px 64px; }
+  .ml-workspace--editorial .ml-workspace-heading { margin-bottom: 32px; }
+  .ml-workspace--editorial .ml-dossier-masthead { margin-inline: 24px; }
+  .ml-workspace--editorial .ml-dossier-overview { padding: 26px 24px; }
+  .ml-workspace--editorial .ml-dossier-columns { grid-template-columns: 1fr; }
+  .ml-workspace--editorial .ml-dossier-agenda { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; padding: 24px; }
+  .ml-workspace--editorial .ml-agenda-heading { grid-column: 1 / -1; padding-bottom: 22px; border-bottom: 1px solid #416054; }
+  .ml-workspace--editorial .ml-agenda-heading h4 { max-width: none; }
+  .ml-workspace--editorial .ml-agenda-period { margin-top: 24px; }
+  .ml-workspace--editorial .ml-agenda-period > strong { font-size: 64px; }
+  .ml-workspace--editorial .ml-agenda-conditions { grid-column: 1; border-bottom: 0; margin-top: 20px; padding: 16px 0 0; }
+  .ml-workspace--editorial .ml-agenda-steps { grid-column: 2; grid-row: 2 / 4; align-content: center; gap: 24px; margin-top: 24px; }
+  .ml-workspace--editorial .ml-agenda-note { grid-column: 1 / -1; margin-top: 24px; padding-top: 16px; }
+  .ml-workspace--editorial .ml-agenda-note br { display: none; }
+  .ml-workspace--editorial .ml-dossier-conversation { padding: 30px 24px 22px; }
+  .ml-workspace--editorial .ml-dossier-caption { padding-inline: 24px; }
+  .ml-workspace--editorial .ml-workspace-benefits { grid-template-columns: 1fr; gap: 20px; }
+}
+@media (max-width: 480px) {
+  .ml-workspace.ml-workspace--editorial { padding-inline: 16px; }
+  .ml-workspace--editorial .ml-workspace-heading h2 { font-size: 36px; }
+  .ml-workspace--editorial .ml-workspace-heading > p { font-size: 14px; }
+  .ml-workspace--editorial .ml-dossier { border-radius: 20px; }
+  .ml-workspace--editorial .ml-dossier-masthead { flex-wrap: wrap; gap: 10px; margin-inline: 20px; padding-top: 19px; }
+  .ml-workspace--editorial .ml-dossier-masthead > span:nth-child(2) { font-size: 9px; }
+  .ml-workspace--editorial .ml-dossier-reference { width: 100%; margin: 0; font-size: 8px; }
+  .ml-workspace--editorial .ml-dossier-overview { display: block; padding: 24px 20px; }
+  .ml-workspace--editorial .ml-dossier-overview h3 { font-size: 34px; }
+  .ml-workspace--editorial .ml-dossier-people { flex-direction: row; align-items: center; gap: 12px; margin-top: 20px; }
+  .ml-workspace--editorial .ml-dossier-avatars > * { width: 34px; height: 34px; }
+  .ml-workspace--editorial .ml-dossier-agenda { grid-template-columns: 1fr; padding: 24px 20px; }
+  .ml-workspace--editorial .ml-agenda-period > strong { font-size: 72px; }
+  .ml-workspace--editorial .ml-agenda-conditions { grid-template-columns: 1fr 1fr; }
+  .ml-workspace--editorial .ml-agenda-steps { grid-column: 1; grid-row: auto; padding-top: 24px; border-top: 1px solid #416054; }
+  .ml-workspace--editorial .ml-agenda-steps strong { font-size: 12px; }
+  .ml-workspace--editorial .ml-agenda-steps small { font-size: 10px; }
+  .ml-workspace--editorial .ml-dossier-conversation { padding: 28px 10px 20px; }
+  .ml-workspace--editorial .ml-conversation-heading h4 { font-size: 30px; }
+  .ml-workspace--editorial .ml-conversation-message { gap: 10px; }
+  .ml-workspace--editorial .ml-conversation-message p { font-size: 12px; }
+  .ml-workspace--editorial .ml-conversation-message--cabinet { padding: 14px 12px; }
+  .ml-workspace--editorial .ml-conversation-arrival { flex-wrap: wrap; }
+  .ml-workspace--editorial .ml-conversation-arrival p { flex: 1; }
+  .ml-workspace--editorial .ml-dossier-caption { padding: 16px 20px; }
+}
