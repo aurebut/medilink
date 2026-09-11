@@ -1,6 +1,7 @@
 import { processIllustrations } from './landing-process-art';
 import { workspacePreview } from './landing-workspace-preview';
 import { continuityPreview } from './landing-continuity-preview';
+import { documentsSection } from './landing-documents-section';
 
 // Original landing restored from Git 60c8e06, with user-requested process illustrations.
 // Legacy hrefs use canonical routes. All markup is repository-authored, never user content.
@@ -129,6 +130,8 @@ export const landingContent = {
         ${continuityPreview}
       </div>
     </section>
+
+    ${documentsSection}
 
     <section class="ml-testimonials" id="temoignages" aria-labelledby="ml-testimonials-title">
       <div class="ml-testimonials-inner">

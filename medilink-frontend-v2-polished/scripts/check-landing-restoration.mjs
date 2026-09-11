@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-// Preserve the original landing outside the explicitly requested guides links, process art and two homepage previews.
+// Preserve the original landing outside the explicitly requested guides links, process art, two homepage previews and documents section.
 const reference = '60c8e06';
 const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
@@ -85,6 +85,28 @@ function normalizeEditorialPreviews(html, updated) {
   }
   return html;
 }
+function normalizeDocumentsSection(html) {
+  assert.equal([...html.matchAll(/\bid="documents"/g)].length, 1, 'documents: exactly one section anchor');
+  const section = /<section class="ml-documents" id="documents" aria-labelledby="ml-documents-title">(?:(?!<\/?section\b)[\s\S])*?<\/section>/g;
+  const matches = [...html.matchAll(section)];
+  assert.equal(matches.length, 1, 'documents: exactly one self-contained section with its accessible heading');
+  const [{ 0: markup, index: start }] = matches;
+  const end = start + markup.length;
+  assert.match(html.slice(0, start), /<section\b[^>]*\bid="continuite"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\s*$/, 'documents: directly follows the continuity section');
+  const separator = /^\r?\n\r?\n {4}(?=<section class="ml-testimonials" id="temoignages")/;
+  assert.match(html.slice(end), separator, 'documents: directly precedes testimonials');
+
+  assert.equal([...markup.matchAll(/\bid="ml-documents-title"/g)].length, 1, 'documents: heading ID is unique');
+  const heading = markup.match(/<h2\b[^>]*\bid="ml-documents-title"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
+  assert.ok(heading && heading.replace(/<[^>]+>/g, '').trim().length > 10, 'documents: meaningful visible section heading');
+  const figures = [...markup.matchAll(/<figure class="ml-documents-preview" aria-labelledby="ml-documents-preview-title">[\s\S]*?<\/figure>/g)];
+  assert.equal(figures.length, 1, 'documents: exactly one accessible interface preview');
+  assert.equal([...figures[0][0].matchAll(/\bid="ml-documents-preview-title"/g)].length, 1, 'documents: preview label resolves to one visible title');
+  assert.match(figures[0][0], /<figcaption\b[^>]*>[\s\S]*?Aperçu illustratif · Données fictives[\s\S]*?<\/figcaption>/, 'documents: preview data remains visibly illustrative');
+
+  // Remove only the new section and its added separator; all surrounding markup remains compared verbatim.
+  return html.slice(0, start) + html.slice(end).replace(separator, '');
+}
 for (const [path, file] of Object.entries(pages)) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
   const response = await fetch(base + path, { signal: AbortSignal.timeout(20000) });
@@ -108,6 +130,7 @@ for (const [path, file] of Object.entries(pages)) {
     for (const section of ['workspace', 'continuity']) {
       assert.ok(compiledCss.includes(`.ml-${section}--editorial`), `${section}: requested interface styles use versioned Next.js assets`);
     }
+    assert.match(compiledCss, /\.ml-documents(?:\s|[{:,.>])/, 'documents: section styles use versioned Next.js assets');
   }
   for (const tag of ['nav', 'main', 'footer']) {
     const pattern = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`);
@@ -133,8 +156,9 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizeConclusionCopy(expected, false);
       rendered = normalizeEditorialPreviews(rendered, true);
       expected = normalizeEditorialPreviews(expected, false);
+      rendered = normalizeDocumentsSection(rendered);
     }
-    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations and interface previews`);
+    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews and documents section`);
   }
   const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
   assert.deepEqual(styles(actual), styles(original), `${path}: original stylesheet order`);
@@ -142,7 +166,7 @@ for (const [path, file] of Object.entries(pages)) {
   [...original.matchAll(/<script src="(\/landing-[^"]+\.js)"/g)].forEach(match => originalAssets.add(match[1]));
   assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
-  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations and interface previews`);
+  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews and documents section`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });
