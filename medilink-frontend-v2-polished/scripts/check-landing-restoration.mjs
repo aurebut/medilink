@@ -8,6 +8,26 @@ const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.h
 const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
 function normalizeRequestedHomeCopy(html, updated) {
+  // Additional copy replacements explicitly requested in the second table.
+  const replacements = [
+  [
+    "Des médecins ont participé <em>aux choix du produit.</em>",
+    "Des médecins ont participé <em>au développement de la plateforme.</em>"
+  ],
+  [
+    "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
+    "<h2 id=\"ml-workspace-title\">Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2>"
+  ],
+  [
+    "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
+    "<span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span>"
+  ]
+];
+  for (const [before, after] of replacements) {
+    const expected = updated ? after : before;
+    assert.equal(html.split(expected).length - 1, 1, `requested copy: ${expected}`);
+    if (updated) html = html.replace(after, before);
+  }
   // The user's replacement table removes four blocks and replaces these two headings.
   for (const className of ['hero-eyebrow', 'hero-sub', 'hero-photo-caption', 'ml-process-note']) {
     const block = new RegExp(`^ *<(p|figcaption) class="${className}">[^\\n]*?<\\/\\1>\\r?\\n`, 'gm');

@@ -98,7 +98,7 @@ export const landingContent = {
     <section class="ml-workspace ml-workspace--editorial" id="communication" aria-labelledby="ml-workspace-title">
       <div class="ml-workspace-inner">
         <header class="ml-workspace-heading">
-          <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2></div>
+          <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2></div>
           <p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>
         </header>
         ${workspacePreview}
@@ -119,7 +119,7 @@ export const landingContent = {
             <li><span aria-hidden="true">02</span><div><h3>Les points à reprendre</h3><p>Repérez les résultats attendus et les situations qui nécessitent un suivi.</p></div></li>
             <li><span aria-hidden="true">03</span><div><h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p></div></li>
           </ol>
-          <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span></p>
+          <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span></p>
         </div>
 
         ${continuityPreview}
@@ -132,7 +132,7 @@ export const landingContent = {
       <div class="ml-testimonials-inner">
         <header class="ml-testimonials-heading">
           <span class="ml-testimonials-kicker">Les médecins contributeurs</span>
-          <h2 id="ml-testimonials-title">Des médecins ont participé <em>aux choix du produit.</em></h2>
+          <h2 id="ml-testimonials-title">Des médecins ont participé <em>au développement de la plateforme.</em></h2>
           <p>Quels critères comparer avant un remplacement ? Quelles informations partager avant le premier jour ? Que transmettre à la reprise ? Les médecins qui ont contribué à MédiLink ont aidé à préciser ces besoins.</p>
         </header>
         <div class="ml-testimonials-grid"><figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">01</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
