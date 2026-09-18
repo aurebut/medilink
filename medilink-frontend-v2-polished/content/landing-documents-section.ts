@@ -8,11 +8,6 @@ export const documentsSection = `<section class="ml-documents" id="documents" ar
           <span class="ml-documents-kicker">Les documents du remplacement</span>
           <h2 id="ml-documents-title">Vos documents réunis.<br><em>Vous avancez ensemble.</em></h2>
           <p>Contrat, attestations, documents de mission : retrouvez vos pièces sur MédiLink, aux côtés de vos échanges et du suivi du remplacement. Un même point de repère pour préparer la suite ensemble.</p>
-          <ol class="ml-documents-benefits">
-            <li><span aria-hidden="true">01</span><div><h3>Vos essentiels à portée de main</h3><p>Retrouvez vos justificatifs et vos documents de mission dans votre espace.</p></div></li>
-            <li><span aria-hidden="true">02</span><div><h3>Un partage au bon moment</h3><p>Le cabinet avec lequel vous êtes en relation accède à vos justificatifs validés.</p></div></li>
-            <li><span aria-hidden="true">03</span><div><h3>La préparation et le suivi réunis</h3><p>Passez des échanges aux pièces utiles, sur la même plateforme.</p></div></li>
-          </ol>
           <div class="ml-documents-connection">${syncIcon}<p>Documents et échanges, au même endroit.<br><strong>Un fil commun pour avancer à deux.</strong></p></div>
         </div>
 
