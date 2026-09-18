@@ -6,7 +6,7 @@ export const documentsSection = `<section class="ml-documents" id="documents" ar
       <div class="ml-documents-inner">
         <div class="ml-documents-copy">
           <span class="ml-documents-kicker">Les documents du remplacement</span>
-          <h2 id="ml-documents-title">Vos documents réunis<br><em>dans un espace commun.</em></h2>
+          <h2 id="ml-documents-title">Vos documents réunis<br><em>dans un <span class="title-accent">espace commun</span>.</em></h2>
           <p>Retrouvez tous vos documents au même endroit : justificatifs, attestations, contrats et documents de mission, dans un espace dédié au remplacement. Tout est centralisé pour préparer, suivre et finaliser la mission simplement.</p>
           <div class="ml-documents-connection">${syncIcon}<p>Documents et échanges, au même endroit.<br><strong>Un fil commun pour avancer à deux.</strong></p></div>
         </div>

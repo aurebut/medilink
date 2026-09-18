@@ -8,6 +8,7 @@ const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.h
 const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
 function normalizeRequestedHomeCopy(html, updated) {
+  html = html.replace(/<span class="title-accent">([^<]+)<\/span>/g, '$1');
   const processNote = /^ *<p class="ml-process-note">[^\n]*?<\/p>\r?\n/gm;
   assert.equal([...html.matchAll(processNote)].length, updated ? 0 : 1, 'requested removal of the process closing note');
   html = html.replace(processNote, '');
@@ -25,7 +26,7 @@ function normalizeRequestedHomeCopy(html, updated) {
   ],
   [
     "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
-    "<h2 id=\"ml-workspace-title\">Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2>"
+    "<h2 id=\"ml-workspace-title\">Retrouvez les échanges et les points à finaliser avant le premier jour.</h2>"
   ],
   [
     "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>",

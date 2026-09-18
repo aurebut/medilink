@@ -12,7 +12,7 @@ export const landingContent = {
       <div class="hero-layout-human">
         <div class="hero-copy">
           <p class="hero-eyebrow">Le remplacement médical, de la recherche à la transmission.</p>
-          <h1 id="hero-title"><span>La plateforme de remplacement</span> <em>conçue avec et pour les médecins généralistes</em></h1>
+          <h1 id="hero-title"><span>La plateforme de remplacement</span> <em>conçue <span class="title-accent">avec</span> et <span class="title-accent">pour</span> les médecins généralistes</em></h1>
           <p class="hero-sub">MédiLink rapproche médecins remplaçants et cabinets selon leurs disponibilités et leurs conditions d’exercice. Comparez les possibilités, convenez des modalités et retrouvez les échanges et les transmissions dans le dossier du remplacement.</p>
           <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/demo">Demander une démo <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></div>
         </div>
@@ -31,7 +31,7 @@ export const landingContent = {
       <div class="ml-process-inner">
         <header class="ml-process-head">
           <span class="ml-process-kicker">Vos critères comme point de départ</span>
-          <h2 id="ml-process-title">Gérez chaque mission simplement, avant, pendant et après le remplacement.</h2>
+          <h2 id="ml-process-title">Gérez chaque mission simplement, <span class="title-accent">avant</span>, <span class="title-accent">pendant</span> et <span class="title-accent">après</span> le remplacement.</h2>
         </header>
         <div class="ml-process-nav">
           <div class="ml-process-tabs" role="tablist" aria-label="Les trois étapes du remplacement">
@@ -97,7 +97,7 @@ export const landingContent = {
       <div class="ml-testimonials-inner">
         <header class="ml-testimonials-heading">
           <span class="ml-testimonials-kicker">Les médecins contributeurs</span>
-          <h2 id="ml-testimonials-title">Des médecins ont participé <em>au développement de la plateforme.</em></h2>
+          <h2 id="ml-testimonials-title">Des médecins ont participé <em>au <span class="title-accent">développement de la plateforme.</span></em></h2>
           <p>Quels critères comparer avant un remplacement ? Quelles informations partager avant le premier jour ? Que transmettre à la reprise ? Les médecins qui ont contribué à MédiLink ont aidé à préciser ces besoins.</p>
         </header>
         <div class="ml-testimonials-grid"><figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">01</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
@@ -109,7 +109,7 @@ export const landingContent = {
     <section class="ml-workspace ml-workspace--editorial" id="communication" aria-labelledby="ml-workspace-title">
       <div class="ml-workspace-inner">
         <header class="ml-workspace-heading">
-          <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2></div>
+          <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Retrouvez les <span class="title-accent">échanges</span> et les <span class="title-accent">points à finaliser</span> avant le premier jour.</h2></div>
           <p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>
         </header>
         ${workspacePreview}

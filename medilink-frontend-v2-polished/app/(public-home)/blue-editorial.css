@@ -40,7 +40,7 @@ html body.landing-home:not(.persona-page) .hero-story {
 }
 html body.landing-home:not(.persona-page) :is(.hero-eyebrow, .section-kicker, .ml-process-kicker, .ml-workspace-kicker, .faq-group-title, .footer-col h4) { color: #45658d; }
 html body.landing-home:not(.persona-page) :is(.hero-sub, .section-sub, .ml-process-copy > p, .ml-workspace-heading > p, .faq-answer, .footer-brand p, .footer-col a, .footer-bottom) { color: #49617f; }
-html body.landing-home:not(.persona-page) :is(.hero h1 em, .ml-process h2 em, .ml-workspace-heading h2 em, .ml-testimonials-heading h2 em) { color: #376aaf; }
+html body.landing-home:not(.persona-page) :is(.hero h1 em, .ml-process h2 em, .ml-workspace-heading h2 em, .ml-testimonials-heading h2 em) { color: inherit; }
 html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal) {
   background: #1952a0;
   color: #fdfefe;
@@ -99,14 +99,15 @@ html body.landing-home:not(.persona-page) .cta-band .btn-primary:hover { backgro
 html body.landing-home:not(.persona-page) .faq-item { border-color: #ced6dd; }
 html body.landing-home:not(.persona-page) .faq-item[open] { background: #e7effb; border-color: #b2bec9; }
 
-/* Main editorial titles use the requested blue; emphasis keeps a softer value. */
+/* Blue is reserved for selected words within editorial headings. */
 html body.landing-home:not(.persona-page) :is(
   .hero h1, .ml-process-head h2, .ml-process-copy h3,
   .ml-testimonials-heading h2, .ml-workspace-heading h2,
   .ml-continuity-copy h2, .ml-documents-copy h2,
   .audiences h2, .audience-card h3, .faq h2
-) { color: #1952a0; }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-copy h2 em, .ml-documents-copy h2 em) { color: #376aaf; }
+) { color: #223e57; }
+html body.landing-home:not(.persona-page) main :is(h1, h2) em { color: inherit; }
+html body.landing-home:not(.persona-page) main :is(h1, h2) .title-accent { color: #1952a0; }
 html body.landing-home:not(.persona-page) .ml-documents { --documents-ink: #1952a0; --documents-muted: #49617f; }
 html body.landing-home:not(.persona-page) .ml-workspace--editorial { --dossier-ink: #1952a0; --dossier-muted: #49617f; }
 html body.landing-home:not(.persona-page) :is(.ml-continuity-copy header > p, .ml-testimonials-heading > p) { color: #49617f; }
