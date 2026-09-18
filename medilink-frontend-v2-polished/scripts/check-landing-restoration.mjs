@@ -11,6 +11,9 @@ function normalizeRequestedHomeCopy(html, updated) {
   const processNote = /^ *<p class="ml-process-note">[^\n]*?<\/p>\r?\n/gm;
   assert.equal([...html.matchAll(processNote)].length, updated ? 0 : 1, 'requested removal of the process closing note');
   html = html.replace(processNote, '');
+  const contributorsNote = /^ *<p class="ml-testimonials-note">[^\n]*?<\/p>\r?\n/gm;
+  assert.equal([...html.matchAll(contributorsNote)].length, updated ? 0 : 1, 'requested removal of the contributors placeholder note');
+  html = html.replace(contributorsNote, '');
   const heroPath = /^ *<ol class="hero-path"[^>]*>[\s\S]*?<\/ol>\r?\n/gm;
   assert.equal([...html.matchAll(heroPath)].length, updated ? 0 : 1, 'requested removal of the three links below the hero photo');
   html = html.replace(heroPath, '');
@@ -22,7 +25,11 @@ function normalizeRequestedHomeCopy(html, updated) {
   ],
   [
     "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
-    "<h2 id=\"ml-workspace-title\">Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2>"
+    "<h2 id=\"ml-workspace-title\">Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</h2>"
+  ],
+  [
+    "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>",
+    "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>"
   ],
   [
     "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
