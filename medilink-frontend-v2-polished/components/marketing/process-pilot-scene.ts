@@ -107,7 +107,7 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
     const information = phase(infoTime, 0, 2100);
     const contactProgress = phase(contactTime, 0, 2200);
     const infoTone = phase(infoTime, 100, 1700) * (1 - phase(contactTime, 200, 1900));
-    root.style.setProperty('--v2-surface', tint('#f5f2e9', '#edf2e7', infoTone));
+    root.style.setProperty('--v2-surface', tint('#edf2f7', '#e8eff6', infoTone));
     root.dataset.scene = contactProgress > 0 ? contactProgress === 1 ? 'contact' : 'contact-transition' : information > 0 ? information === 1 ? 'information' : 'information-transition' : 'documents';
     const copyProgress = [1 - phase(infoTime, 200, 750), phase(infoTime, 700, 1300) * (1 - phase(contactTime, 200, 750)), phase(contactTime, 700, 1500)];
     copies.forEach((elements, index) => elements.forEach(element => {
@@ -165,8 +165,8 @@ export function createPilotProcessScene(): (ProcessScene & { destroy: () => void
         rect.setAttribute('height', String(height));
         rect.setAttribute('rx', String(radius));
       }
-      face.style.fill = isDocuments ? tint('#fffef9', '#e9efdf', fold) : '#fffef9';
-      face.style.stroke = isDocuments ? '#c4d0b8' : 'none';
+      face.style.fill = isDocuments ? tint('#fdfefe', '#dfe7ef', fold) : '#fdfefe';
+      face.style.stroke = isDocuments ? '#b9c4cf' : 'none';
       // Practical icons clear the space while the same two doctors stay present.
       const paperVisible = isDocuments ? 1 : 0;
       opacity(face, paperVisible);

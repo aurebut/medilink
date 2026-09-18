@@ -106,10 +106,10 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
     figure!.dataset.scene = chatTravel > 0
       ? chatTravel === 1 ? 'discussion' : 'discussion-transition'
       : travel === 0 ? 'map' : travel === 1 ? 'criteria' : 'transition';
-    figure!.style.setProperty('--v2-surface', color(color('#f1f5ef', '#153e34', backdrop), '#f5f2e9', chatBackdrop));
-    figure!.style.setProperty('--v2-ink', color(color('#164c41', '#eef5e9', backdrop), '#164c41', chatBackdrop));
-    figure!.style.setProperty('--v2-muted', color(color('#577368', '#b6cbbb', backdrop), '#577368', chatBackdrop));
-    figure!.style.setProperty('--v2-thread', color(color('#7fa68a', '#c7e89b', backdrop), '#87a789', chatBackdrop));
+    figure!.style.setProperty('--v2-surface', color(color('#e8eff6', '#1d355b', backdrop), '#edf2f7', chatBackdrop));
+    figure!.style.setProperty('--v2-ink', color(color('#152342', '#eff5fa', backdrop), '#152342', chatBackdrop));
+    figure!.style.setProperty('--v2-muted', color(color('#506d94', '#becfdd', backdrop), '#506d94', chatBackdrop));
+    figure!.style.setProperty('--v2-thread', color(color('#4266ad', '#c4dff2', backdrop), '#4266ad', chatBackdrop));
     map.style.opacity = String(1 - mapExit);
     map.style.visibility = mapExit === 1 ? 'hidden' : 'visible';
     map.setAttribute('transform', `translate(260 200) scale(${1 - mapExit * .025}) translate(-260 -200)`);
@@ -133,19 +133,19 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
       paper.setAttribute('height', String(mix(317, 100, chatTravel)));
       paper.setAttribute('rx', String(mix(22, 18, chatTravel)));
     }
-    checklistFace.style.fill = color('#f3f7eb', '#fffef7', chatTravel);
-    checklistFace.style.stroke = color('#d5e5c2', '#b9c7ad', chatTravel);
-    checklistBack.style.fill = color('#799972', '#dce2cf', chatTravel);
+    checklistFace.style.fill = color('#ebf1f7', '#fdfefe', chatTravel);
+    checklistFace.style.stroke = color('#c4d4e3', '#aebac6', chatTravel);
+    checklistBack.style.fill = color('#7491ba', '#d0d9e1', chatTravel);
     const route = chatTravel > 0 ? morphPath(straightRoute, discussionRoute, chatTravel) : morphPath(mapRoute, straightRoute, travel);
     link.setAttribute('d', route);
     linkBed.setAttribute('d', route);
     linkBed.setAttribute('transform', `translate(0 ${travel * 6 * (1 - chatTravel)})`);
-    link.style.stroke = color(color('#3d7f5d', '#c7e89b', travel), '#7c9d70', chatTravel);
+    link.style.stroke = color(color('#31589e', '#c4dff2', travel), '#557bb5', chatTravel);
     // Let the connecting thread disappear before the conversation takes over.
     link.style.opacity = String(1 - criteriaExit);
     link.style.strokeDasharray = '1';
     link.style.strokeDashoffset = String(motion.matches ? 0 : 1 - phase(time, 100, 1500));
-    linkBed.style.stroke = color(color('#f8fcf4', '#071c16', travel), '#e2e6d7', chatTravel);
+    linkBed.style.stroke = color(color('#f5f8fb', '#09121a', travel), '#d7dfe6', chatTravel);
     linkBed.style.strokeWidth = String(mix(mix(7, 4, travel), 7, chatTravel));
     linkBed.style.opacity = String(mix(mix(1, .3, travel), 1, chatTravel) * (1 - criteriaExit));
     copyVisibility(mapCopy, oldCopy, -6 * (1 - oldCopy), newCopy < .5 && chatCopy < .5);
@@ -167,8 +167,8 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
     actors.forEach(({ actor, cabinet, face, icon, shadow, mapLabel, matchLabel, start, end }) => {
       actor.setAttribute('transform', `translate(${mix(start[0], end[0], travel)} ${mix(mix(start[1], end[1], travel), cabinet ? 94 : 218, chatTravel)})`);
       face.setAttribute('d', morphPath(pinOutline, tileOutline, travel, true));
-      face.style.fill = color(color(cabinet ? '#fffef8' : '#285b48', '#224b3e', travel), cabinet ? '#fffef7' : '#3a6550', chatTravel);
-      face.style.stroke = color(color(cabinet ? '#83a379' : '#366a53', '#618363', travel), cabinet ? '#b9c7ad' : '#325d47', chatTravel);
+      face.style.fill = color(color(cabinet ? '#fdfefe' : '#23497e', '#284776', travel), cabinet ? '#fdfefe' : '#274e87', chatTravel);
+      face.style.stroke = color(color(cabinet ? '#6582ab' : '#315994', '#7390bd', travel), cabinet ? '#aebac6' : '#315b98', chatTravel);
       face.style.strokeWidth = String(mix(1.1, 1.2, travel));
       face.style.filter = `drop-shadow(0 ${5 * (1 - travel)}px ${5 * (1 - travel)}px rgb(40 79 40 / ${.15 * (1 - travel)}))`;
       shadow.style.opacity = String(1 - travel);
@@ -177,12 +177,12 @@ export function createFirstProcessScene(): (ProcessScene & { destroy: () => void
       icon.setAttribute('height', String(size));
       icon.setAttribute('x', String(-size / 2));
       icon.setAttribute('y', String(-size / 2));
-      icon.style.color = color(color(cabinet ? '#275843' : '#edf6df', '#e0eddb', travel), cabinet ? '#3d634d' : '#f1f5e9', chatTravel);
+      icon.style.color = color(color(cabinet ? '#3155a0' : '#e2ebf3', '#dbe4ed', travel), cabinet ? '#31558e' : '#e9eff5', chatTravel);
       mapLabel.setAttribute('y', String(mix(-42, 68, travel)));
       matchLabel.setAttribute('y', String(mix(-42, 68, travel)));
       mapLabel.style.opacity = String(1 - phase(travel, .02, .3));
       matchLabel.style.opacity = String(phase(travel, .7, 1));
-      matchLabel.style.fill = color('#e0eddb', '#3d634d', chatTravel);
+      matchLabel.style.fill = color('#dbe4ed', '#31558e', chatTravel);
     });
 
     // Linear motion never pauses or reverses; identical rows make the wrap seamless.

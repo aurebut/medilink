@@ -21,7 +21,7 @@ const DURATION = 19000;
 const STATIC_TIMES = [5000, 18000];
 const departure = (index: number) => 2100 + (2 - index) * 340;
 const TRANSFER_DURATION = 3900;
-const noteColors = ['#e0e8d4', '#baceb0', '#315f4d'];
+const noteColors = ['#d4dee8', '#a9c0e0', '#2d5594'];
 
 function notePose(time: number, index: number, still: boolean) {
   if (still && time < SUMMARY_START) return { x: [225, 253, 281][index], y: [196, 178, 160][index], scale: 1, angle: [-15, -11, -7][index] };
@@ -113,8 +113,8 @@ export function createConcludeProcessScene(): (ProcessScene & { destroy: () => v
         rect.setAttribute('height', String(height));
         rect.setAttribute('rx', String(mix(10, .5, fold)));
       }
-      face.style.fill = tint(noteColors[index], '#c5d1bb', fold);
-      face.style.stroke = tint(['#afc39d', '#a5bb96', '#315f4d'][index], '#c5d1bb', fold);
+      face.style.fill = tint(noteColors[index], '#bcc6d0', fold);
+      face.style.stroke = tint(['#89a6ce', '#819dc4', '#2d5594'][index], '#bcc6d0', fold);
       face.style.strokeWidth = String(1 - fold);
       opacity(shadow, .09 * (1 - fold));
       opacity(ink, 1 - phase(time, 10500 + index * 80, 11100 + index * 80));
