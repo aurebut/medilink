@@ -29,6 +29,20 @@ export const landingContent = {
       </div>
     </section>
 
+    <section class="ml-testimonials" id="temoignages" aria-labelledby="ml-testimonials-title">
+      <div class="ml-testimonials-inner">
+        <header class="ml-testimonials-heading">
+          <span class="ml-testimonials-kicker">Les médecins contributeurs</span>
+          <h2 id="ml-testimonials-title">Des médecins ont participé <em>au développement de la plateforme.</em></h2>
+          <p>Quels critères comparer avant un remplacement ? Quelles informations partager avant le premier jour ? Que transmettre à la reprise ? Les médecins qui ont contribué à MédiLink ont aidé à préciser ces besoins.</p>
+        </header>
+        <div class="ml-testimonials-grid"><figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">01</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
+<figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-claire-martin.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">02</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
+<figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-juliette-moreau.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">03</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure></div>
+        <p class="ml-testimonials-note">Trois emplacements à personnaliser avec les noms, portraits et contributions des médecins ayant participé à la conception.</p>
+      </div>
+    </section>
+
     <section class="ml-process" id="matching" aria-labelledby="ml-process-title">
       <div class="ml-process-inner">
         <header class="ml-process-head">
@@ -127,20 +141,6 @@ export const landingContent = {
     </section>
 
     ${documentsSection}
-
-    <section class="ml-testimonials" id="temoignages" aria-labelledby="ml-testimonials-title">
-      <div class="ml-testimonials-inner">
-        <header class="ml-testimonials-heading">
-          <span class="ml-testimonials-kicker">Les médecins contributeurs</span>
-          <h2 id="ml-testimonials-title">Des médecins ont participé <em>au développement de la plateforme.</em></h2>
-          <p>Quels critères comparer avant un remplacement ? Quelles informations partager avant le premier jour ? Que transmettre à la reprise ? Les médecins qui ont contribué à MédiLink ont aidé à préciser ces besoins.</p>
-        </header>
-        <div class="ml-testimonials-grid"><figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">01</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
-<figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-claire-martin.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">02</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure>
-<figure class="ml-contributor"><div class="ml-contributor-photo"><img src="/landing-assets/temoignage-juliette-moreau.png" width="314" height="218" alt="Portrait d’illustration à remplacer par celui du médecin contributeur" loading="lazy" decoding="async"><span>Portrait d’illustration</span></div><figcaption><span class="ml-contributor-label">Médecin contributeur <span aria-hidden="true">03</span></span><h3>Dr [Prénom Nom]</h3><p class="ml-contributor-specialty">Spécialité · Mode d’exercice à renseigner</p><div class="ml-contributor-contribution"><h4>Ce qu’il ou elle a aidé à définir</h4><p>À compléter avec son rôle dans la conception et les besoins du terrain qu’il ou elle a contribué à préciser.</p></div></figcaption></figure></div>
-        <p class="ml-testimonials-note">Trois emplacements à personnaliser avec les noms, portraits et contributions des médecins ayant participé à la conception.</p>
-      </div>
-    </section>
 
     <section class="audiences" id="audiences" aria-labelledby="audiences-title"><div class="audiences-inner">
       <header class="section-head reveal"><div class="section-kicker">Votre recherche</div><h2 class="section-h" id="audiences-title">Vous cherchez une mission ou un remplaçant ?</h2></header>

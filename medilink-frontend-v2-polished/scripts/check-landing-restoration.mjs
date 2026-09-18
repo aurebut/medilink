@@ -123,6 +123,20 @@ function normalizeEditorialPreviews(html, updated) {
   }
   return html;
 }
+function normalizeContributorsPosition(html) {
+  const section = /    <section class="ml-testimonials" id="temoignages"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\r?\n\r?\n/g;
+  const matches = [...html.matchAll(section)];
+  assert.equal(matches.length, 1, 'contributors: exactly one section');
+  const [{ 0: markup, index: start }] = matches;
+  const precedingSections = [...html.slice(0, start).matchAll(/<section\b[^>]*>/g)];
+  assert.equal(precedingSections.length, 1, 'contributors: immediately after the first section');
+  assert.match(precedingSections[0][0], /class="hero hero--structured"/, 'contributors: follows the hero');
+  assert.match(html.slice(start + markup.length), /^ {4}<section class="ml-process" id="matching"/, 'contributors: precedes the process section');
+  // Restore the original position for the remaining exact markup comparison.
+  const target = '    <section class="audiences" id="audiences"';
+  assert.ok(html.includes(target), 'contributors: original following section exists');
+  return html.replace(markup, '').replace(target, markup + target);
+}
 function normalizeDocumentsSection(html) {
   assert.equal([...html.matchAll(/\bid="documents"/g)].length, 1, 'documents: exactly one section anchor');
   const section = /<section class="ml-documents" id="documents" aria-labelledby="ml-documents-title">(?:(?!<\/?section\b)[\s\S])*?<\/section>/g;
@@ -184,6 +198,7 @@ for (const [path, file] of Object.entries(pages)) {
       }
     }
     if (path === '/' && tag === 'main') {
+      rendered = normalizeContributorsPosition(rendered);
       rendered = normalizeRequestedHomeCopy(rendered, true);
       expected = normalizeRequestedHomeCopy(expected, false);
       rendered = normalizeProcessFigures(rendered, true);
