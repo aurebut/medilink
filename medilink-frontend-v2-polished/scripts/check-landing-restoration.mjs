@@ -7,6 +7,24 @@ const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
 const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
+function normalizeRequestedHomeCopy(html, updated) {
+  // The user's replacement table removes four blocks and replaces these two headings.
+  for (const className of ['hero-eyebrow', 'hero-sub', 'hero-photo-caption', 'ml-process-note']) {
+    const block = new RegExp(`^ *<(p|figcaption) class="${className}">[^\\n]*?<\\/\\1>\\r?\\n`, 'gm');
+    assert.equal([...html.matchAll(block)].length, updated ? 0 : 1, `${className}: requested removal`);
+    html = html.replace(block, '');
+  }
+  if (updated) {
+    assert.ok(html.includes('<h1 id="hero-title">La plateforme de remplacement conçue avec et pour les médecins généralistes</h1>'), 'requested hero title');
+    assert.ok(html.includes('<h2 id="ml-process-title">Gérez chaque mission simplement, avant, pendant et après le remplacement.</h2>'), 'requested process title');
+  }
+  html = html.replace(/<h1 id="hero-title">[^\n]*?<\/h1>/, '<h1 id="hero-title">REQUESTED_HERO</h1>');
+  const processHeading = /<h2 id="ml-process-title">[^\n]*?<\/h2>/;
+  if (!updated) {
+    html = html.replace(/(<h2 id="ml-process-title">[^\n]*?<\/h2>)\r?\n *<p>[^\n]*?<\/p>/, '$1');
+  }
+  return html.replace(processHeading, '<h2 id="ml-process-title">REQUESTED_PROCESS</h2>');
+}
 function normalizeProcessFigures(html, updated) {
   for (const key of ['criteria', 'matching', 'report']) {
     const className = updated ? `ml-process-art ml-process-art--${key} ml-process-art--v2` : `ml-stage ml-human-stage ml-human-stage--${key}`;
@@ -146,6 +164,8 @@ for (const [path, file] of Object.entries(pages)) {
       }
     }
     if (path === '/' && tag === 'main') {
+      rendered = normalizeRequestedHomeCopy(rendered, true);
+      expected = normalizeRequestedHomeCopy(expected, false);
       rendered = normalizeProcessFigures(rendered, true);
       expected = normalizeProcessFigures(expected, false);
       rendered = normalizeFirstStepCopy(rendered, true);
