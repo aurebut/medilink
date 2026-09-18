@@ -1,0 +1,175 @@
+{
+  "description": "Actual MédiLink application UI, rendered with fictional API fixtures. No interface reconstruction or restyling.",
+  "capturedAt": "2026-09-16T10:00:00.000Z",
+  "timezone": "Europe/Paris",
+  "locale": "fr-FR",
+  "browser": "153.0.4234.32",
+  "format": "lossless WebP",
+  "source": "scripts/capture-landing-interface.mjs",
+  "fixture": "scripts/fixtures/landing-interface.mjs",
+  "apiPaths": [
+    "/auth/me",
+    "/conversations",
+    "/conversations/c1/messages",
+    "/conversations/c1/read",
+    "/conversations/events",
+    "/me/applications",
+    "/me/dashboard",
+    "/me/documents",
+    "/me/profile",
+    "/missions",
+    "/notifications"
+  ],
+  "assets": [
+    {
+      "name": "messages",
+      "device": "desktop",
+      "route": "/app/messages?id=c1",
+      "viewport": {
+        "width": 1440,
+        "height": 851
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 1440,
+        "height": 851
+      },
+      "width": 1440,
+      "height": 851,
+      "files": [
+        "messages-desktop.webp",
+        "messages-desktop@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "a212df05e3d5b29b6d6563e80b6d5d7a326a102fba0515450dbff2328dd265bd"
+    },
+    {
+      "name": "messages",
+      "device": "mobile",
+      "route": "/app/messages?id=c1",
+      "viewport": {
+        "width": 390,
+        "height": 772
+      },
+      "crop": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 772
+      },
+      "width": 390,
+      "height": 772,
+      "files": [
+        "messages-mobile.webp",
+        "messages-mobile@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "bd2f1968b2886984c07e636ffb5976e9a868caa38689064872a8f6df39132cc5"
+    },
+    {
+      "name": "mission",
+      "device": "desktop",
+      "route": "/app/current-missions",
+      "viewport": {
+        "width": 1200,
+        "height": 1000
+      },
+      "crop": {
+        "x": 293,
+        "y": 361,
+        "width": 858,
+        "height": 574,
+        "scrollY": 90,
+        "selector": ".candidate-current-route",
+        "clippedBottom": false
+      },
+      "width": 858,
+      "height": 574,
+      "files": [
+        "mission-desktop.webp",
+        "mission-desktop@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "b7268bde752f701d2a430f0db8188b8e1e9908837912111278ff9bf66ca21b62"
+    },
+    {
+      "name": "mission",
+      "device": "mobile",
+      "route": "/app/current-missions",
+      "viewport": {
+        "width": 390,
+        "height": 1100
+      },
+      "crop": {
+        "x": 15,
+        "y": 155,
+        "width": 360,
+        "height": 840,
+        "scrollY": 435,
+        "selector": ".candidate-current-route",
+        "clippedBottom": false
+      },
+      "width": 360,
+      "height": 840,
+      "files": [
+        "mission-mobile.webp",
+        "mission-mobile@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "3b6b0f40be183ceeefb9b7dd37eb647f1d7d1fdef596326b914ece1fe08a367e"
+    },
+    {
+      "name": "documents",
+      "device": "desktop",
+      "route": "/app/profile",
+      "viewport": {
+        "width": 1560,
+        "height": 1100
+      },
+      "crop": {
+        "x": 658,
+        "y": 89,
+        "width": 834,
+        "height": 739,
+        "scrollY": 193,
+        "selector": ".documents-card",
+        "clippedBottom": true
+      },
+      "width": 834,
+      "height": 739,
+      "files": [
+        "documents-desktop.webp",
+        "documents-desktop@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "154583baccb93eacd6470926ff983c1bb3ee2afec09c5a3c01d8861386b39d5a"
+    },
+    {
+      "name": "documents",
+      "device": "mobile",
+      "route": "/app/profile",
+      "viewport": {
+        "width": 390,
+        "height": 1100
+      },
+      "crop": {
+        "x": 14,
+        "y": 90,
+        "width": 362,
+        "height": 667,
+        "scrollY": 797,
+        "selector": ".documents-card",
+        "clippedBottom": true
+      },
+      "width": 362,
+      "height": 667,
+      "files": [
+        "documents-mobile.webp",
+        "documents-mobile@2x.webp"
+      ],
+      "sourceScale": 2,
+      "sha256": "b33c3e5712d421e1f7a16c6dd95f4ab7a0dc0f3a9c3c48cdeb7bda69a3a8bf8d"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowUpRight, FileText, Trash2 } from 'lucide-react';
 import { api, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import type { Document, DocumentType } from '@/lib/types';
 import { documentTypeLabel, statusLabel } from '@/lib/labels';
@@ -192,12 +193,13 @@ export function DocumentSection() {
     <Card className="documents-card">
       <div className="documents-hero">
         <div>
-          <h2>Dossier documents</h2>
-          <p>Centralisez les pièces utiles à vos candidatures. Elles restent privées et ne sont consultables par un établissement que si vous candidatez à l'une de ses missions.</p>
+          <span className="documents-eyebrow">Votre dossier professionnel</span>
+          <h2>Vos documents</h2>
+          <p>Vos pièces restent privées. Un établissement peut les consulter après votre candidature à l’une de ses missions.</p>
         </div>
         <div className="documents-score">
-          <strong>{completionScore}%</strong>
-          <span>documents essentiels validés</span>
+          <strong>{completionScore}<small>%</small></strong>
+          <span>du dossier essentiel validé</span>
         </div>
       </div>
 
@@ -220,26 +222,29 @@ export function DocumentSection() {
           <div className="document-checklist">
             {checklist.map(({ type, required, document }) => (
               <div className={`document-checklist-item ${document?.verificationStatus === 'APPROVED' ? 'is-approved' : ''}`} key={type}>
-                <div className="document-checklist-head">
-                  <div>
-                    <span>{required ? 'Essentiel' : 'Recommandé'}</span>
+                <div className="document-folio-icon" aria-hidden="true"><FileText size={23} strokeWidth={1.35} /></div>
+                <div className="document-record-main">
+                  <div className="document-checklist-head">
                     <strong>{documentTypeLabel(type)}</strong>
+                    <span>{required ? 'Essentiel' : 'Recommandé'}</span>
                   </div>
+                  {document ? (
+                    <div className="document-file-meta">
+                      <strong>{document.fileName}</strong>
+                      <span>Ajouté le {formatDateTime(document.createdAt)}</span>
+                    </div>
+                  ) : null}
+                  {document?.verificationStatus !== 'APPROVED' ? <p className="document-record-note">{checklistCopy(type, document)}</p> : null}
+                </div>
+                <div className="document-record-status">
                   <Badge tone={checklistStatusTone(document)}>{checklistStatusLabel(document)}</Badge>
                 </div>
-                <p>{checklistCopy(type, document)}</p>
-                {document ? (
-                  <div className="document-file-meta">
-                    <strong>{document.fileName}</strong>
-                    <span>Ajouté le {formatDateTime(document.createdAt)}</span>
-                  </div>
-                ) : null}
-                <div className="actions">
-                  {document ? <Button variant="light" onClick={() => openDocument(document.id)}>Voir</Button> : null}
-                  <Button variant={document ? 'secondary' : 'primary'} onClick={() => chooseDocumentType(type)}>
+                <div className="document-record-actions">
+                  {document ? <Button variant="light" className="document-open-action" aria-label={`Voir ${documentTypeLabel(type)}`} onClick={() => openDocument(document.id)}>Voir <ArrowUpRight size={15} aria-hidden="true" /></Button> : null}
+                  <Button variant={document ? 'light' : 'primary'} className={document ? 'document-text-action' : ''} aria-label={`${document ? 'Remplacer' : 'Ajouter'} ${documentTypeLabel(type)}`} onClick={() => chooseDocumentType(type)}>
                     {document ? 'Remplacer' : 'Ajouter'}
                   </Button>
-                  {document ? <Button variant="danger" onClick={() => remove(document.id)}>Supprimer</Button> : null}
+                  {document ? <Button variant="light" className="document-delete-action" title={`Supprimer ${documentTypeLabel(type)}`} aria-label={`Supprimer ${documentTypeLabel(type)}`} onClick={() => remove(document.id)}><Trash2 size={16} aria-hidden="true" /></Button> : null}
                 </div>
               </div>
             ))}
@@ -275,7 +280,8 @@ export function DocumentSection() {
 
       {loading ? null : visibleDocuments.length === 0 ? null : (
         <>
-          <h3>Historique</h3>
+          <details className="document-history">
+          <summary>Historique des documents <span>{visibleDocuments.length} fichier{visibleDocuments.length > 1 ? 's' : ''}</span></summary>
           <div className="table-wrap">
             <table>
               <thead><tr><th>Type</th><th>Fichier</th><th>Statut</th><th>Ajouté</th><th>Actions</th></tr></thead>
@@ -290,6 +296,7 @@ export function DocumentSection() {
               </tbody>
             </table>
           </div>
+          </details>
         </>
       )}
     </Card>

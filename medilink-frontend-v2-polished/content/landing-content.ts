@@ -121,14 +121,14 @@ export const landingContent = {
       <div class="ml-continuity-inner">
         <div class="ml-continuity-copy">
           <header>
-            <span class="ml-continuity-kicker">Le suivi du remplacement en temps réel</span>
+            <span class="ml-continuity-kicker">Le suivi du remplacement</span>
             <h2 id="continuity-title">Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></h2>
-            <p>Consultations réalisées, résultats attendus, situations à suivre : le compte rendu évolue en temps réel. Médecin remplaçant ou remplacé, consultez les informations de la mission au moment où vous en avez besoin.</p>
+            <p>Dates confirmées, avancement, documents et rétrocession : retrouvez les étapes de votre remplacement et les informations utiles au même endroit.</p>
           </header>
           <ol class="ml-continuity-benefits">
-            <li><span aria-hidden="true">01</span><div><h3>L’activité du remplacement</h3><p>Consultez les consultations réalisées au fil de la mission.</p></div></li>
-            <li><span aria-hidden="true">02</span><div><h3>Les points à reprendre</h3><p>Repérez les résultats attendus et les situations qui nécessitent un suivi.</p></div></li>
-            <li><span aria-hidden="true">03</span><div><h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p></div></li>
+            <li><span aria-hidden="true">01</span><div><h3>Les étapes du remplacement</h3><p>Retrouvez la confirmation, le début et la fin de la mission.</p></div></li>
+            <li><span aria-hidden="true">02</span><div><h3>La prochaine étape</h3><p>Repérez les documents à préparer et ce qui reste à valider.</p></div></li>
+            <li><span aria-hidden="true">03</span><div><h3>Les informations utiles</h3><p>Consultez le brief, les contacts et les conditions convenues.</p></div></li>
           </ol>
           <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span></p>
         </div>

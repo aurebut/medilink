@@ -1,0 +1,40 @@
+/* Shared by the public landing and the product. Keep decorative brand colours
+   separate from success/warning/error states in the application. */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/landing-assets/dm-sans-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/landing-assets/instrument-serif-regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Instrument Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/landing-assets/instrument-serif-italic.woff2') format('woff2');
+}
+
+:root {
+  --brand-primary: #1952a0;
+  --brand-primary-hover: #123f80;
+  --brand-heading: #223e57;
+  --brand-text: #243f64;
+  --brand-muted: #49617f;
+  --brand-canvas: #f7f8fa;
+  --brand-paper: #fdfefe;
+  --brand-mist: #e7effb;
+  --brand-frost: #eff4fc;
+  --brand-line: #d7e1e9;
+  --brand-focus: #1952a0;
+  --brand-shadow: 0 18px 45px -30px #1952a026;
+  --brand-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --brand-serif: 'Instrument Serif', Georgia, serif;
+}

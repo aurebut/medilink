@@ -1,0 +1,21 @@
+# Real interface captures
+
+These lossless WebP files are screenshots of the application's actual React pages and CSS. The browser receives fictional API responses from `scripts/fixtures/landing-interface.mjs`. No account, patient data, stored document, or backend mutation is involved.
+
+Start the frontend, then run from its directory:
+
+```sh
+node scripts/capture-landing-interface.mjs http://localhost:3000
+```
+
+The script uses an installed `playwright` module, or `PLAYWRIGHT_MODULE_PATH` when it is installed outside this project. The Codex workspace runtime is a fallback. `sharp` comes from the frontend's installed dependencies. On Windows, the default browser is installed Microsoft Edge; `CAPTURE_BROWSER_CHANNEL` overrides it.
+
+`CAPTURE_OUTPUT_DIR` selects another destination for visual review. `CAPTURE_ONLY=messages,mission,documents` can limit a review run; `CAPTURE_DEVICE=desktop` or `mobile` limits it to one native layout. Partial runs require `CAPTURE_OUTPUT_DIR`, preventing them from replacing the complete public manifest. Use the full default run for the production manifest.
+
+The captures use French locale, Europe/Paris time and a fixed 16 September 2026 clock. All API responses are intercepted; an unknown API request or external service makes the run fail. The application font requests are permitted. The only injected CSS hides the Next.js development indicator.
+
+- Messages: `/app/messages?id=c1`, desktop navigation and the native mobile layout. The viewport height is calculated from the real rendered messages to keep the three text bubbles complete.
+- Mission: `/app/current-missions`, the real mission timeline with a small crop of its surrounding surface.
+- Documents: `/app/profile`, after selecting the Documents tab. The crop ends at a complete row boundary after four essential desktop documents or the first two mobile documents.
+
+`manifest.json` records the source routes, viewport sizes, crops, output dimensions, browser version and SHA-256 of each 2× image. Both 1× and 2× files are lossless WebP. Regenerate the whole set after interface changes; do not retouch the UI inside individual images.

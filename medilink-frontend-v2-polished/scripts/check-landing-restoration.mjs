@@ -18,25 +18,45 @@ function normalizeRequestedHomeCopy(html, updated) {
   const heroPath = /^ *<ol class="hero-path"[^>]*>[\s\S]*?<\/ol>\r?\n/gm;
   assert.equal([...html.matchAll(heroPath)].length, updated ? 0 : 1, 'requested removal of the three links below the hero photo');
   html = html.replace(heroPath, '');
-  // Additional copy replacements explicitly requested in the second table.
+  // Approved copy, including the actual mission-step UI replacing the fictional clinical report.
   const replacements = [
-  [
-    "Des médecins ont participé <em>aux choix du produit.</em>",
-    "Des médecins ont participé <em>au développement de la plateforme.</em>"
-  ],
-  [
-    "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
-    "<h2 id=\"ml-workspace-title\">Retrouvez les échanges et les points à finaliser avant le premier jour.</h2>"
-  ],
-  [
-    "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>",
-    "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>"
-  ],
-  [
-    "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
-    "<span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span>"
-  ]
-];
+    [
+      "Le suivi du remplacement en temps réel",
+      "Le suivi du remplacement"
+    ],
+    [
+      "Consultations réalisées, résultats attendus, situations à suivre : le compte rendu évolue en temps réel. Médecin remplaçant ou remplacé, consultez les informations de la mission au moment où vous en avez besoin.",
+      "Dates confirmées, avancement, documents et rétrocession : retrouvez les étapes de votre remplacement et les informations utiles au même endroit."
+    ],
+    [
+      "<h3>L’activité du remplacement</h3><p>Consultez les consultations réalisées au fil de la mission.</p>",
+      "<h3>Les étapes du remplacement</h3><p>Retrouvez la confirmation, le début et la fin de la mission.</p>"
+    ],
+    [
+      "<h3>Les points à reprendre</h3><p>Repérez les résultats attendus et les situations qui nécessitent un suivi.</p>",
+      "<h3>La prochaine étape</h3><p>Repérez les documents à préparer et ce qui reste à valider.</p>"
+    ],
+    [
+      "<h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p>",
+      "<h3>Les informations utiles</h3><p>Consultez le brief, les contacts et les conditions convenues.</p>"
+    ],
+    [
+      "Des médecins ont participé <em>aux choix du produit.</em>",
+      "Des médecins ont participé <em>au développement de la plateforme.</em>"
+    ],
+    [
+      "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
+      "<h2 id=\"ml-workspace-title\">Retrouvez les échanges et les points à finaliser avant le premier jour.</h2>"
+    ],
+    [
+      "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées. Vous retrouvez ce qui a été échangé et ce qui reste à régler avant le premier jour.</p>",
+      "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>"
+    ],
+    [
+      "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
+      "<span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span>"
+    ]
+  ];
   for (const [before, after] of replacements) {
     const expected = updated ? after : before;
     assert.equal(html.split(expected).length - 1, 1, `requested copy: ${expected}`);
@@ -124,7 +144,7 @@ function normalizeEditorialPreviews(html, updated) {
     assert.ok(end > start, `${id}: preview has a matching closing tag`);
     const markup = html.slice(start, end);
     if (updated) {
-      assert.match(markup, /Aperçu illustratif · Données fictives/, `${id}: preview data remains clearly illustrative`);
+      assert.match(markup, /Interface MédiLink · Données de démonstration/, `${id}: preview data remains clearly illustrative`);
       if (tag === 'figure') assert.match(markup, /<figcaption\b[^>]*>/, `${id}: preview retains its visible caption`);
       else assert.match(matches[0][0], /aria-label="Exemple du dossier partagé d’un remplacement"/, `${id}: shared dossier retains its accessible label`);
     }
@@ -161,10 +181,10 @@ function normalizeDocumentsSection(html) {
   assert.equal([...markup.matchAll(/\bid="ml-documents-title"/g)].length, 1, 'documents: heading ID is unique');
   const heading = markup.match(/<h2\b[^>]*\bid="ml-documents-title"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
   assert.ok(heading && heading.replace(/<[^>]+>/g, '').trim().length > 10, 'documents: meaningful visible section heading');
-  const figures = [...markup.matchAll(/<figure class="ml-documents-preview" aria-labelledby="ml-documents-preview-title">[\s\S]*?<\/figure>/g)];
+  const figures = [...markup.matchAll(/<figure class="ml-documents-preview ml-interface-preview" aria-labelledby="ml-documents-preview-title">[\s\S]*?<\/figure>/g)];
   assert.equal(figures.length, 1, 'documents: exactly one accessible interface preview');
   assert.equal([...figures[0][0].matchAll(/\bid="ml-documents-preview-title"/g)].length, 1, 'documents: preview label resolves to one visible title');
-  assert.match(figures[0][0], /<figcaption\b[^>]*>[\s\S]*?Aperçu illustratif · Données fictives[\s\S]*?<\/figcaption>/, 'documents: preview data remains visibly illustrative');
+  assert.match(figures[0][0], /<figcaption\b[^>]*>[\s\S]*?Interface MédiLink · Données de démonstration[\s\S]*?<\/figcaption>/, 'documents: preview data remains visibly illustrative');
 
   // Remove only the new section and its added separator; all surrounding markup remains compared verbatim.
   return html.slice(0, start) + html.slice(end).replace(separator, '');

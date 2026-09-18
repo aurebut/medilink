@@ -348,9 +348,9 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
   const hasAddress = address !== 'Adresse à confirmer';
   const dates = missionDateRange(row.application, row.agreement);
   return (
-    <section className="candidate-command-strip" aria-label="Mission prioritaire">
+    <section className="candidate-command-strip mission-folio-command" aria-label="Mission prioritaire">
       <div className="candidate-command-main">
-        <span>Prochaine mission</span>
+        <span>Votre mission</span>
         <h2>{mission?.title || 'Mission confirmée'}</h2>
         <p>{mission?.establishment?.name || mission?.city || 'Établissement à confirmer'} - {address}</p>
       </div>
@@ -363,22 +363,6 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
         <span>Statut</span>
         <strong>{row.agreement ? agreementLabel(row.agreement.status) : statusLabel(row.application.status)}</strong>
         <small>{agreementNextStep(row.agreement?.status)}</small>
-      </div>
-      <div className="candidate-command-map">
-        {hasAddress ? (
-          <iframe
-            title={`Carte de ${mission?.title || 'la mission'}`}
-            src={mapsEmbedHref(address)}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        ) : (
-          <div className="candidate-command-map-empty">Adresse à confirmer</div>
-        )}
-        <div className="candidate-command-map-label">
-          <span>Adresse mission</span>
-          <strong>{address}</strong>
-        </div>
       </div>
       <div className="candidate-command-actions">
         {row.conversation ? (
@@ -426,31 +410,40 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
   const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
   return (
-    <section className="candidate-current-detail candidate-current-unified">
+    <section className="candidate-current-detail candidate-current-unified mission-folio">
       {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
 
       {activeSection === 'pilotage' ? (
         <>
           <div className="candidate-current-pilotage-grid">
-            <section className="candidate-current-route" aria-label="Timeline de mission">
+            <section className="candidate-current-route mission-folio-route" aria-label="Suivi de mission">
               <div className="candidate-current-route-head">
-                <div>
-                  <span>Timeline</span>
-                  <strong>Avancement mission</strong>
+                <div className="mission-folio-intro">
+                  <span>Le déroulement</span>
+                  <h2>Suivi de mission</h2>
+                  <p>De la confirmation au règlement, chaque étape à sa place.</p>
                 </div>
-                <small>{nextStep}</small>
+                <div className="mission-folio-progress">
+                  <strong>{String(progress.filter((step) => step.done).length).padStart(2, '0')}<span> / {String(progress.length).padStart(2, '0')}</span></strong>
+                  <span>étapes terminées</span>
+                  <div className="mission-folio-progress-track" aria-hidden="true"><span style={{ width: `${progress.filter((step) => step.done).length / progress.length * 100}%` }} /></div>
+                </div>
+                <div className="mission-folio-next">
+                  <span>À suivre</span>
+                  <p>{nextStep}</p>
+                </div>
               </div>
               <div className="candidate-current-route-list">
                 {progress.map((step, index) => (
                   <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
-                    <span aria-hidden="true">{step.done ? '' : index + 1}</span>
+                    <span aria-hidden="true">{step.done ? '' : String(index + 1).padStart(2, '0')}</span>
                     <div>
                       <div className="candidate-current-route-title">
                         <strong>{step.label}</strong>
                         <small>{step.status}</small>
                       </div>
-                      {step.dateLabel ? <span className="candidate-current-route-date">{step.dateLabel}</span> : null}
                       <p>{step.helper}</p>
+                      {step.dateLabel ? <span className="candidate-current-route-date">{step.dateLabel}</span> : null}
                     </div>
                   </div>
                 ))}

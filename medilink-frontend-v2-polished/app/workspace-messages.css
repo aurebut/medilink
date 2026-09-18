@@ -1,0 +1,233 @@
+/* The actual conversation uses the landing's folio hierarchy: one frame,
+   a quiet contents column and generous room for the exchange itself. */
+.workspace-design .message-layout.message-layout--editorial {
+  gap: 0;
+  border: 1px solid var(--brand-line);
+  border-radius: 22px;
+  background: var(--brand-paper);
+  box-shadow: var(--brand-shadow);
+}
+.workspace-design .message-layout--editorial .card.conversation-list {
+  padding: 30px 20px 20px;
+  background: var(--brand-frost);
+}
+.workspace-design .message-layout--editorial .conversation-list > .toolbar {
+  margin: 0 0 25px;
+  padding: 0 8px;
+}
+.workspace-design .conversation-list-eyebrow {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--brand-muted);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.workspace-design .message-layout--editorial .conversation-list h2 {
+  margin: 0 0 9px;
+  font: 400 33px/1.05 var(--brand-serif);
+  letter-spacing: -.025em;
+}
+.workspace-design .message-layout--editorial .conversation-list > .toolbar .small {
+  font-size: 11px;
+  color: var(--brand-muted);
+}
+.workspace-design .message-layout.message-layout--editorial .conversation-mobile-search {
+  gap: 10px;
+  min-height: 44px;
+  margin-bottom: 22px;
+  padding: 8px 11px;
+  border: 0;
+  border-bottom: 1px solid #c9d7e6;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.workspace-design .message-layout--editorial .conversation-mobile-search svg { flex-shrink: 0; color: var(--brand-muted); }
+.workspace-design .message-layout--editorial .conversation-mobile-search input { font-size: 12px; }
+.workspace-design .message-layout.message-layout--editorial .conversation-button {
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  padding: 17px 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.workspace-design .message-layout.message-layout--editorial .conversation-button.active {
+  border-color: var(--brand-line);
+  background: var(--brand-paper);
+}
+.workspace-design .message-layout--editorial .conversation-button:hover { background: var(--brand-mist); }
+.workspace-design .message-layout.message-layout--editorial .conversation-mobile-avatar {
+  width: 34px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--brand-primary);
+  font: 400 30px/1 var(--brand-serif);
+  box-shadow: none;
+}
+.workspace-design .message-layout--editorial .conversation-mobile-head { gap: 5px; }
+.workspace-design .message-layout--editorial .conversation-mobile-head strong { font-size: 13px; line-height: 1.5; font-weight: 600; }
+.workspace-design .message-layout--editorial .conversation-mobile-head > span { font-size: 9px; }
+.workspace-design .message-layout--editorial .conversation-mobile-mission { margin-top: 6px; font-size: 10px; font-weight: 400; color: var(--brand-muted); }
+.workspace-design .message-layout--editorial .conversation-mobile-preview { font-size: 12px; line-height: 1.6; }
+
+.workspace-design .message-layout--editorial .message-pane > .conversation-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 20px !important;
+  padding: 28px 32px 23px !important;
+  border-bottom: 0 !important;
+  background: var(--brand-paper) !important;
+  min-height: 0 !important;
+}
+.workspace-design .message-layout--editorial .conversation-header-top { flex: 1; width: auto; min-width: 0; gap: 0; }
+.workspace-design .message-layout--editorial .conversation-title-meta h2 {
+  white-space: normal;
+  text-overflow: clip;
+  overflow: visible;
+  color: var(--brand-heading);
+  font: 400 clamp(25px, 2.25vw, 33px)/1.08 var(--brand-serif);
+  letter-spacing: -.018em;
+}
+.workspace-design .message-layout--editorial .conversation-subtitle { margin-top: 10px; font-size: 11px; line-height: 1.5; white-space: normal; }
+.workspace-design .message-layout--editorial .conversation-header-actions { width: auto; flex: 0 0 auto; }
+.workspace-design .message-layout--editorial .conversation-header-actions .conversation-action-toggle {
+  width: auto;
+  min-height: 44px;
+  padding: 8px 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--brand-primary);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: none;
+}
+.workspace-design .message-layout--editorial .conversation-action-toggle > span { padding-left: 7px; }
+.workspace-design .conversation-context {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin: 0 32px;
+  padding: 15px 0;
+  border-block: 1px solid var(--brand-line);
+}
+.workspace-design .conversation-context .conversation-status-badge .badge { padding: 4px 0; border: 0; border-radius: 0; background: transparent; font-size: 10px; font-weight: 500; }
+.workspace-design .conversation-context .desktop-workflow-header-step {
+  display: flex;
+  align-items: center;
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: none;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.workspace-design .conversation-context .desktop-workflow-marker { width: 6px; height: 6px; min-width: 6px; flex: 0 0 6px; border: 0; background: var(--step-color); box-shadow: none; }
+.workspace-design .conversation-context .desktop-workflow-marker::after { display: none; }
+.workspace-design .conversation-context .desktop-workflow-copy { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 12px; }
+.workspace-design .conversation-context .desktop-workflow-title { justify-content: flex-start; gap: 8px; }
+.workspace-design .conversation-context .desktop-workflow-title strong { font-size: 11px; font-weight: 500; }
+.workspace-design .conversation-context .desktop-workflow-title span { font-size: 9px; background: transparent; }
+.workspace-design .conversation-context .desktop-workflow-copy p { margin: 0; font-size: 10px; color: var(--brand-muted); line-height: 1.4; }
+
+.workspace-design .message-layout.message-layout--editorial .messages { padding: 30px 32px; background: var(--brand-paper); }
+.workspace-design .message-layout--editorial .message-log { gap: 25px; }
+.workspace-design .message-layout--editorial .message:not(.system) {
+  max-width: 85%;
+  padding: 18px 21px 13px;
+  border: 1px solid var(--brand-line);
+  border-radius: 3px 18px 18px;
+  color: var(--brand-text);
+  background: var(--brand-paper);
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.workspace-design .message-layout--editorial .message.mine:not(.system) {
+  border-color: transparent;
+  border-radius: 18px 3px 18px 18px;
+  background: var(--brand-mist);
+}
+.workspace-design .message-layout--editorial .message .small { margin-top: 11px; color: var(--brand-muted); font-size: 9px; }
+.workspace-design .message-layout.message-layout--editorial .message-form {
+  align-items: center;
+  gap: 14px;
+  margin: 0 32px;
+  padding: 18px 0 24px;
+  background: var(--brand-paper);
+}
+.workspace-design .message-layout--editorial .message-form .textarea { min-height: 54px; padding: 16px; border: 1px solid var(--brand-line); border-radius: 12px; background: var(--brand-canvas); font-size: 13px; resize: vertical; }
+.workspace-design .message-layout--editorial .message-form .btn { min-height: 46px; font-size: 12px; font-weight: 500; border-radius: 10px; }
+.workspace-design .message-layout--editorial .workflow-card { padding: 22px; border-radius: 12px; box-shadow: none; }
+
+@media (min-width: 981px) {
+  .workspace-design .message-layout.message-layout--editorial { grid-template-columns: 265px minmax(0, 1fr); }
+}
+@media (min-width: 621px) {
+  .workspace-design .message-layout.message-layout--editorial {
+    height: var(--message-layout-height, calc(100dvh - 240px));
+    min-height: min(360px, var(--message-layout-height, 360px));
+  }
+  .workspace-design .message-layout--editorial .card.conversation-list {
+    background: var(--brand-primary);
+    border-right: 0;
+    color: var(--brand-paper);
+  }
+  .workspace-design .message-layout--editorial .conversation-list :is(h2, .conversation-mobile-head strong) { color: var(--brand-paper); }
+  .workspace-design .message-layout--editorial .conversation-list :is(.conversation-list-eyebrow, .toolbar .small, .conversation-mobile-head > span, .conversation-mobile-mission, .conversation-mobile-preview, .conversation-mobile-empty) { color: #dbe7fa; }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-mobile-search { border-bottom-color: #ffffff40; }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-mobile-search :is(svg, input) { color: var(--brand-paper); }
+  .workspace-design .message-layout--editorial .conversation-list input::placeholder { color: #dbe7fa; opacity: 1; }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-mobile-avatar { color: var(--brand-paper); }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-button.active { background: #ffffff12; border-color: #ffffff36; }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-button:hover { background: #ffffff1c; }
+  .workspace-design .message-layout--editorial .conversation-list :is(input, button):focus-visible { outline-color: var(--brand-paper) !important; }
+  .workspace-design .message-layout--editorial .conversation-list .conversation-mobile-search:focus-within { outline-color: var(--brand-paper); }
+}
+@media (min-width: 621px) and (max-width: 980px) {
+  .workspace-design .message-layout.message-layout--editorial { grid-template-columns: 215px minmax(0, 1fr); }
+  .workspace-design .message-layout--editorial .card.conversation-list { padding: 24px 12px; }
+  .workspace-design .message-layout--editorial .message-pane > .conversation-header { flex-wrap: wrap; padding: 20px !important; gap: 8px !important; }
+  .workspace-design .conversation-context { margin-inline: 20px; }
+  .workspace-design .message-layout.message-layout--editorial .messages { padding: 22px 20px; }
+  .workspace-design .message-layout.message-layout--editorial .message-form { margin-inline: 20px; }
+}
+@media (max-width: 620px) {
+  .workspace-design .message-layout.message-layout--editorial { border-radius: 18px; }
+  .workspace-design .message-layout.message-layout--editorial.message-layout-mobile-active { border: 0; border-radius: 0; }
+  .workspace-design .message-layout--editorial .card.conversation-list { padding: 25px 16px; }
+  .workspace-design .message-layout.message-layout--editorial .conversation-list > .toolbar { padding: 0 8px; }
+  .workspace-design .message-layout--editorial .message-pane > .conversation-header { flex-wrap: wrap; padding: 15px 17px 11px !important; gap: 0 10px !important; }
+  .workspace-design .message-layout--editorial .conversation-header-top { flex: 1 1 100%; }
+  .workspace-design .message-layout--editorial .conversation-title-meta h2 { font-size: 24px; line-height: 1.1; }
+  .workspace-design .message-layout--editorial .conversation-subtitle { margin-top: 6px; font-size: 10px; }
+  .workspace-design .message-layout--editorial .conversation-back-button { width: 32px; height: 44px; min-width: 32px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+  .workspace-design .message-layout--editorial .conversation-header-actions { margin-left: 44px; gap: 14px; flex-wrap: wrap; }
+  .workspace-design .message-layout--editorial .conversation-header-actions > * { flex: 0 1 auto !important; }
+  .workspace-design .message-layout--editorial .conversation-header-actions .conversation-action-toggle { height: auto !important; min-height: 36px; padding: 6px 0 !important; font-size: 11px !important; font-weight: 500 !important; }
+  .workspace-design .conversation-context { margin: 0 17px; padding: 10px 0; gap: 6px 15px; }
+  .workspace-design .conversation-context .desktop-workflow-header-step { flex: 1 1 120px; }
+  .workspace-design .conversation-context .desktop-workflow-copy p { display: none; }
+  .workspace-design .message-layout.message-layout--editorial .messages { padding: 23px 17px; }
+  .workspace-design .message-layout--editorial .message-log { gap: 19px; }
+  .workspace-design .message-layout--editorial .message:not(.system) { max-width: 91%; padding: 13px 15px 10px; font-size: 13px; line-height: 1.65; }
+  .workspace-design .message-layout--editorial .message .small { margin-top: 9px; }
+  .workspace-design .message-layout.message-layout--editorial .message-form { margin: 0 17px; padding: 13px 0 16px; gap: 9px; }
+  .workspace-design .message-layout--editorial .message-form .textarea { min-height: 48px; padding: 12px; font-size: 16px; }
+  .workspace-design .message-layout--editorial .message-form .btn { padding-inline: 13px; }
+  .workspace-design .message-layout--editorial .mobile-workflow-menu { top: 10px; bottom: 10px; max-height: none; }
+}

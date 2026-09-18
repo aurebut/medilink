@@ -1,31 +1,31 @@
-/* Homepage palette anchored on #1952a0, with porcelain and pale blue surfaces. Colour only;
+/* Homepage palette anchored on var(--brand-primary), with porcelain and pale blue surfaces. Colour only;
    keep the original layout and SVG animation geometry/timing unchanged. */
 html body.landing-home:not(.persona-page) {
-  --ivory: #f7f8fa;
-  --navy: #1952a0;
+  --ivory: var(--brand-canvas);
+  --navy: var(--brand-primary);
   --navy-2: #174780;
   --navy-3: #315f9b;
-  --blue: #1952a0;
+  --blue: var(--brand-primary);
   --blue-lt: #16458a;
-  --teal: #1952a0;
+  --teal: var(--brand-primary);
   --teal-lt: #16458a;
-  --text: #243f64;
+  --text: var(--brand-text);
   --text-2: #405b7b;
   --text-3: #566d89;
   --gray-1: #eef2f6;
   --gray-2: #dae3eb;
   --gray-3: #bdcddb;
-  --surface-line: #d7e1e9;
+  --surface-line: var(--brand-line);
   --surface-shadow: 0 18px 45px -30px #1952a026;
-  --editorial-paper: #fdfefe;
-  --editorial-mist: #e7effb;
-  --editorial-frost: #eff4fc;
+  --editorial-paper: var(--brand-paper);
+  --editorial-mist: var(--brand-mist);
+  --editorial-frost: var(--brand-frost);
   background: var(--ivory);
 }
 
 /* A mist-blue hero with deeper slate typography and actions. */
 html body.landing-home:not(.persona-page) .hero--structured {
-  background: linear-gradient(180deg, #e1ebfa 0%, #eff4fc 55%, #f7f8fa 100%);
+  background: linear-gradient(180deg, #e1ebfa 0%, var(--brand-frost) 55%, var(--brand-canvas) 100%);
 }
 html body.landing-home:not(.persona-page) .hero--structured > .hero-bg { background: none; }
 html body.landing-home:not(.persona-page) nav {
@@ -39,14 +39,14 @@ html body.landing-home:not(.persona-page) .hero-story {
   box-shadow: var(--surface-shadow);
 }
 html body.landing-home:not(.persona-page) :is(.hero-eyebrow, .section-kicker, .ml-process-kicker, .ml-workspace-kicker, .faq-group-title, .footer-col h4) { color: #45658d; }
-html body.landing-home:not(.persona-page) :is(.hero-sub, .section-sub, .ml-process-copy > p, .ml-workspace-heading > p, .faq-answer, .footer-brand p, .footer-col a, .footer-bottom) { color: #49617f; }
+html body.landing-home:not(.persona-page) :is(.hero-sub, .section-sub, .ml-process-copy > p, .ml-workspace-heading > p, .faq-answer, .footer-brand p, .footer-col a, .footer-bottom) { color: var(--brand-muted); }
 html body.landing-home:not(.persona-page) :is(.hero h1 em, .ml-process h2 em, .ml-workspace-heading h2 em, .ml-testimonials-heading h2 em) { color: inherit; }
 html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal) {
-  background: #1952a0;
-  color: #fdfefe;
+  background: var(--brand-primary);
+  color: var(--brand-paper);
   box-shadow: 0 5px 12px #1952a01a;
 }
-html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal):hover { background: #123f80; }
+html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal):hover { background: var(--brand-primary-hover); }
 html body.landing-home:not(.persona-page) .nav-mobile-panel { background: var(--editorial-paper); border-color: var(--surface-line); }
 
 /* The diagrams share the same slate and mist-blue palette;
@@ -57,20 +57,20 @@ html body.landing-home:not(.persona-page) :is(.ml-process-nav, .ml-process-panel
 }
 /* Reset the legacy green hover, including sticky hover on touch screens.
    An inactive hovered tab must remain distinct from the selected step. */
-html body.landing-home:not(.persona-page) .ml-process-tab { background: transparent; color: #49617f; }
+html body.landing-home:not(.persona-page) .ml-process-tab { background: transparent; color: var(--brand-muted); }
 @media (hover: hover) and (pointer: fine) {
   html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="false"]:hover { background: #f3f6fa; }
 }
-html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="true"] { background: #e7effb; color: #1952a0; }
+html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="true"] { background: var(--brand-mist); color: var(--brand-primary); }
 html body.landing-home:not(.persona-page) .ml-tab-fill { background: #d8e6fa; }
-html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="true"] .ml-tab-num { background: #1952a0; }
-html body.landing-home:not(.persona-page) .ml-process-art--report { --v2-surface: #eff4fc; }
+html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="true"] .ml-tab-num { background: var(--brand-primary); }
+html body.landing-home:not(.persona-page) .ml-process-art--report { --v2-surface: var(--brand-frost); }
 html body.landing-home:not(.persona-page) .ml-testimonial--sage { background: var(--editorial-mist); }
-html body.landing-home:not(.persona-page) .ml-tab-num { background: #eff4fc; color: #586e81; }
+html body.landing-home:not(.persona-page) .ml-tab-num { background: var(--brand-frost); color: #586e81; }
 html body.landing-home:not(.persona-page) .ml-process-tab[aria-selected="true"] .ml-tab-num { color: #fff; }
 html body.landing-home:not(.persona-page) :is(.ml-testimonials-kicker, .ml-contributor-label, .ml-contributor-contribution h4) { color: #45658d; }
-html body.landing-home:not(.persona-page) :is(.ml-testimonials-heading > p, .ml-contributor-specialty, .ml-contributor-contribution p) { color: #49617f; }
-html body.landing-home:not(.persona-page) .ml-contributor h3 { color: #1952a0; }
+html body.landing-home:not(.persona-page) :is(.ml-testimonials-heading > p, .ml-contributor-specialty, .ml-contributor-contribution p) { color: var(--brand-muted); }
+html body.landing-home:not(.persona-page) .ml-contributor h3 { color: var(--brand-primary); }
 html body.landing-home:not(.persona-page) .ml-contributor-contribution { border-color: var(--surface-line); }
 
 /* Carry the same porcelain and mist surfaces through all three product previews. */
@@ -82,22 +82,22 @@ html body.landing-home:not(.persona-page) .ml-documents-folio::before { backgrou
 html body.landing-home:not(.persona-page) .ml-documents-folio::after { background: #d8e0e7; border-color: #bec8d1; }
 html body.landing-home:not(.persona-page) .ml-documents-folio-tab { background: #ced7e0; border-color: #b3bfcb; color: #3d4a57; }
 html body.landing-home:not(.persona-page) .ml-conversation-message--cabinet { background: #e6ebf0; }
-html body.landing-home:not(.persona-page) .ml-dossier-agenda { background: #1952a0; }
+html body.landing-home:not(.persona-page) .ml-dossier-agenda { background: var(--brand-primary); }
 
 /* Two roles, two subtle values of the same blue. */
 html body.landing-home:not(.persona-page) .audience-card { background: var(--editorial-mist); border-color: #ccd4db; }
 html body.landing-home:not(.persona-page) .audience-card:nth-child(2) { background: var(--editorial-frost); border-color: #ccd6df; }
 html body.landing-home:not(.persona-page) .audience-card :is(.audience-kicker, .audience-card-head > div > span, .audience-index) { color: #45658d; }
 html body.landing-home:not(.persona-page) .audience-card .audience-index { background: transparent; border-color: transparent; }
-html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal) { background: #1952a0; color: #fdfefe; }
-html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal):hover { background: #123f80; }
-html body.landing-home:not(.persona-page) .cta-band { background: #1952a0; }
-html body.landing-home:not(.persona-page) .cta-band h2 { color: #fdfefe; }
+html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal) { background: var(--brand-primary); color: var(--brand-paper); }
+html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal):hover { background: var(--brand-primary-hover); }
+html body.landing-home:not(.persona-page) .cta-band { background: var(--brand-primary); }
+html body.landing-home:not(.persona-page) .cta-band h2 { color: var(--brand-paper); }
 html body.landing-home:not(.persona-page) .cta-band p { color: #dbe7fa; }
-html body.landing-home:not(.persona-page) .cta-band .btn-primary { background: #e4edfb; color: #1952a0; }
+html body.landing-home:not(.persona-page) .cta-band .btn-primary { background: #e4edfb; color: var(--brand-primary); }
 html body.landing-home:not(.persona-page) .cta-band .btn-primary:hover { background: #e8eef3; }
 html body.landing-home:not(.persona-page) .faq-item { border-color: #ced6dd; }
-html body.landing-home:not(.persona-page) .faq-item[open] { background: #e7effb; border-color: #b2bec9; }
+html body.landing-home:not(.persona-page) .faq-item[open] { background: var(--brand-mist); border-color: #b2bec9; }
 
 /* Blue is reserved for selected words within editorial headings. */
 html body.landing-home:not(.persona-page) :is(
@@ -105,11 +105,11 @@ html body.landing-home:not(.persona-page) :is(
   .ml-testimonials-heading h2, .ml-workspace-heading h2,
   .ml-continuity-copy h2, .ml-documents-copy h2,
   .audiences h2, .audience-card h3, .faq h2
-) { color: #223e57; }
+) { color: var(--brand-heading); }
 html body.landing-home:not(.persona-page) main :is(h1, h2) em { color: inherit; }
-html body.landing-home:not(.persona-page) main :is(h1, h2) .title-accent { color: #1952a0; }
-html body.landing-home:not(.persona-page) .ml-documents { --documents-ink: #1952a0; --documents-muted: #49617f; }
-html body.landing-home:not(.persona-page) .ml-workspace--editorial { --dossier-ink: #1952a0; --dossier-muted: #49617f; }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-copy header > p, .ml-testimonials-heading > p) { color: #49617f; }
+html body.landing-home:not(.persona-page) main :is(h1, h2) .title-accent { color: var(--brand-primary); }
+html body.landing-home:not(.persona-page) .ml-documents { --documents-ink: var(--brand-primary); --documents-muted: var(--brand-muted); }
+html body.landing-home:not(.persona-page) .ml-workspace--editorial { --dossier-ink: var(--brand-primary); --dossier-muted: var(--brand-muted); }
+html body.landing-home:not(.persona-page) :is(.ml-continuity-copy header > p, .ml-testimonials-heading > p) { color: var(--brand-muted); }
 html body.landing-home:not(.persona-page) :is(.ml-continuity-kicker, .ml-documents-kicker) { color: #45658d; }
-html body.landing-home:not(.persona-page) .ml-process-art--v2:not(.ml-process-art--matching) { --v2-ink: #1952a0; --v2-thread: #376aaf; }
+html body.landing-home:not(.persona-page) .ml-process-art--v2:not(.ml-process-art--matching) { --v2-ink: var(--brand-primary); --v2-thread: #376aaf; }

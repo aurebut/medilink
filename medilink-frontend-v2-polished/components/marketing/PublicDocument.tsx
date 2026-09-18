@@ -1,10 +1,11 @@
 /* eslint-disable @next/next/no-html-link-for-pages -- Full document navigation preserves isolated marketing and workspace root layouts. */
 /* eslint-disable @next/next/no-head-element -- Shared App Router root document; next/head is for the Pages Router. */
-/* eslint-disable @next/next/no-page-custom-font -- Preserve the original home typography in its isolated App Router root document. */
 import type { ReactNode } from 'react';
+import '@/app/brand-tokens.css';
 import Script from 'next/script';
 import { landingShell } from '@/content/landing-shell';
 import { LandingProcess } from './LandingProcess';
+import { LandingInterfaceLightbox } from './LandingInterfaceLightbox';
 
 export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides';
 
@@ -42,7 +43,6 @@ export function PublicDocument({ variant, children }: { variant: PublicVariant; 
   const bodyClass = persona ? `persona-page ${variant}` : variant === 'home' ? 'landing-home' : 'guides-page';
   const restored = variant === 'guides' ? null : landingShell[variant];
   return <html lang="fr"><head>
-    {variant === 'home' && <><link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" /><link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" /></>}
     {['special', ...styles, 'icons', ...(variant === 'guides' ? ['seo'] : [])].map(name => <link key={name} rel="stylesheet" href={`/landing-${name}.css`} />)}
   </head><body className={bodyClass}>
     {restored ? <nav aria-label="Navigation principale" dangerouslySetInnerHTML={{ __html: restored.navigation }} /> : <><a className="skip-link" href="#main-content">Aller au contenu</a><PublicNavigation variant={variant} /></>}
@@ -51,5 +51,6 @@ export function PublicDocument({ variant, children }: { variant: PublicVariant; 
     {restored && <Script src="/landing-special.js" strategy="afterInteractive" />}
     <Script src="/landing-main.js" strategy="afterInteractive" />
     {variant === 'home' && <LandingProcess />}
+    {variant === 'home' && <LandingInterfaceLightbox />}
   </body></html>;
 }

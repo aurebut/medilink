@@ -376,7 +376,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
   }, [isMobile]);
   useEffect(() => {
     const layout = messageLayoutRef.current;
-    if (!layout || isMobile) {
+    if (!layout || isMobile || loading) {
       layout?.style.removeProperty('--message-layout-height');
       return;
     }
@@ -386,9 +386,11 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const rect = layout.getBoundingClientRect();
-        const bottomGap = 16;
-        const availableHeight = Math.floor(window.innerHeight - rect.top - bottomGap);
-        layout.style.setProperty('--message-layout-height', `${Math.max(360, availableHeight)}px`);
+        const mobileNav = document.querySelector<HTMLElement>('.mobile-bottom-nav');
+        const navRect = mobileNav?.getBoundingClientRect();
+        const bottom = navRect && navRect.height > 0 ? Math.min(window.innerHeight, navRect.top) : window.innerHeight;
+        const availableHeight = Math.floor(bottom - rect.top - 16);
+        layout.style.setProperty('--message-layout-height', `${Math.max(240, availableHeight)}px`);
       });
     };
 
@@ -408,7 +410,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
       resizeObserver.disconnect();
       layout.style.removeProperty('--message-layout-height');
     };
-  }, [isMobile]);
+  }, [isMobile, loading, conversations.length]);
   useEffect(() => {
     if (!activeId) return;
     messagesEndRef.current?.scrollIntoView({ block: 'end' });
@@ -800,11 +802,12 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
   const headerWorkflowStep = isMobile || !desktopTimelineOpen ? mobileCurrentStep : null;
 
   return (
-    <div ref={messageLayoutRef} className={`message-layout ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
+    <div ref={messageLayoutRef} className={`message-layout message-layout--editorial ${isMobile ? 'message-layout-mobile' : ''} ${isMobile && activeId ? 'message-layout-mobile-active' : ''}`}>
       {showConversationList ? <Card className="conversation-list">
         <div className="toolbar">
           <div>
-            <h2>Conversations</h2>
+            <span className="conversation-list-eyebrow">Votre messagerie</span>
+            <h2>Les échanges.</h2>
             <div className="small">
               {conversations.length} {conversations.length === 1 ? 'échange' : 'échanges'}
             </div>
@@ -812,7 +815,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
         </div>
         <div className="conversation-mobile-search">
             <label className="sr-only" htmlFor="conversation-search">Rechercher une conversation</label>
-            <span aria-hidden="true" />
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" /></svg>
             <input
               id="conversation-search"
               type="search"
@@ -876,18 +879,10 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
               ) : null}
               <div className="conversation-title-meta">
                 <h2 id={conversationTitleId}>{active?.mission?.title || 'Conversation'}</h2>
-                <div className="conversation-subtitle">{active?.establishment?.name} • {active?.mission?.city}</div>
+                <div className="conversation-subtitle">{[active?.establishment?.name, active?.mission?.city].filter(Boolean).join(' · ')}</div>
               </div>
             </div>
             
-            <div className="conversation-status-badge">
-              <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>
-                {currentStatus}
-              </Badge>
-            </div>
-            {headerWorkflowStep ? (
-              <DesktopWorkflowHeaderStep step={headerWorkflowStep} />
-            ) : null}
           </div>
 
           <div className="conversation-header-actions">
@@ -903,7 +898,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
                 aria-expanded={mobileOptionsOpen}
                 onClick={() => setMobileOptionsOpen((open) => !open)}
               >
-                {mobileOptionsOpen ? 'Masquer détails' : 'Plus de détails'}
+                {mobileOptionsOpen ? 'Fermer le suivi' : 'Voir le suivi'}
               </Button>
             ) : null}
 
@@ -915,10 +910,17 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
                 aria-expanded={desktopTimelineOpen}
                 onClick={() => setDesktopTimelineOpen(true)}
               >
-                Plus de détails
+                Voir le suivi <span aria-hidden="true">↗</span>
               </Button>
             ) : null}
           </div>
+        </div>
+
+        <div className="conversation-context">
+          <div className="conversation-status-badge">
+            <Badge tone={state.rejected ? 'danger' : state.fundsSecured || state.released ? 'success' : 'neutral'}>{currentStatus}</Badge>
+          </div>
+          {headerWorkflowStep ? <DesktopWorkflowHeaderStep step={headerWorkflowStep} /> : null}
         </div>
 
         {isMobile && mobileOptionsOpen ? (
