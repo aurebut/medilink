@@ -124,9 +124,10 @@ function normalizeContributorsPosition(html) {
   assert.equal(matches.length, 1, 'contributors: exactly one section');
   const [{ 0: markup, index: start }] = matches;
   const precedingSections = [...html.slice(0, start).matchAll(/<section\b[^>]*>/g)];
-  assert.equal(precedingSections.length, 1, 'contributors: immediately after the first section');
-  assert.match(precedingSections[0][0], /class="hero hero--structured"/, 'contributors: follows the hero');
-  assert.match(html.slice(start + markup.length), /^ {4}<section class="ml-process" id="matching"/, 'contributors: precedes the process section');
+  assert.equal(precedingSections.length, 2, 'contributors: immediately after the first two sections');
+  assert.match(precedingSections[0][0], /class="hero hero--structured"/, 'hero remains first');
+  assert.match(html.slice(0, start), /<section class="ml-process" id="matching"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\s*$/, 'contributors: directly follows the complete process section');
+  assert.match(html.slice(start + markup.length), /^ {4}<section class="ml-workspace ml-workspace--editorial" id="communication"/, 'contributors: precedes the workspace section');
   // Restore the original position for the remaining exact markup comparison.
   const target = '    <section class="audiences" id="audiences"';
   assert.ok(html.includes(target), 'contributors: original following section exists');
