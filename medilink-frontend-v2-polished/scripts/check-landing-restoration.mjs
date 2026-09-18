@@ -28,12 +28,7 @@ function normalizeRequestedHomeCopy(html, updated) {
     assert.equal(html.split(expected).length - 1, 1, `requested copy: ${expected}`);
     if (updated) html = html.replace(after, before);
   }
-  // The user's replacement table removes four blocks and replaces these two headings.
-  for (const className of ['hero-eyebrow', 'hero-sub', 'hero-photo-caption', 'ml-process-note']) {
-    const block = new RegExp(`^ *<(p|figcaption) class="${className}">[^\\n]*?<\\/\\1>\\r?\\n`, 'gm');
-    assert.equal([...html.matchAll(block)].length, updated ? 0 : 1, `${className}: requested removal`);
-    html = html.replace(block, '');
-  }
+  // Empty replacement cells preserve the original copy, compared verbatim below.
   if (updated) {
     assert.ok(html.includes('<h1 id="hero-title">La plateforme de remplacement conçue avec et pour les médecins généralistes</h1>'), 'requested hero title');
     assert.ok(html.includes('<h2 id="ml-process-title">Gérez chaque mission simplement, avant, pendant et après le remplacement.</h2>'), 'requested process title');

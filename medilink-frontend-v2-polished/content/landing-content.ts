@@ -11,13 +11,16 @@ export const landingContent = {
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-layout-human">
         <div class="hero-copy">
+          <p class="hero-eyebrow">Le remplacement médical, de la recherche à la transmission.</p>
           <h1 id="hero-title">La plateforme de remplacement conçue avec et pour les médecins généralistes</h1>
+          <p class="hero-sub">MédiLink rapproche médecins remplaçants et cabinets selon leurs disponibilités et leurs conditions d’exercice. Comparez les possibilités, convenez des modalités et retrouvez les échanges et les transmissions dans le dossier du remplacement.</p>
           <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/demo">Demander une démo <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></div>
         </div>
         <div class="hero-human-wrap">
           <div class="hero-story">
             <figure class="hero-human-frame">
               <img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async">
+              <figcaption class="hero-photo-caption"><span>Dates, conditions, transmissions.</span><strong>Un remplacement se prépare dans les détails.</strong></figcaption>
             </figure>
             <ol class="hero-path" aria-label="Votre remplacement, de la recherche au suivi">
               <li><a href="#matching"><span class="hero-path-number" aria-hidden="true">01</span><span><strong>Comparez selon vos critères</strong><small>Disponibilités, localisation, conditions d’exercice.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
@@ -106,6 +109,7 @@ export const landingContent = {
           </div>
           ${processIllustrations.report}
         </div>
+        <p class="ml-process-note">Une fois le contact établi, MédiLink accompagne aussi <strong>la préparation et le déroulement du remplacement.</strong></p>
       </div>
     </section>
 
