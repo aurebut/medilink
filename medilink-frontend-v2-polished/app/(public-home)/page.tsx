@@ -5,6 +5,7 @@ import './workspace-editorial.css';
 import './continuity-editorial.css';
 import './documents-editorial.css';
 import './hero-frame.css';
+import './section-spacing.css';
 
 export const metadata = pageMetadata("Remplacement médical pour médecins et cabinets", "Préparez vos remplacements en médecine générale avec MédiLink : disponibilités, conditions d’exercice et échanges entre médecins remplaçants et cabinets.", "/");
 

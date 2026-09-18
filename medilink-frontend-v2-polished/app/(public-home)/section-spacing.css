@@ -1,0 +1,21 @@
+/* Shared outer spacing; each section keeps its natural content height. */
+body.landing-home:not(.persona-page) main {
+  --landing-section-space: clamp(36px, 4.5vw, 56px);
+}
+
+body.landing-home:not(.persona-page) main > :is(
+  .ml-process,
+  .ml-testimonials,
+  .ml-workspace,
+  .ml-continuity,
+  .ml-documents,
+  .audiences,
+  .faq
+) {
+  padding-block: var(--landing-section-space);
+}
+
+/* Neighbouring sections already provide the space around this inset card. */
+body.landing-home:not(.persona-page) main > .cta-band {
+  margin-block: 0;
+}
