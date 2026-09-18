@@ -30,7 +30,7 @@ function normalizeRequestedHomeCopy(html, updated) {
   }
   // Empty replacement cells preserve the original copy, compared verbatim below.
   if (updated) {
-    assert.ok(html.includes('<h1 id="hero-title">La plateforme de remplacement conçue avec et pour les médecins généralistes</h1>'), 'requested hero title');
+    assert.ok(html.includes('<h1 id="hero-title"><span>La plateforme de remplacement</span> <em>conçue avec et pour les médecins généralistes</em></h1>'), 'requested hero title with the original color emphasis');
     assert.ok(html.includes('<h2 id="ml-process-title">Gérez chaque mission simplement, avant, pendant et après le remplacement.</h2>'), 'requested process title');
   }
   html = html.replace(/<h1 id="hero-title">[^\n]*?<\/h1>/, '<h1 id="hero-title">REQUESTED_HERO</h1>');
