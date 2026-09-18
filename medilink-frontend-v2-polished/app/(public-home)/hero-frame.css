@@ -1,0 +1,10 @@
+/* Keep an even frame around the photo after removing the three links below it. */
+.hero--structured .hero-story {
+  padding: 8px;
+}
+
+@media (max-width: 640px) {
+  .hero--structured .hero-story {
+    padding: 6px;
+  }
+}

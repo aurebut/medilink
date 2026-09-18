@@ -8,6 +8,9 @@ const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.h
 const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
 function normalizeRequestedHomeCopy(html, updated) {
+  const heroPath = /^ *<ol class="hero-path"[^>]*>[\s\S]*?<\/ol>\r?\n/gm;
+  assert.equal([...html.matchAll(heroPath)].length, updated ? 0 : 1, 'requested removal of the three links below the hero photo');
+  html = html.replace(heroPath, '');
   // Additional copy replacements explicitly requested in the second table.
   const replacements = [
   [

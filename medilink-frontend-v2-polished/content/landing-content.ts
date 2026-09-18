@@ -22,11 +22,6 @@ export const landingContent = {
               <img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async">
               <figcaption class="hero-photo-caption"><span>Dates, conditions, transmissions.</span><strong>Un remplacement se prépare dans les détails.</strong></figcaption>
             </figure>
-            <ol class="hero-path" aria-label="Votre remplacement, de la recherche au suivi">
-              <li><a href="#matching"><span class="hero-path-number" aria-hidden="true">01</span><span><strong>Comparez selon vos critères</strong><small>Disponibilités, localisation, conditions d’exercice.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
-              <li><a href="#communication"><span class="hero-path-number" aria-hidden="true">02</span><span><strong>Préparez le remplacement</strong><small>Échanges, documents et modalités à confirmer.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
-              <li><a href="#continuite"><span class="hero-path-number" aria-hidden="true">03</span><span><strong>Organisez la transmission</strong><small>Activité, résultats attendus et points à reprendre.</small></span><span class="hero-path-arrow" aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></li>
-            </ol>
           </div>
         </div>
       </div>
