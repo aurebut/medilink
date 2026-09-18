@@ -23,7 +23,7 @@ export function LandingInterfaceLightbox() {
       const src = source?.getAttribute('srcset')?.split(',').at(-1)?.trim().split(/\s+/)[0] || img.currentSrc;
       setZoomed(false);
       setCapture({ src, alt: img.alt,
-        title: anchor.closest('figure')?.querySelector('.ml-interface-heading > span')?.textContent || 'Aperçu MédiLink',
+        title: anchor.closest('figure')?.querySelector('.ml-interface-title')?.textContent || 'Aperçu MédiLink',
         width: Number(source?.getAttribute('width')) || img.width,
         height: Number(source?.getAttribute('height')) || img.height,
       });

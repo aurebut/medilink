@@ -32,7 +32,7 @@ await mkdir(output, { recursive: true });
 
 async function capture(name, device) {
   const mobile = device === 'mobile';
-  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'documents' ? { width: 1560, height: 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1200, height: 1000 };
+  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'documents' ? { width: 1280, height: 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1100, height: 1000 };
   const context = await browser.newContext({ viewport, deviceScaleFactor: 2, locale: 'fr-FR', timezoneId: 'Europe/Paris', reducedMotion: 'reduce' });
   const page = await context.newPage();
   const errors = [];
@@ -102,9 +102,28 @@ async function capture(name, device) {
   let png;
   let crop;
   if (name === 'messages') {
-    crop = { x: 0, y: 0, width: viewport.width, height: viewport.height };
-    png = await page.screenshot({ clip: crop, animations: 'disabled' });
+    // Capture the native conversation component, including its list on desktop,
+    // instead of shrinking the unrelated application navigation into the preview.
+    const box = await subject.boundingBox();
+    const form = await page.locator('.message-form').boundingBox();
+    assert.ok(form && form.y >= box.y && form.y + form.height <= box.y + box.height + 1,
+      `${name}/${device}: the complete composer remains inside the capture`);
+    const clip = {
+      x: Math.floor(box.x), y: Math.floor(box.y),
+      width: Math.ceil(box.x + box.width) - Math.floor(box.x),
+      height: Math.ceil(box.y + box.height) - Math.floor(box.y),
+    };
+    png = await page.screenshot({ clip, animations: 'disabled' });
+    crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
   } else {
+    if (!mobile && name === 'mission') {
+      const columns = await subject.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+      assert.equal(columns, 2, 'mission/desktop: the native timeline keeps its two-column layout');
+    }
+    if (!mobile && name === 'documents') {
+      const desktopHero = await page.locator('.documents-hero').evaluate(element => getComputedStyle(element).display);
+      assert.equal(desktopHero, 'flex', 'documents/desktop: the native document heading keeps its desktop layout');
+    }
     // Scroll the actual component into view, leaving real fixed navigation outside the crop.
     await subject.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
     const box = await subject.boundingBox();

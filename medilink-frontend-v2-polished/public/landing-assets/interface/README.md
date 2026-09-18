@@ -14,8 +14,8 @@ The script uses an installed `playwright` module, or `PLAYWRIGHT_MODULE_PATH` wh
 
 The captures use French locale, Europe/Paris time and a fixed 16 September 2026 clock. All API responses are intercepted; an unknown API request or external service makes the run fail. The application font requests are permitted. The only injected CSS hides the Next.js development indicator.
 
-- Messages: `/app/messages?id=c1`, desktop navigation and the native mobile layout. The viewport height is calculated from the real rendered messages to keep the three text bubbles complete.
-- Mission: `/app/current-missions`, the real mission timeline with a small crop of its surrounding surface.
-- Documents: `/app/profile`, after selecting the Documents tab. The crop ends at a complete row boundary after four essential desktop documents or the first two mobile documents.
+- Messages: `/app/messages?id=c1`, the native `.message-layout` component. Desktop includes the conversation list; mobile shows the selected conversation. General application navigation and the page title stay outside the crop. The viewport height is calculated from the real rendered messages to keep all three text bubbles and the complete composer visible.
+- Mission: `/app/current-missions`, the real mission timeline with a small crop of its surrounding surface. The 1100 px desktop viewport keeps the native two-column timeline while making its contents larger in the landing preview; mobile remains at 390 px.
+- Documents: `/app/profile`, after selecting the Documents tab. The 1280 px desktop viewport keeps the native desktop document heading. The crop ends at a complete row boundary after four essential desktop documents or the first two mobile documents. The mobile viewport remains at 390 px.
 
 `manifest.json` records the source routes, viewport sizes, crops, output dimensions, browser version and SHA-256 of each 2× image. Both 1× and 2× files are lossless WebP. Regenerate the whole set after interface changes; do not retouch the UI inside individual images.

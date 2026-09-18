@@ -1,0 +1,29 @@
+/* Native horizontal scrolling keeps every contributor on one row on phones. */
+@media (max-width: 700px) {
+  .landing-home .ml-testimonials-grid {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: min(86%, 360px);
+    gap: 16px;
+    max-width: none;
+    margin-inline: 0;
+    padding-bottom: 14px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--brand-primary) var(--brand-line);
+  }
+
+  .landing-home .ml-testimonials-grid > .ml-contributor {
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+.landing-home .ml-testimonials-grid:focus-visible {
+  outline: 2px solid var(--brand-focus);
+  outline-offset: 5px;
+  border-radius: 4px;
+}
