@@ -90,7 +90,6 @@ export const landingContent = {
           </div>
           ${processIllustrations.report}
         </div>
-        <p class="ml-process-note">Une fois le contact établi, MédiLink accompagne aussi <strong>la préparation et le déroulement du remplacement.</strong></p>
       </div>
     </section>
 
