@@ -2,6 +2,8 @@
 
 Le module rattache un dossier à une candidature précise (`applicationId` unique). Il ne réutilise pas les documents du profil : seuls le candidat concerné et les membres OWNER, ADMIN ou RECRUITER de l’établissement accèdent à ce dossier. Une candidature clôturée rend le dossier existant accessible en lecture seule. Aucun dossier n’est créé après clôture.
 
+Les trois tables du dossier sont réservées au backend. La migration `20260919143000_harden_replacement_dossier_access` active RLS sans politique cliente et révoque tous les privilèges de `PUBLIC`, `anon` et `authenticated`. La connexion Prisma actuelle utilise le propriétaire `postgres`, qui conserve ses droits. Ne pas activer `FORCE ROW LEVEL SECURITY` ni remplacer cette connexion par un rôle client. Un futur rôle backend distinct nécessitera des droits et politiques dédiés. La migration est rejouable après une application directe du correctif dans Supabase, sans modifier la migration de création déjà enregistrée.
+
 ## Activation
 
 1. Construire la version : `npm ci`, `npm run prisma:generate`, `npm run build`.
@@ -45,3 +47,5 @@ Les mutations, sauf `upload-url`, retournent la vue complète. `/send` ne retour
 `npm run dossier:test` teste les droits, l’isolation des candidatures, le gel des fichiers, leurs signatures, les PDF, les révisions, l’archivage, les dates de validité et les échecs/réessais d’envoi. Il utilise des doubles en mémoire pour la base et le fournisseur email et le véritable `StorageService` local dans un répertoire temporaire. Il ne remplace pas un test concurrent transactionnel PostgreSQL.
 
 Compléter par `npm run security:test`, `npm run build` et la vérification SQL de la migration dans une base locale isolée avant publication.
+
+`npm run dossier:access:test` utilise un PostgreSQL éphémère PGlite, sans accès réseau ni identifiants de production. Il vérifie le refus des opérations publiques, l'accès du propriétaire aux données, RLS même en cas de droit SELECT réaccordé, et le rejeu de la migration.

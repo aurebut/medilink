@@ -12,6 +12,7 @@
     "build": "nest build",
     "security:test": "ts-node -r tsconfig-paths/register scripts/security-regression-tests.ts",
     "dossier:test": "ts-node -r tsconfig-paths/register scripts/dossier-regression-tests.ts",
+    "dossier:access:test": "node scripts/dossier-access-tests.mjs",
     "start:prod": "node dist/src/main.js",
     "admin:create": "node dist/scripts/create-admin.js",
     "admin:create:dev": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
@@ -42,6 +43,7 @@
     "stripe": "^22.2.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@nestjs/cli": "^11.0.24",
     "@nestjs/schematics": "^11.1.0",
     "@nestjs/testing": "^11.1.28",
