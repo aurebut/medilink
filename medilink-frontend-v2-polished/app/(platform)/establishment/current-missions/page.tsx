@@ -1005,7 +1005,28 @@ function MissionControlPanel({
 
       {activeSection === 'documents' ? (
         <div>
-          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="establishment" conversationId={row.conversation?.id} paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'} />
+          <ReplacementDossier
+            key={row.application.id}
+            applicationId={row.application.id}
+            viewer="establishment"
+            conversationId={row.conversation?.id}
+            paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'}
+            presentation={{
+              establishment: mission?.establishment ? {
+                name: mission.establishment.name,
+                imageUrl: mission.establishment.photos?.find(photo => photo.isPrimary && photo.url)?.url
+                  || mission.establishment.photos?.find(photo => photo.url)?.url || mission.establishment.logoUrl,
+                city: mission.city || mission.establishment.city,
+              } : undefined,
+              replacement: (profile || row.application.candidate?.profile) ? {
+                name: [
+                  (profile || row.application.candidate?.profile)?.firstName,
+                  (profile || row.application.candidate?.profile)?.lastName,
+                ].filter(Boolean).join(' ') || 'Remplaçant',
+                imageUrl: (profile || row.application.candidate?.profile)?.avatarUrl,
+              } : undefined,
+            }}
+          />
           <details className="replacement-dossier-legacy"><summary>Documents professionnels du candidat</summary><div><CandidateDocumentsPanel
           candidateProfile={candidateProfile}
           loading={profileLoading}

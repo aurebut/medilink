@@ -6,13 +6,18 @@ import { api, apiFetch, ApiError, getApiUrl, isMockStorageUrl, openDocumentPrevi
 import { errorMessage } from '@/lib/user-facing';
 import { currentDossierDocument, dossierCategories, dossierCategoryFor, dossierDate, dossierDocumentHints, dossierDocumentIsCurrent, dossierDocumentLabels, dossierFieldLabels, dossierKindAllowsMultiple, dossierRecipientLabels, dossierUploadKinds, type DossierCategory, type DossierDocument, type DossierDocumentKind, type DossierRecipientType, type DossierUploadKind, type ReplacementDetails, type ReplacementDossierData } from '@/lib/replacement-dossier';
 import { Alert, Button, Field, Input, Select, Textarea } from '@/components/ui';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 
 type UploadResponse = { documentId: string; uploadUrl: string; method: string; headers: Record<string, string> };
 type Panel = 'details' | 'upload' | 'send' | 'manage' | null;
 type RegisterRow = { kind: DossierDocumentKind; document?: DossierDocument } | { kind: 'PLATFORM_RECEIPT' };
+type DossierPresentation = {
+  establishment?: { name: string; imageUrl?: string | null; city?: string | null };
+  replacement?: { name: string; imageUrl?: string | null };
+};
 const PAGE_SIZE = 3;
 
-export function ReplacementDossier({ applicationId, viewer, conversationId, paymentReleased = false }: { applicationId: string; viewer: 'candidate' | 'establishment'; conversationId?: string; paymentReleased?: boolean }) {
+export function ReplacementDossier({ applicationId, viewer, conversationId, paymentReleased = false, presentation }: { applicationId: string; viewer: 'candidate' | 'establishment'; conversationId?: string; paymentReleased?: boolean; presentation?: DossierPresentation }) {
   const path = `/applications/${applicationId}/dossier`;
   const registerId = useId();
   const [category, setCategory] = useState<DossierCategory>('replacement');
@@ -255,6 +260,27 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
       <div><span className="rd-eyebrow">Le dossier partagé</span><h2>Vos <em>documents.</em></h2></div>
       <span className="rd-shared" aria-label="Espace partagé"><FolderOpen size={21} strokeWidth={1.3} /></span>
     </header>
+
+    {presentation?.establishment || presentation?.replacement ? (
+      <div className="rd-participants" role="group" aria-label="Établissement et profil du remplaçant">
+        {presentation.establishment ? (
+          <div className="rd-participant rd-place">
+            <ProfileAvatar src={presentation.establishment.imageUrl} name={presentation.establishment.name} className="rd-place-photo" decorative />
+            <div className="rd-participant-details">
+              <span>Établissement</span>
+              <strong>{presentation.establishment.name}</strong>
+              {presentation.establishment.city ? <small>{presentation.establishment.city}</small> : null}
+            </div>
+          </div>
+        ) : null}
+        {presentation.replacement ? (
+          <div className="rd-participant rd-replacement">
+            <ProfileAvatar src={presentation.replacement.imageUrl} name={presentation.replacement.name} className="rd-replacement-photo" decorative />
+            <div className="rd-participant-details"><span>Remplaçant</span><strong>{presentation.replacement.name}</strong></div>
+          </div>
+        ) : null}
+      </div>
+    ) : null}
 
     <div className="rd-mission-context">
       <p>{dossier.details.holderName || 'Médecin remplacé'}<span aria-hidden="true"> & </span>{dossier.details.replacementName || 'Remplaçant'}</p>

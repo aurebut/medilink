@@ -215,10 +215,10 @@
 /* The people and place come from the mission's existing profiles and photos. */
 .workspace-design .mission-folio-people { display: grid; gap: 16px; min-width: 0; }
 .workspace-design .mission-folio-place { display: grid; gap: 10px; min-width: 0; }
-.workspace-design .mission-folio-place-photo { width: 100%; height: 92px; border-radius: 9px; border: 1px solid var(--brand-line); }
+.workspace-design .mission-folio-place-photo { width: 100%; height: 132px; border-radius: 9px; border: 1px solid var(--brand-line); }
 .workspace-design .mission-folio-place-photo img { object-position: center 58%; }
 .workspace-design .mission-folio-person { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.workspace-design .mission-folio-person > span { width: 36px; height: 36px; }
+.workspace-design .mission-folio-person > span { width: 48px; height: 48px; }
 .workspace-design .mission-folio-people strong { display: block; color: var(--brand-heading); font-size: 12px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
 .workspace-design :is(.mission-folio-place, .mission-folio-person) > div > span { display: block; margin-top: 3px; color: var(--brand-muted); font-size: 10px; line-height: 1.4; }
 
@@ -599,9 +599,9 @@
   .workspace-design .mission-folio-route .mission-folio-intro p { font-size: 11px; }
   .workspace-design .mission-folio-progress { padding-top: 25px; }
   .workspace-design .mission-folio-people { grid-column: 1 / -1; grid-row: 2; gap: 12px; }
-  .workspace-design .mission-folio-place { grid-template-columns: 76px minmax(0, 1fr); align-items: center; gap: 12px; }
-  .workspace-design .mission-folio-place-photo { width: 76px; height: 54px; border-radius: 7px; }
-  .workspace-design .mission-folio-person > span { width: 30px; height: 30px; }
+  .workspace-design .mission-folio-place { grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 12px; }
+  .workspace-design .mission-folio-place-photo { width: 104px; height: 74px; border-radius: 7px; }
+  .workspace-design .mission-folio-person > span { width: 44px; height: 44px; }
   .workspace-design .mission-folio-progress { grid-column: 2; grid-row: 1; }
   .workspace-design .mission-folio-progress > strong { font-size: 38px; }
   .workspace-design .mission-folio-progress > strong > span { font-size: 15px; }

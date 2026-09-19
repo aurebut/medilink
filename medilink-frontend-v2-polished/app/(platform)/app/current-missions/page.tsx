@@ -556,7 +556,17 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
       {activeSection === 'documents' ? (
         <div>
-          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="candidate" conversationId={row.conversation?.id} paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'} />
+          <ReplacementDossier
+            key={row.application.id}
+            applicationId={row.application.id}
+            viewer="candidate"
+            conversationId={row.conversation?.id}
+            paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'}
+            presentation={{
+              establishment: establishment ? { name: establishment.name, imageUrl: establishmentPhoto, city: mission?.city || establishment.city } : undefined,
+              replacement: candidateName ? { name: candidateName, imageUrl: candidate?.avatarUrl } : undefined,
+            }}
+          />
           <details className="replacement-dossier-legacy"><summary>Fichiers produits pendant la mission</summary><div><MissionDocumentsPanel row={row} /></div></details>
         </div>
       ) : null}

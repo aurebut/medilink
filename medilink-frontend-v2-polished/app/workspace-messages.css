@@ -47,7 +47,7 @@
 .workspace-design .message-layout--editorial .conversation-mobile-search svg { flex-shrink: 0; color: var(--brand-muted); }
 .workspace-design .message-layout--editorial .conversation-mobile-search input { font-size: 12px; }
 .workspace-design .message-layout.message-layout--editorial .conversation-button {
-  grid-template-columns: 40px minmax(0, 1fr);
+  grid-template-columns: 52px minmax(0, 1fr);
   align-items: start;
   gap: 11px;
   padding: 17px 12px;
@@ -62,8 +62,8 @@
 }
 .workspace-design .message-layout--editorial .conversation-button:hover { background: var(--brand-mist); }
 .workspace-design .message-layout.message-layout--editorial .conversation-mobile-avatar {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -73,6 +73,7 @@
 }
 .workspace-design .message-layout.message-layout--editorial .conversation-photo--establishment { border-radius: 12px; }
 .workspace-design .message-layout--editorial .conversation-header-title-wrapper { gap: 13px; }
+.workspace-design .message-layout--editorial .conversation-header-photo { width: 64px; height: 64px; }
 .workspace-design .message-layout--editorial .conversation-title-meta { min-width: 0; }
 .workspace-design .message-layout--editorial .conversation-mobile-head { gap: 5px; }
 .workspace-design .message-layout--editorial .conversation-mobile-head strong { font-size: 13px; line-height: 1.5; font-weight: 600; }
@@ -175,7 +176,7 @@
 }
 .workspace-design .message-layout--editorial .message-row.mine { flex-direction: row-reverse; margin-left: auto; }
 .workspace-design .message-layout--editorial .message-row > .message { max-width: none; min-width: 0; margin-left: 0; }
-.workspace-design .message-layout--editorial .message-sender-photo { width: 34px; height: 34px; margin-bottom: 2px; font-size: 15px; }
+.workspace-design .message-layout--editorial .message-sender-photo { width: 50px; height: 50px; margin-bottom: 2px; font-size: 19px; }
 .workspace-design .message-layout--editorial .message .small { margin-top: 11px; color: var(--brand-muted); font-size: 9px; }
 .workspace-design .message-layout.message-layout--editorial .message-form {
   align-items: center;
@@ -229,7 +230,7 @@
   .workspace-design .message-layout--editorial .conversation-header-top { flex: 1 1 100%; }
   .workspace-design .message-layout--editorial .conversation-title-meta h2 { font-size: 24px; line-height: 1.1; }
   .workspace-design .message-layout--editorial .conversation-header-title-wrapper { gap: 9px; }
-  .workspace-design .message-layout--editorial .conversation-header-photo { width: 38px; height: 38px; }
+  .workspace-design .message-layout--editorial .conversation-header-photo { width: 52px; height: 52px; }
   .workspace-design .message-layout--editorial .conversation-subtitle { margin-top: 6px; font-size: 10px; }
   .workspace-design .message-layout--editorial .conversation-back-button { width: 32px; height: 44px; min-width: 32px; padding: 0; border: 0; background: transparent; box-shadow: none; }
   .workspace-design .message-layout--editorial .conversation-header-actions { margin-left: 44px; gap: 14px; flex-wrap: wrap; }
@@ -243,7 +244,7 @@
   .workspace-design .message-layout--editorial .message:not(.system) { max-width: 91%; padding: 13px 15px 10px; font-size: 13px; line-height: 1.65; }
   .workspace-design .message-layout--editorial .message-row { max-width: 100%; gap: 8px; }
   .workspace-design .message-layout--editorial .message-row > .message { max-width: none; }
-  .workspace-design .message-layout--editorial .message-sender-photo { width: 32px; height: 32px; }
+  .workspace-design .message-layout--editorial .message-sender-photo { width: 44px; height: 44px; }
   .workspace-design .message-layout--editorial .message .small { margin-top: 9px; }
   .workspace-design .message-layout.message-layout--editorial .message-form { margin: 0 17px; padding: 13px 0 16px; gap: 9px; }
   .workspace-design .message-layout--editorial .message-form .textarea { min-height: 48px; padding: 12px; font-size: 16px; }

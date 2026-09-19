@@ -16,7 +16,7 @@ export function interfacePreview(name: PreviewName, className: string, title: st
     <a class="ml-interface-open" href="${source(desktop, true)}" target="_blank" rel="noopener" data-interface-preview="${name}" aria-label="Voir l’interface : ${title} (agrandir)">
       <span class="ml-interface-stage">
         <span class="ml-interface-window">
-          <picture>
+          <picture style="--ml-capture-width:${desktop.width};--ml-capture-height:${desktop.height};--ml-mobile-capture-width:${mobile.width};--ml-mobile-capture-height:${mobile.height}">
             <source media="(max-width: 700px)" srcset="${source(mobile)} 1x, ${source(mobile, true)} 2x" width="${mobile.width}" height="${mobile.height}">
             <img src="${source(desktop)}" srcset="${source(desktop)} 1x, ${source(desktop, true)} 2x" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
           </picture>

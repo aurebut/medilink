@@ -138,7 +138,9 @@ try {
       assert.match(await subject.locator('[data-kind="CONTRACT"]').innerText(), /relire|signer/i);
       assert.equal(await subject.locator('.rd-document-row').count(), 3);
       if (width <= 390) {
-        assert.ok((await subject.boundingBox()).height < 850, 'The initial mobile register stays compact');
+        // The requested photo header adds context above the unchanged register.
+        const participantsHeight = (await subject.locator('.rd-participants').boundingBox())?.height || 0;
+        assert.ok((await subject.boundingBox()).height - participantsHeight < 850, 'The initial mobile register stays compact below the participant header');
         const buttons = subject.locator('[data-kind="CONTRACT"] .rd-row-actions button');
         assert.deepEqual(await buttons.allTextContents(), ['Télécharger', 'Transmettre', 'Gérer']);
         for (const button of await buttons.all()) {
