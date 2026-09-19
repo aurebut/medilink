@@ -9,8 +9,8 @@ import { join } from 'path';
 import { Readable } from 'stream';
 import { StorageService } from '../src/modules/documents/storage.service';
 import { EmailService } from '../src/modules/notifications/email.service';
-import { DossierDetails } from '../src/modules/replacement-dossiers/dossier-types';
-import { SendDossierDto, UploadDossierDto } from '../src/modules/replacement-dossiers/dossier.dto';
+import { DOSSIER_ATTACHMENT_KINDS, DossierDetails } from '../src/modules/replacement-dossiers/dossier-types';
+import { GenerateDossierDto, SendDossierDto, UploadDossierDto } from '../src/modules/replacement-dossiers/dossier.dto';
 import { ReplacementDossiersService } from '../src/modules/replacement-dossiers/replacement-dossiers.service';
 
 const details: DossierDetails = {
@@ -186,6 +186,41 @@ function sendDto(documentIds: string[], idempotencyKey = 'test-delivery-000001')
   return { documentIds, recipientEmail: 'recipient@example.test', recipientName: 'Destinataire', recipientType: 'COUNTERPART', idempotencyKey };
 }
 
+async function testAdditionalDocuments(storage: StorageService) {
+  const env = setup(storage);
+  const addedIds: string[] = [];
+  for (const kind of DOSSIER_ATTACHMENT_KINDS) {
+    const dto = { revision: 1, kind, fileName: `${kind}.pdf`, mimeType: 'application/pdf', sizeBytes: 100 };
+    assert.deepEqual(await validate(plainToInstance(UploadDossierDto, dto)), [], `${kind} is accepted by the HTTP DTO`);
+    const imported = await upload(env, storage, kind);
+    await env.service.confirmUpload(user('candidate'), 'application-1', imported.documentId);
+    assert.ok((await env.service.download(user('owner'), 'application-1', imported.documentId)).downloadUrl, `${kind} is downloadable by the counterpart`);
+    await expectStatus(() => env.service.download(user('other-candidate'), 'application-1', imported.documentId), 403);
+    addedIds.push(imported.documentId);
+  }
+  const view = await env.service.get(user('owner'), 'application-1');
+  assert.deepEqual(new Set(view.documents.map(document => document.kind)), new Set(DOSSIER_ATTACHMENT_KINDS));
+  assert.equal(view.documents.every(document => document.source === 'UPLOADED' && document.status === 'READY'), true);
+  const sent = await env.service.send(user('candidate'), 'application-1', sendDto(addedIds, 'all-supported-documents'));
+  assert.equal(sent.deliveries[0].status, 'SENT');
+  assert.deepEqual(new Set(sent.deliveries[0].documentIds), new Set(addedIds));
+  for (const recipientType of ['CPAM', 'OTHER'] as const) {
+    const certificate = env.documents.find(document => document.kind === 'REPLACEMENT_CERTIFICATE');
+    const dto = { ...sendDto([certificate.id], `recipient-type-${recipientType}-0001`), recipientType };
+    assert.deepEqual(await validate(plainToInstance(SendDossierDto, dto)), []);
+    const result = await env.service.send(user('candidate'), 'application-1', dto);
+    const delivery = result.deliveries.find(item => item.idempotencyKey === dto.idempotencyKey);
+    assert.equal(delivery.status, 'SENT');
+    assert.equal(delivery.recipientType, recipientType);
+    assert.deepEqual(delivery.documentIds, [certificate.id]);
+  }
+  for (const kind of ['BANK_DETAILS', 'REPLACEMENT_CERTIFICATE', 'ADDENDUM']) {
+    assert.ok((await validate(plainToInstance(GenerateDossierDto, { revision: 1, kind }))).length, `${kind} is an import, not an official document generator`);
+  }
+  await expectStatus(() => upload(env, storage, 'UNSUPPORTED'), 400);
+  console.log('PASS expanded document types: DTO, upload, counterpart download, access control and explicit transmission; official documents remain imports');
+}
+
 async function testSending(storage: StorageService) {
   const env = setup(storage);
   const imported = await upload(env, storage);
@@ -272,6 +307,7 @@ async function main() {
     const storage = new StorageService({ get: (key: string) => ({ STORAGE_PROVIDER: 'local', NODE_ENV: 'test', LOCAL_STORAGE_DIR: root, STORAGE_SIGNING_SECRET: 'test-only-secret' }[key]) } as ConfigService);
     await testPermissions(storage);
     await testUploadAndVersions(storage);
+    await testAdditionalDocuments(storage);
     await testSending(storage);
     await testDtoAndEmailMock();
     await testPostSendPersistenceFailure(storage);

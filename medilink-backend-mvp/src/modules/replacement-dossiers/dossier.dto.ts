@@ -2,7 +2,7 @@ import {
   ArrayMaxSize, ArrayMinSize, ArrayUnique, IsArray, IsDateString, IsEmail,
   IsIn, IsInt, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min,
 } from 'class-validator';
-import { DossierAttachmentKind, DossierDetails, GeneratedDossierKind } from './dossier-types';
+import { DOSSIER_ATTACHMENT_KINDS, DossierAttachmentKind, DossierDetails, GeneratedDossierKind } from './dossier-types';
 
 export class DossierRevisionDto {
   @IsInt() @Min(1) revision: number;
@@ -17,7 +17,7 @@ export class GenerateDossierDto extends DossierRevisionDto {
 }
 
 export class UploadDossierDto extends DossierRevisionDto {
-  @IsIn(['SIGNED_CONTRACT', 'REGISTRATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE', 'OTHER'])
+  @IsIn(DOSSIER_ATTACHMENT_KINDS)
   kind: DossierAttachmentKind;
   @IsString() @MaxLength(180) @Matches(/^[^\x00-\x1f\x7f/\\]+$/) fileName: string;
   @IsIn(['application/pdf', 'image/jpeg', 'image/png', 'image/webp']) mimeType: string;
@@ -30,7 +30,7 @@ export class SendDossierDto {
   @IsString({ each: true }) @MaxLength(100, { each: true }) documentIds: string[];
   @IsEmail() @MaxLength(254) recipientEmail: string;
   @IsString() @MaxLength(160) @Matches(/\S/) recipientName: string;
-  @IsIn(['COUNTERPART', 'ORDER']) recipientType: 'COUNTERPART' | 'ORDER';
+  @IsIn(['COUNTERPART', 'ORDER', 'CPAM', 'OTHER']) recipientType: 'COUNTERPART' | 'ORDER' | 'CPAM' | 'OTHER';
   @IsOptional() @IsString() @MaxLength(3000) message?: string;
   @IsString() @Matches(/^[a-zA-Z0-9_-]{16,100}$/) idempotencyKey: string;
 }

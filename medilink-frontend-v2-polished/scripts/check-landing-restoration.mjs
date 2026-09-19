@@ -147,8 +147,9 @@ function normalizeEditorialPreviews(html, updated) {
     assert.ok(end > start, `${id}: preview has a matching closing tag`);
     const markup = html.slice(start, end);
     if (updated) {
-      assert.match(markup, /Interface MédiLink · Données de démonstration/, `${id}: preview data remains clearly illustrative`);
-      if (tag === 'figure') assert.match(markup, /<figcaption\b[^>]*>/, `${id}: preview retains its visible caption`);
+      assert.doesNotMatch(markup, /<figcaption\b|Interface MédiLink · Données de démonstration/, `${id}: requested preview captions removed`);
+      assert.match(markup, /<figure\b[^>]*aria-label="[^"]+"/, `${id}: preview retains its accessible name`);
+      if (tag === 'figure') assert.match(matches[0][0], /aria-label="L’avancement de votre mission"/, `${id}: mission preview keeps its accessible name`);
       else assert.match(matches[0][0], /aria-label="Exemple du dossier partagé d’un remplacement"/, `${id}: shared dossier retains its accessible label`);
     }
     html = html.slice(0, start) + `<!-- requested interface preview: ${id} -->` + html.slice(end);
@@ -187,10 +188,9 @@ function normalizeDocumentsSection(html) {
   assert.equal([...markup.matchAll(/\bid="ml-documents-title"/g)].length, 1, 'documents: heading ID is unique');
   const heading = markup.match(/<h2\b[^>]*\bid="ml-documents-title"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
   assert.ok(heading && heading.replace(/<[^>]+>/g, '').trim().length > 10, 'documents: meaningful visible section heading');
-  const figures = [...markup.matchAll(/<figure class="ml-documents-preview ml-interface-preview ml-interface-preview--documents" aria-labelledby="ml-documents-preview-title"(?: style="--ml-documents-preview-ratio:\d+\/\d+")?>[\s\S]*?<\/figure>/g)];
+  const figures = [...markup.matchAll(/<figure class="ml-documents-preview ml-interface-preview ml-interface-preview--documents" aria-label="Le dossier du remplacement"(?: style="--ml-documents-preview-ratio:\d+\/\d+")?>[\s\S]*?<\/figure>/g)];
   assert.equal(figures.length, 1, 'documents: exactly one accessible interface preview');
-  assert.equal([...figures[0][0].matchAll(/\bid="ml-documents-preview-title"/g)].length, 1, 'documents: preview label resolves to one visible title');
-  assert.match(figures[0][0], /<figcaption\b[^>]*>[\s\S]*?Interface MédiLink · Données de démonstration[\s\S]*?<\/figcaption>/, 'documents: preview data remains visibly illustrative');
+  assert.doesNotMatch(figures[0][0], /<figcaption\b|Interface MédiLink · Données de démonstration/, 'documents: requested preview caption removed');
 
   // Remove only the new section and its added separator; all surrounding markup remains compared verbatim.
   return html.slice(0, start) + html.slice(end).replace(separator, '');

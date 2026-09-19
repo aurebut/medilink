@@ -155,7 +155,7 @@
         "documents-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "177bf75607cdbb30a2cb369784691cf57baecd999558d5d8b9a70a01784969fc"
+      "sha256": "ecf651df2224687da8638ba6078fc981f4c6ed5adb6a4313ac13c06b68405984"
     },
     {
       "name": "documents",
@@ -167,22 +167,22 @@
       },
       "crop": {
         "x": 35,
-        "y": 222,
+        "y": 112,
         "width": 320,
-        "height": 689,
-        "scrollY": 80,
+        "height": 799,
+        "scrollY": 190,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
       "width": 320,
-      "height": 689,
-      "previewHeight": 689,
+      "height": 799,
+      "previewHeight": 799,
       "files": [
         "documents-mobile.webp",
         "documents-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "0d62348310c477f531ec87a17de73cce7cd5638ebead881ebcc06eaf0c247f52"
+      "sha256": "2693062053f858878853e1e817140234deca9aae24a34a058b747343fd9a875b"
     }
   ]
 }

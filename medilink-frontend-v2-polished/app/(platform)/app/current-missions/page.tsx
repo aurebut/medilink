@@ -532,7 +532,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
 
       {activeSection === 'documents' ? (
         <div>
-          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="candidate" />
+          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="candidate" conversationId={row.conversation?.id} paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'} />
           <details className="replacement-dossier-legacy"><summary>Fichiers produits pendant la mission</summary><div><MissionDocumentsPanel row={row} /></div></details>
         </div>
       ) : null}

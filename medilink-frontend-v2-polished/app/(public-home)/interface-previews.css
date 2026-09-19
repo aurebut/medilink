@@ -42,8 +42,6 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 .landing-home .ml-interface-open:hover .ml-interface-enlarge svg { transform: translateX(3px); }
 .landing-home .ml-interface-open:hover .ml-interface-enlarge { text-decoration: underline; text-underline-offset: 4px; }
 .landing-home .ml-interface-open:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 5px; border-radius: 24px; }
-html body.landing-home:not(.persona-page) .ml-interface-preview figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 18px; margin: 15px 2px 0; padding: 0; color: #61748b; font: 400 9px/1.6 var(--brand-sans); text-align: left; }
-.landing-home .ml-interface-title { color: var(--brand-muted); font-size: 10px; font-weight: 500; }
 .landing-home .ml-interface-preview--wide .ml-interface-stage { padding: 36px 36px 64px; }
 .landing-home .ml-interface-preview--wide .ml-interface-enlarge { right: 36px; }
 
@@ -74,8 +72,6 @@ html body.landing-home:not(.persona-page) .ml-interface-preview figcaption { dis
   /* The complete compact document list, including its contextual actions. */
   .landing-home .ml-interface-preview--documents picture { aspect-ratio: var(--ml-documents-preview-ratio); }
   .landing-home .ml-interface-preview .ml-interface-enlarge { right: 21px; bottom: 5px; font-size: 11px; }
-  html body.landing-home:not(.persona-page) .ml-interface-preview figcaption { flex-direction: column; align-items: center; gap: 3px; margin-top: 14px; font-size: 9px; text-align: center; }
-  .landing-home .ml-interface-title { font-size: 11px; }
   .ml-interface-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); border-radius: 14px; }
   .ml-interface-dialog-head { align-items: flex-start; gap: 14px; padding: 16px; }
   .ml-interface-dialog-head h2 { font-size: 22px; }

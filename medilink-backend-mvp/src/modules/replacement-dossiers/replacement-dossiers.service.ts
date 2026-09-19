@@ -7,7 +7,7 @@ import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { EmailService } from '../notifications/email.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { DossierDetails, DOSSIER_FIELD_LABELS, DOSSIER_TEMPLATE_VERSION, getMissingDossierFields } from './dossier-types';
+import { DossierDetails, DOSSIER_ATTACHMENT_KINDS, DOSSIER_FIELD_LABELS, DOSSIER_TEMPLATE_VERSION, getMissingDossierFields } from './dossier-types';
 import { generateDossierPdf } from './dossier-pdf';
 import { GenerateDossierDto, SendDossierDto, UpdateDossierDto, UploadDossierDto } from './dossier.dto';
 
@@ -102,7 +102,7 @@ export class ReplacementDossiersService {
     const application = await this.assertAccess(user, applicationId, true);
     const dossier = await this.ensureDossier(application);
     // Validation also lives here so internal callers cannot bypass HTTP DTO validation.
-    if (!['SIGNED_CONTRACT', 'REGISTRATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE', 'OTHER'].includes(dto.kind)
+    if (!DOSSIER_ATTACHMENT_KINDS.includes(dto.kind)
       || !['application/pdf', 'image/jpeg', 'image/png', 'image/webp'].includes(dto.mimeType)
       || !Number.isInteger(dto.sizeBytes) || dto.sizeBytes < 1 || dto.sizeBytes > 10 * 1024 * 1024) {
       throw new BadRequestException('Type ou taille du fichier non autorisé (10 Mo maximum).');

@@ -1005,7 +1005,7 @@ function MissionControlPanel({
 
       {activeSection === 'documents' ? (
         <div>
-          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="establishment" />
+          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="establishment" conversationId={row.conversation?.id} paymentReleased={row.agreement?.status === 'PAYMENT_RELEASED'} />
           <details className="replacement-dossier-legacy"><summary>Documents professionnels du candidat</summary><div><CandidateDocumentsPanel
           candidateProfile={candidateProfile}
           loading={profileLoading}

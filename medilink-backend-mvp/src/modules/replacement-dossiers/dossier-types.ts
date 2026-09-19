@@ -28,13 +28,12 @@ export interface DossierDetails {
 }
 
 export type GeneratedDossierKind = 'CONTRACT' | 'DECLARATION';
-export type DossierAttachmentKind =
-  | 'SIGNED_CONTRACT'
-  | 'REGISTRATION'
-  | 'LICENSE'
-  | 'AUTHORIZATION'
-  | 'INSURANCE'
-  | 'OTHER';
+export const DOSSIER_ATTACHMENT_KINDS = [
+  'SIGNED_CONTRACT', 'REGISTRATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE',
+  'ADDENDUM', 'REPLACEMENT_CERTIFICATE', 'ORDER_RESPONSE',
+  'BANK_DETAILS', 'FEE_STATEMENT', 'PAYMENT_PROOF', 'OTHER',
+] as const;
+export type DossierAttachmentKind = typeof DOSSIER_ATTACHMENT_KINDS[number];
 
 /** Bump whenever the legal text or semantics of a template changes. */
 export const DOSSIER_TEMPLATE_VERSION = 'FR-LIBERAL-2026-09-19.1';

@@ -26,13 +26,29 @@ Toutes les routes sont authentifiées et commencent par `/api/applications/:appl
 | POST `/documents/:documentId/confirm` | Fige les octets avant contrôle de signature/type et taille ; rend le document READY |
 | GET `/documents/:documentId/download-url` | URL temporaire du fichier autorisé |
 | DELETE `/documents/:documentId` | Archive le document sans effacer l’historique ni ses octets |
-| POST `/send` | `{documentIds, recipientEmail, recipientName, recipientType: COUNTERPART ou ORDER, message?, idempotencyKey}` |
+| POST `/send` | `{documentIds, recipientEmail, recipientName, recipientType: COUNTERPART, ORDER, CPAM ou OTHER, message?, idempotencyKey}` |
 
 Les mutations, sauf `upload-url`, retournent la vue complète. `/send` ne retourne pas de statut d’envoi à la racine : identifier la tentative dans `deliveries` grâce à son `idempotencyKey`. `SENT` signifie que le fournisseur email a accepté l’envoi, sans preuve de réception, de signature, ni d’autorisation ordinale.
 
 `DossierDetails` et ses libellés sont définis dans `src/modules/replacement-dossiers/dossier-types.ts`. Un brouillon peut conserver des chaînes vides. La génération exige les champs propres au document et la confirmation explicite `practiceFramework=INDIVIDUAL_LIBERAL`. Elle est réservée aux missions REMPLACEMENT médicales; elle ne couvre pas les contrats salariés ou les contrats d’une société d’exercice. Le médecin remplacé n’est jamais déduit de l’identité d’un compte établissement.
 
 ## Intégrité et envoi
+
+### Pièces et présentation
+
+Le registre de l’application comporte trois rubriques, limitées à trois lignes visibles par page, y compris sur mobile :
+
+- **Remplacement** : contrat préparé ou exemplaire signé, courrier au Conseil, inscription à l’Ordre ou licence/autorisation selon le statut, assurance RCP.
+- **Paiement** : `BANK_DETAILS` (RIB pour le règlement), `FEE_STATEMENT` (décompte de rétrocession), `PAYMENT_PROOF` (reçu ou preuve de virement). Lorsque la mission est réglée sur MediLink, son justificatif existant est téléchargeable via la route authentifiée des factures. Il n’est pas copié ni envoyé automatiquement dans le dossier.
+- **Compléments** : `ADDENDUM` (avenant), `REPLACEMENT_CERTIFICATE` (attestation demandée par la CPAM), `ORDER_RESPONSE` (courrier ou accusé de réception du Conseil), `OTHER` (autres pièces). Plusieurs avenants, réponses et autres pièces restent accessibles séparément, avec leurs actions propres.
+
+La liste autorisée des imports est centralisée dans `DOSSIER_ATTACHMENT_KINDS` et utilisée par la validation HTTP et le service. Le champ Prisma `kind` est une chaîne : cette extension ne nécessite pas de migration. Seuls `CONTRACT` et `DECLARATION` sont générés; les autres pièces restent des imports explicites. Le formulaire rappelle leur partage avec l’autre partie. Les pièces complémentaires sont conditionnelles, sans indicateur de conformité ou de validation automatique.
+
+L’action de transmission d’une attestation de remplacement présélectionne le type CPAM et uniquement cette pièce, en laissant le nom et l’adresse du destinataire à renseigner. Aucune adresse n’est déduite. Les autres destinataires restent configurables; tous les envois exigent la vérification du contenu, du destinataire et la confirmation explicite. Le canal de dépôt demandé par la CPAM ou le Conseil reste à vérifier par l’utilisateur.
+
+Le périmètre s’appuie sur les démarches décrites par le [Conseil national de l’Ordre](https://www.conseil-national.medecin.fr/medecin/carriere/remplacement-dun-medecin) et les formalités de [l’Assurance maladie](https://www.ameli.fr/medecin/exercice-liberal/vie-cabinet/remplacements), consultées le 19 septembre 2026. Il couvre le dossier partagé d’un remplacement médical libéral individuel, pas toutes les pièces d’installation ou démarches personnelles. Pièce d’identité, carte Vitale et dossiers personnels d’affiliation CPAM/Urssaf/CARMF ne sont pas copiés ici. Le profil actuel ne doit pas être présenté comme un coffre privé : les justificatifs approuvés y suivent leurs droits d’accès existants.
+
+### Conservation et transmission
 
 - La révision augmente quand les informations changent. Une requête sur une révision périmée reçoit 409. Chaque génération conserve sa version, la révision utilisée, les détails figés et la version du modèle.
 - PDF, JPEG, PNG et WEBP : 10 Mo maximum par pièce, 20 Mo au total et 15 pièces maximum par envoi. Le corps du message est limité à 3 000 caractères.
