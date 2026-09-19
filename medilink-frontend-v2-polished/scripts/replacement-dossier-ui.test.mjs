@@ -15,11 +15,12 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.platform === 'win32' ? { channel: 'msedge' } : {}) });
 const reports = [];
 
-async function scenario(role, width, test) {
+async function scenario(role, width, test, prepare = () => {}) {
   const context = await browser.newContext({ viewport: { width, height: 1000 }, locale: 'fr-FR', timezoneId: 'Europe/Paris', reducedMotion: 'reduce' });
   const page = await context.newPage();
   page.setDefaultTimeout(10000);
   const state = structuredClone(replacementDossier);
+  prepare(state);
   const requests = [];
   const unexpected = [];
   const errors = [];
@@ -94,7 +95,7 @@ async function scenario(role, width, test) {
   });
   try {
     await page.goto(`${base}/${role === 'candidate' ? 'app' : 'establishment'}/current-missions?section=documents`, { waitUntil: 'domcontentloaded' });
-    await page.locator('.replacement-dossier .rd-contract').waitFor();
+    await page.locator('.replacement-dossier .rd-document-register .rd-document-row').first().waitFor();
     await page.evaluate(() => document.fonts.ready);
     await page.addStyleTag({ content: 'nextjs-portal { display: none !important; }' });
     const subject = page.locator('.replacement-dossier');
@@ -113,9 +114,9 @@ async function scenario(role, width, test) {
 try {
   for (const [role, width] of [['candidate', 1280], ['candidate', 390], ['candidate', 320], ['establishment', 1280]]) {
     await scenario(role, width, async ({ page, subject }) => {
-      await subject.getByRole('button', { name: 'Envoyer le dossier', exact: true }).waitFor();
+      await subject.getByRole('button', { name: 'Transmettre le dossier', exact: true }).waitFor();
       await subject.screenshot({ path: path.join(output, `${role}-${width}.png`) });
-      assert.match(await subject.innerText(), /À relire et signer/);
+      assert.match(await subject.locator('[data-kind="CONTRACT"]').innerText(), /relire|signer/i);
       await subject.getByRole('button', { name: 'Informations du remplacement', exact: true }).click();
       assert.equal(await page.getByLabel('Nom du remplaçant', { exact: true }).inputValue(), 'Sarah Bernard');
       await page.getByLabel('Statut du remplaçant', { exact: true }).selectOption('STUDENT');
@@ -124,15 +125,18 @@ try {
     });
   }
   await scenario('candidate', 1280, async ({ page, subject, state, requests, failSend }) => {
+    const contractRow = subject.locator('.rd-document-row[data-kind="CONTRACT"]');
+    await contractRow.getByRole('button', { name: 'Gérer Contrat de remplacement', exact: true }).click();
     await subject.getByRole('button', { name: 'Régénérer le contrat', exact: true }).click();
-    await subject.getByText('Version 2', { exact: true }).waitFor();
+    await subject.getByText(/Le PDF est prêt/).waitFor();
     assert.equal(state.documents.filter(doc => doc.kind === 'CONTRACT').length, 2, 'Previous contract kept');
+    await contractRow.getByRole('button', { name: 'Gérer Contrat de remplacement', exact: true }).click();
     await subject.getByRole('button', { name: 'Ajouter l’exemplaire signé', exact: true }).click();
     await page.getByLabel(/^Fichier/).setInputFiles({ name: 'contrat-signe.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n% browser fixture only\n%%EOF') });
     await subject.getByRole('button', { name: 'Ajouter au dossier', exact: true }).click();
-    await subject.locator('.rd-contract').getByText('Exemplaire signé ajouté', { exact: false }).waitFor();
+    await contractRow.getByText(/signé/i).waitFor();
     assert.ok(requests.some(request => request.endpoint.endsWith('/confirm')));
-    await subject.getByRole('button', { name: 'Envoyer le dossier', exact: true }).click();
+    await subject.getByRole('button', { name: 'Transmettre le dossier', exact: true }).click();
     await page.getByLabel('Destinataire', { exact: true }).selectOption('ORDER');
     assert.equal(await page.getByLabel(/^Adresse email/).inputValue(), state.details.orderEmail);
     await page.locator('.rd-send-selection label').filter({ hasText: 'Contrat signé' }).getByRole('checkbox').check();
@@ -149,6 +153,58 @@ try {
     await subject.locator('summary').filter({ hasText: 'Versions et envois' }).click();
     await subject.screenshot({ path: path.join(output, 'workflow-history.png') });
   });
+  await scenario('candidate', 390, async ({ page, subject, state, requests }) => {
+    const declaration = state.documents.find(document => document.kind === 'DECLARATION');
+    const declarationRow = subject.locator('.rd-document-row[data-kind="DECLARATION"]');
+    await declarationRow.getByRole('button', { name: /Transmettre/, exact: false }).click();
+    assert.equal(await page.getByLabel('Destinataire', { exact: true }).inputValue(), 'ORDER');
+    assert.equal(await page.getByLabel(/^Adresse email/).inputValue(), state.details.orderEmail);
+    const checked = page.locator('.rd-send-selection input:checked');
+    assert.equal(await checked.count(), 1, 'The row action selects only the chosen document');
+    assert.equal(await page.locator('.rd-send-selection label').filter({ hasText: declaration.fileName }).getByRole('checkbox').isChecked(), true);
+    assert.equal(requests.filter(request => request.endpoint.endsWith('/send')).length, 0, 'Opening transmission sends no email');
+    const sendButton = page.getByRole('button', { name: 'Confirmer et envoyer', exact: true });
+    assert.equal(await sendButton.isEnabled(), false, 'A preselected document still requires explicit review');
+    const confirmation = page.getByRole('checkbox', { name: /J’ai vérifié/ });
+    await confirmation.check();
+    await page.getByLabel(/^Adresse email/).fill('autre-conseil@example.test');
+    assert.equal(await confirmation.isChecked(), false, 'Changing recipient resets confirmation');
+    assert.equal(await sendButton.isEnabled(), false);
+    assert.equal(requests.filter(request => request.endpoint.endsWith('/send')).length, 0);
+    await confirmation.check();
+    await sendButton.click();
+    await subject.getByText(/Le dossier a été envoyé/).waitFor();
+    const sent = requests.filter(request => request.endpoint.endsWith('/send'));
+    assert.equal(sent.length, 1);
+    assert.deepEqual(sent[0].body.documentIds, [declaration.id]);
+    assert.equal(sent[0].body.recipientEmail, 'autre-conseil@example.test');
+    assert.equal(sent[0].body.recipientType, 'ORDER');
+  }, state => {
+    // Keep this workflow independent from the illustrative landing's document mix.
+    if (!state.documents.some(document => document.kind === 'DECLARATION')) {
+      state.documents.push({ ...state.documents.find(document => document.kind === 'CONTRACT'), id: 'test-declaration', kind: 'DECLARATION', fileName: 'Declaration-test.pdf', status: 'READY', source: 'GENERATED', revision: state.revision });
+    }
+  });
+  await scenario('candidate', 390, async ({ subject, requests }) => {
+    assert.equal(await subject.getByRole('button', { name: 'Transmettre le dossier', exact: true }).isEnabled(), false);
+    assert.equal(await subject.getByRole('button', { name: 'Informations du remplacement', exact: true }).count(), 0);
+    assert.equal(await subject.locator('.rd-document-register').getByRole('button', { name: /^(Générer|Actualiser|Ajouter|Remplacer|Transmettre)\b/ }).count(), 0, 'Read-only rows expose no editing or transmission action');
+    assert.equal(requests.filter(request => request.method !== 'GET').length, 0);
+  }, state => { state.canEdit = false; state.canSend = false; });
+  await scenario('candidate', 390, async ({ page, subject, state, requests }) => {
+    await subject.locator('.rd-document-row[data-kind="CONTRACT"]').getByRole('button', { name: 'Actualiser Contrat de remplacement', exact: true }).waitFor();
+    await subject.getByRole('button', { name: 'Transmettre le dossier', exact: true }).click();
+    const choices = await page.locator('.rd-send-selection').innerText();
+    for (const document of state.documents.filter(document => document.source === 'GENERATED' || document.kind === 'INSURANCE')) {
+      assert.ok(!choices.includes(document.fileName), 'Outdated and expired documents cannot be selected for transmission');
+    }
+    assert.ok(choices.includes(state.documents.find(document => document.kind === 'REGISTRATION').fileName), 'A current supporting document remains available');
+    assert.equal(requests.filter(request => request.endpoint.endsWith('/send')).length, 0);
+  }, state => {
+    state.revision++;
+    const insurance = state.documents.find(document => document.kind === 'INSURANCE');
+    if (insurance) insurance.expiresAt = '2026-09-01T00:00:00.000Z';
+  });
   await scenario('candidate', 1280, async ({ page, subject, state, conflictSave }) => {
     await subject.getByRole('button', { name: 'Informations du remplacement', exact: true }).click();
     await page.getByLabel('Nom du médecin remplacé', { exact: true }).fill('Saisie locale');
@@ -163,5 +219,5 @@ try {
     await subject.getByText(/Informations enregistrées/).waitFor();
   });
   console.log(reports.join('\n'));
-  console.log('PASS generation, signed upload, recipient/attachment review, failed send, idempotent retry and edit conflict. All requests were intercepted; no real document was sent.');
+  console.log('PASS compact register, generation, signed upload, contextual transmission, recipient/attachment review, permission gating, outdated document exclusion, failed send, idempotent retry and edit conflict. All requests were intercepted; no real document was sent.');
 } finally { await browser.close(); }

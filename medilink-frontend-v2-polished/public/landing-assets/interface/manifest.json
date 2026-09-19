@@ -135,27 +135,27 @@
       "device": "desktop",
       "route": "/app/current-missions?section=documents",
       "viewport": {
-        "width": 1280,
-        "height": 1105
+        "width": 1040,
+        "height": 1100
       },
       "crop": {
         "x": 313,
-        "y": 89,
-        "width": 898,
-        "height": 865,
-        "scrollY": 184,
+        "y": 251,
+        "width": 658,
+        "height": 692,
+        "scrollY": 13,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
-      "width": 898,
-      "height": 865,
-      "previewHeight": 865,
+      "width": 658,
+      "height": 692,
+      "previewHeight": 692,
       "files": [
         "documents-desktop.webp",
         "documents-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "21edd4d71dde947dd8f3653bc49f93f3ba4f456fee2602b7b1c26c2b16e114dd"
+      "sha256": "177bf75607cdbb30a2cb369784691cf57baecd999558d5d8b9a70a01784969fc"
     },
     {
       "name": "documents",
@@ -163,26 +163,26 @@
       "route": "/app/current-missions?section=documents",
       "viewport": {
         "width": 390,
-        "height": 1617
+        "height": 1100
       },
       "crop": {
         "x": 35,
-        "y": 90,
+        "y": 222,
         "width": 320,
-        "height": 1377,
-        "scrollY": 212,
+        "height": 689,
+        "scrollY": 80,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
       "width": 320,
-      "height": 1377,
-      "previewHeight": 848,
+      "height": 689,
+      "previewHeight": 689,
       "files": [
         "documents-mobile.webp",
         "documents-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "09e9c32981d4374f710c22747de4913a3cad2fe583aa1b95c248a2f12cef88a0"
+      "sha256": "0d62348310c477f531ec87a17de73cce7cd5638ebead881ebcc06eaf0c247f52"
     }
   ]
 }

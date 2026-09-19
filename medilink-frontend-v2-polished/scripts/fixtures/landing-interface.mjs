@@ -77,7 +77,8 @@ export const conversation = {
   createdAt, updatedAt: createdAt, lastMessageAt: messages.at(-1).createdAt,
 };
 // Documents belonging to this replacement, separate from the private profile.
-// The contract is prepared, not signed or approved by the Ordre.
+// The contract is prepared, not signed or approved by the Ordre. The letter is
+// still to generate, showing the real contextual action of an incomplete dossier.
 export const replacementDossier = {
   id: 'preview-dossier', applicationId: application.id, revision: 1,
   canEdit: true, canSend: true, missingFields: [],
@@ -95,7 +96,6 @@ export const replacementDossier = {
   },
   documents: [
     ['CONTRACT', 'Contrat_remplacement_Bernard_Martin.pdf', 'GENERATED'],
-    ['DECLARATION', 'Declaration_remplacement_Ordre.pdf', 'GENERATED'],
     ['REGISTRATION', 'Attestation_inscription_Ordre.pdf', 'UPLOADED'],
     ['INSURANCE', 'Attestation_RCP_2026.pdf', 'UPLOADED'],
   ].map(([kind, fileName, source], index) => ({

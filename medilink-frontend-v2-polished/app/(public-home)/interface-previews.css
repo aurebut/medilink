@@ -71,7 +71,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview figcaption { dis
   /* A complete group of mission steps; the enlargement retains all six. */
   .landing-home .ml-interface-preview--mission picture { aspect-ratio: 360 / 534; }
   .landing-home .ml-interface-preview--mission picture::after { content: ''; position: absolute; inset: auto 0 0; height: 24px; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
-  /* The contract and first complete document row; enlargement retains the whole dossier. */
+  /* The complete compact document list, including its contextual actions. */
   .landing-home .ml-interface-preview--documents picture { aspect-ratio: var(--ml-documents-preview-ratio); }
   .landing-home .ml-interface-preview .ml-interface-enlarge { right: 21px; bottom: 5px; font-size: 11px; }
   html body.landing-home:not(.persona-page) .ml-interface-preview figcaption { flex-direction: column; align-items: center; gap: 3px; margin-top: 14px; font-size: 9px; text-align: center; }

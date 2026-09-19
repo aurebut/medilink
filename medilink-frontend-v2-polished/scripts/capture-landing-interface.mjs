@@ -32,7 +32,7 @@ await mkdir(output, { recursive: true });
 
 async function capture(name, device) {
   const mobile = device === 'mobile';
-  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'documents' ? { width: 1280, height: 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1100, height: 1000 };
+  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'documents' ? { width: 1040, height: 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1100, height: 1000 };
   const context = await browser.newContext({ viewport, deviceScaleFactor: 2, locale: 'fr-FR', timezoneId: 'Europe/Paris', reducedMotion: 'reduce' });
   const page = await context.newPage();
   const errors = [];
@@ -67,7 +67,7 @@ async function capture(name, device) {
   const selector = name === 'messages' ? '.message-layout' : name === 'mission' ? '.candidate-current-route' : '.replacement-dossier';
   const subject = page.locator(selector);
   await subject.waitFor();
-  if (name === 'documents') await subject.locator('.rd-contract').waitFor();
+  if (name === 'documents') await subject.locator('.rd-document-register .rd-document-row').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(800);
   if (name === 'documents') {
@@ -140,11 +140,9 @@ async function capture(name, device) {
   assert.equal(metadata.height, crop.height * 2, `${name}/${device}: crop height fits the browser viewport`);
   const width = Math.round(metadata.width / 2);
   const height = Math.round(metadata.height / 2);
-  let previewHeight = height;
-  if (name === 'documents' && mobile) {
-    const firstRow = await subject.locator('.rd-document-row').first().boundingBox();
-    previewHeight = Math.ceil(firstRow.y + firstRow.height - crop.y);
-  }
+  // The compact document register fits as one complete screen. Keep every row
+  // and its action visible in the landing preview as well as its enlargement.
+  const previewHeight = height;
   const filename = `${name}-${device}`;
   const highDensity = await sharp(png).webp({ lossless: true, effort: 6 }).toBuffer();
   const sha256 = createHash('sha256').update(highDensity).digest('hex');
