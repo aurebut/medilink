@@ -56,6 +56,9 @@ export class EmailService {
     subject: string;
     html: string;
     type: string;
+    attachments?: { filename: string; content: Buffer }[];
+    requireDelivery?: boolean;
+    idempotencyKey?: string;
   }) {
     const event = await this.prisma.emailEvent.create({
       data: {
@@ -70,15 +73,20 @@ export class EmailService {
     try {
       let providerMessageId: string | undefined;
 
+      if (params.requireDelivery && !this.isDossierDeliveryAvailable()) {
+        throw new Error('Envoi indisponible : le service email n’est pas configuré. Aucun document n’a été envoyé.');
+      }
       if (this.resend) {
         const result = await this.resend.emails.send({
           from: this.config.get<string>('EMAIL_FROM') || 'MédiLink <no-reply@example.com>',
           to: params.to,
           subject: params.subject,
           html: params.html,
-        });
+          attachments: params.attachments,
+        }, params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined);
         if (result.error) throw new Error(result.error.message);
         providerMessageId = result.data?.id;
+        if (params.requireDelivery && !providerMessageId) throw new Error('Le fournisseur email n’a pas confirmé la prise en charge.');
       } else {
         this.logger.warn(
           `[EMAIL MOCK] To: ${params.to} | Subject: ${params.subject} | Content redacted`,
@@ -93,6 +101,7 @@ export class EmailService {
           sentAt: new Date(),
         },
       });
+      return { providerMessageId };
     } catch (error: any) {
       await this.prisma.emailEvent.update({
         where: { id: event.id },
@@ -104,6 +113,35 @@ export class EmailService {
       });
       throw error;
     }
+  }
+
+  isDossierDeliveryAvailable() {
+    return Boolean(this.resend && this.config.get<string>('EMAIL_FROM'));
+  }
+
+  sendDossierEmail(params: {
+    userId: string;
+    to: string;
+    recipientName: string;
+    message?: string;
+    attachments: { filename: string; content: Buffer }[];
+    idempotencyKey: string;
+    createdAt?: Date;
+  }) {
+    return this.sendEmail({
+      userId: params.userId,
+      to: params.to,
+      subject: 'Dossier de remplacement médical — MédiLink',
+      type: 'replacement_dossier.sent',
+      html: this.wrapInLayout('Dossier de remplacement', `<h1>Dossier de remplacement médical</h1>
+        <p>Bonjour ${this.escapeHtml(params.recipientName)},</p>
+        <p>Vous trouverez en pièces jointes les documents sélectionnés par votre interlocuteur sur MédiLink.</p>
+        ${params.message ? `<p style="white-space:pre-line">${this.escapeHtml(params.message)}</p>` : ''}
+        <p>Cet envoi ne constitue ni un accusé de réception, ni une signature, ni une autorisation de remplacement. Les démarches requises auprès du conseil de l’Ordre restent à vérifier par les médecins concernés.</p>`, params.createdAt),
+      attachments: params.attachments,
+      requireDelivery: true,
+      idempotencyKey: params.idempotencyKey,
+    });
   }
 
   private getFrontendUrl(): string {
@@ -217,7 +255,7 @@ export class EmailService {
     return labels[type] || type;
   }
 
-  private wrapInLayout(title: string, bodyHtml: string): string {
+  private wrapInLayout(title: string, bodyHtml: string, generatedAt = new Date()): string {
     return `
 <!DOCTYPE html>
 <html>
@@ -263,7 +301,7 @@ export class EmailService {
           <tr>
             <td style="padding: 32px 48px 40px 48px; text-align: center; font-size: 13px; color: #6A7A92; line-height: 1.6; font-family: 'DM Sans', sans-serif;">
               <p style="margin: 0 0 8px 0;">Vous recevez cet e-mail dans le cadre de votre activité sur MédiLink.</p>
-              <p style="margin: 0 0 16px 0;">© ${new Date().getFullYear()} MédiLink. Tous droits réservés.</p>
+              <p style="margin: 0 0 16px 0;">© ${generatedAt.getFullYear()} MédiLink. Tous droits réservés.</p>
               <p style="margin: 0;">
                 <a href="${this.getFrontendUrl()}" style="color: #0E8A7A; text-decoration: none; font-weight: 600;">Accéder à la plateforme</a>
               </p>

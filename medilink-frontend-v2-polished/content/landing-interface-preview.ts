@@ -10,7 +10,9 @@ export function interfacePreview(name: PreviewName, className: string, title: st
   const source = (device: typeof desktop, retina = false) =>
     `/landing-assets/interface/${name}-${device.device}${retina ? '@2x' : ''}.webp?v=${device.sha256.slice(0, 12)}`;
 
-  return `<figure class="${className} ml-interface-preview ml-interface-preview--${name}" aria-labelledby="ml-${name}-preview-title">
+  const previewStyle = name === 'documents' ? ` style="--ml-documents-preview-ratio:${mobile.width}/${mobile.previewHeight}"` : '';
+
+  return `<figure class="${className} ml-interface-preview ml-interface-preview--${name}" aria-labelledby="ml-${name}-preview-title"${previewStyle}>
     <a class="ml-interface-open" href="${source(desktop, true)}" target="_blank" rel="noopener" data-interface-preview="${name}" aria-label="Voir l’interface : ${title} (agrandir)">
       <span class="ml-interface-stage">
         <span class="ml-interface-window">
@@ -21,7 +23,7 @@ export function interfacePreview(name: PreviewName, className: string, title: st
           </picture>
         </span>
       </span>
-      <span class="ml-interface-enlarge">Voir l’interface<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
+      <span class="ml-interface-enlarge">${name === 'documents' ? 'Voir le dossier complet' : 'Voir l’interface'}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
     </a>
     <figcaption><span id="ml-${name}-preview-title" class="ml-interface-title">${title}</span><span>Interface MédiLink · Données de démonstration</span></figcaption>
   </figure>`;

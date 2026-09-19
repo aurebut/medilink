@@ -1,0 +1,223 @@
+.replacement-dossier {
+  --rd-blue: #1952a0;
+  --rd-ink: #243f64;
+  --rd-muted: #61758b;
+  --rd-line: #dce5ee;
+  color: var(--rd-ink);
+  font-family: var(--brand-sans);
+  padding: 30px 32px 20px;
+  background: #fbfcfe;
+  border: 1px solid var(--rd-line);
+  border-radius: 16px;
+  min-width: 0;
+}
+.replacement-dossier *, .replacement-dossier *::before, .replacement-dossier *::after { box-sizing: border-box; }
+.replacement-dossier h2, .replacement-dossier h3, .replacement-dossier h4, .replacement-dossier p { margin: 0; }
+.replacement-dossier button { font-family: inherit; }
+.replacement-dossier .btn { min-height: 40px; font-size: 12px; padding: 10px 14px; gap: 8px; white-space: normal; }
+.replacement-dossier button:disabled { opacity: .5; cursor: not-allowed; }
+.replacement-dossier button:focus-visible, .replacement-dossier summary:focus-visible, .replacement-dossier input:focus-visible { outline: 2px solid var(--rd-blue); outline-offset: 4px; }
+.replacement-dossier .rd-eyebrow { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: .13em; font-weight: 650; color: var(--rd-blue); }
+.replacement-dossier .rd-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; margin-bottom: 24px; }
+.replacement-dossier .rd-heading h2 { margin: 6px 0 7px; font: 400 clamp(31px, 3.2vw, 42px)/1.08 var(--brand-serif); color: var(--rd-ink); letter-spacing: -.035em; }
+.replacement-dossier .rd-heading h2 em { color: var(--rd-blue); font-weight: 400; }
+.replacement-dossier .rd-heading p { color: var(--rd-muted); font-size: 12px; line-height: 1.55; }
+.replacement-dossier .rd-shared { display: flex; align-items: center; gap: 7px; flex-shrink: 0; font-size: 10px; padding-top: 8px; color: #477564; }
+.replacement-dossier .rd-mission-context { display: flex; align-items: center; gap: 15px; border-block: 1px solid var(--rd-line); padding: 16px 0; }
+.replacement-dossier .rd-person { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.replacement-dossier .rd-person small { display: block; font-size: 9px; color: var(--rd-muted); margin-bottom: 3px; }
+.replacement-dossier .rd-person strong { display: block; font-size: 11px; font-weight: 600; overflow-wrap: anywhere; }
+.replacement-dossier .rd-avatar { display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: #243f64; color: #fff; font-size: 10px; }
+.replacement-dossier .rd-avatar-light { background: #e2eafa; color: var(--rd-blue); }
+.replacement-dossier .rd-person-connector { color: #8b9fb3; font-size: 16px; }
+.replacement-dossier .rd-mission-dates { margin-left: auto; text-align: right; max-width: 35%; }
+.replacement-dossier .rd-mission-dates strong { display: block; font-size: 10px; font-weight: 550; }
+.replacement-dossier .rd-mission-dates span { display: block; font-size: 9px; color: var(--rd-muted); margin-top: 4px; line-height: 1.4; }
+.replacement-dossier .rd-progress { display: grid; grid-template-columns: 1fr 1.25fr 1fr; padding: 0; margin: 18px 0 22px; list-style: none; gap: 14px; }
+.replacement-dossier .rd-progress li { display: flex; align-items: center; gap: 8px; color: #697a8c; font-size: 10px; }
+.replacement-dossier .rd-progress li > span { display: grid; place-items: center; flex-shrink: 0; width: 25px; height: 25px; border: 1px solid #d6e0eb; border-radius: 50%; font-size: 9px; }
+.replacement-dossier .rd-progress small { display: block; font-size: 9px; margin-top: 3px; font-weight: 400; color: var(--rd-muted); }
+.replacement-dossier .rd-progress li.is-current > span { border-color: #a8c2e3; color: var(--rd-blue); background: #eaf1fd; }
+.replacement-dossier .rd-progress li.is-current { color: var(--rd-blue); }
+.replacement-dossier .rd-progress li.is-done > span { background: #edf5f0; color: #387156; border-color: #bcd9c7; }
+.replacement-dossier .rd-contract { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; align-items: center; gap: 21px; padding: 24px; background: #edf3fc; border: 1px solid #dce7f4; border-radius: 11px; }
+.replacement-dossier .rd-contract-folio { display: flex; position: relative; flex-direction: column; align-items: flex-start; width: 81px; height: 108px; padding: 10px 11px; background: #fff; box-shadow: 0 7px 17px #2743640c; border: 1px solid #d4deea; color: var(--rd-blue); transform: rotate(-4deg); border-radius: 2px; }
+.replacement-dossier .rd-contract-folio::before { content: ''; position: absolute; z-index: -1; inset: 3px -5px -4px 3px; background: #fafcff; border: 1px solid #d5e1ef; transform: rotate(6deg); }
+.replacement-dossier .rd-contract-folio > span { font-size: 4px; font-weight: 600; letter-spacing: .13em; margin-bottom: 12px; }
+.replacement-dossier .rd-contract-folio svg { margin-bottom: 7px; }
+.replacement-dossier .rd-contract-folio i { width: 100%; height: 1px; background: #d6e2f1; margin-bottom: 5px; }
+.replacement-dossier .rd-contract-folio i + i { width: 68%; }
+.replacement-dossier .rd-contract-folio b { font-size: 6px; margin-top: 4px; letter-spacing: .08em; }
+.replacement-dossier .rd-contract-folio small { font-size: 4px; letter-spacing: .1em; margin-top: 3px; }
+.replacement-dossier .rd-contract-copy { min-width: 0; }
+.replacement-dossier .rd-contract-copy .rd-eyebrow { font-size: 8px; }
+.replacement-dossier .rd-contract-copy h3 { font: 400 27px/1.05 var(--brand-serif); letter-spacing: -.025em; max-width: 320px; margin: 7px 0 8px; }
+.replacement-dossier .rd-contract-copy p { max-width: 350px; font-size: 11px; line-height: 1.55; color: var(--rd-muted); }
+.replacement-dossier .rd-status { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; line-height: 1.45; color: #806131; }
+.replacement-dossier .rd-status > span { width: 4px; height: 4px; background: currentColor; border-radius: 50%; flex-shrink: 0; }
+.replacement-dossier .rd-status small { color: var(--rd-muted); border-left: 1px solid #c5d3e3; padding-left: 8px; margin-left: 4px; font-size: 9px; }
+.replacement-dossier .rd-status.is-ready { color: #3c7359; }
+.replacement-dossier .rd-contract-copy > .rd-status { margin-top: 11px; }
+.replacement-dossier .rd-contract-actions { display: flex; flex-direction: column; align-items: stretch; gap: 7px; max-width: 194px; }
+.replacement-dossier .rd-contract-actions .btn-light { border-color: #cbd9eb; background: #f7faff; }
+.replacement-dossier .rd-contract-actions .rd-text-button { font-size: 9px; align-self: center; padding: 3px 0; }
+.replacement-dossier .rd-text-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 4px 0; border: 0; background: transparent; color: var(--rd-blue); cursor: pointer; font-size: 10px; font-weight: 550; text-decoration: none; }
+.replacement-dossier .rd-text-button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.replacement-dossier .rd-icon-button { display: inline-grid; place-items: center; width: 29px; height: 29px; border: 1px solid #d7e2ee; background: #f8fafd; color: var(--rd-blue); border-radius: 6px; cursor: pointer; flex-shrink: 0; }
+.replacement-dossier .rd-icon-button:hover { background: #eaf1fc; }
+.replacement-dossier .rd-register-heading { margin: 24px 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.replacement-dossier .rd-register-heading .rd-eyebrow { font-size: 8px; }
+.replacement-dossier .rd-register-heading h3 { font: 400 24px/1.1 var(--brand-serif); margin-top: 5px; }
+.replacement-dossier .rd-document-register { border-top: 1px solid var(--rd-line); }
+.replacement-dossier .rd-document-row { display: grid; grid-template-columns: 18px 28px minmax(0, 1fr) 115px 73px; align-items: center; gap: 10px; padding: 13px 0; border-bottom: 1px solid var(--rd-line); }
+.replacement-dossier .rd-document-index { font-size: 9px; color: #8194a7; }
+.replacement-dossier .rd-document-icon { display: flex; align-items: center; color: #6582a5; }
+.replacement-dossier .rd-document-description { min-width: 0; }
+.replacement-dossier .rd-document-description strong { display: block; font-size: 11px; font-weight: 550; line-height: 1.4; }
+.replacement-dossier .rd-document-description small { display: block; font-size: 9px; color: var(--rd-muted); line-height: 1.4; margin-top: 4px; }
+.replacement-dossier .rd-row-actions { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.replacement-dossier .rd-send-strip { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 19px 0 15px; }
+.replacement-dossier .rd-send-strip > div { display: flex; align-items: center; gap: 12px; }
+.replacement-dossier .rd-send-icon { display: grid; place-items: center; background: #eef3fb; width: 39px; height: 39px; border-radius: 50%; color: var(--rd-blue); flex-shrink: 0; }
+.replacement-dossier .rd-send-strip strong { display: block; font-size: 11px; font-weight: 550; }
+.replacement-dossier .rd-send-strip p { font-size: 10px; line-height: 1.5; color: var(--rd-muted); margin-top: 4px; }
+.replacement-dossier .rd-bottom-actions { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 4px 0 14px; }
+.replacement-dossier .rd-bottom-actions > span { font-size: 9px; color: var(--rd-muted); text-align: right; }
+.replacement-dossier .rd-service-note { padding: 3px 0 13px; color: var(--rd-muted); font-size: 10px; line-height: 1.5; }
+.replacement-dossier .rd-history { border-top: 1px solid var(--rd-line); }
+.replacement-dossier .rd-history > summary { display: flex; align-items: center; gap: 8px; list-style: none; font-size: 10px; padding: 15px 0 0; color: var(--rd-muted); cursor: pointer; }
+.replacement-dossier .rd-history > summary::-webkit-details-marker { display: none; }
+.replacement-dossier .rd-history > summary > span { margin-left: auto; font-size: 9px; }
+.replacement-dossier .rd-history[open] > summary > svg:last-child { transform: rotate(90deg); }
+.replacement-dossier .rd-history-content { padding-top: 16px; }
+.replacement-dossier .rd-history-content h4 { font-size: 12px; font-weight: 600; margin: 17px 0 6px; }
+.replacement-dossier .rd-history-content > p { font-size: 11px; color: var(--rd-muted); padding: 10px 0; }
+.replacement-dossier .rd-history-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e7edf4; }
+.replacement-dossier .rd-history-row > div { flex: 1; min-width: 0; }
+.replacement-dossier .rd-history-row strong { display: block; font-size: 11px; font-weight: 500; overflow-wrap: anywhere; }
+.replacement-dossier .rd-history-row small { display: block; font-size: 9px; margin-top: 4px; color: var(--rd-muted); overflow-wrap: anywhere; }
+.replacement-dossier .rd-delete { color: #a53a44; }
+.replacement-dossier .rd-edit-panel { padding: 24px; margin: 14px 0 24px; border: 1px solid #c8d8ed; border-radius: 10px; background: #fff; scroll-margin: 24px; }
+.replacement-dossier .rd-panel-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 15px; }
+.replacement-dossier .rd-panel-heading h3 { font: 400 28px/1.2 var(--brand-serif); margin-top: 5px; }
+.replacement-dossier .rd-form-note { color: var(--rd-muted); font-size: 11px; line-height: 1.6; margin: 10px 0 16px; }
+.replacement-dossier .rd-missing-fields { margin: 0 0 18px; color: #806131; font-size: 12px; line-height: 1.6; }
+.replacement-dossier .rd-missing-fields summary { cursor: pointer; }
+.replacement-dossier .rd-conflict { margin-bottom: 18px; }
+.replacement-dossier .rd-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px; }
+.replacement-dossier .rd-fields .field { min-width: 0; margin: 0; }
+.replacement-dossier .rd-fieldset { border: 0; padding: 0; margin: 24px 0 20px; min-width: 0; }
+.replacement-dossier .rd-fieldset legend { padding: 0 0 12px; font-weight: 600; font-size: 12px; }
+.replacement-dossier .field .label { font-size: 11px; }
+.replacement-dossier .field-description { font-size: 10px; line-height: 1.5; }
+.replacement-dossier .input, .replacement-dossier .select, .replacement-dossier .textarea { font-size: 12px; }
+.replacement-dossier .rd-form-actions { display: flex; gap: 12px; align-items: center; margin-top: 20px; }
+.replacement-dossier .rd-send-selection { display: grid; gap: 8px; }
+.replacement-dossier .rd-send-selection label { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--rd-line); border-radius: 6px; cursor: pointer; }
+.replacement-dossier .rd-send-selection input, .replacement-dossier .rd-send-confirmation input { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--rd-blue); }
+.replacement-dossier .rd-send-selection label > span { min-width: 0; }
+.replacement-dossier .rd-send-selection strong { display: block; font-size: 11px; font-weight: 550; }
+.replacement-dossier .rd-send-selection small { display: block; font-size: 10px; color: var(--rd-muted); margin-top: 3px; overflow-wrap: anywhere; }
+.replacement-dossier .rd-send-confirmation { background: #f0f5fc; padding: 16px; border-radius: 7px; margin-top: 18px; }
+.replacement-dossier .rd-send-confirmation > strong { display: block; font-size: 12px; font-weight: 550; overflow-wrap: anywhere; }
+.replacement-dossier .rd-send-confirmation label { display: flex; align-items: flex-start; gap: 9px; font-size: 11px; line-height: 1.5; margin: 13px 0 9px; }
+.replacement-dossier .rd-send-confirmation p { font-size: 10px; line-height: 1.5; color: var(--rd-muted); }
+.replacement-dossier.rd-loading { padding: 40px; display: grid; justify-items: center; text-align: center; gap: 16px; color: var(--rd-muted); }
+.replacement-dossier.rd-loading h3 { font: 400 30px/1.2 var(--brand-serif); }
+.replacement-dossier.rd-loading p { font-size: 12px; }
+.replacement-dossier-legacy { margin-top: 18px; border: 1px solid #dce5ee; border-radius: 10px; background: #fbfcfe; }
+.replacement-dossier-legacy > summary { cursor: pointer; padding: 17px 20px; font: 500 12px/1.5 var(--brand-sans); color: #49617f; }
+.replacement-dossier-legacy > div { padding: 0 20px 20px; }
+@media (max-width: 1100px) {
+  .replacement-dossier { padding: 24px; }
+  .replacement-dossier .rd-contract { grid-template-columns: 70px minmax(0, 1fr); padding: 20px; gap: 16px; }
+  .replacement-dossier .rd-contract-folio { width: 67px; height: 96px; padding: 8px; }
+  .replacement-dossier .rd-contract-actions { grid-column: 1/-1; flex-direction: row; align-items: center; max-width: none; gap: 10px; flex-wrap: wrap; }
+  .replacement-dossier .rd-contract-actions .rd-text-button { margin-left: auto; }
+  .replacement-dossier .rd-document-row { grid-template-columns: 15px 23px minmax(0, 1fr) 99px 68px; gap: 8px; }
+  .replacement-dossier .rd-mission-context { flex-wrap: wrap; gap: 11px; }
+  .replacement-dossier .rd-mission-dates { flex-basis: 100%; max-width: none; text-align: left; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .replacement-dossier .rd-mission-dates span { margin-top: 0; }
+}
+@media (max-width: 650px) {
+  .replacement-dossier { padding: 21px 17px 15px; border-radius: 12px; }
+  .replacement-dossier .rd-heading { gap: 5px; margin-bottom: 18px; }
+  .replacement-dossier .rd-heading h2 { font-size: 34px; }
+  .replacement-dossier .rd-heading p { font-size: 13px; max-width: 280px; }
+  .replacement-dossier .rd-heading .rd-eyebrow { font-size: 10px; }
+  .replacement-dossier .rd-shared { font-size: 0; padding-top: 3px; }
+  .replacement-dossier .rd-shared svg { width: 19px; height: 19px; }
+  .replacement-dossier .rd-mission-context { padding: 12px 0; gap: 9px; }
+  .replacement-dossier .rd-person { flex: 1; gap: 7px; }
+  .replacement-dossier .rd-avatar { width: 28px; height: 28px; font-size: 8px; }
+  .replacement-dossier .rd-person strong { font-size: 12px; }
+  .replacement-dossier .rd-person small { font-size: 10px; }
+  .replacement-dossier .rd-person-connector { font-size: 13px; }
+  .replacement-dossier .rd-mission-dates { gap: 3px; }
+  .replacement-dossier .rd-mission-dates strong { width: 100%; font-size: 11px; }
+  .replacement-dossier .rd-mission-dates span { font-size: 10px; }
+  .replacement-dossier .rd-progress { gap: 7px; margin: 14px 0 17px; grid-template-columns: 1fr 1.2fr 1fr; }
+  .replacement-dossier .rd-progress li { align-items: flex-start; gap: 5px; font-size: 11px; }
+  .replacement-dossier .rd-progress li > span { width: 18px; height: 18px; font-size: 7px; }
+  .replacement-dossier .rd-progress small { font-size: 10px; margin-top: 3px; line-height: 1.4; }
+  .replacement-dossier .rd-contract { grid-template-columns: 51px minmax(0, 1fr); padding: 16px 13px 12px; gap: 13px; border-radius: 8px; }
+  .replacement-dossier .rd-contract-folio { width: 48px; height: 76px; padding: 7px; }
+  .replacement-dossier .rd-contract-folio > span { font-size: 3px; margin-bottom: 7px; }
+  .replacement-dossier .rd-contract-folio svg { width: 21px; height: 21px; margin-bottom: 6px; }
+  .replacement-dossier .rd-contract-folio b { font-size: 4px; margin-top: 1px; }
+  .replacement-dossier .rd-contract-folio small { font-size: 3px; }
+  .replacement-dossier .rd-contract-copy .rd-eyebrow { font-size: 9px; letter-spacing: .1em; }
+  .replacement-dossier .rd-contract-copy h3 { font-size: 25px; margin: 5px 0 5px; }
+  .replacement-dossier .rd-contract-copy p { font-size: 12px; line-height: 1.5; }
+  .replacement-dossier .rd-contract-copy > .rd-status { margin-top: 7px; }
+  .replacement-dossier .rd-status, .replacement-dossier .rd-status small { font-size: 10px; }
+  .replacement-dossier .rd-contract-actions { gap: 6px; display: grid; grid-template-columns: .85fr 1.15fr; }
+  .replacement-dossier .rd-contract-actions .btn { font-size: 12px; padding: 9px 7px; min-height: 44px; gap: 4px; }
+  .replacement-dossier .rd-contract-actions .btn:only-child { grid-column: 1/-1; }
+  .replacement-dossier .rd-contract-actions > .rd-text-button { grid-column: 1/-1; margin: 0; justify-self: center; font-size: 12px; min-height: 44px; }
+  .replacement-dossier .rd-register-heading { display: block; margin-top: 20px; margin-bottom: 8px; }
+  .replacement-dossier .rd-register-heading .rd-eyebrow { font-size: 10px; }
+  .replacement-dossier .rd-register-heading h3 { font-size: 25px; }
+  .replacement-dossier .rd-register-heading > .rd-text-button { margin-top: 5px; font-size: 12px; min-height: 44px; }
+  .replacement-dossier .rd-document-row { grid-template-columns: 24px minmax(0, 1fr) 44px; gap: 5px 7px; padding: 13px 0; }
+  .replacement-dossier .rd-document-index { display: none; }
+  .replacement-dossier .rd-document-icon { grid-row: 1/3; align-self: start; padding-top: 2px; }
+  .replacement-dossier .rd-document-description { grid-column: 2; }
+  .replacement-dossier .rd-document-description strong { font-size: 13px; }
+  .replacement-dossier .rd-document-description small { font-size: 10px; margin-top: 3px; }
+  .replacement-dossier .rd-document-row > .rd-status { grid-column: 2; }
+  .replacement-dossier .rd-row-actions { grid-column: 3; grid-row: 1/3; gap: 0; flex-direction: column; }
+  .replacement-dossier .rd-row-actions .rd-text-button { font-size: 12px; gap: 1px; min-width: 44px; min-height: 44px; }
+  .replacement-dossier .rd-row-actions .rd-text-button svg { width: 11px; }
+  .replacement-dossier .rd-row-actions .rd-icon-button { width: 44px; height: 44px; }
+  .replacement-dossier .rd-send-strip { padding: 16px 0 12px; display: block; }
+  .replacement-dossier .rd-send-strip > div { gap: 9px; }
+  .replacement-dossier .rd-send-strip strong { font-size: 14px; }
+  .replacement-dossier .rd-send-strip p { font-size: 12px; margin-top: 3px; }
+  .replacement-dossier .rd-send-icon { width: 31px; height: 31px; }
+  .replacement-dossier .rd-send-strip > .btn { width: 100%; margin-top: 13px; font-size: 14px; min-height: 44px; }
+  .replacement-dossier .rd-bottom-actions { flex-wrap: wrap; gap: 6px; padding-bottom: 12px; }
+  .replacement-dossier .rd-bottom-actions > span { text-align: left; font-size: 10px; line-height: 1.5; }
+  .replacement-dossier .rd-bottom-actions .rd-text-button { font-size: 12px; min-height: 44px; }
+  .replacement-dossier .rd-history > summary { font-size: 12px; gap: 5px; padding-top: 12px; min-height: 44px; flex-wrap: wrap; }
+  .replacement-dossier .rd-history > summary > span { font-size: 10px; }
+  .replacement-dossier .rd-history > summary > svg { width: 13px; }
+  .replacement-dossier .rd-edit-panel { padding: 16px 12px; margin-top: 10px; }
+  .replacement-dossier .rd-panel-heading h3 { font-size: 25px; }
+  .replacement-dossier .rd-fields { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .replacement-dossier .rd-form-actions { flex-wrap: wrap; }
+  .replacement-dossier .rd-edit-panel .rd-icon-button { min-width: 44px; min-height: 44px; }
+  .replacement-dossier .input, .replacement-dossier .select, .replacement-dossier .textarea { font-size: 16px; }
+  .replacement-dossier .field .label, .replacement-dossier .rd-fieldset legend { font-size: 13px; }
+  .replacement-dossier .field-description, .replacement-dossier .rd-form-note, .replacement-dossier .rd-service-note { font-size: 12px; }
+  .replacement-dossier .rd-send-selection strong, .replacement-dossier .rd-send-confirmation > strong, .replacement-dossier .rd-send-confirmation label { font-size: 13px; }
+  .replacement-dossier .rd-send-selection small, .replacement-dossier .rd-send-confirmation p { font-size: 11px; }
+  .replacement-dossier .rd-history-row strong { font-size: 12px; }
+  .replacement-dossier .rd-history-row small { font-size: 11px; }
+  .replacement-dossier .rd-history-row > button { min-height: 44px; font-size: 12px; }
+  .replacement-dossier .rd-history-row { flex-wrap: wrap; gap: 8px; }
+  .replacement-dossier .rd-history-row > div { min-width: 100%; }
+  .replacement-dossier-legacy > summary { padding: 14px; font-size: 11px; }
+  .replacement-dossier-legacy > div { padding: 0 12px 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .replacement-dossier * { scroll-behavior: auto; } }

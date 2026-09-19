@@ -11,6 +11,7 @@ import type { Application, Conversation, Mission, MissionAgreement } from '@/lib
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
+import { ReplacementDossier } from '@/components/ReplacementDossier';
 
 type MissionStep = {
   key: string;
@@ -36,7 +37,7 @@ const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: "Vue d'ensemble" },
   { id: 'brief', label: 'Brief' },
   { id: 'lieu', label: 'Lieu & contact' },
-  { id: 'documents', label: 'Documents de mission' },
+  { id: 'documents', label: 'Dossier du remplacement' },
   { id: 'conditions', label: 'Rémunération & actions' },
 ];
 
@@ -239,6 +240,9 @@ export default function CandidateCurrentMissionsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('section') === 'documents') setActiveSection('documents');
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -527,7 +531,10 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
       ) : null}
 
       {activeSection === 'documents' ? (
-        <MissionDocumentsPanel row={row} />
+        <div>
+          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="candidate" />
+          <details className="replacement-dossier-legacy"><summary>Fichiers produits pendant la mission</summary><div><MissionDocumentsPanel row={row} /></div></details>
+        </div>
       ) : null}
 
       {activeSection === 'conditions' ? (

@@ -21,6 +21,7 @@ import { ProfilesModule } from './modules/profiles/profiles.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspaceNotesModule } from './modules/workspace-notes/workspace-notes.module';
+import { ReplacementDossiersModule } from './modules/replacement-dossiers/replacement-dossiers.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { WorkspaceNotesModule } from './modules/workspace-notes/workspace-notes.
     DashboardModule,
     AdminModule,
     WorkspaceNotesModule,
+    ReplacementDossiersModule,
   ],
   providers: [
     {

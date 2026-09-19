@@ -14,6 +14,7 @@ import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapabilit
 import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input, type BadgeTone } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
+import { ReplacementDossier } from '@/components/ReplacementDossier';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type MissionStep = {
@@ -39,7 +40,7 @@ const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
   { id: 'brief', label: 'Brief & notes' },
   { id: 'candidat', label: 'Candidat & contact' },
-  { id: 'documents', label: 'Documents validés' },
+  { id: 'documents', label: 'Dossier du remplacement' },
   { id: 'payment', label: 'Paiement & justificatifs' },
 ];
 
@@ -237,6 +238,9 @@ export default function EstablishmentCurrentMissionsPage() {
   const [candidateProfile, setCandidateProfile] = useState<CandidateProfileForApplication | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('section') === 'documents') setActiveSection('documents');
+  }, []);
 
   useEffect(() => {
     if (!primary) {
@@ -1000,11 +1004,14 @@ function MissionControlPanel({
       ) : null}
 
       {activeSection === 'documents' ? (
-        <CandidateDocumentsPanel
+        <div>
+          <ReplacementDossier key={row.application.id} applicationId={row.application.id} viewer="establishment" />
+          <details className="replacement-dossier-legacy"><summary>Documents professionnels du candidat</summary><div><CandidateDocumentsPanel
           candidateProfile={candidateProfile}
           loading={profileLoading}
           openDocument={openDocument}
-        />
+          /></div></details>
+        </div>
       ) : null}
 
       {activeSection === 'payment' ? (

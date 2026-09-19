@@ -56,7 +56,7 @@ async function capture(name, device) {
     forbiddenRequests.push(`EXTERNAL ${url.origin}${url.pathname}`);
     return route.abort();
   });
-  const routePath = name === 'messages' ? '/app/messages?id=c1' : name === 'mission' ? '/app/current-missions' : '/app/profile';
+  const routePath = name === 'messages' ? '/app/messages?id=c1' : name === 'mission' ? '/app/current-missions' : '/app/current-missions?section=documents';
   await page.goto(`${base}${routePath}`, { waitUntil: 'domcontentloaded' });
   try { await page.locator('.workspace-design').waitFor(); }
   catch (error) {
@@ -64,13 +64,18 @@ async function capture(name, device) {
     throw error;
   }
   await page.addStyleTag({ content: 'nextjs-portal { display: none !important; }' });
-  if (name === 'documents') await page.getByRole('tab', { name: 'Documents', exact: true }).click();
-  const selector = name === 'messages' ? '.message-layout' : name === 'mission' ? '.candidate-current-route' : '.documents-card';
+  const selector = name === 'messages' ? '.message-layout' : name === 'mission' ? '.candidate-current-route' : '.replacement-dossier';
   const subject = page.locator(selector);
   await subject.waitFor();
-  if (name === 'documents') await page.locator('.document-checklist-item').last().waitFor();
+  if (name === 'documents') await subject.locator('.rd-contract').waitFor();
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(800);
+  if (name === 'documents') {
+    // Resize the real viewport to include the native component; never scale or restyle its UI.
+    const box = await subject.boundingBox();
+    viewport = { ...viewport, height: Math.max(viewport.height, Math.ceil(box.height) + 240) };
+    await page.setViewportSize(viewport);
+  }
   if (name === 'messages') {
     await page.locator('.message-log .message').last().waitFor();
     // Match the actual viewport to a complete group of messages. Only native scrolling
@@ -120,22 +125,12 @@ async function capture(name, device) {
       const columns = await subject.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length);
       assert.equal(columns, 2, 'mission/desktop: the native timeline keeps its two-column layout');
     }
-    if (!mobile && name === 'documents') {
-      const desktopHero = await page.locator('.documents-hero').evaluate(element => getComputedStyle(element).display);
-      assert.equal(desktopHero, 'flex', 'documents/desktop: the native document heading keeps its desktop layout');
-    }
     // Scroll the actual component into view, leaving real fixed navigation outside the crop.
     await subject.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
     const box = await subject.boundingBox();
     const padding = name === 'mission' ? 20 : 0;
     const topPadding = name === 'mission' ? 10 : 0;
     let height = Math.ceil(box.height) + padding + topPadding;
-    if (name === 'documents') {
-      const lastIncluded = await page.locator('.document-checklist-item').nth(mobile ? 1 : 3).boundingBox();
-      const nextRow = await page.locator('.document-checklist-item').nth(mobile ? 2 : 4).boundingBox();
-      const naturalGap = Math.max(0, nextRow.y - lastIncluded.y - lastIncluded.height);
-      height = Math.floor(lastIncluded.y + lastIncluded.height - box.y + Math.min(16, naturalGap / 2));
-    }
     const clip = { x: Math.floor(box.x - padding), y: Math.floor(box.y - topPadding), width: Math.ceil(box.width) + padding * 2, height };
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: height < box.height };
@@ -145,12 +140,17 @@ async function capture(name, device) {
   assert.equal(metadata.height, crop.height * 2, `${name}/${device}: crop height fits the browser viewport`);
   const width = Math.round(metadata.width / 2);
   const height = Math.round(metadata.height / 2);
+  let previewHeight = height;
+  if (name === 'documents' && mobile) {
+    const firstRow = await subject.locator('.rd-document-row').first().boundingBox();
+    previewHeight = Math.ceil(firstRow.y + firstRow.height - crop.y);
+  }
   const filename = `${name}-${device}`;
   const highDensity = await sharp(png).webp({ lossless: true, effort: 6 }).toBuffer();
   const sha256 = createHash('sha256').update(highDensity).digest('hex');
   await writeFile(path.join(output, `${filename}@2x.webp`), highDensity);
   await sharp(png).resize(width, height).webp({ lossless: true, effort: 6 }).toFile(path.join(output, `${filename}.webp`));
-  assets.push({ name, device, route: routePath, viewport, crop, width, height, files: [`${filename}.webp`, `${filename}@2x.webp`], sourceScale: 2, sha256 });
+  assets.push({ name, device, route: routePath, viewport, crop, width, height, previewHeight, files: [`${filename}.webp`, `${filename}@2x.webp`], sourceScale: 2, sha256 });
   console.log(`${filename}: ${width} x ${height}`);
   await context.close();
 }

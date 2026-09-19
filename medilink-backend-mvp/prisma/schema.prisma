@@ -752,10 +752,74 @@ model Application {
   history      ApplicationStatusHistory[]
   conversation Conversation?
   agreements   MissionAgreement[]
+  replacementDossier ReplacementDossier?
 
   @@unique([missionId, candidateUserId])
   @@index([candidateUserId])
   @@index([status])
+}
+
+// Separate from profile Documents: access is scoped to one candidate/application.
+model ReplacementDossier {
+  id            String   @id @default(uuid())
+  applicationId String   @unique
+  revision      Int      @default(1)
+  details       Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  documents   ReplacementDossierDocument[]
+  deliveries  ReplacementDossierDelivery[]
+}
+
+model ReplacementDossierDocument {
+  id              String   @id @default(uuid())
+  dossierId       String
+  kind            String
+  fileName        String
+  storageKey      String   @unique
+  mimeType        String
+  sizeBytes       Int
+  status          String   @default("UPLOADING")
+  source          String
+  version         Int
+  revision        Int
+  detailsSnapshot Json?
+  templateVersion String?
+  createdById     String
+  expiresAt       DateTime?
+  archivedAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  dossier ReplacementDossier @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+
+  @@unique([dossierId, kind, version])
+  @@index([dossierId, createdAt])
+}
+
+model ReplacementDossierDelivery {
+  id                String   @id @default(uuid())
+  dossierId         String
+  actorUserId       String
+  recipientEmail    String
+  recipientName     String
+  recipientType     String
+  message           String?
+  documentIds       String[]
+  documentSnapshots Json
+  idempotencyKey    String
+  requestHash       String
+  status            String   @default("SENDING")
+  providerMessageId String?
+  error             String?
+  createdAt         DateTime @default(now())
+  sentAt            DateTime?
+
+  dossier ReplacementDossier @relation(fields: [dossierId], references: [id], onDelete: Cascade)
+
+  @@unique([dossierId, idempotencyKey])
+  @@index([dossierId, createdAt])
 }
 
 model ApplicationStatusHistory {

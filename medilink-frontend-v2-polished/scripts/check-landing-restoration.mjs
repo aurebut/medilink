@@ -187,7 +187,7 @@ function normalizeDocumentsSection(html) {
   assert.equal([...markup.matchAll(/\bid="ml-documents-title"/g)].length, 1, 'documents: heading ID is unique');
   const heading = markup.match(/<h2\b[^>]*\bid="ml-documents-title"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
   assert.ok(heading && heading.replace(/<[^>]+>/g, '').trim().length > 10, 'documents: meaningful visible section heading');
-  const figures = [...markup.matchAll(/<figure class="ml-documents-preview ml-interface-preview ml-interface-preview--documents" aria-labelledby="ml-documents-preview-title">[\s\S]*?<\/figure>/g)];
+  const figures = [...markup.matchAll(/<figure class="ml-documents-preview ml-interface-preview ml-interface-preview--documents" aria-labelledby="ml-documents-preview-title"(?: style="--ml-documents-preview-ratio:\d+\/\d+")?>[\s\S]*?<\/figure>/g)];
   assert.equal(figures.length, 1, 'documents: exactly one accessible interface preview');
   assert.equal([...figures[0][0].matchAll(/\bid="ml-documents-preview-title"/g)].length, 1, 'documents: preview label resolves to one visible title');
   assert.match(figures[0][0], /<figcaption\b[^>]*>[\s\S]*?Interface MédiLink · Données de démonstration[\s\S]*?<\/figcaption>/, 'documents: preview data remains visibly illustrative');

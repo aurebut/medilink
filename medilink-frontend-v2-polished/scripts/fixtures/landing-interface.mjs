@@ -11,11 +11,11 @@ export const profile = {
   acceptedTimeSlots: [], acceptedPracticeSettings: [], acceptedMissionTypes: [],
   preferredDurations: [], refusedSchedules: [], knownSoftware: [], acceptedPatientTypes: [], languages: [],
 };
-const establishment = {
+export const establishment = {
   id: 'preview-establishment', name: 'Cabinet des Tilleuls', type: 'CABINET',
   verificationStatus: 'VERIFIED', photos: [],
 };
-const mission = {
+export const mission = {
   id: 'preview-mission', title: 'Remplacement en médecine générale',
   description: 'Un cabinet de quartier et une équipe disponible pour vous accueillir.',
   practicalInfo: 'Le secrétariat vous accueille à 8 h 15. Consultations de 8 h 30 à 18 h 30.',
@@ -27,12 +27,12 @@ const mission = {
   hasSecretary: true, secretaryType: 'ON_SITE', parkingAvailable: true,
   averagePatientsPerDay: 25, createdAt, updatedAt: createdAt,
 };
-const application = {
+export const application = {
   id: 'preview-application', missionId: mission.id, candidateUserId: profile.userId,
   status: 'ACCEPTED', mission, createdAt, updatedAt: createdAt,
   candidate: { id: profile.userId, profile },
 };
-const agreement = {
+export const agreement = {
   id: 'preview-agreement', applicationId: application.id, conversationId: 'c1',
   missionId: mission.id, candidateUserId: profile.userId, establishmentId: establishment.id,
   status: 'FUNDS_SECURED', compensationMode: 'RETROCESSION', retrocessionPercentage: 70,
@@ -70,11 +70,41 @@ export const documents = [
   storageKey: `fictional/${fileName}`, mimeType: 'application/pdf', sizeBytes: 85000,
   verificationStatus: 'APPROVED', createdAt, updatedAt: createdAt, verifiedAt: createdAt,
 }));
-const conversation = {
+export const conversation = {
   id: 'c1', missionId: mission.id, applicationId: application.id, candidateUserId: profile.userId,
   establishmentId: establishment.id, establishment, mission: { ...mission, city: 'Paris' }, application,
   agreements: [agreement], messages: [messages.at(-1)], participants: [],
   createdAt, updatedAt: createdAt, lastMessageAt: messages.at(-1).createdAt,
+};
+// Documents belonging to this replacement, separate from the private profile.
+// The contract is prepared, not signed or approved by the Ordre.
+export const replacementDossier = {
+  id: 'preview-dossier', applicationId: application.id, revision: 1,
+  canEdit: true, canSend: true, missingFields: [],
+  details: {
+    practiceFramework: 'INDIVIDUAL_LIBERAL', replacementKind: 'DOCTOR',
+    holderName: 'Thomas Martin', holderRpps: '10101234567', holderOrderNumber: '75/12345',
+    holderAddress: '12 rue des Tilleuls, 75011 Paris', holderEmail: 'thomas.martin@example.test',
+    replacementName: 'Sarah Bernard', replacementRpps: '10107654321', replacementOrderNumber: '75/54321',
+    replacementAddress: '8 rue des Lilas, 75012 Paris', replacementEmail: 'sarah.bernard@example.test',
+    licenseNumber: '', licenseValidUntil: '', specialty: 'Médecine générale',
+    practiceAddress: '12 rue des Tilleuls, 75011 Paris', startDate: '2026-09-14', endDate: '2026-09-18',
+    scheduleDetails: 'Du lundi au vendredi, de 8 h 30 à 18 h 30.', retrocessionPercent: 70,
+    paymentTerms: 'Règlement par virement dans les 7 jours suivant la fin du remplacement.',
+    orderCouncilName: 'Conseil départemental de Paris', orderEmail: 'conseil-demo@example.test',
+  },
+  documents: [
+    ['CONTRACT', 'Contrat_remplacement_Bernard_Martin.pdf', 'GENERATED'],
+    ['DECLARATION', 'Declaration_remplacement_Ordre.pdf', 'GENERATED'],
+    ['REGISTRATION', 'Attestation_inscription_Ordre.pdf', 'UPLOADED'],
+    ['INSURANCE', 'Attestation_RCP_2026.pdf', 'UPLOADED'],
+  ].map(([kind, fileName, source], index) => ({
+    id: `preview-dossier-document-${index}`, kind, fileName, source,
+    mimeType: 'application/pdf', sizeBytes: 85000, status: 'READY', version: 1, revision: 1,
+    createdAt, expiresAt: kind === 'INSURANCE' ? '2026-12-31T00:00:00.000Z' : null,
+    templateVersion: source === 'GENERATED' ? '2026-09-19' : null,
+  })),
+  deliveries: [],
 };
 export function fixtureResponse(path, method = 'GET') {
   if (path === '/conversations/events') return { eventStream: true };
@@ -86,6 +116,7 @@ export function fixtureResponse(path, method = 'GET') {
     '/notifications': [], '/conversations': [conversation], '/conversations/c1/messages': messages,
     '/me/dashboard': { profile, documents, applications: [application], conversations: [conversation], notifications: [] },
     '/missions': { items: [mission], total: 1, limit: 50, offset: 0 },
+    '/applications/preview-application/dossier': replacementDossier,
   }[path];
   return data === undefined ? null : { data };
 }

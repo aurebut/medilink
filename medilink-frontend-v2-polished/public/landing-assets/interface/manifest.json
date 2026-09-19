@@ -8,6 +8,7 @@
   "source": "scripts/capture-landing-interface.mjs",
   "fixture": "scripts/fixtures/landing-interface.mjs",
   "apiPaths": [
+    "/applications/preview-application/dossier",
     "/auth/me",
     "/conversations",
     "/conversations/c1/messages",
@@ -40,6 +41,7 @@
       },
       "width": 1132,
       "height": 660,
+      "previewHeight": 660,
       "files": [
         "messages-desktop.webp",
         "messages-desktop@2x.webp"
@@ -66,6 +68,7 @@
       },
       "width": 390,
       "height": 632,
+      "previewHeight": 632,
       "files": [
         "messages-mobile.webp",
         "messages-mobile@2x.webp"
@@ -92,6 +95,7 @@
       },
       "width": 758,
       "height": 574,
+      "previewHeight": 574,
       "files": [
         "mission-desktop.webp",
         "mission-desktop@2x.webp"
@@ -118,6 +122,7 @@
       },
       "width": 360,
       "height": 840,
+      "previewHeight": 840,
       "files": [
         "mission-mobile.webp",
         "mission-mobile@2x.webp"
@@ -128,54 +133,56 @@
     {
       "name": "documents",
       "device": "desktop",
-      "route": "/app/profile",
+      "route": "/app/current-missions?section=documents",
       "viewport": {
         "width": 1280,
-        "height": 1100
+        "height": 1105
       },
       "crop": {
-        "x": 622,
+        "x": 313,
         "y": 89,
-        "width": 626,
-        "height": 739,
-        "scrollY": 188,
-        "selector": ".documents-card",
-        "clippedBottom": true
+        "width": 898,
+        "height": 865,
+        "scrollY": 184,
+        "selector": ".replacement-dossier",
+        "clippedBottom": false
       },
-      "width": 626,
-      "height": 739,
+      "width": 898,
+      "height": 865,
+      "previewHeight": 865,
       "files": [
         "documents-desktop.webp",
         "documents-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "22d1c8570adf8a18a58ec0eb99dfe54329ee33521c82f0c3d5a19fd1e1162769"
+      "sha256": "21edd4d71dde947dd8f3653bc49f93f3ba4f456fee2602b7b1c26c2b16e114dd"
     },
     {
       "name": "documents",
       "device": "mobile",
-      "route": "/app/profile",
+      "route": "/app/current-missions?section=documents",
       "viewport": {
         "width": 390,
-        "height": 1100
+        "height": 1617
       },
       "crop": {
-        "x": 14,
+        "x": 35,
         "y": 90,
-        "width": 362,
-        "height": 667,
-        "scrollY": 797,
-        "selector": ".documents-card",
-        "clippedBottom": true
+        "width": 320,
+        "height": 1377,
+        "scrollY": 212,
+        "selector": ".replacement-dossier",
+        "clippedBottom": false
       },
-      "width": 362,
-      "height": 667,
+      "width": 320,
+      "height": 1377,
+      "previewHeight": 848,
       "files": [
         "documents-mobile.webp",
         "documents-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "b33c3e5712d421e1f7a16c6dd95f4ab7a0dc0f3a9c3c48cdeb7bda69a3a8bf8d"
+      "sha256": "09e9c32981d4374f710c22747de4913a3cad2fe583aa1b95c248a2f12cef88a0"
     }
   ]
 }

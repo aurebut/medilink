@@ -10,8 +10,8 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { createReadStream, createWriteStream } from 'fs';
-import { access, mkdir, open, rename, stat, unlink } from 'fs/promises';
+import { constants, createReadStream, createWriteStream } from 'fs';
+import { access, copyFile, mkdir, open, readFile, stat, unlink, writeFile } from 'fs/promises';
 import { dirname, isAbsolute, relative, resolve } from 'path';
 import { Transform } from 'stream';
 import { pipeline } from 'stream/promises';
@@ -266,9 +266,12 @@ export class StorageService {
     const destination = this.localPath(destinationKey);
     await mkdir(dirname(destination), { recursive: true });
     try {
-      await rename(source, destination);
+      // Copy instead of rename: an in-flight upload may still hold an open file
+      // descriptor. It must never retain a writable handle to the final object.
+      await copyFile(source, destination, constants.COPYFILE_EXCL);
+      await unlink(source);
     } catch (error: any) {
-      if (error?.code !== 'ENOENT') throw error;
+      if (!['ENOENT', 'EEXIST'].includes(error?.code)) throw error;
       await access(destination);
     }
     return destinationKey;
@@ -288,6 +291,36 @@ export class StorageService {
     } catch (error: any) {
       if (error?.code !== 'ENOENT') throw error;
     }
+  }
+
+  /** Server-only keys are never exposed as upload targets. */
+  async writeBuffer(key: string, bytes: Buffer, mimeType: string) {
+    if (this.client) {
+      await this.client.send(new PutObjectCommand({
+        Bucket: this.bucket, Key: key, Body: bytes, ContentType: mimeType,
+        ContentLength: bytes.length, IfNoneMatch: '*',
+      }));
+      return;
+    }
+    const target = this.localPath(key);
+    await mkdir(dirname(target), { recursive: true });
+    await writeFile(target, bytes, { flag: 'wx' });
+  }
+
+  async readBuffer(key: string, maxSizeBytes = 10 * 1024 * 1024): Promise<Buffer> {
+    const metadata = await this.objectMetadata(key);
+    if (metadata.sizeBytes > maxSizeBytes) throw new Error('Stored file exceeds attachment size limit.');
+    if (!this.client) return readFile(this.localPath(key));
+    const result = await this.client.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }));
+    if (!result.Body) throw new Error('Stored file is empty.');
+    const chunks: Buffer[] = [];
+    let total = 0;
+    for await (const chunk of result.Body as AsyncIterable<Uint8Array>) {
+      total += chunk.length;
+      if (total > maxSizeBytes) throw new Error('Stored file exceeds attachment size limit.');
+      chunks.push(Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
   }
 
   contentDisposition(fileName?: string, mimeType?: string) {
