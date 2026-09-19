@@ -47,7 +47,7 @@
         "messages-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "30bc74cf908a25827fc522efb1238e135319bab00dbb5ed8595fe1b438453d9e"
+      "sha256": "363e0c15376b348163b2ee0cd06933cb44fab0804d885fe888cc956a38852dd2"
     },
     {
       "name": "messages",
@@ -55,26 +55,26 @@
       "route": "/app/messages?id=c1",
       "viewport": {
         "width": 390,
-        "height": 772
+        "height": 798
       },
       "crop": {
         "x": 0,
         "y": 68,
         "width": 390,
-        "height": 632,
+        "height": 658,
         "scrollY": 0,
         "selector": ".message-layout",
         "clippedBottom": false
       },
       "width": 390,
-      "height": 632,
-      "previewHeight": 632,
+      "height": 658,
+      "previewHeight": 658,
       "files": [
         "messages-mobile.webp",
         "messages-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "439bdb74eeee47c73400e9079838cbb69f375218993b224c029223d110398f3e"
+      "sha256": "b44b2b93fdcd1269978f6f99914ff5112fe2ce2bdc26530fdc1e21e1ae257842"
     },
     {
       "name": "mission",
@@ -86,22 +86,22 @@
       },
       "crop": {
         "x": 293,
-        "y": 361,
+        "y": 301,
         "width": 758,
-        "height": 574,
-        "scrollY": 92,
+        "height": 634,
+        "scrollY": 152,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
       "width": 758,
-      "height": 574,
-      "previewHeight": 574,
+      "height": 634,
+      "previewHeight": 634,
       "files": [
         "mission-desktop.webp",
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "0b6e6c422376797f356ae841ce76d56087a49dce22a9b6ef2dc78a945e30111f"
+      "sha256": "d1e08b9b3a08cfc9572c1a846067955a30f366679246423ff4cf6e03a9042bc2"
     },
     {
       "name": "mission",
@@ -109,26 +109,26 @@
       "route": "/app/current-missions",
       "viewport": {
         "width": 390,
-        "height": 1100
+        "height": 1172
       },
       "crop": {
         "x": 15,
-        "y": 155,
+        "y": 105,
         "width": 360,
-        "height": 840,
-        "scrollY": 435,
+        "height": 962,
+        "scrollY": 485,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
       "width": 360,
-      "height": 840,
-      "previewHeight": 840,
+      "height": 962,
+      "previewHeight": 661,
       "files": [
         "mission-mobile.webp",
         "mission-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "3b6b0f40be183ceeefb9b7dd37eb647f1d7d1fdef596326b914ece1fe08a367e"
+      "sha256": "53f0f297ba8dd022f177a734f4acfbfb204e3d322d7c3c19af00a8f8ee23514c"
     },
     {
       "name": "documents",

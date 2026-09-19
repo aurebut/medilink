@@ -8,7 +8,8 @@ import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { formatCompensation, formatDate, formatDateTime } from '@/lib/format';
 import { candidateContractedArticle, candidateHas, candidateNoun, candidateWithArticle } from '@/lib/grammar';
 import { Alert, Badge, Button, Card, EmptyState, Field, Input, LoadingCard, Textarea } from './ui';
-import { useAuth } from './AuthProvider';
+import { useAuth } from './AuthProvider';
+import { ProfileAvatar } from './ProfileAvatar';
 import { errorMessage } from '@/lib/user-facing';
 
 
@@ -154,6 +155,10 @@ function workflowLabel(kind: WorkflowKind) {
   return labels[kind];
 }
 
+function profileName(profile?: Profile | null) {
+  return [profile?.firstName, profile?.lastName].filter(Boolean).join(' ');
+}
+
 export function MessageCenter({ establishmentId }: { establishmentId?: string }) {
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -236,6 +241,13 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
   const candidate = user?.role === 'CANDIDATE';
   const currentRetrocession = lastProposal?.workflow?.proposal?.compensationMode === 'RETROCESSION';
   const activeCandidateProfile = active?.application?.candidate?.profile;
+  const activeEstablishmentPhoto = active?.establishment?.photos?.find((photo) => photo.isPrimary && photo.url)?.url
+    || active?.establishment?.photos?.find((photo) => photo.url)?.url
+    || active?.establishment?.logoUrl;
+  const activeConversationPhoto = recruiter ? activeCandidateProfile?.avatarUrl : activeEstablishmentPhoto;
+  const activeConversationName = recruiter
+    ? profileName(activeCandidateProfile) || 'Remplaçant'
+    : active?.establishment?.name || 'Établissement';
   const currentStatus = state.invoices
     ? 'Factures disponibles'
     : state.released
@@ -831,7 +843,13 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
             const last = conv.messages?.[0];
             const title = conv.establishment?.name || conv.mission?.title || 'Conversation';
             const preview = last?.body.startsWith(WORKFLOW_PREFIX) ? 'Mise a jour du suivi' : last?.body || 'Aucun message';
-            const initial = title.trim().charAt(0).toUpperCase() || 'M';
+            const avatarProfile = conv.application?.candidate?.profile;
+            const avatarSource = recruiter ? avatarProfile?.avatarUrl : (
+              conv.establishment?.photos?.find((photo) => photo.isPrimary && photo.url)?.url
+              || conv.establishment?.photos?.find((photo) => photo.url)?.url
+              || conv.establishment?.logoUrl
+            );
+            const avatarName = recruiter ? profileName(avatarProfile) || title : title;
             return (
               <button
                 key={conv.id}
@@ -839,7 +857,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
                 aria-current={conv.id === activeId ? 'true' : undefined}
                 onClick={() => setActiveId(conv.id)}
               >
-                <span className="conversation-mobile-avatar" aria-hidden="true">{initial}</span>
+                <ProfileAvatar src={avatarSource} name={avatarName} className={`conversation-photo conversation-mobile-avatar${recruiter ? '' : ' conversation-photo--establishment'}`} decorative />
                 <span className="conversation-mobile-content">
                   <span className="conversation-mobile-head">
                     <strong>{title}</strong>
@@ -877,6 +895,7 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
                   </svg>
                 </button>
               ) : null}
+              {active ? <ProfileAvatar src={activeConversationPhoto} name={activeConversationName} className={`conversation-photo conversation-header-photo${recruiter ? '' : ' conversation-photo--establishment'}`} decorative /> : null}
               <div className="conversation-title-meta">
                 <h2 id={conversationTitleId}>{active?.mission?.title || 'Conversation'}</h2>
                 <div className="conversation-subtitle">{[active?.establishment?.name, active?.mission?.city].filter(Boolean).join(' · ')}</div>
@@ -999,10 +1018,21 @@ export function MessageCenter({ establishmentId }: { establishmentId?: string })
 
               const mine = m.senderUserId === user?.id;
               const system = m.messageType === 'SYSTEM';
-              return (
+              const senderProfile = m.sender?.profile
+                || (m.senderUserId === active?.candidateUserId ? activeCandidateProfile : null)
+                || messages.find((message) => message.senderUserId === m.senderUserId && message.sender?.profile)?.sender?.profile;
+              const senderName = profileName(senderProfile) || (mine ? 'Vous' : active?.establishment?.name || 'Interlocuteur');
+              const bubble = (
                 <div key={m.id} className={`message ${mine ? 'mine' : ''} ${system ? 'system' : ''} ${m.localStatus === 'pending' ? 'pending' : ''}`}>
                   <div>{m.body}</div>
                   <div className="small">{m.localStatus === 'pending' ? 'Envoi...' : formatDateTime(m.createdAt)}</div>
+                </div>
+              );
+              if (system) return bubble;
+              return (
+                <div key={m.id} className={`message-row${mine ? ' mine' : ''}`}>
+                  <ProfileAvatar src={senderProfile?.avatarUrl} name={senderName} className="conversation-photo message-sender-photo" />
+                  {bubble}
                 </div>
               );
             })}

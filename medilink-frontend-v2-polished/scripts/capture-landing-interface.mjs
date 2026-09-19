@@ -16,7 +16,7 @@ function loadPlaywright() {
   throw new Error('Install Playwright or set PLAYWRIGHT_MODULE_PATH to its installed module directory.');
 }
 const { chromium } = loadPlaywright();
-const sharp = require('sharp');
+const sharp = require(process.env.SHARP_MODULE_PATH || require.resolve('sharp', { paths: [path.dirname(require.resolve('next/package.json'))] }));
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = process.env.CAPTURE_OUTPUT_DIR ? path.resolve(process.env.CAPTURE_OUTPUT_DIR) : path.join(root, 'public/landing-assets/interface');
 const base = (process.env.CAPTURE_BASE_URL || process.argv[2] || 'http://localhost:3000').replace(/\/$/, '');
@@ -69,8 +69,12 @@ async function capture(name, device) {
   await subject.waitFor();
   if (name === 'documents') await subject.locator('.rd-document-register .rd-document-row').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
+  await subject.locator('img').evaluateAll(images => Promise.all(images.map(async image => {
+    await image.decode();
+    if (!image.naturalWidth) throw new Error(`Image failed to load: ${image.currentSrc}`);
+  })));
   await page.waitForTimeout(800);
-  if (name === 'documents') {
+  if (name === 'documents' || name === 'mission') {
     // Resize the real viewport to include the native component; never scale or restyle its UI.
     const box = await subject.boundingBox();
     viewport = { ...viewport, height: Math.max(viewport.height, Math.ceil(box.height) + 240) };
@@ -140,9 +144,14 @@ async function capture(name, device) {
   assert.equal(metadata.height, crop.height * 2, `${name}/${device}: crop height fits the browser viewport`);
   const width = Math.round(metadata.width / 2);
   const height = Math.round(metadata.height / 2);
-  // The compact document register fits as one complete screen. Keep every row
-  // and its action visible in the landing preview as well as its enlargement.
-  const previewHeight = height;
+  // Mobile mission previews end after three complete steps, regardless of the
+  // context above them. Enlargement and the document register retain all rows.
+  const previewHeight = name === 'mission' && mobile
+    ? Math.min(height, Math.ceil(await subject.locator('.candidate-current-route-list > div').nth(2).evaluate(element => {
+      const content = element.lastElementChild.getBoundingClientRect();
+      return content.bottom;
+    }) - crop.y + 20))
+    : height;
   const filename = `${name}-${device}`;
   const highDensity = await sharp(png).webp({ lossless: true, effort: 6 }).toBuffer();
   const sha256 = createHash('sha256').update(highDensity).digest('hex');

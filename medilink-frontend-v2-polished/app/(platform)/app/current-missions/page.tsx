@@ -12,6 +12,7 @@ import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
 import { ReplacementDossier } from '@/components/ReplacementDossier';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 
 type MissionStep = {
   key: string;
@@ -398,6 +399,10 @@ function MissionCommandStrip({ row }: { row: MissionRow }) {
 function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSection: MissionSection }) {
   const mission = row.application.mission;
   const establishment = mission?.establishment;
+  const establishmentPhoto = establishment?.photos?.find(photo => photo.isPrimary && photo.url)?.url
+    || establishment?.photos?.find(photo => photo.url)?.url || establishment?.logoUrl;
+  const candidate = row.conversation?.application?.candidate?.profile || row.application.candidate?.profile;
+  const candidateName = [candidate?.firstName, candidate?.lastName].filter(Boolean).join(' ');
   const progress = missionProgress(row.application, row.agreement);
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse à confirmer';
@@ -427,6 +432,25 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
                   <h2>Suivi de mission</h2>
                   <p>De la confirmation au règlement, chaque étape à sa place.</p>
                 </div>
+                {establishmentPhoto || candidateName ? (
+                  <div className="mission-folio-people">
+                    {establishmentPhoto ? (
+                      <div className="mission-folio-place">
+                        <ProfileAvatar src={establishmentPhoto} name={establishment?.name || 'Établissement'} className="mission-folio-place-photo" decorative />
+                        <div>
+                          <strong>{establishment?.name || 'Établissement'}</strong>
+                          {mission?.city || establishment?.city ? <span>{mission?.city || establishment?.city}</span> : null}
+                        </div>
+                      </div>
+                    ) : null}
+                    {candidateName ? (
+                      <div className="mission-folio-person">
+                        <ProfileAvatar src={candidate?.avatarUrl} name={candidateName} decorative />
+                        <div><strong>{candidateName}</strong><span>Remplacement</span></div>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <div className="mission-folio-progress">
                   <strong>{String(progress.filter((step) => step.done).length).padStart(2, '0')}<span> / {String(progress.length).padStart(2, '0')}</span></strong>
                   <span>étapes terminées</span>

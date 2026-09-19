@@ -10,7 +10,7 @@ export function interfacePreview(name: PreviewName, className: string, title: st
   const source = (device: typeof desktop, retina = false) =>
     `/landing-assets/interface/${name}-${device.device}${retina ? '@2x' : ''}.webp?v=${device.sha256.slice(0, 12)}`;
 
-  const previewStyle = name === 'documents' ? ` style="--ml-documents-preview-ratio:${mobile.width}/${mobile.previewHeight}"` : '';
+  const previewStyle = name === 'documents' || name === 'mission' ? ` style="--ml-${name}-preview-ratio:${mobile.width}/${mobile.previewHeight}"` : '';
 
   return `<figure class="${className} ml-interface-preview ml-interface-preview--${name}" aria-label="${title}"${previewStyle}>
     <a class="ml-interface-open" href="${source(desktop, true)}" target="_blank" rel="noopener" data-interface-preview="${name}" aria-label="Voir l’interface : ${title} (agrandir)">

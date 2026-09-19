@@ -7,13 +7,21 @@ export const profile = {
   candidateGender: 'FEMALE', city: 'Paris', country: 'France', medicalStatus: 'DOCTOR',
   specialty: 'Médecine générale', completionScore: 100, experienceYears: 6,
   bio: 'Médecin généraliste remplaçante.', healthVerificationStatus: 'VERIFIED',
+  avatarUrl: '/landing-assets/people/sarah-bernard.webp',
   actsPerformed: [], preferredCities: ['Paris'], mobilityOptions: [], acceptedWeekdays: [],
   acceptedTimeSlots: [], acceptedPracticeSettings: [], acceptedMissionTypes: [],
   preferredDurations: [], refusedSchedules: [], knownSoftware: [], acceptedPatientTypes: [], languages: [],
 };
 export const establishment = {
   id: 'preview-establishment', name: 'Cabinet des Tilleuls', type: 'CABINET',
-  verificationStatus: 'VERIFIED', photos: [],
+  verificationStatus: 'VERIFIED', city: 'Paris', country: 'France',
+  logoUrl: '/landing-assets/people/cabinet-des-tilleuls.webp',
+  photos: [{
+    id: 'preview-establishment-photo', establishmentId: 'preview-establishment',
+    url: '/landing-assets/people/cabinet-des-tilleuls.webp', isPrimary: true, orderIndex: 0,
+    fileName: 'cabinet-des-tilleuls.webp', storageKey: 'fictional/cabinet-des-tilleuls.webp',
+    mimeType: 'image/webp', sizeBytes: 100910, createdAt, updatedAt: createdAt,
+  }],
 };
 export const mission = {
   id: 'preview-mission', title: 'Remplacement en médecine générale',
@@ -43,6 +51,12 @@ export const agreement = {
 };
 const textMessage = (id, senderUserId, body, time) => ({
   id, conversationId: 'c1', senderUserId, body, messageType: 'TEXT',
+  sender: {
+    id: senderUserId,
+    profile: senderUserId === profile.userId ? profile : {
+      firstName: 'Thomas', lastName: 'Martin', avatarUrl: '/landing-assets/people/thomas-martin.webp',
+    },
+  },
   createdAt: `2026-09-16T${time}:00.000Z`, updatedAt: createdAt,
 });
 const workflowMessage = (id, kind, proposal) => ({

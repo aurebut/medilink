@@ -1,0 +1,20 @@
+.avatar {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--brand-line, #d6e0e9);
+  border-radius: 50%;
+  background: var(--brand-frost, #eef4fa);
+  color: var(--brand-primary, #1952a0);
+  font: 400 19px/1 var(--brand-serif, serif);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
