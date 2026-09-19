@@ -124,6 +124,7 @@ export function MultiChoiceField({
   onChange,
   description,
   error,
+  allowCustom = true,
 }: {
   label: string;
   values: string[];
@@ -131,6 +132,7 @@ export function MultiChoiceField({
   onChange: (values: string[]) => void;
   description?: ReactNode;
   error?: ReactNode;
+  allowCustom?: boolean;
 }) {
   const generatedId = useId();
   const controlId = `multi-choice-${generatedId}`;
@@ -175,7 +177,7 @@ export function MultiChoiceField({
       >
         <option value="">Ajouter une option</option>
         {availableOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        <option value={OTHER_VALUE}>Autre</option>
+        {allowCustom ? <option value={OTHER_VALUE}>Autre</option> : null}
       </Select>
       {customOpen ? (
         <div className="custom-choice-row">

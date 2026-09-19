@@ -99,6 +99,19 @@ export const acceptedMissionTypeOptions: ChoiceOption[] = [
   { value: 'AIDE_OP', label: 'Aide opératoire' },
 ];
 
+export const candidateMissionTypeOptions: ChoiceOption[] = [
+  { value: 'REMPLACEMENT_COURTE_DUREE', label: 'Remplacement courte durée' },
+  { value: 'REMPLACEMENT_LONGUE_DUREE', label: 'Remplacement longue durée' },
+];
+
+export function normalizeCandidateMissionTypes(values?: string[]) {
+  // An existing replacement preference did not restrict the duration.
+  const acceptsReplacement = values?.some((value) => value.trim().toUpperCase() === 'REMPLACEMENT');
+  return candidateMissionTypeOptions
+    .filter((option) => acceptsReplacement || values?.includes(option.value))
+    .map((option) => option.value);
+}
+
 export const weekdayOptions: ChoiceOption[] = [
   { value: 'MONDAY', label: 'Lundi' },
   { value: 'TUESDAY', label: 'Mardi' },

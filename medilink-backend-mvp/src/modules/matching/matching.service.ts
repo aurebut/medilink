@@ -512,6 +512,9 @@ export class MatchingService {
     const legacyMap: Record<string, string> = {
       garde: 'GARDE',
       remplacement: 'REMPLACEMENT',
+      // Candidate duration preferences remain compatible with replacement missions.
+      remplacement_courte_duree: 'REMPLACEMENT',
+      remplacement_longue_duree: 'REMPLACEMENT',
       vacation: 'VACATION',
       stage: 'STAGE',
       'aide op': 'AIDE_OP',

@@ -9,22 +9,19 @@ import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, Prog
 import { DocumentSection } from '@/components/DocumentSection';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import {
-  acceptedMissionTypeOptions,
+  candidateMissionTypeOptions,
   actsPerformedOptions,
   additionalTrainingOptions,
   candidateMedicalStatusOptions,
   cityOptions,
   countryOptions,
-  durationOptions,
   hospitalOrFacultyOptions,
   missionActOptions,
   mobilityRangeOptions,
-  mobilityOptions,
+  normalizeCandidateMissionTypes,
   noticeOptions,
   patientTypeOptions,
-  pressureLevelOptions,
   practiceSettingOptions,
-  refusedScheduleOptions,
   softwareOptions,
   specialtyOptions,
   timeSlotOptions,
@@ -63,7 +60,6 @@ type ProfileForm = {
   availabilityNotes?: string | null;
   preferredCities?: string[];
   maxTravelRadiusKm?: number | string | null;
-  mobilityOptions?: string[];
   acceptedWeekdays?: string[];
   acceptedTimeSlots?: string[];
   minimumNoticeHours?: number | string | null;
@@ -72,19 +68,15 @@ type ProfileForm = {
   acceptedPracticeSettings?: string[];
   acceptedMissionTypes?: string[];
   minimumCompensation?: number | string | null;
-  preferredDurations?: string[];
-  refusedSchedules?: string[];
   knownSoftware?: string[];
   acceptedPatientTypes?: string[];
   refusedPatientTypes?: string[];
-  maxPatientsPerDay?: number | string | null;
   parkingRequired?: boolean | null;
   acceptedActs?: string[];
   refusedActs?: string[];
   secretaryRequired?: boolean | null;
   accommodationRequired?: boolean | null;
   fastPaymentImportant?: boolean | null;
-  acceptedPressureLevel?: string | null;
   rpps?: string | null;
 };
 
@@ -199,28 +191,23 @@ export default function ProfilePage() {
       availabilityNotes: form.availabilityNotes || undefined,
       preferredCities: cleanArray(form.preferredCities),
       maxTravelRadiusKm: form.maxTravelRadiusKm === '' || form.maxTravelRadiusKm == null ? undefined : Number(form.maxTravelRadiusKm),
-      mobilityOptions: cleanArray(form.mobilityOptions),
       acceptedWeekdays: cleanArray(form.acceptedWeekdays),
       acceptedTimeSlots: cleanArray(form.acceptedTimeSlots),
       minimumNoticeHours: form.minimumNoticeHours === '' || form.minimumNoticeHours == null ? undefined : Number(form.minimumNoticeHours),
       mobilityRangeType: form.mobilityRangeType || undefined,
       housingRequiredBeyondKm: form.housingRequiredBeyondKm === '' || form.housingRequiredBeyondKm == null ? undefined : Number(form.housingRequiredBeyondKm),
       acceptedPracticeSettings: cleanArray(form.acceptedPracticeSettings),
-      acceptedMissionTypes: cleanArray(form.acceptedMissionTypes),
+      acceptedMissionTypes: normalizeCandidateMissionTypes(form.acceptedMissionTypes),
       minimumCompensation: form.minimumCompensation === '' || form.minimumCompensation == null ? undefined : Number(form.minimumCompensation),
-      preferredDurations: cleanArray(form.preferredDurations),
-      refusedSchedules: cleanArray(form.refusedSchedules),
       knownSoftware: cleanArray(form.knownSoftware),
       acceptedPatientTypes: cleanArray(form.acceptedPatientTypes),
       refusedPatientTypes: cleanArray(form.refusedPatientTypes),
-      maxPatientsPerDay: form.maxPatientsPerDay === '' || form.maxPatientsPerDay == null ? undefined : Number(form.maxPatientsPerDay),
       parkingRequired: form.parkingRequired,
       acceptedActs: cleanArray(form.acceptedActs),
       refusedActs: cleanArray(form.refusedActs),
       secretaryRequired: form.secretaryRequired,
       accommodationRequired: form.accommodationRequired,
       fastPaymentImportant: form.fastPaymentImportant,
-      acceptedPressureLevel: form.acceptedPressureLevel || undefined,
     };
 
     try {
@@ -531,7 +518,6 @@ export default function ProfilePage() {
                       </Field>
                     </div>
 
-                    <MultiChoiceField label="Mobilité" values={safeArray(form.mobilityOptions)} options={mobilityOptions} onChange={(values) => set('mobilityOptions', values)} />
                     <div className="form-row">
                       <SingleChoiceField
                         label="Périmètre de mobilité"
@@ -553,35 +539,16 @@ export default function ProfilePage() {
                     <div className="form-row">
                       <BooleanPreference label="Logement nécessaire" value={form.accommodationRequired} onChange={(value) => set('accommodationRequired', value)} />
                     </div>
-                    <MultiChoiceField label="Types de missions acceptées" values={safeArray(form.acceptedMissionTypes)} options={acceptedMissionTypeOptions} onChange={(values) => set('acceptedMissionTypes', values)} />
-                    <MultiChoiceField label="Durées préférées" values={safeArray(form.preferredDurations)} options={durationOptions} onChange={(values) => set('preferredDurations', values)} />
-                    <MultiChoiceField label="Horaires refusés" values={safeArray(form.refusedSchedules)} options={refusedScheduleOptions} onChange={(values) => set('refusedSchedules', values)} />
+                    <MultiChoiceField label="Types de missions acceptées" values={normalizeCandidateMissionTypes(form.acceptedMissionTypes)} options={candidateMissionTypeOptions} allowCustom={false} onChange={(values) => set('acceptedMissionTypes', values)} />
                     <MultiChoiceField label="Cadres d'exercice acceptés" values={safeArray(form.acceptedPracticeSettings)} options={practiceSettingOptions} onChange={(values) => set('acceptedPracticeSettings', values)} />
                     <MultiChoiceField label="Logiciels déjà utilisés" values={safeArray(form.knownSoftware)} options={softwareOptions} onChange={(values) => set('knownSoftware', values)} />
                     <MultiChoiceField label="Patientèle acceptée" values={safeArray(form.acceptedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('acceptedPatientTypes', values)} />
                     <MultiChoiceField label="Patientèle refusée" values={safeArray(form.refusedPatientTypes)} options={patientTypeOptions} onChange={(values) => set('refusedPatientTypes', values)} />
 
                     <div className="profile-preferences-section">
-                       <h3>Actes et charge de travail</h3>
+                       <h3>Actes</h3>
                        <MultiChoiceField label="Actes acceptés" values={safeArray(form.acceptedActs)} options={missionActOptions} onChange={(values) => set('acceptedActs', values)} />
                        <MultiChoiceField label="Actes refusés" values={safeArray(form.refusedActs)} options={missionActOptions} onChange={(values) => set('refusedActs', values)} />
-                       <div className="form-row">
-                         <Field label="Patients par jour maximum">
-                           <Input
-                             type="number"
-                             min={0}
-                             max={300}
-                             value={form.maxPatientsPerDay ?? ''}
-                             onChange={(event) => set('maxPatientsPerDay', event.target.value)}
-                           />
-                         </Field>
-                         <SingleChoiceField
-                           label="Rythme de travail accepté"
-                           value={form.acceptedPressureLevel || ''}
-                           options={pressureLevelOptions}
-                           onChange={(value) => set('acceptedPressureLevel', value)}
-                         />
-                       </div>
                     </div>
 
                     <div className="form-row">
