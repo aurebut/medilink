@@ -18,6 +18,9 @@ function normalizeRequestedHomeCopy(html, updated) {
   const heroPath = /^ *<ol class="hero-path"[^>]*>[\s\S]*?<\/ol>\r?\n/gm;
   assert.equal([...html.matchAll(heroPath)].length, updated ? 0 : 1, 'requested removal of the three links below the hero photo');
   html = html.replace(heroPath, '');
+  const heroCaption = /^ *<figcaption class="hero-photo-caption"><span>Dates, conditions, transmissions\.<\/span><strong>Un remplacement se prépare dans les détails\.<\/strong><\/figcaption>\r?\n/gm;
+  assert.equal([...html.matchAll(heroCaption)].length, updated ? 0 : 1, 'requested removal of both texts over the hero photo');
+  html = html.replace(heroCaption, '');
   // Approved copy, including the actual mission-step UI replacing the fictional clinical report.
   const replacements = [
     [

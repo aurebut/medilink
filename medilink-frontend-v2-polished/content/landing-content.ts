@@ -20,7 +20,6 @@ export const landingContent = {
           <div class="hero-story">
             <figure class="hero-human-frame">
               <img class="hero-human-photo" src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async">
-              <figcaption class="hero-photo-caption"><span>Dates, conditions, transmissions.</span><strong>Un remplacement se prépare dans les détails.</strong></figcaption>
             </figure>
           </div>
         </div>
