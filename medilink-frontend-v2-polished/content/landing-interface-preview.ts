@@ -16,14 +16,12 @@ export function interfacePreview(name: PreviewName, className: string, title: st
     <a class="ml-interface-open" href="${source(desktop, true)}" target="_blank" rel="noopener" data-interface-preview="${name}" aria-label="Voir l’interface : ${title} (agrandir)">
       <span class="ml-interface-stage">
         <span class="ml-interface-window">
-          <span class="ml-interface-toolbar" aria-hidden="true"><span class="ml-interface-window-dots"><i></i><i></i><i></i></span><span>${title}</span><span class="ml-interface-window-mark">ML</span></span>
           <picture>
             <source media="(max-width: 700px)" srcset="${source(mobile)} 1x, ${source(mobile, true)} 2x" width="${mobile.width}" height="${mobile.height}">
             <img src="${source(desktop)}" srcset="${source(desktop)} 1x, ${source(desktop, true)} 2x" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
           </picture>
         </span>
       </span>
-      <span class="ml-interface-enlarge">${name === 'documents' ? 'Agrandir l’aperçu' : 'Voir l’interface'}<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span>
     </a>
   </figure>`;
 }
