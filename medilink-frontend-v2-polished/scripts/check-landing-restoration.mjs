@@ -178,6 +178,40 @@ function normalizeContributorsPosition(html) {
   assert.ok(html.includes(target), 'contributors: original following section exists');
   return html.replace(markup, '').replace(target, markup + target);
 }
+function normalizePreviewOrder(html) {
+  const pair = /(<section class="ml-continuity ml-continuity--editorial"[^>]*>[\s\S]*?<\/section>)(\s+)(<section class="ml-workspace ml-workspace--editorial"[^>]*>[\s\S]*?<\/section>)/g;
+  assert.equal([...html.matchAll(pair)].length, 1, 'mission overview directly precedes the shared conversation');
+  return html.replace(pair, '$3$2$1');
+}
+function normalizePreviewLayouts(html, updated) {
+  for (const [name, id] of [['workspace', 'communication'], ['continuity', 'continuite']]) {
+    const pattern = new RegExp(`<section class="ml-${name}"[^>]*>[\\s\\S]*?<\\/section>`, 'g');
+    assert.equal([...html.matchAll(pattern)].length, 1, `${id}: one section to compare`);
+    html = html.replace(pattern, markup => {
+      const opening = markup.match(/^<section[^>]*>/)[0];
+      const header = markup.match(/<header\b[^>]*>[\s\S]*?<\/header>/)?.[0];
+      const benefits = markup.match(name === 'workspace'
+        ? /<div class="ml-workspace-benefits">[\s\S]*?<\/div>/
+        : /<ol class="ml-continuity-benefits">[\s\S]*?<\/ol>/)?.[0];
+      const connection = name === 'continuity' ? markup.match(/<p class="ml-continuity-connection">[\s\S]*?<\/p>/)?.[0] : '';
+      const preview = `<!-- requested interface preview: ${id} -->`;
+      assert.ok(header && benefits && markup.includes(preview), `${id}: heading, benefits and preview retained`);
+      if (name === 'continuity') assert.ok(connection, 'mission closing copy retained');
+      if (updated) {
+        assert.ok(markup.indexOf(header) < markup.indexOf(preview), `${id}: heading precedes the preview`);
+        assert.equal(markup.indexOf(benefits) < markup.indexOf(preview), name === 'workspace', `${id}: requested content structure`);
+        if (name === 'workspace') assert.match(markup, /<div class="ml-workspace-copy">/, 'conversation copy grouped beside its preview');
+      }
+      const parts = [header, benefits, connection, preview].filter(Boolean);
+      let remainder = markup;
+      for (const part of parts) remainder = remainder.replace(part, '');
+      assert.equal(remainder.replace(/<[^>]*>/g, '').trim(), '', `${id}: no unaccounted visible copy`);
+      // Compare all retained content verbatim, allowing only wrapper/indentation changes.
+      return opening + '\n' + parts.map(part => part.replace(/^ +/gm, '')).join('\n') + '\n</section>';
+    });
+  }
+  return html;
+}
 function normalizeDocumentsSection(html) {
   assert.equal([...html.matchAll(/\bid="documents"/g)].length, 1, 'documents: exactly one section anchor');
   const section = /<section class="ml-documents" id="documents" aria-labelledby="ml-documents-title">(?:(?!<\/?section\b)[\s\S])*?<\/section>/g;
@@ -238,6 +272,7 @@ for (const [path, file] of Object.entries(pages)) {
       }
     }
     if (path === '/' && tag === 'main') {
+      rendered = normalizePreviewOrder(rendered);
       rendered = normalizeContributorsPosition(rendered);
       rendered = normalizeRequestedHomeCopy(rendered, true);
       expected = normalizeRequestedHomeCopy(expected, false);
@@ -251,6 +286,8 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizeConclusionCopy(expected, false);
       rendered = normalizeEditorialPreviews(rendered, true);
       expected = normalizeEditorialPreviews(expected, false);
+      rendered = normalizePreviewLayouts(rendered, true);
+      expected = normalizePreviewLayouts(expected, false);
       rendered = normalizeDocumentsSection(rendered);
     }
     assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews and documents section`);

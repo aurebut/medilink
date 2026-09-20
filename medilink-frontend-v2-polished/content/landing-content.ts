@@ -104,17 +104,6 @@ export const landingContent = {
       </div>
     </section>
 
-    <section class="ml-workspace ml-workspace--editorial" id="communication" aria-labelledby="ml-workspace-title">
-      <div class="ml-workspace-inner">
-        <header class="ml-workspace-heading">
-          <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Retrouvez les <span class="title-accent">échanges</span> et les <span class="title-accent">points à finaliser</span> avant le premier jour.</h2></div>
-          <p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>
-        </header>
-        ${workspacePreview}
-        <div class="ml-workspace-benefits"><p><span aria-hidden="true">01</span><strong>Reprenez la conversation</strong>Retrouvez les échanges liés à ce remplacement.</p><p><span aria-hidden="true">02</span><strong>Vérifiez les conditions convenues</strong>Dates, horaires et rétrocession restent consultables.</p><p><span aria-hidden="true">03</span><strong>Identifiez ce qui reste à confirmer</strong>Repérez l’étape en cours et la suite à donner.</p></div>
-      </div>
-    </section>
-
     <section class="ml-continuity ml-continuity--editorial" id="continuite" aria-labelledby="continuity-title">
       <div class="ml-continuity-inner">
         <div class="ml-continuity-copy">
@@ -123,15 +112,27 @@ export const landingContent = {
             <h2 id="continuity-title">Pendant le remplacement, savoir <span class="title-accent">où en est la mission.</span></h2>
             <p>Dates confirmées, avancement, documents et rétrocession : retrouvez les étapes de votre remplacement et les informations utiles au même endroit.</p>
           </header>
-          <ol class="ml-continuity-benefits">
+        </div>
+        ${continuityPreview}
+        <ol class="ml-continuity-benefits">
             <li><span aria-hidden="true">01</span><div><h3>Les moments clés</h3><p>De la mission confirmée à la rétrocession, gardez le fil.</p></div></li>
             <li><span aria-hidden="true">02</span><div><h3>La prochaine étape</h3><p>Repérez ce qui est en cours et ce qui reste à finaliser.</p></div></li>
             <li><span aria-hidden="true">03</span><div><h3>Les informations utiles</h3><p>Consultez le brief, les contacts et les conditions convenues.</p></div></li>
-          </ol>
-          <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Pendant le remplacement, savoir où en est la mission.</span></p>
-        </div>
+        </ol>
+        <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Pendant le remplacement, savoir où en est la mission.</span></p>
+      </div>
+    </section>
 
-        ${continuityPreview}
+    <section class="ml-workspace ml-workspace--editorial" id="communication" aria-labelledby="ml-workspace-title">
+      <div class="ml-workspace-inner">
+        <div class="ml-workspace-copy">
+          <header class="ml-workspace-heading">
+            <div><span class="ml-workspace-kicker">La préparation du remplacement</span><h2 id="ml-workspace-title">Retrouvez les <span class="title-accent">échanges</span> et les <span class="title-accent">points à finaliser</span> avant le premier jour.</h2></div>
+            <p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>
+          </header>
+          <div class="ml-workspace-benefits"><p><span aria-hidden="true">01</span><strong>Reprenez la conversation</strong>Retrouvez les échanges liés à ce remplacement.</p><p><span aria-hidden="true">02</span><strong>Vérifiez les conditions convenues</strong>Dates, horaires et rétrocession restent consultables.</p><p><span aria-hidden="true">03</span><strong>Identifiez ce qui reste à confirmer</strong>Repérez l’étape en cours et la suite à donner.</p></div>
+        </div>
+        ${workspacePreview}
       </div>
     </section>
 
