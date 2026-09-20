@@ -10,6 +10,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
+The user subsequently removed the blue background frame behind all three device mockups. Keep `.ml-interface-stage` transparent, without a border, rounded background panel or tinted backdrop shadow on desktop and mobile. Preserve its spacing, the physical laptop/iPhone frames and their own subtle shadows, and the full-screen capture treatment below.
+
 The user subsequently requested that captures fill the mockup screens. The desktop macOS window is now maximized edge to edge: preserve its slim toolbar, remove the blue wallpaper inset, secondary rounded border and floating-window shadow. On mobile, the mission phone height follows the full-width native capture plus its status/home safe areas so profiles and all six steps stay visible without side gutters, cropping or scrolling. The documents capture also fills the screen width without added picture padding. Keep authentic image proportions and no enlargement.
 
 The user subsequently requested a macOS-style window inside each desktop laptop mockup. Above 700px, a slim decorative toolbar with three traffic lights and the MédiLink title sits above the genuine capture, inset into a blue desktop background. Keep the full image's native proportions and bottom alignment by sizing the screen around the window and capture. The window wrapper uses `display: contents` on mobile so the existing phone status, capture and home-indicator flex layout stays intact. The dots are decorative, not controls; previews still cannot enlarge. This supersedes the older prohibition on desktop window decorations.
