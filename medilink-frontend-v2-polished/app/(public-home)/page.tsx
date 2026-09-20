@@ -1,6 +1,7 @@
 import { LandingContent } from '@/components/marketing/LandingContent';
 import { pageMetadata } from '@/lib/seo';
 import './process-art.css';
+import './process-copy.css';
 import './workspace-editorial.css';
 import './continuity-editorial.css';
 import './documents-editorial.css';

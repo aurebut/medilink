@@ -1,0 +1,97 @@
+/* One reading rhythm for all three steps; keep their complete copy and artwork. */
+html body.landing-home:not(.persona-page) .ml-process-copy {
+  min-width: 0;
+  justify-content: flex-start;
+  padding: 40px 32px;
+}
+
+html body.landing-home:not(.persona-page) .ml-process-copy > .ml-process-kicker {
+  margin-bottom: 12px;
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: .12em;
+}
+
+html body.landing-home:not(.persona-page) .ml-process-copy > h3 {
+  font-size: clamp(36px, 3.2vw, 44px);
+  line-height: 1.06;
+  letter-spacing: -.015em;
+}
+
+html body.landing-home:not(.persona-page) .ml-process-copy > :is(.ml-match-intro, .ml-pilot-intro, .ml-close-intro) {
+  width: 100%;
+  max-width: 320px;
+  min-height: 3.1em;
+  margin-top: 14px;
+  color: var(--brand-heading);
+  font-size: 17px;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+html body.landing-home:not(.persona-page) .ml-process-copy > :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  margin-top: 26px;
+}
+
+html body.landing-home:not(.persona-page) :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) > p {
+  margin: 0;
+  padding-block: 13px;
+  border-top: 1px solid var(--brand-line);
+  color: var(--brand-muted);
+  font-size: 15px;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+html body.landing-home:not(.persona-page) :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) > p:last-child {
+  padding-bottom: 0;
+}
+
+html body.landing-home:not(.persona-page) :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--brand-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+html body.landing-home:not(.persona-page) .ml-process-copy > .ml-match-summary {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-color: var(--brand-line);
+  font-size: 14px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+@media (max-width: 850px) {
+  html body.landing-home:not(.persona-page) .ml-process-copy {
+    width: 100%;
+    max-width: 620px;
+    margin-inline: auto;
+    padding: 32px 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  html body.landing-home:not(.persona-page) .ml-process-copy {
+    padding: 28px 18px;
+  }
+
+  html body.landing-home:not(.persona-page) .ml-process-copy > h3 {
+    font-size: 36px;
+  }
+
+  html body.landing-home:not(.persona-page) .ml-process-copy > :is(.ml-match-intro, .ml-pilot-intro, .ml-close-intro) {
+    margin-top: 12px;
+    font-size: 16px;
+  }
+
+  html body.landing-home:not(.persona-page) .ml-process-copy > :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) {
+    margin-top: 22px;
+  }
+}
