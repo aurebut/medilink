@@ -16,7 +16,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   background: transparent;
   box-shadow: none;
 }
-.landing-home .ml-interface-open { position: relative; display: block; color: var(--brand-primary); text-decoration: none; }
+.landing-home .ml-interface-display { position: relative; display: block; color: var(--brand-primary); }
 .landing-home .ml-interface-stage {
   position: relative;
   isolation: isolate;
@@ -40,67 +40,47 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   box-shadow: inset 0 0 0 1px #e3e8ed80, 0 16px 32px -21px #1d354c80;
 }
 .landing-home .ml-device-camera { position: absolute; top: .75cqw; left: calc(50% - .2cqw); width: .4cqw; height: .4cqw; border-radius: 50%; background: #426078; box-shadow: 0 0 0 .13cqw #10161e; }
-.landing-home .ml-device-screen { position: relative; display: block; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
-.landing-home .ml-interface-open picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
+.landing-home .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: var(--ml-screen-ratio); border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
+.landing-home .ml-interface-display picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
 /* Follow the native corners at every rendered size, hiding the page background
    captured outside them without cutting through the application's own border. */
 .landing-home .ml-interface-preview--messages img { border-radius: calc(100% * 22 / var(--ml-capture-width)) / calc(100% * 22 / var(--ml-capture-height)); }
 .landing-home .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-capture-width)) / calc(100% * 14 / var(--ml-capture-height)); }
-.landing-home .ml-interface-open img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.landing-home .ml-interface-display img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+.landing-home .ml-interface-display picture:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: -3px; }
 .landing-home .ml-device-base { position: relative; display: block; width: 100%; height: 1.7cqw; margin-top: -.15cqw; border: 1px solid #a1adbc; border-top-color: #f7fafc; border-radius: .2cqw .2cqw 3cqw 3cqw / .2cqw .2cqw 1.3cqw 1.3cqw; background: linear-gradient(#e6ebef 0%, #cbd3dc 40%, #a2aebb 85%, #8a97a7); box-shadow: 0 .7cqw 1.5cqw -.5cqw #28476633; }
 .landing-home .ml-device-base::before { content: ''; position: absolute; top: -1px; left: 42%; width: 16%; height: .65cqw; border-radius: 0 0 .65cqw .65cqw; background: linear-gradient(#8693a2, #c0c9d3); box-shadow: 0 1px #edf2f6; }
 .landing-home :is(.ml-device-status, .ml-device-home, .ml-device-buttons) { display: none; }
-.landing-home .ml-interface-open:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 5px; border-radius: 24px; }
 .landing-home .ml-interface-preview--wide .ml-interface-stage { padding: 56px 46px 50px; }
-@media (hover: hover) and (pointer: fine) {
-  .landing-home .ml-interface-open { cursor: zoom-in; }
-}
-
-.ml-interface-modal-open { overflow: hidden; }
-.ml-interface-dialog { position: fixed; inset: 0; width: min(1280px, calc(100vw - 48px)); max-width: none; max-height: calc(100dvh - 48px); margin: auto; padding: 0; border: 1px solid var(--brand-line); border-radius: 18px; color: var(--brand-text); background: var(--brand-paper); box-shadow: 0 28px 100px #10274440; }
-.ml-interface-dialog::backdrop { background: #122b4c99; backdrop-filter: blur(5px); }
-.ml-interface-dialog-head { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 20px 24px; border-bottom: 1px solid var(--brand-line); background: var(--brand-paper); }
-.ml-interface-dialog-head h2 { font: 400 26px/1.1 var(--brand-serif); color: var(--brand-heading); }
-.ml-interface-dialog-head p { margin-top: 6px; color: var(--brand-muted); font: 400 10px/1.5 var(--brand-sans); }
-.ml-interface-dialog-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.ml-interface-dialog-actions button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 14px; border: 1px solid var(--brand-line); border-radius: 8px; background: var(--brand-frost); color: var(--brand-primary); font: 500 12px/1.4 var(--brand-sans); cursor: pointer; }
-.ml-interface-dialog-actions button:hover { background: var(--brand-mist); }
-.ml-interface-dialog-actions button:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 2px; }
-.ml-interface-dialog-actions span { font-size: 20px; }
-.ml-interface-dialog-image { overflow: auto; max-height: calc(100dvh - 158px); padding: 20px; overscroll-behavior: contain; }
-.ml-interface-dialog-image img { display: block; width: auto; max-width: 100%; height: auto; max-height: calc(100dvh - 198px); margin: auto; object-fit: contain; }
-.ml-interface-dialog-image.is-zoomed img { width: auto; max-width: none; max-height: none; }
 
 @media (max-width: 700px) {
   html body.landing-home:not(.persona-page) .ml-interface-preview { width: 100%; max-width: 440px; margin-inline: auto; }
   .landing-home .ml-interface-preview .ml-interface-stage { padding: 32px 30px 36px; border-radius: 26px; }
   .landing-home .ml-interface-stage::after { bottom: 22px; inset-inline: 20%; height: 9%; filter: blur(13px); }
   .landing-home .ml-interface-window { --ml-phone-radius: 38px; --ml-phone-inset: 6px; width: min(100%, 280px); padding: var(--ml-phone-inset); border: 1px solid #8a96a4; border-radius: var(--ml-phone-radius); background: linear-gradient(115deg, #566371, #202934 12%, #111922 80%, #62707f); box-shadow: inset 0 0 0 1px #e1e7ed99, inset 0 0 0 3px #1b2530, 12px 22px 36px -20px #233d6266, 0 3px 6px #263d581a; }
-  .landing-home .ml-device-screen { display: flex; flex-direction: column; aspect-ratio: 9 / 19.5; border: 1px solid #101923; border-radius: calc(var(--ml-phone-radius) - var(--ml-phone-inset) - 1px); }
-  .landing-home .ml-device-status { position: relative; flex: 0 0 39px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px 2px; color: #162438; font: 600 10px/1 var(--brand-sans); }
-  .landing-home .ml-device-island { position: absolute; top: 9px; left: 50%; width: 29%; height: 19px; transform: translateX(-50%); border-radius: 20px; background: #10151c; box-shadow: inset 0 0 0 1px #030609; }
+  .landing-home .ml-device-screen { container-type: inline-size; display: flex; flex-direction: column; aspect-ratio: 9 / 19.5; border: 1px solid #101923; border-radius: calc(var(--ml-phone-radius) - var(--ml-phone-inset) - 1px); }
+  .landing-home .ml-device-status { position: relative; flex: 0 0 15cqw; display: flex; align-items: center; justify-content: space-between; padding: 0 7cqw .75cqw; color: #162438; font: 600 3.8cqw/1 var(--brand-sans); }
+  .landing-home .ml-device-island { position: absolute; top: 3.4cqw; left: 50%; width: 29%; height: 7.2cqw; transform: translateX(-50%); border-radius: 20px; background: #10151c; box-shadow: inset 0 0 0 1px #030609; }
   .landing-home .ml-device-island::after { content: ''; position: absolute; right: 8px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 65% 35%, #244b65, #101c2c 65%); box-shadow: 0 0 0 1px #202936; }
-  .landing-home .ml-device-indicators { width: 29px; }
-  .landing-home .ml-device-indicators svg { display: block; width: 100%; height: 10px; }
-  .landing-home .ml-interface-open picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
-  .landing-home .ml-interface-open picture::-webkit-scrollbar { display: none; }
-  .landing-home .ml-interface-open img { width: 100%; max-height: none; }
+  .landing-home .ml-device-indicators { width: 11cqw; }
+  .landing-home .ml-device-indicators svg { display: block; width: 100%; height: 3.8cqw; }
+  .landing-home .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
+  .landing-home .ml-interface-display picture::-webkit-scrollbar { display: none; }
+  .landing-home .ml-interface-display img { width: 100%; max-height: none; }
   .landing-home .ml-interface-preview--messages img { border-radius: 0; }
+  /* The mobile mission capture contains just the six native timeline rows.
+     Fit it completely so every stage is visible without scrolling or zooming. */
+  .landing-home .ml-interface-preview--mission .ml-interface-stage { padding-inline: 20px; }
+  .landing-home .ml-interface-preview--mission .ml-interface-window { width: min(100%, 300px); }
+  .landing-home .ml-interface-preview--mission .ml-device-buttons::after { left: calc(min(100cqw, 300px) + 1px); }
+  .landing-home .ml-interface-preview--mission picture { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .landing-home .ml-interface-preview--mission img { width: auto; max-width: 100%; max-height: 100%; }
   .landing-home .ml-interface-preview--documents picture { padding: 5px 9px 20px; }
   .landing-home .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-mobile-capture-width)) / calc(100% * 14 / var(--ml-mobile-capture-height)); }
-  .landing-home :is(.ml-interface-preview--mission, .ml-interface-preview--documents) .ml-device-screen::after { content: ''; position: absolute; inset: auto 0 22px; height: 16px; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
-  .landing-home .ml-device-home { position: relative; display: block; flex: 0 0 22px; }
-  .landing-home .ml-device-home::after { content: ''; position: absolute; bottom: 7px; left: 34%; width: 32%; height: 3px; border-radius: 5px; background: #192535; }
+  .landing-home .ml-interface-preview--documents .ml-device-screen::after { content: ''; position: absolute; inset: auto 0 7.5cqw; height: 6cqw; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
+  .landing-home .ml-device-home { position: relative; display: block; flex: 0 0 7.5cqw; }
+  .landing-home .ml-device-home::after { content: ''; position: absolute; bottom: 2.65cqw; left: 34%; width: 32%; height: 1.1cqw; border-radius: 5px; background: #192535; }
   .landing-home .ml-device-buttons { position: absolute; display: block; left: -3px; top: 18%; width: 2px; height: 24px; border-radius: 2px 0 0 2px; background: #63707d; box-shadow: 0 36px #63707d, 0 65px #63707d; }
   .landing-home .ml-device-buttons::after { content: ''; position: absolute; top: 39px; left: calc(min(100cqw, 280px) + 1px); width: 2px; height: 45px; border-radius: 0 2px 2px 0; background: #63707d; }
   .landing-home :is(.ml-device-camera, .ml-device-base) { display: none; }
-  .ml-interface-dialog { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); border-radius: 14px; }
-  .ml-interface-dialog-head { align-items: flex-start; gap: 14px; padding: 16px; }
-  .ml-interface-dialog-head h2 { font-size: 22px; }
-  .ml-interface-dialog-head p { font-size: 9px; }
-  .ml-interface-dialog-actions { flex-direction: column-reverse; gap: 5px; }
-  .ml-interface-dialog-actions button { padding: 6px 10px; font-size: 10px; }
-  .ml-interface-dialog-image { padding: 10px; max-height: calc(100dvh - 156px); }
-  .ml-interface-dialog-image img { max-height: none; }
-  .ml-interface-dialog-image.is-zoomed img { width: 780px; }
 }

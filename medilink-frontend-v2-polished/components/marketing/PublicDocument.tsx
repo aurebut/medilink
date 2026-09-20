@@ -5,7 +5,6 @@ import '@/app/brand-tokens.css';
 import Script from 'next/script';
 import { landingShell } from '@/content/landing-shell';
 import { LandingProcess } from './LandingProcess';
-import { LandingInterfaceLightbox } from './LandingInterfaceLightbox';
 
 export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides';
 
@@ -51,6 +50,5 @@ export function PublicDocument({ variant, children }: { variant: PublicVariant; 
     {restored && <Script src="/landing-special.js" strategy="afterInteractive" />}
     <Script src="/landing-main.js" strategy="afterInteractive" />
     {variant === 'home' && <LandingProcess />}
-    {variant === 'home' && <LandingInterfaceLightbox />}
   </body></html>;
 }

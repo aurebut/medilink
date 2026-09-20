@@ -55,26 +55,26 @@
       "route": "/app/messages?id=c1",
       "viewport": {
         "width": 390,
-        "height": 798
+        "height": 897
       },
       "crop": {
         "x": 0,
         "y": 68,
         "width": 390,
-        "height": 658,
+        "height": 757,
         "scrollY": 0,
         "selector": ".message-layout",
         "clippedBottom": false
       },
       "width": 390,
-      "height": 658,
-      "previewHeight": 658,
+      "height": 757,
+      "previewHeight": 757,
       "files": [
         "messages-mobile.webp",
         "messages-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "d593272b8a0e7aab20732c2a545c0eab8247ffbf28131080821ccab2f9cfc27a"
+      "sha256": "f10d68339d71561cc0026cd451ea331b0b42a5179a0a510bf92736535db3eedf"
     },
     {
       "name": "mission",
@@ -112,23 +112,23 @@
         "height": 1198
       },
       "crop": {
-        "x": 15,
-        "y": 105,
-        "width": 360,
-        "height": 988,
+        "x": 27,
+        "y": 463,
+        "width": 336,
+        "height": 618,
         "scrollY": 492,
-        "selector": ".candidate-current-route",
+        "selector": ".candidate-current-route .candidate-current-route-list",
         "clippedBottom": false
       },
-      "width": 360,
-      "height": 988,
-      "previewHeight": 688,
+      "width": 336,
+      "height": 618,
+      "previewHeight": 618,
       "files": [
         "mission-mobile.webp",
         "mission-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "4a4af30302441eb700327607d8beec776cdbebcce0113c0e20a0510eedaf5d6f"
+      "sha256": "33509d18acfcb4c6a18632e6ea1b8d05c7420acf5e222c0b02f87bcb7e0c2059"
     },
     {
       "name": "documents",

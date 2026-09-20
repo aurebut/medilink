@@ -97,6 +97,17 @@ async function capture(name, device) {
       await page.setViewportSize(viewport);
       await page.waitForTimeout(120);
     }
+    if (mobile) {
+      // Match the phone's content area (screen minus native-looking safe areas).
+      // Resize the real app so its composer sits at the bottom; never stretch pixels.
+      const box = await subject.boundingBox();
+      const minimumHeight = Math.ceil(box.width * 1.94);
+      if (box.height < minimumHeight) {
+        viewport = { ...viewport, height: viewport.height + minimumHeight - Math.floor(box.height) };
+        await page.setViewportSize(viewport);
+        await page.waitForTimeout(120);
+      }
+    }
     await page.locator('.messages').evaluate(element => { element.scrollTop = element.scrollHeight; });
     const boundaries = await page.locator('.messages').evaluate(element => {
       const first = element.querySelector('.message:not(.system)').getBoundingClientRect();
@@ -125,6 +136,21 @@ async function capture(name, device) {
     };
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
+  } else if (name === 'mission' && mobile) {
+    // Focus the phone on the complete native timeline. The surrounding profile
+    // overview remains in the app and desktop capture, without shrinking six steps.
+    const timeline = subject.locator('.candidate-current-route-list');
+    const steps = timeline.locator(':scope > div');
+    assert.equal(await steps.count(), 6, 'mission/mobile: all six native steps');
+    await timeline.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
+    const box = await timeline.boundingBox();
+    const padding = 8;
+    const clip = {
+      x: Math.floor(box.x - padding), y: Math.floor(box.y - padding),
+      width: Math.ceil(box.width) + padding * 2, height: Math.ceil(box.height) + padding * 2,
+    };
+    png = await page.screenshot({ clip, animations: 'disabled' });
+    crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector: `${selector} .candidate-current-route-list`, clippedBottom: false };
   } else {
     if (!mobile && name === 'mission') {
       const columns = await subject.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length);
@@ -145,14 +171,8 @@ async function capture(name, device) {
   assert.equal(metadata.height, crop.height * 2, `${name}/${device}: crop height fits the browser viewport`);
   const width = Math.round(metadata.width / 2);
   const height = Math.round(metadata.height / 2);
-  // Mobile mission previews end after three complete steps, regardless of the
-  // context above them. Enlargement and the document register retain all rows.
-  const previewHeight = name === 'mission' && mobile
-    ? Math.min(height, Math.ceil(await subject.locator('.candidate-current-route-list > div').nth(2).evaluate(element => {
-      const content = element.lastElementChild.getBoundingClientRect();
-      return content.bottom;
-    }) - crop.y + 20))
-    : height;
+  // Every selected component is shown completely, including all six mission steps.
+  const previewHeight = height;
   const filename = `${name}-${device}`;
   const highDensity = await sharp(png).webp({ lossless: true, effort: 6 }).toBuffer();
   const sha256 = createHash('sha256').update(highDensity).digest('hex');
