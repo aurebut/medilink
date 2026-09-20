@@ -36,7 +36,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   box-shadow: inset 0 0 0 1px #e3e8ed80, 0 16px 32px -21px #1d354c80;
 }
 .landing-home .ml-device-camera { position: absolute; top: .75cqw; left: calc(50% - .2cqw); width: .4cqw; height: .4cqw; border-radius: 50%; background: #426078; box-shadow: 0 0 0 .13cqw #10161e; }
-.landing-home .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: var(--ml-screen-ratio); border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
+.landing-home .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
 .landing-home .ml-interface-display picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
 /* Desktop captures meet the macOS toolbar with square content corners. */
 .landing-home .ml-interface-display img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -50,14 +50,12 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 
 @media (min-width: 701px) {
   .landing-home :is(.ml-interface-preview--mission, .ml-interface-preview--documents) .ml-interface-stage { padding-inline: 12px; }
-  /* The maximized macOS window fills the physical screen edge to edge.
-     Its content keeps the complete native capture's own proportions. */
-  .landing-home .ml-device-screen {
-    aspect-ratio: auto;
-  }
+  /* All laptops share a 16:10 screen; content never determines the device shape. */
   .landing-home .ml-macos-window {
-    position: relative;
-    display: block;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
     background: var(--brand-paper);
   }
@@ -66,7 +64,8 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 3.2cqw;
+    flex: 0 0 auto;
+    aspect-ratio: 25 / 1;
     border-bottom: 1px solid #d6dfe8;
     background: linear-gradient(#f8fafce8, #eaf0f6e8);
     color: #43556c;
@@ -77,7 +76,9 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   .landing-home .ml-macos-lights > span { width: .9cqw; height: .9cqw; border-radius: 50%; background: #ff6058; box-shadow: inset 0 0 0 1px #00000012; }
   .landing-home .ml-macos-lights > span:nth-child(2) { background: #febc2e; }
   .landing-home .ml-macos-lights > span:nth-child(3) { background: #28c840; }
-  .landing-home .ml-interface-display picture { position: relative; inset: auto; height: auto; aspect-ratio: var(--ml-screen-ratio); }
+  .landing-home .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; }
+  .landing-home .ml-interface-display img { width: 100%; max-height: none; }
+  .landing-home .ml-interface-preview--documents picture { overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #9fadc0 var(--brand-paper); }
 }
 
 @media (max-width: 700px) {

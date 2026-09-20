@@ -24,6 +24,8 @@ const origin = new URL(base).origin;
 const channel = process.env.CAPTURE_BROWSER_CHANNEL || (process.platform === 'win32' ? 'msedge' : undefined);
 const apiPaths = new Set();
 const assets = [];
+// Same 16:10 screen and width/25 macOS toolbar as interface-previews.css.
+const desktopContentHeightRatio = 10 / 16 - 1 / 25;
 const forbiddenRequests = [];
 assert.ok(!(process.env.CAPTURE_ONLY || process.env.CAPTURE_DEVICE) || process.env.CAPTURE_OUTPUT_DIR,
   'Partial review runs require CAPTURE_OUTPUT_DIR so the complete public manifest cannot be replaced.');
@@ -97,7 +99,16 @@ async function capture(name, device) {
       await page.setViewportSize(viewport);
       await page.waitForTimeout(120);
     }
-    if (mobile) {
+    if (!mobile) {
+      // Fill the shared laptop content area by resizing the actual app viewport.
+      const box = await subject.boundingBox();
+      const captureWidth = Math.ceil(box.x + box.width) - Math.floor(box.x);
+      const captureHeight = Math.ceil(box.y + box.height) - Math.floor(box.y);
+      const adjustment = Math.round(captureWidth * desktopContentHeightRatio) - captureHeight;
+      viewport = { ...viewport, height: viewport.height + adjustment };
+      await page.setViewportSize(viewport);
+      await page.waitForTimeout(120);
+    } else {
       // Match the phone's content area (screen minus native-looking safe areas).
       // Resize the real app so its composer sits at the bottom; never stretch pixels.
       const box = await subject.boundingBox();
@@ -159,9 +170,11 @@ async function capture(name, device) {
     await subject.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
     const box = await subject.boundingBox();
     const padding = name === 'mission' ? 20 : 0;
-    const topPadding = name === 'mission' ? 10 : 0;
-    let height = Math.ceil(box.height) + padding + topPadding;
-    const clip = { x: Math.floor(box.x - padding), y: Math.floor(box.y - topPadding), width: Math.ceil(box.width) + padding * 2, height };
+    const width = Math.ceil(box.width) + padding * 2;
+    const height = name === 'mission' ? Math.round(width * desktopContentHeightRatio) : Math.ceil(box.height);
+    assert.ok(height >= Math.ceil(box.height), `${name}/${device}: the full native component fits the capture`);
+    const topPadding = name === 'mission' ? Math.floor((height - box.height) / 2) : 0;
+    const clip = { x: Math.floor(box.x - padding), y: Math.floor(box.y - topPadding), width, height };
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: height < box.height };
   }

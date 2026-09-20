@@ -28,26 +28,26 @@
       "route": "/app/messages?id=c1",
       "viewport": {
         "width": 1440,
-        "height": 851
+        "height": 853
       },
       "crop": {
         "x": 276,
         "y": 175,
         "width": 1132,
-        "height": 660,
+        "height": 662,
         "scrollY": 0,
         "selector": ".message-layout",
         "clippedBottom": false
       },
       "width": 1132,
-      "height": 660,
-      "previewHeight": 660,
+      "height": 662,
+      "previewHeight": 662,
       "files": [
         "messages-desktop.webp",
         "messages-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "bd9c4bfc59826065110dd47324c8e3e64c4f77f0d68bcbbf0424246b752eefc2"
+      "sha256": "7a25df82b39056ae323a50440723d1f4d55412d5fd558006e42684d5ff5c3c35"
     },
     {
       "name": "messages",
@@ -86,22 +86,22 @@
       },
       "crop": {
         "x": 349,
-        "y": 340,
+        "y": 347,
         "width": 1146,
-        "height": 694,
+        "height": 670,
         "scrollY": 134,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
       "width": 1146,
-      "height": 694,
-      "previewHeight": 694,
+      "height": 670,
+      "previewHeight": 670,
       "files": [
         "mission-desktop.webp",
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "5f7727f19b1085ce4bc214c88ace61737d2f9d2bafdf70fdcf975071b54e2f49"
+      "sha256": "104f5ae2d4bfebcf222dab8562f79d7c546d382d7ee41f9553ffbeae401b6871"
     },
     {
       "name": "mission",

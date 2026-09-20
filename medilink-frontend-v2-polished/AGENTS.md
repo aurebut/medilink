@@ -10,6 +10,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
+The user subsequently requested identical proportions for all desktop computers. All three laptop screens now use a fixed 16:10 ratio, including a macOS toolbar with a 25:1 width/height ratio. Never derive the physical screen ratio from capture dimensions. Native desktop messages are captured using a matching real viewport height; the complete mission route uses tighter blank outer margins. Long documents scroll inside the fixed screen, including by keyboard, without zoom or image distortion. Preserve the enlarged desktop widths and all phone layouts. This supersedes earlier capture-dependent laptop heights.
+
 The user subsequently requested moderately larger desktop mockups in the continuity and shared-documents sections. Their mirrored two-column grids use a 1200px maximum, a 64px desktop gap and 58% of the available column space for the preview; desktop preview side padding is 12px. This increases the large-screen captures by about 15% while retaining readable copy. Preserve existing tablet stacking, all phone dimensions, and the messages mockup size.
 
 The user subsequently shortened the continuity section by removing “Quand vous en avez besoin.” from its heading and repeated closing line. Keep “où en est la mission.” highlighted with the shared `.title-accent` brand blue in its existing h2, consistent with the other landing headings.
