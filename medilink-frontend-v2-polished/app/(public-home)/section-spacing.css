@@ -21,7 +21,7 @@ body.landing-home:not(.persona-page) main > .cta-band {
   margin-block: 0;
 }
 
-/* One fine divider at each section boundary, including the hero and inset CTA. */
+/* Fine dividers between sections, with an open transition from hero to process. */
 body.landing-home:not(.persona-page) main > :is(
   .ml-process,
   .ml-testimonials,
@@ -30,7 +30,7 @@ body.landing-home:not(.persona-page) main > :is(
   .ml-documents,
   .audiences
 )::after,
-body.landing-home:not(.persona-page) main > :is(.ml-process, .faq)::before {
+body.landing-home:not(.persona-page) main > .faq::before {
   content: '';
   display: block;
   max-width: 1100px;
@@ -38,8 +38,8 @@ body.landing-home:not(.persona-page) main > :is(.ml-process, .faq)::before {
   border-top: 1px solid #d8dde2;
 }
 
-/* Place these dividers outside the hero and CTA's existing decorative layers. */
-body.landing-home:not(.persona-page) main > :is(.ml-process, .faq)::before {
+/* Place this divider outside the CTA's existing decorative layers. */
+body.landing-home:not(.persona-page) main > .faq::before {
   margin-block: 0 var(--landing-divider-space);
 }
 
