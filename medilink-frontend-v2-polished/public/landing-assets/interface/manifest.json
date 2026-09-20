@@ -86,7 +86,7 @@
       },
       "crop": {
         "x": 349,
-        "y": 347,
+        "y": 352,
         "width": 1146,
         "height": 670,
         "scrollY": 134,
@@ -101,7 +101,7 @@
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "795f32a832323dad33e0587f6e6354c680b1cbad8130a1f787a9140f7016fe69"
+      "sha256": "9a1dc33f06cc32259b3d096d6c171478bd9434a2fd8795857a80ed82603e8723"
     },
     {
       "name": "mission",

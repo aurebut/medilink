@@ -183,8 +183,13 @@ async function capture(name, device) {
     const width = Math.ceil(box.width) + padding * 2;
     const height = name === 'mission' ? Math.round(width * desktopContentHeightRatio) : Math.ceil(box.height);
     assert.ok(height >= Math.ceil(box.height), `${name}/${device}: the full native component fits the capture`);
-    const topPadding = name === 'mission' ? Math.floor((height - box.height) / 2) : 0;
-    const clip = { x: Math.floor(box.x - padding), y: Math.floor(box.y - topPadding), width, height };
+    // The route's outer section divider is not part of the mission interface.
+    // Start below it so it cannot double the laptop toolbar's own separator.
+    const topBorder = name === 'mission'
+      ? await subject.evaluate(element => parseFloat(getComputedStyle(element).borderTopWidth) || 0)
+      : 0;
+    const top = name === 'mission' ? Math.ceil(box.y + topBorder) : Math.floor(box.y);
+    const clip = { x: Math.floor(box.x - padding), y: top, width, height };
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: height < box.height };
   }
