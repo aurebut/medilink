@@ -59,15 +59,6 @@ html body.landing-home:not(.persona-page) :is(.ml-match-audience, .ml-pilot-expl
   line-height: 1.5;
 }
 
-html body.landing-home:not(.persona-page) .ml-process-copy > .ml-match-summary {
-  margin-top: 24px;
-  padding-top: 18px;
-  border-color: var(--brand-line);
-  font-size: 14px;
-  line-height: 1.7;
-  text-wrap: pretty;
-}
-
 @media (max-width: 850px) {
   html body.landing-home:not(.persona-page) .ml-process-copy {
     width: 100%;

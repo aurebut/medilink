@@ -157,7 +157,6 @@ html body.landing-home:not(.persona-page) .ml-tab-fill { border-radius: 12px; }
 .ml-match-copy .ml-match-audience { display: grid; gap: 16px; width: 100%; margin-top: 26px; }
 .ml-match-audience p { margin: 0; color: #526474; font: 400 15px/1.7 var(--sans); text-wrap: pretty; }
 .ml-match-audience strong { color: #284158; font-weight: 600; }
-.ml-match-copy > .ml-match-summary { margin-top: 24px; padding-top: 18px; border-top: 1px solid #e2e5e8; color: #384653; font: 400 14px/1.65 var(--sans); text-wrap: pretty; }
 #ml-panel-criteria > .ml-process-art { align-self: center; }
 @media (max-width: 480px) {
   .ml-process-copy.ml-match-copy { padding: 24px 18px; }

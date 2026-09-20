@@ -60,7 +60,6 @@ export const landingContent = {
               <p><strong>Remplaçant :</strong> indiquez vos disponibilités et vos préférences.</p>
               <p><strong>Établissement :</strong> décrivez votre besoin et vos critères d’exercice.</p>
             </div>
-            <p class="ml-match-summary">Les mêmes dates <em>ne suffisent pas toujours.</em> Le lieu, les horaires, le logiciel utilisé ou l’organisation du cabinet comptent aussi. MédiLink compare les critères renseignés par chacun pour vous aider à choisir avec qui travailler.</p>
           </div>
           ${processIllustrations.criteria}
         </div>
