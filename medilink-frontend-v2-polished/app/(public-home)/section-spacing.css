@@ -17,9 +17,9 @@ body.landing-home:not(.persona-page) main > :is(
 }
 
 @media (min-width: 851px) {
-  /* Add 35px to the existing 18px gap below the process navigation. */
+  /* Add 25px to the existing 18px gap below the process navigation. */
   body.landing-home:not(.persona-page) .ml-process-nav {
-    margin-bottom: 53px;
+    margin-bottom: 43px;
   }
 }
 
