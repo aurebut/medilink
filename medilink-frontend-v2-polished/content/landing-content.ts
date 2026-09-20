@@ -30,7 +30,7 @@ export const landingContent = {
       <div class="ml-process-inner">
         <header class="ml-process-head">
           <span class="ml-process-kicker">Vos critères comme point de départ</span>
-          <h2 id="ml-process-title">Gérez chaque mission simplement, <span class="title-accent">avant</span>, <span class="title-accent">pendant</span> et <span class="title-accent">après</span> le remplacement.</h2>
+          <h2 id="ml-process-title">Gérez chaque mission au même endroit, sans vous éparpiller, <span class="title-accent">avant</span>, <span class="title-accent">pendant</span> et <span class="title-accent">après</span> le remplacement.</h2>
         </header>
         <div class="ml-process-nav">
           <div class="ml-process-tabs" role="tablist" aria-label="Les trois étapes du remplacement">
