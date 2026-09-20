@@ -6,6 +6,8 @@ import { agreementLabel, agreementNextStep, conversationForApplication, latestAg
 import { formatCompensation, formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateConversationPath } from '@/lib/mission-links';
+import { missionProgress } from '@/lib/mission-progress';
+import type { ReplacementDossierData } from '@/lib/replacement-dossier';
 import { getDepartmentLabel, getEquipmentLabel, getSecretaryTypeLabel, getSectorLabel, getSoftwareLabel } from '@/lib/profile-options';
 import type { Application, Conversation, Mission, MissionAgreement } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
@@ -13,17 +15,6 @@ import { Alert, Button, EmptyState, Input, LinkButton, LoadingCard, PageHeader }
 import { errorMessage } from '@/lib/user-facing';
 import { ReplacementDossier } from '@/components/ReplacementDossier';
 import { ProfileAvatar } from '@/components/ProfileAvatar';
-
-type MissionStep = {
-  key: string;
-  label: string;
-  helper: string;
-  status: string;
-  dateLabel?: string;
-
-  active: boolean;
-  done: boolean;
-};
 
 type MissionRow = {
   application: Application;
@@ -91,67 +82,6 @@ function missionDateRange(application: Application, agreement?: MissionAgreement
     primary: formatDate(start),
     secondary: end ? `Fin ${formatDate(end)}` : 'Fin à confirmer',
   };
-}
-
-function missionProgress(application: Application, agreement?: MissionAgreement | null): MissionStep[] {
-  const status = agreement?.status;
-  const start = startDateTime(application, agreement);
-  const end = endDateTime(application, agreement);
-  const now = new Date();
-  const confirmed = application.status === 'ACCEPTED' || Boolean(agreement);
-  const active = Boolean(start && end && now >= start && now <= end);
-  const scheduleStarted = Boolean(start && now >= start);
-  const scheduleEnded = Boolean(end && now > end);
-  const completed = Boolean(status === 'COMPLETED' || status === 'PAYMENT_RELEASED' || agreement?.completedAt);
-  const paymentReleased = Boolean(status === 'PAYMENT_RELEASED' || agreement?.payment?.releasedAt);
-  const paymentSecured = Boolean(status === 'FUNDS_SECURED' || status === 'COMPLETED' || paymentReleased || agreement?.payment?.securedAt);
-  const isRetrocession =
-    agreement?.compensationMode === 'RETROCESSION'
-    || application.mission?.compensationMode === 'RETROCESSION';
-
-  const startDate = missionStart(application, agreement);
-
-  const endDate = missionEnd(application, agreement);
-
-  const startLabel = startDate ? formatDate(startDate) : 'Date à confirmer';
-
-  const endLabel = endDate ? formatDate(endDate) : 'Date à confirmer';
-
-  return [
-    { key: 'confirmed', label: 'Mission confirmée', helper: 'La mission est validée avec l’établissement.', status: confirmed ? 'Validé' : 'À confirmer', active: confirmed && !scheduleStarted, done: confirmed },
-    { key: 'started', label: 'Début de mission', helper: scheduleStarted ? 'La mission a démarré selon le planning confirmé.' : 'Cette étape se validera au début de la mission.', status: scheduleStarted ? 'Démarrée' : 'À venir', dateLabel: startLabel, active: confirmed && !scheduleStarted, done: scheduleStarted },
-    { key: 'ended', label: 'Fin de mission', helper: scheduleEnded ? 'La date de fin de mission est passée.' : 'Cette étape se validera à la date de fin de mission.', status: scheduleEnded ? 'Terminée' : 'À venir', dateLabel: endLabel, active: active, done: scheduleEnded },
-    { key: 'documents', label: 'Documents de mission', helper: 'Déposer les fichiers générés pendant la mission.', status: scheduleEnded ? 'À finaliser' : scheduleStarted ? 'À préparer' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    { key: 'completed', label: 'Validation de mission', helper: completed ? 'La mission a été validée.' : scheduleEnded ? 'La mission est terminée, en attente de validation.' : 'Cette étape suivra la fin de mission et les documents.', status: completed ? 'Validée' : scheduleEnded ? 'À valider' : 'À venir', active: scheduleEnded && !completed, done: completed },
-    {
-      key: 'payment',
-      label: isRetrocession ? 'Rétrocession' : 'Règlement',
-      helper: isRetrocession
-        ? paymentReleased
-          ? 'La rétrocession déclarée a été validée.'
-          : paymentSecured
-            ? 'La mission est confirmée. Le règlement reste à suivre entre les parties.'
-            : 'Les conditions de rétrocession restent à confirmer.'
-        : paymentReleased
-          ? 'Le paiement candidat est libéré.'
-          : paymentSecured
-            ? 'Paiement sécurisé, libération après validation.'
-            : 'Paiement en attente de confirmation.',
-      status: isRetrocession
-        ? paymentReleased
-          ? 'Validée'
-          : paymentSecured
-            ? 'Mission confirmée'
-            : 'À confirmer'
-        : paymentReleased
-          ? 'Libéré'
-          : paymentSecured
-            ? 'Sécurisé'
-            : 'En attente',
-      active: completed && !paymentReleased,
-      done: paymentReleased,
-    },
-  ];
 }
 
 function missionSortValue(row: MissionRow) {
@@ -403,7 +333,37 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
     || establishment?.photos?.find(photo => photo.url)?.url || establishment?.logoUrl;
   const candidate = row.conversation?.application?.candidate?.profile || row.application.candidate?.profile;
   const candidateName = [candidate?.firstName, candidate?.lastName].filter(Boolean).join(' ');
-  const progress = missionProgress(row.application, row.agreement);
+  const dossierPath = `/applications/${row.application.id}/dossier`;
+  const [dossierState, setDossierState] = useState<{ path: string; data: ReplacementDossierData | null; loading: boolean }>({ path: dossierPath, data: null, loading: true });
+  useEffect(() => {
+    if (activeSection !== 'pilotage') return;
+    let active = true;
+    setDossierState({ path: dossierPath, data: null, loading: true });
+    const update = (data: ReplacementDossierData) => {
+      if (active) setDossierState({ path: dossierPath, data, loading: false });
+    };
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return;
+      void api.reload<ReplacementDossierData>(dossierPath).then(update).catch(() => {
+        if (active) setDossierState({ path: dossierPath, data: null, loading: false });
+      });
+    };
+    const unsubscribe = subscribeApiCache<ReplacementDossierData>(dossierPath, update);
+    refresh();
+    const timer = window.setInterval(refresh, 15_000);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      active = false;
+      unsubscribe();
+      window.clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [activeSection, dossierPath]);
+  const dossier = dossierState.path === dossierPath ? dossierState.data : null;
+  const dossierLoading = dossierState.path !== dossierPath || dossierState.loading;
+  const progress = missionProgress(row.application, row.agreement, dossier, dossierLoading);
   const address = establishmentAddress(mission);
   const hasAddress = address !== 'Adresse à confirmer';
   const detailItems = [
@@ -417,7 +377,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
     { label: 'Logement', value: mission?.accommodationProvided ? 'Fourni' : null },
   ].filter((item) => item.value);
 
-  const nextStep = row.agreement ? agreementNextStep(row.agreement.status) : 'Échanger avec l’établissement pour confirmer les derniers détails.';
+  const nextStep = progress.find(step => step.active)?.nextAction || 'Toutes les étapes sont terminées.';
   return (
     <section className="candidate-current-detail candidate-current-unified mission-folio">
       {activeSection === 'pilotage' ? <MissionCommandStrip row={row} /> : null}
@@ -428,9 +388,9 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
             <section className="candidate-current-route mission-folio-route" aria-label="Suivi de mission">
               <div className="candidate-current-route-head">
                 <div className="mission-folio-intro">
-                  <span>Le déroulement</span>
+                  <span>Votre remplacement</span>
                   <h2>Suivi de mission</h2>
-                  <p>De la confirmation au règlement, chaque étape à sa place.</p>
+                  <p>Vos documents, votre mission, votre rétrocession. Un seul fil.</p>
                 </div>
                 {establishmentPhoto || candidateName ? (
                   <div className="mission-folio-people">
@@ -461,9 +421,9 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
                   <p>{nextStep}</p>
                 </div>
               </div>
-              <div className="candidate-current-route-list">
+              <div className="candidate-current-route-list" aria-busy={dossierLoading}>
                 {progress.map((step, index) => (
-                  <div key={step.key} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
+                  <div key={step.key} data-mission-step={step.key} aria-current={step.active ? 'step' : undefined} className={`${step.done ? 'done' : ''} ${step.active ? 'active' : ''}`}>
                     <span aria-hidden="true">{step.done ? '' : String(index + 1).padStart(2, '0')}</span>
                     <div>
                       <div className="candidate-current-route-title">

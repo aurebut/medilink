@@ -101,7 +101,7 @@
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "104f5ae2d4bfebcf222dab8562f79d7c546d382d7ee41f9553ffbeae401b6871"
+      "sha256": "e871fff4b9ffcc3df84c1ba850baa5cbed2b52ac5c42e74991b5fd8fb3f6d828"
     },
     {
       "name": "mission",
@@ -113,22 +113,22 @@
       },
       "crop": {
         "x": 27,
-        "y": 333,
+        "y": 355,
         "width": 336,
-        "height": 650,
-        "scrollY": 266,
+        "height": 628,
+        "scrollY": 244,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
       "width": 336,
-      "height": 650,
-      "previewHeight": 650,
+      "height": 628,
+      "previewHeight": 628,
       "files": [
         "mission-mobile.webp",
         "mission-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "36f94919a4ad4ea4b94fa87be3715b4922ac837c2cea66b2a86c7dee0bfa3da3"
+      "sha256": "d12134e11b04f3446bfa54e037b50739c87e0da90d3f4c1d04a2402b22620378"
     },
     {
       "name": "documents",

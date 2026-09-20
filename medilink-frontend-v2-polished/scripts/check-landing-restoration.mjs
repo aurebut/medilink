@@ -33,11 +33,11 @@ function normalizeRequestedHomeCopy(html, updated) {
     ],
     [
       "<h3>L’activité du remplacement</h3><p>Consultez les consultations réalisées au fil de la mission.</p>",
-      "<h3>Les étapes du remplacement</h3><p>Retrouvez la confirmation, le début et la fin de la mission.</p>"
+      "<h3>Les moments clés</h3><p>De la mission confirmée à la rétrocession, gardez le fil.</p>"
     ],
     [
       "<h3>Les points à reprendre</h3><p>Repérez les résultats attendus et les situations qui nécessitent un suivi.</p>",
-      "<h3>La prochaine étape</h3><p>Repérez les documents à préparer et ce qui reste à valider.</p>"
+      "<h3>Le dossier et ses envois</h3><p>Retrouvez les documents préparés et leur transmission à l’Ordre.</p>"
     ],
     [
       "<h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p>",

@@ -122,7 +122,23 @@ export const replacementDossier = {
   })),
   deliveries: [],
 };
-export function fixtureResponse(path, method = 'GET') {
+// The mission overview illustrates a later moment than the document-preparation
+// preview: a fictional signed copy and letter have been sent, without Ordre approval.
+export const missionTrackingDossier = {
+  ...replacementDossier,
+  documents: [
+    ...replacementDossier.documents,
+    { id: 'preview-signed-contract', kind: 'SIGNED_CONTRACT', fileName: 'Contrat_signe.pdf', source: 'UPLOADED', mimeType: 'application/pdf', sizeBytes: 85000, status: 'READY', version: 1, revision: 1, createdAt },
+    { id: 'preview-order-letter', kind: 'DECLARATION', fileName: 'Courrier_Ordre.pdf', source: 'GENERATED', mimeType: 'application/pdf', sizeBytes: 85000, status: 'READY', version: 1, revision: 1, createdAt },
+  ],
+  deliveries: [{
+    id: 'preview-order-delivery', recipientType: 'ORDER', recipientName: 'Conseil départemental de Paris',
+    recipientEmail: 'conseil-demo@example.test', status: 'SENT',
+    documentIds: ['preview-signed-contract', 'preview-order-letter'],
+    createdAt: '2026-09-11T09:00:00.000Z', sentAt: '2026-09-11T09:00:02.000Z',
+  }],
+};
+export function fixtureResponse(path, method = 'GET', scenario) {
   if (path === '/conversations/events') return { eventStream: true };
   if (method === 'POST' && path === '/conversations/c1/read') return { data: {} };
   if (method !== 'GET') return null;
@@ -132,7 +148,7 @@ export function fixtureResponse(path, method = 'GET') {
     '/notifications': [], '/conversations': [conversation], '/conversations/c1/messages': messages,
     '/me/dashboard': { profile, documents, applications: [application], conversations: [conversation], notifications: [] },
     '/missions': { items: [mission], total: 1, limit: 50, offset: 0 },
-    '/applications/preview-application/dossier': replacementDossier,
+    '/applications/preview-application/dossier': scenario === 'mission' ? missionTrackingDossier : replacementDossier,
   }[path];
   return data === undefined ? null : { data };
 }

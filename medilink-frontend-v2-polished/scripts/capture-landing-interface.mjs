@@ -47,7 +47,7 @@ async function capture(name, device) {
     const url = new URL(route.request().url());
     if (url.pathname.startsWith('/api/') || url.port === '4000') {
       const endpoint = url.pathname.replace(/^\/api/, '');
-      const result = fixtureResponse(endpoint, route.request().method());
+      const result = fixtureResponse(endpoint, route.request().method(), name);
       apiPaths.add(endpoint);
       if (!result) {
         forbiddenRequests.push(`${route.request().method()} ${endpoint}`);
@@ -72,6 +72,7 @@ async function capture(name, device) {
   const selector = name === 'messages' ? '.message-layout' : name === 'mission' ? '.candidate-current-route' : '.replacement-dossier';
   const subject = page.locator(selector);
   await subject.waitFor();
+  if (name === 'mission') await subject.locator('[data-mission-step="order"].done').waitFor();
   if (name === 'documents') await subject.locator('.rd-document-register .rd-document-row').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
   await subject.locator('img').evaluateAll(images => Promise.all(images.map(async image => {
@@ -150,10 +151,10 @@ async function capture(name, device) {
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
   } else if (name === 'mission' && mobile) {
-    // The native mobile layout keeps a compact identity header and all six steps.
+    // The native mobile layout keeps both identities and all five key milestones.
     const timeline = subject.locator('.candidate-current-route-list');
     const steps = timeline.locator(':scope > div');
-    assert.equal(await steps.count(), 6, 'mission/mobile: all six native steps');
+    assert.equal(await steps.count(), 5, 'mission/mobile: all five native milestones');
     await subject.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
     const box = await subject.boundingBox();
     const padding = 8;
@@ -192,7 +193,7 @@ async function capture(name, device) {
   assert.equal(metadata.height, crop.height * 2, `${name}/${device}: crop height fits the browser viewport`);
   const width = Math.round(metadata.width / 2);
   const height = Math.round(metadata.height / 2);
-  // Every selected component is shown completely, including all six mission steps.
+  // Every selected component is shown completely, including all mission milestones.
   const previewHeight = height;
   const filename = `${name}-${device}`;
   const highDensity = await sharp(png).webp({ lossless: true, effort: 6 }).toBuffer();
