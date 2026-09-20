@@ -52,6 +52,44 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 .landing-home .ml-device-base::before { content: ''; position: absolute; top: -1px; left: 42%; width: 16%; height: .65cqw; border-radius: 0 0 .65cqw .65cqw; background: linear-gradient(#8693a2, #c0c9d3); box-shadow: 0 1px #edf2f6; }
 .landing-home :is(.ml-device-status, .ml-device-home, .ml-device-buttons) { display: none; }
 .landing-home .ml-interface-preview--wide .ml-interface-stage { padding: 56px 46px 50px; }
+.landing-home .ml-macos-window { display: contents; }
+.landing-home .ml-macos-toolbar { display: none; }
+
+@media (min-width: 701px) {
+  /* A separate macOS-style window sits inside the physical laptop screen.
+     Its content keeps the complete native capture's own proportions. */
+  .landing-home .ml-device-screen {
+    aspect-ratio: auto;
+    padding: 1.5cqw;
+    background: radial-gradient(ellipse at 95% 100%, #d7e8f6, transparent 65%), radial-gradient(ellipse at 5% 0%, #87b3da, transparent 60%), linear-gradient(135deg, #427bb8, #1952a0 55%, #9ebfdf);
+  }
+  .landing-home .ml-macos-window {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border: 1px solid #ffffffa6;
+    border-radius: .9cqw;
+    background: var(--brand-paper);
+    box-shadow: 0 .8cqw 2cqw -.5cqw #102b5c66, 0 0 0 1px #16386726;
+  }
+  .landing-home .ml-macos-toolbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3.2cqw;
+    border-bottom: 1px solid #d6dfe8;
+    background: linear-gradient(#f8fafce8, #eaf0f6e8);
+    color: #43556c;
+    font: 600 1.2cqw/1 var(--brand-sans);
+    letter-spacing: .01em;
+  }
+  .landing-home .ml-macos-lights { position: absolute; left: 1.15cqw; display: flex; gap: .55cqw; }
+  .landing-home .ml-macos-lights > span { width: .9cqw; height: .9cqw; border-radius: 50%; background: #ff6058; box-shadow: inset 0 0 0 1px #00000012; }
+  .landing-home .ml-macos-lights > span:nth-child(2) { background: #febc2e; }
+  .landing-home .ml-macos-lights > span:nth-child(3) { background: #28c840; }
+  .landing-home .ml-interface-display picture { position: relative; inset: auto; height: auto; aspect-ratio: var(--ml-screen-ratio); }
+}
 
 @media (max-width: 700px) {
   html body.landing-home:not(.persona-page) .ml-interface-preview { width: 100%; max-width: 440px; margin-inline: auto; }
@@ -68,8 +106,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   .landing-home .ml-interface-display picture::-webkit-scrollbar { display: none; }
   .landing-home .ml-interface-display img { width: 100%; max-height: none; }
   .landing-home .ml-interface-preview--messages img { border-radius: 0; }
-  /* The mobile mission capture contains just the six native timeline rows.
-     Fit it completely so every stage is visible without scrolling or zooming. */
+  /* Fit the native compact mission header and six steps completely in the phone. */
   .landing-home .ml-interface-preview--mission .ml-interface-stage { padding-inline: 20px; }
   .landing-home .ml-interface-preview--mission .ml-interface-window { width: min(100%, 300px); }
   .landing-home .ml-interface-preview--mission .ml-device-buttons::after { left: calc(min(100cqw, 300px) + 1px); }

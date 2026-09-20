@@ -593,29 +593,34 @@
   .workspace-design .mission-folio-command .candidate-command-main p { font-size: 12px; line-height: 1.6; }
   .workspace-design .mission-folio-command .candidate-command-stat strong { font-size: 14px; }
   .workspace-design .mission-folio-command .candidate-command-stat small { font-size: 11px; line-height: 1.5; }
-  .workspace-design .mission-folio-route { grid-template-columns: 1fr; gap: 28px; margin-top: 26px; padding-top: 26px; }
-  .workspace-design .mission-folio-route .candidate-current-route-head { grid-template-columns: minmax(0, 1fr) 75px; gap: 18px; }
-  .workspace-design .mission-folio-intro h2 { font-size: 32px; margin: 8px 0 10px; }
-  .workspace-design .mission-folio-route .mission-folio-intro p { font-size: 11px; }
-  .workspace-design .mission-folio-progress { padding-top: 25px; }
-  .workspace-design .mission-folio-people { grid-column: 1 / -1; grid-row: 2; gap: 12px; }
-  .workspace-design .mission-folio-place { grid-template-columns: 104px minmax(0, 1fr); align-items: center; gap: 12px; }
-  .workspace-design .mission-folio-place-photo { width: 104px; height: 74px; border-radius: 7px; }
-  .workspace-design .mission-folio-person > span { width: 44px; height: 44px; }
+  .workspace-design .mission-folio-route { grid-template-columns: 1fr; gap: 14px; margin-top: 26px; padding-top: 16px; }
+  .workspace-design .mission-folio-route .candidate-current-route-head { grid-template-columns: minmax(0, 1fr) 80px; gap: 12px; }
+  .workspace-design .mission-folio-intro h2 { font-size: 26px; margin: 6px 0; }
+  .workspace-design .mission-folio-route .mission-folio-intro p { display: none; }
+  .workspace-design .mission-folio-progress { padding-top: 0; }
+  /* A compact identity row keeps the people and place alongside the full journey. */
+  .workspace-design .mission-folio-people { grid-column: 1 / -1; grid-row: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: center; }
+  .workspace-design .mission-folio-place { grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 8px; }
+  .workspace-design .mission-folio-place-photo { width: 46px; height: 46px; border-radius: 7px; }
+  .workspace-design .mission-folio-person { gap: 8px; }
+  .workspace-design .mission-folio-person > span { width: 36px; height: 36px; flex: 0 0 36px; }
+  .workspace-design .mission-folio-people strong { font-size: 11px; }
+  .workspace-design :is(.mission-folio-place, .mission-folio-person) > div > span { font-size: 9px; }
   .workspace-design .mission-folio-progress { grid-column: 2; grid-row: 1; }
-  .workspace-design .mission-folio-progress > strong { font-size: 38px; }
-  .workspace-design .mission-folio-progress > strong > span { font-size: 15px; }
+  .workspace-design .mission-folio-progress > strong { font-size: 32px; }
+  .workspace-design .mission-folio-progress > strong > span { font-size: 13px; }
   .workspace-design .mission-folio-progress > span { display: block; font-size: 9px; line-height: 1.4; }
-  .workspace-design .mission-folio-progress-track { margin-top: 10px; }
-  .workspace-design .mission-folio-next { grid-column: 1 / -1; grid-template-columns: auto 1fr; gap: 12px; align-items: baseline; padding-top: 14px; }
+  .workspace-design .mission-folio-progress-track { margin-top: 8px; }
+  .workspace-design .mission-folio-next { grid-column: 1 / -1; grid-template-columns: auto 1fr; gap: 8px; align-items: baseline; padding-top: 10px; }
   .workspace-design .mission-folio-route .mission-folio-next p { max-width: none; font-size: 11px; }
-  .workspace-design .mission-folio-route .candidate-current-route-list > div { grid-template-columns: 26px minmax(0, 1fr); gap: 14px; padding-bottom: 25px; }
-  .workspace-design .mission-folio-route .candidate-current-route-list > div > span { width: 26px; height: 26px; }
-  .workspace-design .mission-folio-route .candidate-current-route-list > div::before { left: 12px; top: 31px; }
-  .workspace-design .mission-folio-route .candidate-current-route-title { align-items: flex-start; min-height: 26px; flex-wrap: wrap; gap: 3px 10px; }
+  .workspace-design .mission-folio-route .candidate-current-route-list > div { grid-template-columns: 24px minmax(0, 1fr); gap: 10px; padding-bottom: 12px; }
+  .workspace-design .mission-folio-route .candidate-current-route-list > div > span { width: 24px; height: 24px; }
+  .workspace-design .mission-folio-route .candidate-current-route-list > div::before { left: 11px; top: 29px; }
+  .workspace-design .mission-folio-route .candidate-current-route-title { align-items: center; min-height: 24px; flex-wrap: wrap; gap: 2px 8px; }
   .workspace-design .mission-folio-route .candidate-current-route-title strong { font-size: 15px; }
-  .workspace-design .mission-folio-route .candidate-current-route-title small { padding-top: 4px; font-size: 10px; }
-  .workspace-design .mission-folio-route .candidate-current-route-list p { font-size: 12px; }
+  .workspace-design .mission-folio-route .candidate-current-route-title small { padding-top: 0; font-size: 10px; }
+  .workspace-design .mission-folio-route .candidate-current-route-list p { font-size: 12px; line-height: 1.45; }
+  .workspace-design .mission-folio-route .candidate-current-route-date { margin-top: 4px; }
 
   .workspace-design .documents-card.card { padding: 24px 20px; border-radius: 16px; }
   .workspace-design .documents-hero { display: grid; grid-template-columns: minmax(0, 1fr) 70px; gap: 8px 18px; padding-bottom: 24px; }

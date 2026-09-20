@@ -137,20 +137,19 @@ async function capture(name, device) {
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
   } else if (name === 'mission' && mobile) {
-    // Focus the phone on the complete native timeline. The surrounding profile
-    // overview remains in the app and desktop capture, without shrinking six steps.
+    // The native mobile layout keeps a compact identity header and all six steps.
     const timeline = subject.locator('.candidate-current-route-list');
     const steps = timeline.locator(':scope > div');
     assert.equal(await steps.count(), 6, 'mission/mobile: all six native steps');
-    await timeline.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
-    const box = await timeline.boundingBox();
+    await subject.evaluate(element => window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY - 90, behavior: 'instant' }));
+    const box = await subject.boundingBox();
     const padding = 8;
     const clip = {
       x: Math.floor(box.x - padding), y: Math.floor(box.y - padding),
       width: Math.ceil(box.width) + padding * 2, height: Math.ceil(box.height) + padding * 2,
     };
     png = await page.screenshot({ clip, animations: 'disabled' });
-    crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector: `${selector} .candidate-current-route-list`, clippedBottom: false };
+    crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
   } else {
     if (!mobile && name === 'mission') {
       const columns = await subject.evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length);
