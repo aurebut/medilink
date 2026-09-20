@@ -1,9 +1,34 @@
+/* Preserve the complete promise with a quieter, balanced typographic hierarchy. */
+html body.landing-home:not(.persona-page) .hero--structured h1 {
+  max-width: 840px;
+  font-size: clamp(40px, 4.4vw, 60px);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+html body.landing-home:not(.persona-page) .hero--structured h1 > em {
+  margin-top: 10px;
+  font-size: .8em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
 /* Keep an even frame around the photo after removing the three links below it. */
 .hero--structured .hero-story {
   padding: 8px;
 }
 
 @media (max-width: 640px) {
+  html body.landing-home:not(.persona-page) .hero--structured h1 {
+    max-width: 520px;
+    font-size: clamp(32px, 8.6vw, 40px);
+  }
+
+  html body.landing-home:not(.persona-page) .hero--structured h1 > em {
+    margin-top: 8px;
+    font-size: .86em;
+  }
+
   .hero--structured .hero-story {
     padding: 6px;
   }

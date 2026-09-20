@@ -10,6 +10,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
+The user subsequently requested a smaller, more elegant homepage hero heading while preserving its complete wording. `hero-frame.css` sets a responsive 60px desktop maximum and a quieter italic continuation at 80% of the main size, with balanced wrapping. Mobile uses 32–40px and an 86% continuation for legibility. Keep the exact copy, Instrument Serif treatment and brand-blue accents on “avec” and “pour”; scope these rules to the homepage and keep them in its versioned stylesheet.
+
+The user subsequently requested less rounded progress navigation for Matchez / Pilotez / Concluez. The versioned homepage CSS gives the navigation a 10px radius, each step a 6px radius, and the moving fill a straight edge (zero radius, clipped by its step). Keep this treatment on desktop and mobile, preserving the blue palette, numbered badges, timing, pause/reduced-motion behavior and keyboard/touch navigation.
+
 The user subsequently requested identical proportions for all desktop computers. All three laptop screens now use a fixed 16:10 ratio, including a macOS toolbar with a 25:1 width/height ratio. Never derive the physical screen ratio from capture dimensions. Native desktop messages are captured using a matching real viewport height; the complete mission route uses tighter blank outer margins. Long documents scroll inside the fixed screen, including by keyboard, without zoom or image distortion. Preserve the enlarged desktop widths and all phone layouts. This supersedes earlier capture-dependent laptop heights.
 
 The user subsequently requested moderately larger desktop mockups in the continuity and shared-documents sections. Their mirrored two-column grids use a 1200px maximum, a 64px desktop gap and 58% of the available column space for the preview; desktop preview side padding is 12px. This increases the large-screen captures by about 15% while retaining readable copy. Preserve existing tablet stacking, all phone dimensions, and the messages mockup size.

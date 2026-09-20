@@ -1,3 +1,8 @@
+/* Keep the step navigation and its progress fill closer to the editorial geometry. */
+html body.landing-home:not(.persona-page) .ml-process-nav { border-radius: 10px; }
+html body.landing-home:not(.persona-page) .ml-process-tab { border-radius: 6px; }
+html body.landing-home:not(.persona-page) .ml-tab-fill { border-radius: 0; }
+
 /* Versioned with the page. The revision scope also overrides any cached v1 public CSS. */
 .ml-process-art.ml-process-art--v2 {
   --v2-ink: #152342;
