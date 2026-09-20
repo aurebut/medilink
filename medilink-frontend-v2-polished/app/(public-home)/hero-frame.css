@@ -1,3 +1,8 @@
+/* The hero background already fades into the page; remove the legacy ivory overlay. */
+html body.landing-home:not(.persona-page) .hero--structured::after {
+  content: none;
+}
+
 /* Set the complete promise as one composed headline, with emphasis only on avec / pour. */
 html body.landing-home:not(.persona-page) .hero--structured h1 {
   max-width: 740px;
