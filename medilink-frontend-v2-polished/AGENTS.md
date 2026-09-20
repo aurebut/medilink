@@ -10,6 +10,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
+The user subsequently shortened the continuity section by removing “Quand vous en avez besoin.” from its heading and repeated closing line. Keep “où en est la mission.” highlighted with the shared `.title-accent` brand blue in its existing h2, consistent with the other landing headings.
+
+The user subsequently requested square interface corners inside desktop mockups, especially below the macOS toolbar. The native desktop message layout and replacement dossier now have zero outer border radius above 700px; regenerate their genuine desktop captures after changes. Do not reapply rounded clipping to desktop capture images. Preserve the physical device screen/case rounding, internal controls/photos, and all mobile styling/assets. This supersedes the source-sized desktop capture corner treatment below.
+
 The user subsequently removed the blue background frame behind all three device mockups. Keep `.ml-interface-stage` transparent, without a border, rounded background panel or tinted backdrop shadow on desktop and mobile. Preserve its spacing, the physical laptop/iPhone frames and their own subtle shadows, and the full-screen capture treatment below.
 
 The user subsequently requested that captures fill the mockup screens. The desktop macOS window is now maximized edge to edge: preserve its slim toolbar, remove the blue wallpaper inset, secondary rounded border and floating-window shadow. On mobile, the mission phone height follows the full-width native capture plus its status/home safe areas so profiles and all six steps stay visible without side gutters, cropping or scrolling. The documents capture also fills the screen width without added picture padding. Keep authentic image proportions and no enlargement.

@@ -56,8 +56,12 @@ function normalizeRequestedHomeCopy(html, updated) {
       "<p>Chaque remplacement possède son dossier : messages, documents et conditions confirmées.</p>"
     ],
     [
+      '<h2 id="continuity-title">Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></h2>',
+      '<h2 id="continuity-title">Pendant le remplacement, savoir où en est la mission.</h2>'
+    ],
+    [
       "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
-      "<span>Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></span>"
+      "<span>Pendant le remplacement, savoir où en est la mission.</span>"
     ]
   ];
   for (const [before, after] of replacements) {

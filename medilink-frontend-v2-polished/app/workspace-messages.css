@@ -7,6 +7,9 @@
   background: var(--brand-paper);
   box-shadow: var(--brand-shadow);
 }
+@media (min-width: 701px) {
+  .workspace-design .message-layout.message-layout--editorial { border-radius: 0; }
+}
 .workspace-design .message-layout--editorial .card.conversation-list {
   padding: 30px 20px 20px;
   background: var(--brand-frost);

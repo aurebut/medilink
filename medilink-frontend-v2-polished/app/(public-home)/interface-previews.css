@@ -38,10 +38,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 .landing-home .ml-device-camera { position: absolute; top: .75cqw; left: calc(50% - .2cqw); width: .4cqw; height: .4cqw; border-radius: 50%; background: #426078; box-shadow: 0 0 0 .13cqw #10161e; }
 .landing-home .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: var(--ml-screen-ratio); border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
 .landing-home .ml-interface-display picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
-/* Follow the native corners at every rendered size, hiding the page background
-   captured outside them without cutting through the application's own border. */
-.landing-home .ml-interface-preview--messages img { border-radius: calc(100% * 22 / var(--ml-capture-width)) / calc(100% * 22 / var(--ml-capture-height)); }
-.landing-home .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-capture-width)) / calc(100% * 14 / var(--ml-capture-height)); }
+/* Desktop captures meet the macOS toolbar with square content corners. */
 .landing-home .ml-interface-display img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
 .landing-home .ml-interface-display picture:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: -3px; }
 .landing-home .ml-device-base { position: relative; display: block; width: 100%; height: 1.7cqw; margin-top: -.15cqw; border: 1px solid #a1adbc; border-top-color: #f7fafc; border-radius: .2cqw .2cqw 3cqw 3cqw / .2cqw .2cqw 1.3cqw 1.3cqw; background: linear-gradient(#e6ebef 0%, #cbd3dc 40%, #a2aebb 85%, #8a97a7); box-shadow: 0 .7cqw 1.5cqw -.5cqw #28476633; }

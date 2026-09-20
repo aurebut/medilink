@@ -12,6 +12,9 @@
   min-width: 0;
   container-type: inline-size;
 }
+@media (min-width: 701px) {
+  .replacement-dossier { border-radius: 0; }
+}
 .replacement-dossier *, .replacement-dossier *::before, .replacement-dossier *::after { box-sizing: border-box; }
 .replacement-dossier h2, .replacement-dossier h3, .replacement-dossier h4, .replacement-dossier p { margin: 0; }
 .replacement-dossier button { font-family: inherit; }
