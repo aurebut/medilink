@@ -113,22 +113,22 @@
       },
       "crop": {
         "x": 27,
-        "y": 301,
+        "y": 333,
         "width": 336,
-        "height": 682,
-        "scrollY": 298,
+        "height": 650,
+        "scrollY": 266,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
       "width": 336,
-      "height": 682,
-      "previewHeight": 682,
+      "height": 650,
+      "previewHeight": 650,
       "files": [
         "mission-mobile.webp",
         "mission-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "87268f983d9e979f86ae9ff264217d0bcb6934743d78b74f390c974cb9c7d338"
+      "sha256": "36f94919a4ad4ea4b94fa87be3715b4922ac837c2cea66b2a86c7dee0bfa3da3"
     },
     {
       "name": "documents",

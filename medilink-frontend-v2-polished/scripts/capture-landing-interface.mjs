@@ -26,6 +26,8 @@ const apiPaths = new Set();
 const assets = [];
 // Same 16:10 screen and width/25 macOS toolbar as interface-previews.css.
 const desktopContentHeightRatio = 10 / 16 - 1 / 25;
+// Shared 9:19.5 phone screen minus its 15% status and 7.5% home areas.
+const mobileContentHeightRatio = 19.5 / 9 - .15 - .075;
 const forbiddenRequests = [];
 assert.ok(!(process.env.CAPTURE_ONLY || process.env.CAPTURE_DEVICE) || process.env.CAPTURE_OUTPUT_DIR,
   'Partial review runs require CAPTURE_OUTPUT_DIR so the complete public manifest cannot be replaced.');
@@ -112,7 +114,7 @@ async function capture(name, device) {
       // Match the phone's content area (screen minus native-looking safe areas).
       // Resize the real app so its composer sits at the bottom; never stretch pixels.
       const box = await subject.boundingBox();
-      const minimumHeight = Math.ceil(box.width * 1.94);
+      const minimumHeight = Math.floor(box.width * mobileContentHeightRatio);
       if (box.height < minimumHeight) {
         viewport = { ...viewport, height: viewport.height + minimumHeight - Math.floor(box.height) };
         await page.setViewportSize(viewport);
@@ -159,6 +161,13 @@ async function capture(name, device) {
       x: Math.floor(box.x - padding), y: Math.floor(box.y - padding),
       width: Math.ceil(box.width) + padding * 2, height: Math.ceil(box.height) + padding * 2,
     };
+    assert.ok(clip.height <= clip.width * mobileContentHeightRatio,
+      'mission/mobile: the complete native capture fits the common phone without clipping');
+    assert.equal(await subject.locator('.mission-folio-people img').count(), 2,
+      'mission/mobile: preserve the establishment photo and replacement portrait');
+    for (const step of await steps.all()) {
+      assert.ok(await step.isVisible(), 'mission/mobile: each native step stays visible');
+    }
     png = await page.screenshot({ clip, animations: 'disabled' });
     crop = { ...clip, scrollY: await page.evaluate(() => window.scrollY), selector, clippedBottom: false };
   } else {
