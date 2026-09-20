@@ -51,9 +51,16 @@ html body.landing-home:not(.persona-page) .nav-mobile-panel { background: var(--
 
 /* The diagrams share the same slate and mist-blue palette;
    the scene clocks use matching light-blue surface endpoints. */
-html body.landing-home:not(.persona-page) :is(.ml-process-nav, .ml-process-panel, .ml-testimonial, .ml-dossier) {
+html body.landing-home:not(.persona-page) :is(.ml-process-nav, .ml-testimonial, .ml-dossier) {
   background: var(--editorial-paper);
   border-color: var(--surface-line);
+}
+/* Let the copy sit on the page while each animation keeps its own framed surface. */
+html body.landing-home:not(.persona-page) .ml-process-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 /* Reset the legacy green hover, including sticky hover on touch screens.
    An inactive hovered tab must remain distinct from the selected step. */
