@@ -37,7 +37,7 @@ function normalizeRequestedHomeCopy(html, updated) {
     ],
     [
       "<h3>Les points à reprendre</h3><p>Repérez les résultats attendus et les situations qui nécessitent un suivi.</p>",
-      "<h3>Le dossier et ses envois</h3><p>Retrouvez les documents préparés et leur transmission à l’Ordre.</p>"
+      "<h3>La prochaine étape</h3><p>Repérez ce qui est en cours et ce qui reste à finaliser.</p>"
     ],
     [
       "<h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p>",

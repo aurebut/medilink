@@ -72,7 +72,7 @@ async function capture(name, device) {
   const selector = name === 'messages' ? '.message-layout' : name === 'mission' ? '.candidate-current-route' : '.replacement-dossier';
   const subject = page.locator(selector);
   await subject.waitFor();
-  if (name === 'mission') await subject.locator('[data-mission-step="order"].done').waitFor();
+  if (name === 'mission') await subject.locator('[data-mission-step="documents"].done').waitFor();
   if (name === 'documents') await subject.locator('.rd-document-register .rd-document-row').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
   await subject.locator('img').evaluateAll(images => Promise.all(images.map(async image => {

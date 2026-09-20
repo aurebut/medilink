@@ -49,9 +49,6 @@ export function missionProgress(
   const sent = prepared && [contract!, letter!].every(document =>
     sentDeliveries.some(delivery => delivery.documentIds.includes(document.id)));
   const latestAttempt = [...orderDeliveries].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
-  const latestSent = [...sentDeliveries].filter(delivery =>
-    delivery.documentIds.some(id => id === contract?.id || id === letter?.id))
-    .sort((a, b) => (b.sentAt || b.createdAt).localeCompare(a.sentAt || a.createdAt))[0];
   const unknownStatus = dossierLoading ? 'Chargement…' : 'À consulter';
   const sending = !sent && latestAttempt?.status === 'SENDING';
   const failed = !sent && latestAttempt?.status === 'FAILED';
@@ -64,33 +61,37 @@ export function missionProgress(
       nextAction: 'Confirmer les conditions ensemble.', done: confirmed, active: false,
     },
     {
-      key: 'documents', label: 'Dossier de remplacement',
-      helper: prepared ? 'Contrat et courrier à l’Ordre préparés.' : 'Réunissez le contrat et le courrier à l’Ordre.',
-      status: !dossier ? unknownStatus : prepared ? 'Préparé' : 'À préparer',
-      nextAction: dossier ? 'Préparer le dossier du remplacement.' : 'Consulter le dossier du remplacement.',
-      done: prepared, active: false,
-    },
-    {
-      key: 'order', label: 'Documents à l’Ordre',
-      helper: sent ? 'Envoi enregistré dans votre dossier.'
+      key: 'documents', label: 'Documents de mission',
+      helper: !dossier ? 'Retrouvez les pièces dans le dossier partagé.'
+        : sent ? 'Les documents ont été envoyés à l’Ordre.'
         : sending ? 'L’envoi des documents est en cours.'
         : failed ? 'Relancez l’envoi depuis votre dossier.'
         : sentDeliveries.length ? 'Certaines pièces actuelles restent à transmettre.'
-        : 'Transmettez les pièces au Conseil départemental.',
-      status: !dossier ? unknownStatus : sent ? 'Envoyés' : sending ? 'En cours' : failed ? 'À relancer' : sentDeliveries.length ? 'À compléter' : 'À transmettre',
-      dateLabel: sent && latestSent ? formatDate(latestSent.sentAt || latestSent.createdAt) : undefined,
-      nextAction: sent ? 'Consulter l’historique des envois.' : sending ? 'Suivre l’envoi dans le dossier.' : 'Transmettre les documents à l’Ordre.',
+        : prepared ? 'Le dossier est prêt à être transmis à l’Ordre.'
+        : 'Préparez le dossier du remplacement.',
+      status: !dossier ? unknownStatus : sent ? 'Transmis' : sending ? 'En cours' : failed ? 'À relancer' : sentDeliveries.length ? 'À compléter' : prepared ? 'À transmettre' : 'À préparer',
+      nextAction: !dossier ? 'Consulter le dossier du remplacement.'
+        : sending ? 'Suivre l’envoi dans le dossier.'
+        : prepared ? 'Transmettre les documents à l’Ordre.' : 'Préparer le dossier du remplacement.',
       done: sent, active: false,
     },
     {
       key: 'replacement', label: 'Le remplacement',
-      helper: completed ? 'La fin de mission a été validée.'
-        : ended ? 'La période est terminée, la fin reste à valider.'
+      helper: completed ? 'Le remplacement est terminé.'
+        : ended ? 'La période prévue est terminée.'
         : started ? 'Brief, contacts et échanges à portée de main.'
         : 'Retrouvez les informations avant le premier jour.',
-      status: completed ? 'Validé' : ended ? 'À valider' : started ? 'En cours' : 'À venir',
+      status: completed ? 'Terminé' : ended ? 'Période écoulée' : started ? 'En cours' : 'À venir',
       dateLabel: startDate && endDate ? `${formatDate(startDate)} — ${formatDate(endDate)}` : 'Dates à confirmer',
-      nextAction: started || ended ? 'Valider la fin du remplacement.' : 'Préparer le premier jour.',
+      nextAction: started ? 'Faire le point pendant la mission.' : 'Préparer le premier jour.',
+      done: ended || completed, active: false,
+    },
+    {
+      key: 'completed', label: 'Fin de mission',
+      helper: completed ? 'La fin de mission a été validée.' : 'Un point ensemble pour clôturer la mission.',
+      status: completed ? 'Validée' : ended ? 'À valider' : 'À venir',
+      dateLabel: endDate ? formatDate(endDate) : 'Date à confirmer',
+      nextAction: 'Valider la fin du remplacement.',
       done: completed, active: false,
     },
     {

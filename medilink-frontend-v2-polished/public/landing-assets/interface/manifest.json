@@ -101,7 +101,7 @@
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "e871fff4b9ffcc3df84c1ba850baa5cbed2b52ac5c42e74991b5fd8fb3f6d828"
+      "sha256": "795f32a832323dad33e0587f6e6354c680b1cbad8130a1f787a9140f7016fe69"
     },
     {
       "name": "mission",
@@ -128,7 +128,7 @@
         "mission-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "d12134e11b04f3446bfa54e037b50739c87e0da90d3f4c1d04a2402b22620378"
+      "sha256": "ee16cc606e94f71be481405eb06fd0f224063512304379c300d283a0f7bafb88"
     },
     {
       "name": "documents",

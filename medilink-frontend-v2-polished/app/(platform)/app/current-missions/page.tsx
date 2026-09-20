@@ -390,7 +390,7 @@ function MissionControlPanel({ row, activeSection }: { row: MissionRow; activeSe
                 <div className="mission-folio-intro">
                   <span>Votre remplacement</span>
                   <h2>Suivi de mission</h2>
-                  <p>Vos documents, votre mission, votre rétrocession. Un seul fil.</p>
+                  <p>De l’accord au règlement, votre mission en un coup d’œil.</p>
                 </div>
                 {establishmentPhoto || candidateName ? (
                   <div className="mission-folio-people">

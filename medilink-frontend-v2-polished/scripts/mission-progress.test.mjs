@@ -57,12 +57,12 @@ async function active(key) {
 
 try {
   await load();
-  await check('documents', 'Préparé', true);
-  await check('order', 'Envoyés', true);
+  await check('documents', 'Transmis', true);
   await check('replacement', 'En cours');
+  await check('completed', 'À venir');
   await check('payment', 'À suivre');
   await active('replacement');
-  assert.equal(await page.locator('[data-mission-step]').count(), 5);
+  assert.deepEqual(await page.locator('[data-mission-step]').evaluateAll(rows => rows.map(row => row.dataset.missionStep)), ['confirmed', 'documents', 'replacement', 'completed', 'payment']);
   assert.equal(await page.locator('.mission-folio-people img').count(), 2);
 
   // Updating documents, then returning to the overview must reload the actual dossier.
@@ -72,7 +72,6 @@ try {
   await page.getByRole('tab', { name: "Vue d'ensemble", exact: true }).click();
   await page.locator('.candidate-current-route-list[aria-busy="false"]').waitFor();
   await check('documents', 'À préparer');
-  await check('order', 'À transmettre');
   await active('documents');
 
   for (const [deliveryStatus, label] of [['FAILED', 'À relancer'], ['SENDING', 'En cours']]) {
@@ -80,46 +79,46 @@ try {
     dossier.deliveries[0].status = deliveryStatus;
     dossier.deliveries[0].sentAt = null;
     await load();
-    await check('order', label);
-    await active('order');
+    await check('documents', label);
+    await active('documents');
   }
 
   dossier = structuredClone(missionTrackingDossier);
   dossier.deliveries[0].recipientType = 'COUNTERPART';
   await load();
-  await check('order', 'À transmettre');
+  await check('documents', 'À transmettre');
 
   dossier = structuredClone(missionTrackingDossier);
   dossier.deliveries[0].documentIds = ['preview-signed-contract'];
   await load();
-  await check('order', 'À compléter');
+  await check('documents', 'À compléter');
 
   dossier = structuredClone(missionTrackingDossier);
   dossier.revision += 1;
   await load();
-  await check('documents', 'À préparer');
-  await check('order', 'À compléter');
+  await check('documents', 'À compléter');
 
   dossier = structuredClone(missionTrackingDossier);
   dossier.missingFields = ['holderName'];
   await load();
-  await check('documents', 'À préparer');
-  await check('order', 'À compléter');
+  await check('documents', 'À compléter');
 
   unavailable = true;
   await load();
   await check('documents', 'À consulter');
-  await check('order', 'À consulter');
   unavailable = false;
   dossier = structuredClone(missionTrackingDossier);
 
   await page.clock.setFixedTime(new Date('2026-09-20T10:00:00.000Z'));
   await load();
-  await check('replacement', 'À valider');
+  await check('replacement', 'Période écoulée', true);
+  await check('completed', 'À valider');
+  await active('completed');
   await check('payment', 'À suivre');
   currentAgreement.status = 'COMPLETED';
   await load();
-  await check('replacement', 'Validé', true);
+  await check('replacement', 'Terminé', true);
+  await check('completed', 'Validée', true);
   await check('payment', 'À suivre');
   await active('payment');
   currentAgreement.status = 'PAYMENT_RELEASED';
@@ -148,7 +147,7 @@ try {
     await page.setViewportSize({ width, height: 1100 });
     await load();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `no horizontal overflow at ${width}px`);
-    await check('order', 'Envoyés', true);
+    await check('documents', 'Transmis', true);
     await check('payment', 'À suivre');
   }
   assert.deepEqual(errors, []);
