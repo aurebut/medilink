@@ -19,3 +19,18 @@ body.landing-home:not(.persona-page) main > :is(
 body.landing-home:not(.persona-page) main > .cta-band {
   margin-block: 0;
 }
+
+/* Continue the mission section's fine divider through the following sections. */
+body.landing-home:not(.persona-page) main > :is(.ml-workspace, .ml-documents, .audiences)::after {
+  content: '';
+  display: block;
+  max-width: 1100px;
+  margin: 31px auto 0;
+  border-top: 1px solid #d8dde2;
+}
+
+@media (max-width: 600px) {
+  body.landing-home:not(.persona-page) main > :is(.ml-workspace, .ml-documents, .audiences)::after {
+    margin-top: 25px;
+  }
+}
