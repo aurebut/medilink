@@ -50,6 +50,7 @@ import type { CandidateDashboardData, Conversation, EstablishmentBillingStatus, 
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useAuth } from './AuthProvider';
 import { useOptionalEstablishments } from './EstablishmentSelector';
+import { ProfileAvatar } from './ProfileAvatar';
 import { errorMessage } from '@/lib/user-facing';
 
 type NavItem = {
@@ -60,17 +61,17 @@ type NavItem = {
 };
 
 const candidateNav: NavItem[] = [
-  { href: '/app/dashboard', label: 'Dashboard', mobileLabel: 'Accueil', icon: LayoutDashboard },
+  { href: '/app/dashboard', label: 'Tableau de bord', mobileLabel: 'Accueil', icon: LayoutDashboard },
   { href: '/app/agenda', label: 'Agenda', mobileLabel: 'Agenda', icon: CalendarDays },
   { href: '/app/current-missions', label: 'Missions en cours', mobileLabel: 'Missions', icon: BriefcaseMedical },
-  { href: '/app/search', label: 'Annonce et candidature', mobileLabel: 'Annonces', icon: Search },
+  { href: '/app/search', label: 'Annonces et candidatures', mobileLabel: 'Annonces', icon: Search },
   { href: '/app/messages', label: 'Messagerie', mobileLabel: 'Messages', icon: MessageCircle },
 ];
 
 const establishmentNav: NavItem[] = [
-  { href: '/establishment/dashboard', label: 'Dashboard', mobileLabel: 'Accueil', icon: LayoutDashboard },
+  { href: '/establishment/dashboard', label: 'Tableau de bord', mobileLabel: 'Accueil', icon: LayoutDashboard },
   { href: '/establishment/agenda', label: 'Agenda', mobileLabel: 'Agenda', icon: CalendarDays },
-  { href: '/establishment/missions', label: 'Annonce et candidature', mobileLabel: 'Annonces', icon: ClipboardList },
+  { href: '/establishment/missions', label: 'Annonces et candidatures', mobileLabel: 'Annonces', icon: ClipboardList },
   { href: '/establishment/current-missions', label: 'Missions en cours', mobileLabel: 'Missions', icon: BriefcaseMedical },
   { href: '/establishment/messages', label: 'Messagerie', mobileLabel: 'Messages', icon: MessageCircle },
 ];
@@ -357,6 +358,16 @@ export function AppShell({
   const userAccountHref = accountHref(area);
   const userHomeHref = homeHref(area, user?.role);
   const unreadNotifications = notifications.filter((notification) => !notification.readAt).length;
+  const candidateName = area === 'candidate'
+    ? [candidateProfile?.firstName, candidateProfile?.lastName].filter(Boolean).join(' ').trim()
+    : '';
+  const accountName = candidateName || user?.email || 'Utilisateur';
+  const establishmentPhoto = selectedEstablishment?.photos?.find((photo) => photo.isPrimary && photo.url)?.url
+    || selectedEstablishment?.photos?.find((photo) => photo.url)?.url
+    || selectedEstablishment?.logoUrl;
+  const accountAvatar = area === 'candidate'
+    ? <ProfileAvatar src={candidateProfile?.avatarUrl} name={accountName} className="avatar" decorative />
+    : <span className="avatar">{initials(user?.email)}</span>;
 
   const [resendingEmail, setResendingEmail] = useState(false);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(null);
@@ -670,6 +681,15 @@ export function AppShell({
           {area !== 'admin' ? (
             <span className="sidebar-context">{areaLabel(area, candidateProfile, user?.role)}</span>
           ) : null}
+          {area === 'establishment' && selectedEstablishment ? (
+            <div className="sidebar-establishment">
+              <ProfileAvatar src={establishmentPhoto} name={selectedEstablishment.name} className="sidebar-establishment-photo" decorative />
+              <span className="sidebar-establishment-copy">
+                <strong>{selectedEstablishment.name}</strong>
+                {selectedEstablishment.city ? <span>{selectedEstablishment.city}</span> : null}
+              </span>
+            </div>
+          ) : null}
         </div>
 
         <nav
@@ -705,9 +725,9 @@ export function AppShell({
 
           <div className="mobile-menu-account">
             <div className="mobile-menu-user">
-              <span className="avatar">{initials(user?.email)}</span>
+              {accountAvatar}
               <span className="truncate">
-                <strong>{user?.email || 'Utilisateur'}</strong>
+                <strong>{accountName}</strong>
                 <br />
                 <span>{roleLabel(user?.role, candidateProfile)}</span>
               </span>
@@ -929,11 +949,12 @@ export function AppShell({
           {accountMenuOpen ? (
             <div className="account-menu" role="menu">
               <div className="account-menu-head">
-                <span className="avatar">{initials(user?.email)}</span>
+                {accountAvatar}
                 <span className="truncate">
-                  <strong>{user?.email || 'Utilisateur'}</strong>
+                  <strong>{accountName}</strong>
                   <br />
                   <span>{roleLabel(user?.role, candidateProfile)}</span>
+                  {candidateName ? <span className="account-menu-email">{user?.email}</span> : null}
                 </span>
               </div>
               <div className="account-menu-section">
@@ -985,6 +1006,7 @@ export function AppShell({
             className={`user-chip ${accountMenuOpen ? 'open' : ''}`}
             aria-haspopup="menu"
             aria-expanded={accountMenuOpen}
+            aria-label={area !== 'admin' ? `Menu du compte de ${accountName}` : undefined}
             onMouseDown={(event) => event.stopPropagation()}
             onClick={(event) => {
               event.stopPropagation();
@@ -993,9 +1015,9 @@ export function AppShell({
               setAccountMenuOpen((open) => !open);
             }}
           >
-            <span className="avatar">{initials(user?.email)}</span>
+            {accountAvatar}
             <span className="truncate">
-              <strong>{user?.email || 'Utilisateur'}</strong>
+              <strong>{accountName}</strong>
               <br />
               <span>{roleLabel(user?.role, candidateProfile)}</span>
             </span>

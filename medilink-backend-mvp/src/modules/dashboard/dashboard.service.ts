@@ -3,6 +3,7 @@ import { EstablishmentMemberRole } from '@prisma/client';
 import { RequestUser } from '../../common/types/request-user.type';
 import { DocumentsService } from '../documents/documents.service';
 import { EstablishmentsService } from '../establishments/establishments.service';
+import { establishmentPhotoPreviewInclude, withSignedEstablishmentPhotoPreview } from '../establishments/establishment-photo-preview';
 import { MissionsService } from '../missions/missions.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -25,7 +26,12 @@ export class DashboardService {
       this.documents.listMine(user.id),
       this.prisma.application.findMany({
         where: { candidateUserId: user.id },
-        include: { mission: { include: { establishment: true } }, conversation: true },
+        include: {
+          mission: {
+            include: { establishment: { include: { photos: establishmentPhotoPreviewInclude } } },
+          },
+          conversation: true,
+        },
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.conversation.findMany({
@@ -40,7 +46,7 @@ export class DashboardService {
         include: {
           mission: true,
           application: { include: { candidate: { include: { profile: true } } } },
-          establishment: true,
+          establishment: { include: { photos: establishmentPhotoPreviewInclude } },
           participants: true,
           agreements: {
             orderBy: { createdAt: 'desc' },
@@ -61,7 +67,27 @@ export class DashboardService {
       }),
     ]);
 
-    return { profile, documents, applications, conversations, notifications };
+    const [applicationsWithPhotos, conversationsWithPhotos] = await Promise.all([
+      Promise.all(applications.map(async (application) => ({
+        ...application,
+        mission: {
+          ...application.mission,
+          establishment: await withSignedEstablishmentPhotoPreview(application.mission.establishment, this.establishments),
+        },
+      }))),
+      Promise.all(conversations.map(async (conversation) => ({
+        ...conversation,
+        establishment: await withSignedEstablishmentPhotoPreview(conversation.establishment, this.establishments),
+      }))),
+    ]);
+
+    return {
+      profile,
+      documents,
+      applications: applicationsWithPhotos,
+      conversations: conversationsWithPhotos,
+      notifications,
+    };
   }
 
   async getEstablishmentDashboard(user: RequestUser, establishmentId?: string) {

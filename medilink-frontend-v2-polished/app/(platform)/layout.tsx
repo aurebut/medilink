@@ -3,9 +3,11 @@ import '../brand-tokens.css';
 import '../globals.css';
 import '../workspace-navigation.css';
 import '../workspace-design.css';
+import '../workspace-collections.css';
 import '../workspace-details.css';
 import '../workspace-messages.css';
 import '../replacement-dossier.css';
+import '../workspace-overview.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {

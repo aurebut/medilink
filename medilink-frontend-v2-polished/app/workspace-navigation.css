@@ -749,8 +749,8 @@
 .workspace-shell > .sidebar .brand em { color: var(--brand-primary); font-style: italic; }
 .workspace-shell > .sidebar :is(.account-menu, .notification-menu, .publication-credit-menu) {
   border: 1px solid var(--brand-line);
-  border-radius: 20px;
-  box-shadow: 0 18px 50px #1952a01f;
+  border-radius: 14px;
+  box-shadow: 0 14px 36px #223e5714;
   background: var(--brand-paper);
   color: var(--brand-text);
 }
@@ -766,6 +766,53 @@
   color: var(--brand-muted);
 }
 .workspace-shell > .sidebar .account-menu-section { border-bottom-color: var(--brand-line); }
+.workspace-shell > .sidebar .account-menu-email {
+  display: block;
+  overflow: hidden;
+  margin-top: 4px;
+  color: var(--brand-muted);
+  font-size: 11px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+}
+.workspace-shell > .sidebar .account-menu-head .avatar {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--brand-line);
+  border-radius: 50%;
+  background: var(--brand-frost);
+  color: var(--brand-primary);
+  font: 400 19px/1 var(--brand-serif);
+}
+.workspace-shell > .sidebar .sidebar-establishment {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin-top: 13px;
+}
+.workspace-shell > .sidebar .sidebar-establishment-photo {
+  width: 52px;
+  height: 58px;
+  border-radius: 8px;
+}
+.workspace-shell > .sidebar .sidebar-establishment-copy {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+.workspace-shell > .sidebar .sidebar-establishment-copy strong {
+  color: var(--brand-heading);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.workspace-shell > .sidebar .sidebar-establishment-copy > span {
+  color: var(--brand-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
 .workspace-shell > .sidebar .account-menu-item:not(.danger) {
   color: var(--brand-text);
   font-weight: 500;
@@ -835,8 +882,8 @@
   }
   .workspace-shell > .sidebar .brand { font-size: 34px; letter-spacing: -.025em; }
   .workspace-shell > .sidebar .sidebar-context {
-    font-size: 8px;
-    letter-spacing: .16em;
+    font-size: 9px;
+    letter-spacing: .12em;
     font-weight: 500;
     color: var(--brand-muted);
   }
@@ -845,7 +892,7 @@
     min-height: 48px;
     padding: 10px 12px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--brand-muted);
     line-height: 1.35;
@@ -902,16 +949,17 @@
     padding: 0 8px 4px;
     margin-top: -8px;
   }
-  .workspace-shell > .sidebar .user-chip { min-height: 44px; }
-  .workspace-shell > .sidebar .user-chip strong { font-size: 11px; font-weight: 600; }
-  .workspace-shell > .sidebar .user-chip > .truncate { font-size: 11px; line-height: 1.65; }
+  .workspace-shell > .sidebar .user-chip { min-height: 48px; gap: 10px; }
+  .workspace-shell > .sidebar .user-chip strong { font-size: 12px; font-weight: 500; }
+  .workspace-shell > .sidebar .user-chip > .truncate { min-width: 0; font-size: 11px; line-height: 1.65; }
   .workspace-shell > .sidebar .user-chip .avatar {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--brand-line);
     border-radius: 50%;
     background: var(--brand-mist);
     color: var(--brand-primary);
-    font-size: 11px;
+    font: 400 18px/1 var(--brand-serif);
   }
 }
 @media (max-width: 1024px) {
@@ -921,6 +969,7 @@
     box-shadow: none;
   }
   .workspace-shell > .sidebar .brand { font-size: 27px; letter-spacing: -.025em; }
+  .workspace-shell > .sidebar .sidebar-establishment { display: none; }
   .workspace-shell > .sidebar .notification-bell {
     width: 40px;
     height: 40px;
@@ -930,7 +979,7 @@
   }
   .workspace-shell > .sidebar .sidebar-footer { width: 40px; height: 40px; flex-basis: 40px; }
   .workspace-shell > .sidebar .user-chip { width: 40px; height: 40px; border-radius: 50%; border-color: transparent; background: transparent; }
-  .workspace-shell > .sidebar .user-chip .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand-mist); color: var(--brand-primary); font-size: 11px; }
+  .workspace-shell > .sidebar .user-chip .avatar { width: 36px; height: 36px; border: 1px solid var(--brand-line); border-radius: 50%; background: var(--brand-mist); color: var(--brand-primary); font: 400 16px/1 var(--brand-serif); }
   .workspace-shell > .mobile-bottom-nav {
     border-top-color: var(--brand-line) !important;
     border-radius: 0;

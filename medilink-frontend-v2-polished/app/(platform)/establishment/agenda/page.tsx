@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EstablishmentMissionHistoryList } from '@/components/EstablishmentMissionHistoryList';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { useEstablishments } from '@/components/EstablishmentSelector';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { buildCalendarEventWeeks, dateKey, dateRangeKeys, weekDayLabels } from '@/lib/candidate-workspace';
@@ -445,12 +446,22 @@ export default function EstablishmentAgendaPage() {
                     {upcomingEvents.map((row) => (
                       <div key={row.mission.id} className="agenda-upcoming-row">
                         <div className="agenda-upcoming-main">
-                          <strong>{row.mission.title}</strong>
-                          <span>
-                            {row.selectedApplication
-                              ? `Candidat : ${candidateName(row.selectedApplication) || 'Validé'}`
-                              : 'Aucun candidat validé'} • {row.mission.city}
-                          </span>
+                          <div className="workspace-upcoming-identity">
+                            <ProfileAvatar
+                              src={row.selectedApplication?.candidate?.profile?.avatarUrl}
+                              name={candidateName(row.selectedApplication) || 'Candidat à confirmer'}
+                              className="workspace-upcoming-photo"
+                              decorative
+                            />
+                            <div>
+                              <strong>{row.mission.title}</strong>
+                              <span>
+                                {row.selectedApplication
+                                  ? `Candidat : ${candidateName(row.selectedApplication) || 'Validé'}`
+                                  : 'Aucun candidat validé'} • {row.mission.city}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                         <div className="agenda-upcoming-meta">
                           <span className="upcoming-date">{row.date ? formatDate(row.date) : 'Date à confirmer'}</span>

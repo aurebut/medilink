@@ -89,7 +89,7 @@
         "y": 251,
         "width": 758,
         "height": 684,
-        "scrollY": 202,
+        "scrollY": 208,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
@@ -116,7 +116,7 @@
         "y": 105,
         "width": 360,
         "height": 988,
-        "scrollY": 485,
+        "scrollY": 492,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
@@ -143,7 +143,7 @@
         "y": 118,
         "width": 658,
         "height": 825,
-        "scrollY": 146,
+        "scrollY": 152,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
@@ -155,7 +155,7 @@
         "documents-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "884a1cf2b9beddf07e229c9e7be7ad2184ad5bd4428631634b484e18f4f108c3"
+      "sha256": "ddcf6f57bda2c0edb147bcd29f7375fe5dfa93971eee5fa06ce5b9821c735bee"
     },
     {
       "name": "documents",
@@ -170,7 +170,7 @@
         "y": 90,
         "width": 320,
         "height": 985,
-        "scrollY": 212,
+        "scrollY": 219,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
@@ -182,7 +182,7 @@
         "documents-mobile@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "d4caea126f5003f221a54e70ff9841fa586de1ea12a80d2e0388e10ec061d8eb"
+      "sha256": "486eb2b03ca9157b8bc9a7aee7313bcb2fd85c42887289cea134bacbd1b1a640"
     }
   ]
 }

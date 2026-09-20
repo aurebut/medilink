@@ -7,6 +7,7 @@ import { gendered } from '@/lib/grammar';
 import { medicalStatusLabel } from '@/lib/labels';
 import { Alert, Badge, Button, Card, Field, Input, LoadingCard, PageHeader, ProgressBar, Select, Textarea } from '@/components/ui';
 import { DocumentSection } from '@/components/DocumentSection';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { MultiChoiceField, MultiChoiceTextField, SingleChoiceField } from '@/components/FormChoiceFields';
 import {
   candidateMissionTypeOptions,
@@ -283,13 +284,7 @@ export default function ProfilePage() {
     }
   }
 
-  const initials = `${form.firstName || ''} ${form.lastName || ''}`
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('')
-    .toUpperCase() || 'ML';
+  const profileName = [form.firstName, form.lastName].filter(Boolean).join(' ') || 'Mon profil';
   const missingPriorities = profileCompletionPriorities(form);
 
   return (
@@ -303,14 +298,7 @@ export default function ProfilePage() {
         <div className="profile-sidebar">
           <Card className="card-highlight">
             <div className="profile-photo-panel">
-              <div className="profile-photo-preview">
-                {profile.avatarUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS
-                  <img src={profile.avatarUrl} alt="Photo de profil" />
-                ) : (
-                  <span>{initials}</span>
-                )}
-              </div>
+              <ProfileAvatar src={profile.avatarUrl} name={profileName} className="profile-photo-preview" />
               <div className="profile-photo-controls">
                 <h2>Photo de profil</h2>
                 <p className="small">JPG, PNG ou WebP, 3 Mo maximum.</p>

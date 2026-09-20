@@ -1,0 +1,158 @@
+/* Extend the message, mission and document folios to the rest of the workspace. */
+:where(.workspace-shell) .workspace-design {
+  --text: var(--brand-text);
+  --heading: var(--brand-heading);
+  --muted: var(--brand-muted);
+  --navy: var(--brand-primary);
+  --radius: 22px;
+  --radius-sm: 12px;
+  --shadow-soft: var(--brand-shadow);
+}
+:where(.workspace-shell) .workspace-design .card.card,
+:where(.workspace-shell) .workspace-design .mission-card,
+:where(.workspace-shell) .workspace-design .establishment-item-card,
+:where(.workspace-shell) .workspace-design .table-wrap { box-shadow: none; }
+:where(.workspace-shell) .workspace-design .btn { font-weight: 500; }
+
+:where(.workspace-shell) .workspace-design .page-header {
+  border-bottom: 1px solid var(--brand-line);
+}
+:where(.workspace-shell) .workspace-design .page-header::before { display: none; }
+:where(.workspace-shell) .workspace-design .page-header .actions { align-self: center; }
+
+:where(.workspace-shell) .workspace-design :is(.candidate-page-tabs, .billing-tabs) {
+  gap: 4px;
+  padding: 5px;
+  border-color: var(--brand-line);
+  border-radius: 12px;
+  background: var(--brand-frost);
+}
+:where(.workspace-shell) .workspace-design :is(.candidate-page-tabs, .billing-tabs) button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--brand-muted);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: none;
+}
+:where(.workspace-shell) .workspace-design :is(.candidate-page-tabs, .billing-tabs) button.active {
+  border-color: var(--brand-line);
+  background: var(--brand-paper);
+  color: var(--brand-primary);
+}
+:where(.workspace-shell) .workspace-design :is(.candidate-page-tabs, .billing-tabs) button.active .tab-count-badge {
+  background: var(--brand-mist);
+  color: var(--brand-primary);
+}
+
+/* Places and people are the same real identities shown in the shared dossier. */
+:where(.workspace-shell) .workspace-design .workspace-mission-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+:where(.workspace-shell) .workspace-design .workspace-mission-identity > div { min-width: 0; }
+:where(.workspace-shell) .workspace-design .workspace-mission-photo { width: 64px; height: 64px; }
+:where(.workspace-shell) .workspace-design .workspace-mission-photo--place { width: 88px; height: 68px; border-radius: 12px; }
+:where(.workspace-shell) .workspace-design .workspace-card-head h3 { overflow-wrap: anywhere; }
+:where(.workspace-shell) .workspace-design .workspace-card-head .small { margin-top: 7px; line-height: 1.6; }
+:where(.workspace-shell) .workspace-design .workspace-badges { flex-wrap: wrap; }
+:where(.workspace-shell) .workspace-design .workspace-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr));
+  gap: 18px;
+  padding-block: 18px;
+  border-block: 1px solid var(--brand-line);
+}
+:where(.workspace-shell) .workspace-design .workspace-metrics > div {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+:where(.workspace-shell) .workspace-design .workspace-metrics span {
+  color: var(--brand-muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+:where(.workspace-shell) .workspace-design .workspace-metrics strong { color: var(--brand-heading); font-weight: 500; line-height: 1.5; }
+:where(.workspace-shell) .workspace-design .workspace-candidate-identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+:where(.workspace-shell) .workspace-design .workspace-candidate-identity > span { width: 52px; height: 52px; }
+:where(.workspace-shell) .workspace-design .workspace-candidate-identity > div { min-width: 0; overflow-wrap: anywhere; }
+:where(.workspace-shell) .workspace-design .workspace-candidate-identity strong { font-weight: 600; }
+:where(.workspace-shell) .workspace-design .establishment-application-section-head h2 { font: 400 30px/1.15 var(--brand-serif); }
+:where(.workspace-shell) .workspace-design .establishment-application-section-head p { color: var(--brand-muted); line-height: 1.6; }
+:where(.workspace-shell) .workspace-design .table-wrap tbody tr:hover { background: var(--brand-frost); }
+
+:where(.workspace-shell) .workspace-design :is(.search-results, .mission-list) .mission-card-image { border-radius: 12px; }
+:where(.workspace-shell) .workspace-design .mission-top { flex-wrap: wrap; }
+:where(.workspace-shell) .workspace-design .mission-top > .grid { flex: 1 1 250px; }
+:where(.workspace-shell) .workspace-design .mission-pay { min-width: 0; max-width: 100%; }
+:where(.workspace-shell) .workspace-design .mission-card--with-image .mission-top { flex-direction: column; gap: 16px; }
+:where(.workspace-shell) .workspace-design .mission-card--with-image .mission-top > .grid { flex-basis: auto; }
+:where(.workspace-shell) .workspace-design .mission-card--with-image .mission-pay { padding: 0; border: 0; background: transparent; }
+@media (min-width: 621px) {
+  :where(.workspace-shell) .workspace-design :is(.search-results, .mission-list) .mission-card-image { grid-row: 1; }
+  :where(.workspace-shell) .workspace-design :is(.search-results, .mission-list) .mission-card--with-image > :not(.mission-card-image):not(.mission-top) { grid-column: 1 / -1; }
+}
+@media (min-width: 981px) {
+  :where(.workspace-shell) .workspace-design .mission-list .mission-card--with-image { grid-template-columns: 192px minmax(0, 1fr); }
+  :where(.workspace-shell) .workspace-design .mission-list .mission-card-image { width: 192px; height: 144px; }
+  :where(.workspace-shell) .workspace-design .search-results .mission-card-image { height: 164px; }
+}
+@media (min-width: 621px) and (max-width: 980px) {
+  :where(.workspace-shell) .workspace-design .search-results .mission-card--with-image { grid-template-columns: 170px minmax(0, 1fr); }
+  :where(.workspace-shell) .workspace-design .search-results .mission-card-image { width: 170px; height: 128px; }
+}
+
+/* Keep utility screens as quiet as the document register. */
+:where(.workspace-shell) .workspace-design .profile-sidebar .card-highlight { background: var(--brand-paper); }
+:where(.workspace-shell) .workspace-design .profile-photo-panel { align-items: flex-start; flex-wrap: wrap; gap: 20px; }
+:where(.workspace-shell) .workspace-design .profile-sidebar .profile-photo-preview { width: 128px; height: 128px; border: 1px solid var(--brand-line); border-radius: 50%; box-shadow: none; font-size: 42px; }
+:where(.workspace-shell) .workspace-design .profile-photo-controls { flex: 1 1 210px; }
+:where(.workspace-shell) .workspace-design .profile-preferences-section { border-radius: 12px; background: var(--brand-paper); }
+:where(.workspace-shell) .workspace-design .profile-preferences-section h3 { color: var(--brand-heading); }
+:where(.workspace-shell) .workspace-design .agenda-overview { border-color: var(--brand-line); border-radius: 14px; background: var(--brand-paper); box-shadow: none; }
+:where(.workspace-shell) .workspace-design .agenda-overview > div { background: transparent; border-color: var(--brand-line); }
+:where(.workspace-shell) .workspace-design .agenda-overview span { color: var(--brand-muted); font-weight: 500; }
+:where(.workspace-shell) .workspace-design .agenda-overview strong { color: var(--brand-heading); font: 400 32px/1.1 var(--brand-serif); }
+:where(.workspace-shell) .workspace-design .agenda-calendar-card { box-shadow: none; }
+:where(.workspace-shell) .workspace-design .agenda-month-title h2 { color: var(--brand-heading); font: 400 30px/1.1 var(--brand-serif); }
+:where(.workspace-shell) .workspace-design .agenda-day { border-color: var(--brand-line); }
+:where(.workspace-shell) .workspace-design .agenda-day.selected { border-color: var(--brand-primary); box-shadow: inset 0 0 0 1px var(--brand-primary); }
+:where(.workspace-shell) .workspace-design :is(.agenda-upcoming-card, .agenda-list-card) > .toolbar { padding: 0 0 20px; border: 0; border-bottom: 1px solid var(--brand-line); border-radius: 0; background: transparent; }
+:where(.workspace-shell) .workspace-design .agenda-upcoming-row { padding: 18px 0; border: 0; border-bottom: 1px solid var(--brand-line); border-radius: 0; background: transparent; }
+:where(.workspace-shell) .workspace-design .agenda-upcoming-row:last-child { border-bottom: 0; padding-bottom: 0; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-identity > div { display: grid; gap: 6px; min-width: 0; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-photo { width: 64px; height: 64px; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-photo--place { width: 88px; border-radius: 10px; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-identity strong { color: var(--brand-heading); font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+:where(.workspace-shell) .workspace-design .workspace-upcoming-identity > div > span { color: var(--brand-muted); font-size: 12px; line-height: 1.6; }
+:where(.workspace-shell) .workspace-design .establishment-photo-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 18px; }
+:where(.workspace-shell) .workspace-design .establishment-photo-item { min-width: 0; border-color: var(--brand-line); border-radius: 14px; box-shadow: none; }
+:where(.workspace-shell) .workspace-design .establishment-photo-item img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border: 0; border-radius: 10px; box-shadow: none; }
+
+@media (max-width: 620px) {
+  :where(.workspace-shell) .workspace-design .page-header .actions { align-self: flex-start; }
+  :where(.workspace-shell) .workspace-design .mission-top > .grid { flex-basis: auto; }
+  :where(.workspace-shell) .workspace-design :is(.candidate-page-tabs, .billing-tabs) button { padding-inline: 12px; }
+  :where(.workspace-shell) .workspace-design .workspace-mission-identity { gap: 13px; }
+  :where(.workspace-shell) .workspace-design .workspace-mission-photo { width: 56px; height: 56px; }
+  :where(.workspace-shell) .workspace-design .workspace-mission-photo--place { width: 68px; height: 56px; border-radius: 9px; }
+  :where(.workspace-shell) .workspace-design .workspace-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 14px; }
+  :where(.workspace-shell) .workspace-design .workspace-metrics strong { font-size: 13px; overflow-wrap: anywhere; }
+  :where(.workspace-shell) .workspace-design :is(.search-results, .mission-list) .mission-card-image { width: 100%; height: 174px; aspect-ratio: auto; }
+  :where(.workspace-shell) .workspace-design .profile-sidebar .profile-photo-preview { width: 112px; height: 112px; }
+  :where(.workspace-shell) .workspace-design .profile-photo-controls { flex-basis: 100%; }
+  :where(.workspace-shell) .workspace-design .agenda-month-title h2 { font-size: 26px; }
+  :where(.workspace-shell) .workspace-design .agenda-upcoming-main { grid-column: 1 / -1; }
+  :where(.workspace-shell) .workspace-design .agenda-upcoming-meta { flex-wrap: wrap; }
+  :where(.workspace-shell) .workspace-design .agenda-upcoming-badge { grid-row: auto; }
+  :where(.workspace-shell) .workspace-design .workspace-upcoming-photo { width: 52px; height: 52px; }
+  :where(.workspace-shell) .workspace-design .workspace-upcoming-photo--place { width: 68px; }
+}

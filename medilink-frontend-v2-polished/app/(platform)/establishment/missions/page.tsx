@@ -10,6 +10,7 @@ import { candidateNoun } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionCard } from '@/components/MissionCard';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, type BadgeTone } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
@@ -382,8 +383,14 @@ function ApplicationSection({
             return (
               <tr key={application.id}>
                 <td data-label="Candidat">
-                  <strong>{application.candidate?.profile?.firstName} {application.candidate?.profile?.lastName}</strong>
-                  <div className="small">{application.candidate?.email}</div>
+                  <div className="workspace-candidate-identity">
+                    <ProfileAvatar src={application.candidate?.profile?.avatarUrl}
+                      name={[application.candidate?.profile?.firstName, application.candidate?.profile?.lastName].filter(Boolean).join(' ') || 'Candidat'} decorative />
+                    <div>
+                      <strong>{application.candidate?.profile?.firstName} {application.candidate?.profile?.lastName}</strong>
+                      <div className="small">{application.candidate?.email}</div>
+                    </div>
+                  </div>
                 </td>
                 <td data-label="Mission">
                   {application.mission?.title}

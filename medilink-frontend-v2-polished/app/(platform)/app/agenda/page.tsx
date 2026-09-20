@@ -11,6 +11,7 @@ import type { Application, Conversation } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { useWorkspaceNotes } from '@/lib/use-workspace-notes';
 import { CandidateMissionHistoryList } from '@/components/CandidateMissionHistoryList';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, Textarea } from '@/components/ui';
 
 function buildCalendarDays(anchor: Date) {
@@ -473,8 +474,20 @@ export default function CandidateAgendaPage() {
                 {upcomingEvents.map(({ application, agreement, conversation, date }) => (
                   <div key={application.id} className="agenda-upcoming-row">
                     <div className="agenda-upcoming-main">
-                      <strong>{application.mission?.title || 'Mission'}</strong>
-                      <span>{application.mission?.establishment?.name || 'Établissement à confirmer'} • {application.mission?.city}</span>
+                      <div className="workspace-upcoming-identity">
+                        <ProfileAvatar
+                          src={application.mission?.establishment?.photos?.find((photo) => photo.isPrimary && photo.url)?.url
+                            || application.mission?.establishment?.photos?.find((photo) => photo.url)?.url
+                            || application.mission?.establishment?.logoUrl}
+                          name={application.mission?.establishment?.name || 'Établissement à confirmer'}
+                          className="workspace-upcoming-photo workspace-upcoming-photo--place"
+                          decorative
+                        />
+                        <div>
+                          <strong>{application.mission?.title || 'Mission'}</strong>
+                          <span>{application.mission?.establishment?.name || 'Établissement à confirmer'} • {application.mission?.city}</span>
+                        </div>
+                      </div>
                     </div>
                     <div className="agenda-upcoming-meta">
                       <span className="upcoming-date">{date ? formatDate(date) : 'Date à confirmer'}</span>

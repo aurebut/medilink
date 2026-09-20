@@ -4,6 +4,7 @@ import { formatDate } from '@/lib/format';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
+import { ProfileAvatar } from './ProfileAvatar';
 
 function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' }) {
   if (type === 'message') {
@@ -47,9 +48,18 @@ export function CandidateMissionHistoryList({
       {visibleRows.map(({ application, conversation, agreement, date }) => (
         <Card key={application.id} className="mission-card workspace-mission-card">
           <div className="workspace-card-head">
-            <div>
-              <h3>{application.mission?.title || 'Mission'}</h3>
-              <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</p>
+            <div className="workspace-mission-identity">
+              <ProfileAvatar
+                src={application.mission?.establishment?.photos?.find(photo => photo.isPrimary && photo.url)?.url
+                  || application.mission?.establishment?.photos?.find(photo => photo.url)?.url || application.mission?.establishment?.logoUrl}
+                name={application.mission?.establishment?.name || 'Établissement'}
+                className="workspace-mission-photo workspace-mission-photo--place"
+                decorative
+              />
+              <div>
+                <h3>{application.mission?.title || 'Mission'}</h3>
+                <p className="small">{application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</p>
+              </div>
             </div>
             <div className="workspace-badges">
               <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
@@ -60,7 +70,7 @@ export function CandidateMissionHistoryList({
           <div className="workspace-metrics">
             <div><span>Date</span><strong>{formatDate(date)}</strong></div>
             <div><span>Ville</span><strong>{application.mission?.city || '-'}</strong></div>
-            <div><span>Remuneration</span><strong>{candidateAmountLabel(agreement)}</strong></div>
+            <div><span>Rémunération</span><strong>{candidateAmountLabel(agreement)}</strong></div>
             <div><span>Prochaine étape</span><strong>{agreementNextStep(agreement?.status)}</strong></div>
           </div>
 

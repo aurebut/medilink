@@ -16,6 +16,8 @@ import {
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { BillingService } from '../billing/billing.service';
+import { EstablishmentsService } from '../establishments/establishments.service';
+import { establishmentPhotoPreviewInclude, withSignedEstablishmentPhotoPreview } from '../establishments/establishment-photo-preview';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -50,6 +52,7 @@ export class ApplicationsService {
     private readonly notifications: NotificationsService,
     private readonly audit: AuditService,
     private readonly billing: BillingService,
+    private readonly establishments: EstablishmentsService,
   ) {}
 
   async apply(user: RequestUser, missionId: string, dto: ApplyDto) {
@@ -175,11 +178,21 @@ export class ApplicationsService {
   }
 
   async listMine(user: RequestUser) {
-    return this.prisma.application.findMany({
+    const applications = await this.prisma.application.findMany({
       where: { candidateUserId: user.id },
-      include: { mission: { include: { establishment: true } }, conversation: true },
+      include: {
+        mission: { include: { establishment: { include: { photos: establishmentPhotoPreviewInclude } } } },
+        conversation: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
+    return Promise.all(applications.map(async (application) => ({
+      ...application,
+      mission: {
+        ...application.mission,
+        establishment: await withSignedEstablishmentPhotoPreview(application.mission.establishment, this.establishments),
+      },
+    })));
   }
 
   async listForEstablishment(user: RequestUser, establishmentId: string) {

@@ -10,6 +10,7 @@ import { missionTypeLabel, statusLabel } from '@/lib/labels';
 import { getEstablishmentConversationPath } from '@/lib/mission-links';
 import { Badge, Card, EmptyState, LinkButton } from './ui';
 import { EstablishmentCapabilityGate } from './EstablishmentCapability';
+import { ProfileAvatar } from './ProfileAvatar';
 
 function MissionHistoryActionIcon({ type }: { type: 'message' | 'mission' }) {
   if (type === 'message') {
@@ -57,11 +58,19 @@ export function EstablishmentMissionHistoryList({
       {visibleRows.map((row) => (
         <Card key={row.mission.id} className="mission-card workspace-mission-card">
           <div className="workspace-card-head">
-            <div>
-              <h3>{row.mission.title}</h3>
-              <p className="small">
-                {candidateName(row.selectedApplication) || row.mission.establishment?.name || row.mission.city || 'Candidat à confirmer'}
-              </p>
+            <div className="workspace-mission-identity">
+              {row.selectedApplication ? <ProfileAvatar
+                src={row.selectedApplication.candidate?.profile?.avatarUrl}
+                name={candidateName(row.selectedApplication) || 'Remplaçant'}
+                className="workspace-mission-photo"
+                decorative
+              /> : null}
+              <div>
+                <h3>{row.mission.title}</h3>
+                <p className="small">
+                  {candidateName(row.selectedApplication) || row.mission.establishment?.name || row.mission.city || 'Candidat à confirmer'}
+                </p>
+              </div>
             </div>
             <div className="workspace-badges">
               <Badge tone={row.mission.status === 'FILLED' ? 'success' : 'neutral'}>{statusLabel(row.mission.status)}</Badge>
@@ -73,7 +82,7 @@ export function EstablishmentMissionHistoryList({
             <div><span>Date</span><strong>{formatDate(row.date)}</strong></div>
             <div><span>Ville</span><strong>{row.mission.city || '-'}</strong></div>
             <div><span>Mission</span><strong>{missionTypeLabel(row.mission.missionType)}</strong></div>
-            <div><span>Remuneration</span><strong>{formatCompensation(row.agreement || row.mission)}</strong></div>
+            <div><span>Rémunération</span><strong>{formatCompensation(row.agreement || row.mission)}</strong></div>
             <div><span>Prochaine étape</span><strong>{establishmentMissionNextStep(row)}</strong></div>
           </div>
 

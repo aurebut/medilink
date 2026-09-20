@@ -21,6 +21,8 @@ import {
 import { RequestUser } from '../../common/types/request-user.type';
 import { AuditService } from '../audit/audit.service';
 import { BillingService } from '../billing/billing.service';
+import { EstablishmentsService } from '../establishments/establishments.service';
+import { establishmentPhotoPreviewInclude, withSignedEstablishmentPhotoPreview } from '../establishments/establishment-photo-preview';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -41,10 +43,11 @@ export class ConversationsService {
     private readonly events: ConversationEventsService,
     private readonly billing: BillingService,
     private readonly config: ConfigService,
+    private readonly establishments: EstablishmentsService,
   ) {}
 
   async list(user: RequestUser) {
-    return this.prisma.conversation.findMany({
+    const conversations = await this.prisma.conversation.findMany({
       where: {
         participants: {
           some: {
@@ -56,7 +59,7 @@ export class ConversationsService {
       include: {
         mission: true,
         application: { include: { candidate: { include: { profile: true } } } },
-        establishment: true,
+        establishment: { include: { photos: establishmentPhotoPreviewInclude } },
         participants: true,
         agreements: {
           orderBy: { createdAt: 'desc' },
@@ -70,6 +73,10 @@ export class ConversationsService {
       },
       orderBy: { lastMessageAt: 'desc' },
     });
+    return Promise.all(conversations.map(async (conversation) => ({
+      ...conversation,
+      establishment: await withSignedEstablishmentPhotoPreview(conversation.establishment, this.establishments),
+    })));
   }
 
   async get(user: RequestUser, conversationId: string) {
@@ -80,7 +87,7 @@ export class ConversationsService {
       include: {
         mission: true,
         application: true,
-        establishment: true,
+        establishment: { include: { photos: establishmentPhotoPreviewInclude } },
         participants: true,
         agreements: { orderBy: { createdAt: 'desc' }, include: { payment: true, invoices: true } },
       },
@@ -90,7 +97,10 @@ export class ConversationsService {
       throw new NotFoundException('Conversation introuvable.');
     }
 
-    return conversation;
+    return {
+      ...conversation,
+      establishment: await withSignedEstablishmentPhotoPreview(conversation.establishment, this.establishments),
+    };
   }
 
   async messages(user: RequestUser, conversationId: string) {

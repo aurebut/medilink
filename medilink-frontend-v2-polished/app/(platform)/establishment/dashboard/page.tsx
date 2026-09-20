@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkspaceWelcome } from '@/components/WorkspaceWelcome';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -253,11 +253,27 @@ export default function EstablishmentDashboardPage() {
 
   return (
     <>
-      <WorkspaceWelcome
-        area="establishment"
-        title={primary.name}
-        description="Votre cockpit recruteur pour prioriser les candidatures, maintenir les missions ouvertes et garder votre fiche établissement solide."
-      />
+      <header className="overview-header overview-header-establishment">
+        <div className="overview-header-copy">
+          <span className="overview-eyebrow">Votre espace établissement <span aria-hidden="true">/</span> Vue d’ensemble</span>
+          <h1>{primary.name}</h1>
+          <p>Vos remplacements prennent forme. Retrouvez les candidatures, les échanges et les prochaines dates.</p>
+          <div className="overview-header-actions">
+            <EstablishmentCapabilityGate capability="create_mission">
+              <LinkButton href="/establishment/missions/new">Publier une mission <span aria-hidden="true">↗</span></LinkButton>
+            </EstablishmentCapabilityGate>
+            <Link className="overview-text-link" href="/establishment/missions">Suivre mes missions <span aria-hidden="true">→</span></Link>
+          </div>
+        </div>
+        <div className="overview-establishment-identity">
+          <ProfileAvatar
+            src={primary.photos?.find((photo) => photo.isPrimary && photo.url)?.url || primary.photos?.find((photo) => photo.url)?.url || primary.logoUrl}
+            name={primary.name}
+            className="overview-cover-photo"
+          />
+          <span>{primary.city || 'Votre établissement'}</span>
+        </div>
+      </header>
       {error ? (
         <Alert type="error">
           {error}{' '}
@@ -267,7 +283,7 @@ export default function EstablishmentDashboardPage() {
         </Alert>
       ) : null}
 
-      <div className="establishment-dashboard candidate-dashboard">
+      <div className="establishment-dashboard candidate-dashboard overview-dashboard">
         <Card className="dashboard-week-card">
           <div className="dashboard-section-head">
             <div>
@@ -283,14 +299,24 @@ export default function EstablishmentDashboardPage() {
                   <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
                   <span>{dashboard.nextAgendaItem.mission.startTime || 'Horaire à confirmer'}</span>
                 </div>
-                <div>
-                  <span>Prochaine échéance</span>
-                  <strong>{dashboard.nextAgendaItem.mission.title}</strong>
-                  <p>
-                    {dashboard.nextAgendaItem.selectedApplication
-                      ? `Avec ${candidateName(dashboard.nextAgendaItem.selectedApplication)}`
-                      : 'Aucun candidat validé'}
-                  </p>
+                <div className="overview-next-identity">
+                  {dashboard.nextAgendaItem.selectedApplication ? (
+                    <ProfileAvatar
+                      src={dashboard.nextAgendaItem.selectedApplication.candidate?.profile?.avatarUrl}
+                      name={candidateName(dashboard.nextAgendaItem.selectedApplication)}
+                      className="overview-row-photo"
+                      decorative
+                    />
+                  ) : null}
+                  <div>
+                    <span>Prochaine échéance</span>
+                    <strong>{dashboard.nextAgendaItem.mission.title}</strong>
+                    <p>
+                      {dashboard.nextAgendaItem.selectedApplication
+                        ? `Avec ${candidateName(dashboard.nextAgendaItem.selectedApplication)}`
+                        : 'Aucun candidat validé'}
+                    </p>
+                  </div>
                 </div>
                 <LinkButton
                   variant="light"
@@ -372,8 +398,17 @@ export default function EstablishmentDashboardPage() {
             {dashboard.sortedApplications.length > 0 ? (
               <div className="dashboard-mini-list">
                 {dashboard.sortedApplications.slice(0, 3).map((application) => (
-                  <div key={application.id}>
-                    <span>{candidateName(application)}</span>
+                  <div key={application.id} className="overview-application-row">
+                    <ProfileAvatar
+                      src={application.candidate?.profile?.avatarUrl}
+                      name={candidateName(application)}
+                      className="overview-row-photo"
+                      decorative
+                    />
+                    <div className="overview-application-copy">
+                      <strong>{candidateName(application)}</strong>
+                      <span>{application.mission?.title || 'Candidature'}</span>
+                    </div>
                     <Badge tone={applicationTone(application.status)}>{statusLabel(application.status)}</Badge>
                   </div>
                 ))}
@@ -402,8 +437,14 @@ export default function EstablishmentDashboardPage() {
                     <Link
                       key={conversation.id}
                       href={`/establishment/messages?id=${conversation.id}`}
-                      className="dashboard-message-link"
+                      className="dashboard-message-link overview-message-link"
                     >
+                      <ProfileAvatar
+                        src={conversation.application?.candidate?.profile?.avatarUrl}
+                        name={conversation.application ? candidateName(conversation.application) : 'Candidat'}
+                        className="overview-row-photo"
+                        decorative
+                      />
                       <div className="dashboard-message-link-main">
                         <strong>{conversation.application ? candidateName(conversation.application) : conversation.mission?.title || 'Conversation'}</strong>
                         <span>{messagePreview(lastMessage?.body)}</span>

@@ -5,16 +5,21 @@ import Link from 'next/link';
 import { api, primeApiCache, subscribeApiCache } from '@/lib/api';
 import { agreementLabel, agreementNextStep, agreementTone, buildCalendarEventWeeks, buildWeekCarousel, candidateAmountLabel, conversationForApplication, dateKey, latestAgreement, missionDateValue, missionEndDateValue, weekDayLabels, weekRangeLabel } from '@/lib/candidate-workspace';
 import { formatDate, formatDateTime } from '@/lib/format';
-import { gendered } from '@/lib/grammar';
 import { statusLabel } from '@/lib/labels';
 import { getCandidateMissionPath } from '@/lib/mission-links';
 import { confirmNotificationRead, normalizeNotifications, primeNotificationsCache } from '@/lib/notification-cache';
 import { formatNotificationText } from '@/lib/notification-text';
-import type { Application, CandidateDashboardData, Conversation, Document, Notification, Profile } from '@/lib/types';
+import type { Application, CandidateDashboardData, Conversation, Document, Establishment, Notification, Profile } from '@/lib/types';
 import { useAutoRefresh } from '@/lib/use-auto-refresh';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard } from '@/components/ui';
 import { userFacingError } from '@/lib/user-facing';
-import { WorkspaceWelcome } from '@/components/WorkspaceWelcome';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
+
+function establishmentPhoto(establishment?: Establishment) {
+  return establishment?.photos?.find((photo) => photo.isPrimary && photo.url)?.url
+    || establishment?.photos?.find((photo) => photo.url)?.url
+    || establishment?.logoUrl;
+}
 
 function applicationTone(status: Application['status']) {
   if (status === 'ACCEPTED') return 'success';
@@ -221,17 +226,31 @@ export default function CandidateDashboardPage() {
     if (!notification.readAt) void confirmNotificationRead(notification.id);
   }
 
-  const firstName = profile?.firstName || 'Bienvenue';
+  const profileName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || 'Votre profil';
   const completionScore = profile?.completionScore || 0;
-  const profileReady = completionScore >= 80;
 
   return (
     <>
-      <WorkspaceWelcome
-        area="candidate"
-        title={`Bonjour ${firstName}`}
-        description={`Votre espace ${gendered(profile, 'connecté', 'connectée')} pour prioriser les missions, garder un dossier solide et suivre les réponses.`}
-      />
+      <header className="overview-header">
+        <div className="overview-header-copy">
+          <span className="overview-eyebrow">Votre espace médecin <span aria-hidden="true">/</span> Vue d’ensemble</span>
+          <h1>{profile?.firstName ? <>Bonjour <em>{profile.firstName}.</em></> : 'Bienvenue dans votre espace.'}</h1>
+          <p>Vos missions, vos échanges et votre dossier. Tout pour préparer la suite.</p>
+          <div className="overview-header-actions">
+            <LinkButton href="/app/search">Trouver une mission <span aria-hidden="true">↗</span></LinkButton>
+            <Link className="overview-text-link" href="/app/missions">Suivre mes missions <span aria-hidden="true">→</span></Link>
+          </div>
+        </div>
+        <Link className="overview-identity overview-identity-person" href="/app/profile">
+          <ProfileAvatar src={profile?.avatarUrl} name={profileName} className="overview-profile-photo" decorative />
+          <div className="overview-identity-copy">
+            <span className="overview-eyebrow">Mon profil</span>
+            <strong>{profileName}</strong>
+            {profile?.specialty || profile?.city ? <span>{[profile?.specialty, profile?.city].filter(Boolean).join(' · ')}</span> : null}
+            <span className="overview-profile-progress">Profil complété à {completionScore} % <span aria-hidden="true">↗</span></span>
+          </div>
+        </Link>
+      </header>
       {error ? (
         <Alert type="error">
           {error}{' '}
@@ -241,7 +260,7 @@ export default function CandidateDashboardPage() {
         </Alert>
       ) : null}
 
-      <div className="candidate-dashboard">
+      <div className="candidate-dashboard overview-dashboard">
         <Card className="dashboard-week-card">
           <div className="dashboard-section-head">
             <div>
@@ -257,10 +276,18 @@ export default function CandidateDashboardPage() {
                   <strong>{formatShortDate(dashboard.nextAgendaItem.date)}</strong>
                   <span>{dashboard.nextAgendaItem.application.mission?.startTime || 'Horaire à confirmer'}</span>
                 </div>
-                <div>
-                  <span>Prochaine échéance</span>
-                  <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
-                  <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
+                <div className="overview-next-identity">
+                  <ProfileAvatar
+                    src={establishmentPhoto(dashboard.nextAgendaItem.application.mission?.establishment)}
+                    name={dashboard.nextAgendaItem.application.mission?.establishment?.name || 'Établissement'}
+                    className="overview-row-photo overview-establishment-photo"
+                    decorative
+                  />
+                  <div>
+                    <span>Prochaine échéance</span>
+                    <strong>{dashboard.nextAgendaItem.application.mission?.title || 'Mission'}</strong>
+                    <p>{dashboard.nextAgendaItem.application.mission?.establishment?.name || dashboard.nextAgendaItem.application.mission?.city || 'Lieu à confirmer'}</p>
+                  </div>
                 </div>
                 <LinkButton
                   variant="light"
@@ -393,8 +420,14 @@ export default function CandidateDashboardPage() {
                     <Link
                       key={conversation.id}
                       href={`/app/messages?id=${conversation.id}`}
-                      className="dashboard-message-link"
+                      className="dashboard-message-link overview-message-link"
                     >
+                      <ProfileAvatar
+                        src={establishmentPhoto(conversation.establishment)}
+                        name={conversation.establishment?.name || 'Établissement'}
+                        className="overview-row-photo overview-establishment-photo"
+                        decorative
+                      />
                       <div className="dashboard-message-link-main">
                         <strong>{conversation.establishment?.name || conversation.mission?.title || 'Conversation'}</strong>
                         <span>
@@ -423,10 +456,10 @@ export default function CandidateDashboardPage() {
         </section>
 
         <Card className="dashboard-panel dashboard-missions-panel">
-          <div className="toolbar">
+          <div className="dashboard-section-head">
             <div>
+              <span>Vos remplacements</span>
               <h2>Suivi des missions</h2>
-              <p className="small">Les missions et accords qui méritent votre attention en premier.</p>
             </div>
             <LinkButton variant="light" href="/app/missions">Tout voir</LinkButton>
           </div>
@@ -434,9 +467,17 @@ export default function CandidateDashboardPage() {
             <div className="dashboard-list dashboard-mission-list">
               {dashboard.missionRows.map(({ application, agreement }) => (
                 <div key={application.id} className="dashboard-list-item">
-                  <div>
-                    <strong>{application.mission?.title || 'Mission'}</strong>
-                    <span>{agreement ? agreementNextStep(agreement.status) : application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
+                  <div className="overview-mission-identity">
+                    <ProfileAvatar
+                      src={establishmentPhoto(application.mission?.establishment)}
+                      name={application.mission?.establishment?.name || 'Établissement'}
+                      className="overview-row-photo overview-establishment-photo"
+                      decorative
+                    />
+                    <div>
+                      <strong>{application.mission?.title || 'Mission'}</strong>
+                      <span>{agreement ? agreementNextStep(agreement.status) : application.mission?.establishment?.name || application.mission?.city || 'Établissement à confirmer'}</span>
+                    </div>
                   </div>
                   <div className="dashboard-list-meta">
                     <Badge tone={agreement ? agreementTone(agreement.status) : applicationTone(application.status)}>

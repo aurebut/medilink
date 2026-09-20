@@ -10,6 +10,8 @@ import { MissionShareActions } from './MissionShareActions';
 import { Badge, Button, Card } from './ui';
 import { useAuth } from './AuthProvider';
 import { hasEstablishmentCapability } from '@/lib/access-control';
+import { ProfileAvatar } from './ProfileAvatar';
+import styles from './MissionCard.module.css';
 
 function sectorLabel(value?: string | null) {
   const labels: Record<string, string> = {
@@ -42,14 +44,14 @@ export function MissionCard({
   const missionDetailHref = isDraftManager
     ? `/establishment/missions/new?draftId=${mission.id}`
     : (detailHref || `/missions/${mission.id}`);
-  const establishmentPhoto = mission.establishment?.photos?.[0]?.url;
+  const establishmentPhoto = mission.establishment?.photos?.find(photo => photo.isPrimary && photo.url)?.url
+    || mission.establishment?.photos?.find(photo => photo.url)?.url || mission.establishment?.logoUrl;
 
   return (
     <Card className={`mission-card${establishmentPhoto ? ' mission-card--with-image' : ''}`}>
       {establishmentPhoto ? (
         <Link className="mission-card-image" href={missionDetailHref} aria-label={`Voir ${mission.title}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- URL signée à durée limitée, mise à l'échelle par CSS */}
-          <img src={establishmentPhoto} alt={mission.establishment?.name || 'Établissement'} />
+          <ProfileAvatar src={establishmentPhoto} name={mission.establishment?.name || 'Établissement'} className={styles.photo} decorative />
         </Link>
       ) : null}
       <div className="mission-top">
