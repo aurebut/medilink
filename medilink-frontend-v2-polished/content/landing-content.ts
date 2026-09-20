@@ -12,7 +12,7 @@ export const landingContent = {
       <div class="hero-layout-human">
         <div class="hero-copy">
           <p class="hero-eyebrow">Le remplacement médical, de la recherche à la transmission.</p>
-          <h1 id="hero-title"><span>La plateforme de remplacement</span> <em>conçue <span class="title-accent">avec</span> et <span class="title-accent">pour</span> les médecins généralistes</em></h1>
+          <h1 id="hero-title"><span>La plateforme de remplacement</span> <em>conçue <span class="title-accent">avec</span> et <span class="title-accent">pour</span> <span class="hero-title-audience">les médecins généralistes</span></em></h1>
           <p class="hero-sub">MédiLink rapproche médecins remplaçants et cabinets selon leurs disponibilités et leurs conditions d’exercice. Comparez les possibilités, convenez des modalités et retrouvez les échanges et les transmissions dans le dossier du remplacement.</p>
           <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/demo">Demander une démo <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10"/></svg></span></a></div>
         </div>

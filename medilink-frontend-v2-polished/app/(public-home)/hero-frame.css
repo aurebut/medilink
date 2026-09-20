@@ -1,16 +1,25 @@
-/* Preserve the complete promise with a quieter, balanced typographic hierarchy. */
+/* Set the complete promise as one composed headline, with emphasis only on avec / pour. */
 html body.landing-home:not(.persona-page) .hero--structured h1 {
-  max-width: 840px;
-  font-size: clamp(40px, 4.4vw, 60px);
+  max-width: 740px;
+  font-size: clamp(40px, 4.2vw, 54px);
   line-height: 1.08;
+  letter-spacing: -.015em;
   text-wrap: balance;
 }
 
 html body.landing-home:not(.persona-page) .hero--structured h1 > em {
-  margin-top: 10px;
-  font-size: .8em;
-  line-height: 1.15;
-  text-wrap: balance;
+  margin-top: 0;
+  font-size: inherit;
+  font-style: normal;
+  line-height: inherit;
+}
+
+html body.landing-home:not(.persona-page) .hero--structured h1 .title-accent {
+  font-style: italic;
+}
+
+html body.landing-home:not(.persona-page) .hero--structured .hero-title-audience {
+  display: block;
 }
 
 /* Keep an even frame around the photo after removing the three links below it. */
@@ -20,13 +29,9 @@ html body.landing-home:not(.persona-page) .hero--structured h1 > em {
 
 @media (max-width: 640px) {
   html body.landing-home:not(.persona-page) .hero--structured h1 {
-    max-width: 520px;
-    font-size: clamp(32px, 8.6vw, 40px);
-  }
-
-  html body.landing-home:not(.persona-page) .hero--structured h1 > em {
-    margin-top: 8px;
-    font-size: .86em;
+    max-width: 360px;
+    font-size: clamp(32px, 9.2vw, 38px);
+    line-height: 1.07;
   }
 
   .hero--structured .hero-story {
