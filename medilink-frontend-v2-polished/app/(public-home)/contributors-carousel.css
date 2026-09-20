@@ -1,3 +1,11 @@
+/* Present contributors directly on the page, keeping the portraits and their rounded corners. */
+.landing-home .ml-contributor {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 /* Native horizontal scrolling keeps every contributor on one row on phones. */
 @media (max-width: 700px) {
   .landing-home .ml-testimonials-grid {

@@ -12,6 +12,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 The user requests that every completed modification be committed and pushed after appropriate verification, without waiting for a separate push request. Include only files belonging to the requested change.
 
+The user removed the background cards around the doctors in the contributors section. Keep `.ml-contributor` transparent, without an outer border, rounded card background or shadow, in the versioned homepage `contributors-carousel.css`. Preserve portrait rounding, all copy, internal spacing, the desktop grid and the accessible horizontal mobile carousel.
+
 The user subsequently removed the surrounding frame behind the Matchez / Pilotez / Concluez copy. Keep `.ml-process-panel` transparent, without a border, rounded background or shadow, in the versioned homepage `blue-editorial.css`. Preserve each animation's own `.ml-process-art` surface and rounded frame, all spacing, copy, navigation and animation behavior on desktop and mobile.
 
 The user subsequently requested swapping both the order and visual structures of the mission tracking and conversation sections while retaining all their copy. The homepage now places `#continuite` first, with a centered heading, wide mission preview and three benefits below; `#communication` follows with grouped copy/benefits on the left and its messages preview on the right. `preview-layouts.css` provides the versioned responsive layouts. Preserve each section's texts, anchors and genuine capture, the shared device proportions, and the documents section immediately afterward. This supersedes the earlier two-column mission layout and wide conversation layout.
