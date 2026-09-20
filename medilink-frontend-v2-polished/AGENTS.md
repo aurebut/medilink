@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 The user requests that every completed modification be committed and pushed after appropriate verification, without waiting for a separate push request. Include only files belonging to the requested change.
 
-The user added desktop-only spacing below the Matchez / Pilotez / Concluez navigation, then reduced the extra space from 35px to 25px. In `section-spacing.css`, `.ml-process-nav` uses a 43px bottom margin above 850px (the original 18px plus 25px). Keep the existing tablet/mobile gap, the vertically centered copy and the animation card dimensions.
+The user requested a smaller desktop-only gap below the Matchez / Pilotez / Concluez navigation. In `section-spacing.css`, `.ml-process-nav` now uses a 33px bottom margin above 850px (the original 18px plus 15px). Keep the existing tablet/mobile gap, the vertically centered copy and the animation card dimensions.
 
 The user extended the subtle section separators across the homepage, then removed the first one between the hero and process animations. Keep that first transition open, without a divider or its reserved spacing. `section-spacing.css` owns the remaining shared 1px #d8dde2 dividers, capped at 1100px, with 31px spacing (25px on mobile): after process, contributors, mission tracking, messages, documents and audiences, plus before FAQ to preserve the CTA's decorative layers. Do not restore the old `.ml-continuity-inner::after` divider in `preview-layouts.css` or introduce duplicate lines. Preserve the existing footer border and all section content.
 
