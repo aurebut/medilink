@@ -1,6 +1,7 @@
 /* Shared outer spacing; each section keeps its natural content height. */
 body.landing-home:not(.persona-page) main {
   --landing-section-space: clamp(36px, 4.5vw, 56px);
+  --landing-divider-space: 31px;
 }
 
 body.landing-home:not(.persona-page) main > :is(
@@ -20,17 +21,30 @@ body.landing-home:not(.persona-page) main > .cta-band {
   margin-block: 0;
 }
 
-/* Continue the mission section's fine divider through the following sections. */
-body.landing-home:not(.persona-page) main > :is(.ml-workspace, .ml-documents, .audiences)::after {
+/* One fine divider at each section boundary, including the hero and inset CTA. */
+body.landing-home:not(.persona-page) main > :is(
+  .ml-process,
+  .ml-testimonials,
+  .ml-continuity,
+  .ml-workspace,
+  .ml-documents,
+  .audiences
+)::after,
+body.landing-home:not(.persona-page) main > :is(.ml-process, .faq)::before {
   content: '';
   display: block;
   max-width: 1100px;
-  margin: 31px auto 0;
+  margin: var(--landing-divider-space) auto 0;
   border-top: 1px solid #d8dde2;
 }
 
+/* Place these dividers outside the hero and CTA's existing decorative layers. */
+body.landing-home:not(.persona-page) main > :is(.ml-process, .faq)::before {
+  margin-block: 0 var(--landing-divider-space);
+}
+
 @media (max-width: 600px) {
-  body.landing-home:not(.persona-page) main > :is(.ml-workspace, .ml-documents, .audiences)::after {
-    margin-top: 25px;
+  body.landing-home:not(.persona-page) main {
+    --landing-divider-space: 25px;
   }
 }

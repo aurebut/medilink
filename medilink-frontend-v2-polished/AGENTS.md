@@ -12,6 +12,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 The user requests that every completed modification be committed and pushed after appropriate verification, without waiting for a separate push request. Include only files belonging to the requested change.
 
+The user extended the subtle section separators across the whole homepage. `section-spacing.css` owns the shared 1px #d8dde2 dividers, capped at 1100px, with 31px spacing (25px on mobile). Keep exactly one divider between each pair of sections: after process, contributors, mission tracking, messages, documents and audiences, plus before process and FAQ to preserve the hero and CTA's decorative layers. Do not restore the old `.ml-continuity-inner::after` divider in `preview-layouts.css` or introduce duplicate lines. Preserve the existing footer border and all section content.
+
 The user removed the background cards around the doctors in the contributors section. Keep `.ml-contributor` transparent, without an outer border, rounded card background or shadow, in the versioned homepage `contributors-carousel.css`. Preserve portrait rounding, all copy, internal spacing, the desktop grid and the accessible horizontal mobile carousel.
 
 The user subsequently removed the surrounding frame behind the Matchez / Pilotez / Concluez copy. Keep `.ml-process-panel` transparent, without a border, rounded background or shadow, in the versioned homepage `blue-editorial.css`. Preserve each animation's own `.ml-process-art` surface and rounded frame, all spacing, copy, navigation and animation behavior on desktop and mobile.
