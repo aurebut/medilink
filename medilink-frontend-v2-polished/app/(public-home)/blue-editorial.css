@@ -1,13 +1,7 @@
-/* Homepage art direction: signature blue, warm ivory and restrained apricot.
-   Keep product tokens and the animated scene colours independent of this palette. */
+/* Homepage palette anchored on var(--brand-primary), with porcelain and pale blue surfaces. Colour only;
+   keep the original layout and SVG animation geometry/timing unchanged. */
 html body.landing-home:not(.persona-page) {
-  --landing-ivory: #faf7f2;
-  --landing-paper: #fffdf9;
-  --landing-apricot: #f2c6ad;
-  --landing-sand: #f5e8dc;
-  --landing-copper: #946044;
-  --landing-line: #e5ddd3;
-  --ivory: var(--landing-ivory);
+  --ivory: var(--brand-canvas);
   --navy: var(--brand-primary);
   --navy-2: #174780;
   --navy-3: #315f9b;
@@ -21,42 +15,39 @@ html body.landing-home:not(.persona-page) {
   --gray-1: #eef2f6;
   --gray-2: #dae3eb;
   --gray-3: #bdcddb;
-  --surface-line: var(--landing-line);
-  --surface-shadow: 0 20px 48px -34px #58442e35;
+  --surface-line: var(--brand-line);
+  --surface-shadow: 0 18px 45px -30px #1952a026;
   --editorial-paper: var(--brand-paper);
   --editorial-mist: var(--brand-mist);
   --editorial-frost: var(--brand-frost);
   background: var(--ivory);
 }
 
-/* A soft daylight wash frames the portrait; the blue actions remain the anchor. */
+/* A mist-blue hero with deeper slate typography and actions. */
 html body.landing-home:not(.persona-page) .hero--structured {
-  background: radial-gradient(ellipse at 82% 12%, #f2c6ad85 0%, transparent 52%),
-    radial-gradient(ellipse at 12% 30%, #efe2cb80 0%, transparent 48%),
-    linear-gradient(180deg, #fbf4eb 0%, var(--landing-ivory) 100%);
+  background: linear-gradient(180deg, #e1ebfa 0%, var(--brand-frost) 55%, var(--brand-canvas) 100%);
 }
 html body.landing-home:not(.persona-page) .hero--structured > .hero-bg { background: none; }
 html body.landing-home:not(.persona-page) nav {
-  background: #fffdf9f2;
-  border-color: #e8dfd5;
-  box-shadow: 0 8px 28px -22px #58442e45;
+  background: #fafcfef2;
+  border-color: #dce5ed;
+  box-shadow: 0 8px 26px -20px #1952a033;
 }
 html body.landing-home:not(.persona-page) .hero-story {
-  background: var(--landing-paper);
-  border-color: #e6d5c5;
-  box-shadow: 0 22px 50px -34px #58442e60;
+  background: var(--editorial-paper);
+  border-color: #d4e0e9;
+  box-shadow: var(--surface-shadow);
 }
-html body.landing-home:not(.persona-page) :is(.hero-eyebrow, .section-kicker, .ml-process-kicker, .ml-workspace-kicker, .faq-group-title) { color: var(--landing-copper); }
-html body.landing-home:not(.persona-page) .footer-col h4 { color: var(--brand-heading); }
+html body.landing-home:not(.persona-page) :is(.hero-eyebrow, .section-kicker, .ml-process-kicker, .ml-workspace-kicker, .faq-group-title, .footer-col h4) { color: #45658d; }
 html body.landing-home:not(.persona-page) :is(.hero-sub, .section-sub, .ml-process-copy > p, .ml-workspace-heading > p, .faq-answer, .footer-brand p, .footer-col a, .footer-bottom) { color: var(--brand-muted); }
 html body.landing-home:not(.persona-page) :is(.hero h1 em, .ml-process h2 em, .ml-workspace-heading h2 em, .ml-testimonials-heading h2 em) { color: inherit; }
 html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal) {
   background: var(--brand-primary);
   color: var(--brand-paper);
-  box-shadow: 0 5px 12px #1952a014;
+  box-shadow: 0 5px 12px #1952a01a;
 }
 html body.landing-home:not(.persona-page) :is(.btn-primary, .btn-teal):hover { background: var(--brand-primary-hover); }
-html body.landing-home:not(.persona-page) .nav-mobile-panel { background: var(--landing-paper); border-color: var(--surface-line); }
+html body.landing-home:not(.persona-page) .nav-mobile-panel { background: var(--editorial-paper); border-color: var(--surface-line); }
 
 /* The diagrams share the same slate and mist-blue palette;
    the scene clocks use matching light-blue surface endpoints. */
@@ -83,7 +74,7 @@ html body.landing-home:not(.persona-page) .ml-contributor h3 { color: var(--bran
 html body.landing-home:not(.persona-page) .ml-contributor-contribution { border-color: var(--surface-line); }
 
 /* Carry the same porcelain and mist surfaces through all three product previews. */
-html body.landing-home:not(.persona-page) .ml-continuity--editorial { background: #f1f5f8; }
+html body.landing-home:not(.persona-page) .ml-continuity--editorial { background: var(--ivory); }
 html body.landing-home:not(.persona-page) :is(.ml-journal-stage, .ml-documents-preview) { background: var(--editorial-mist); }
 html body.landing-home:not(.persona-page) :is(.ml-journal-sheet, .ml-documents-paper) { background: var(--editorial-paper); }
 html body.landing-home:not(.persona-page) .ml-documents-sync > span { box-shadow: 0 0 0 7px var(--editorial-mist); }
@@ -93,21 +84,20 @@ html body.landing-home:not(.persona-page) .ml-documents-folio-tab { background: 
 html body.landing-home:not(.persona-page) .ml-conversation-message--cabinet { background: #e6ebf0; }
 html body.landing-home:not(.persona-page) .ml-dossier-agenda { background: var(--brand-primary); }
 
-/* The two audiences have distinct, calm surfaces within one brand. */
-html body.landing-home:not(.persona-page) .audience-card { background: #eaf0f7; border-color: #d9e2ec; }
-html body.landing-home:not(.persona-page) .audience-card:nth-child(2) { background: var(--landing-sand); border-color: #e8d9cb; }
-html body.landing-home:not(.persona-page) .audience-card :is(.audience-kicker, .audience-card-head > div > span, .audience-index) { color: var(--brand-primary); }
-html body.landing-home:not(.persona-page) .audience-card:nth-child(2) :is(.audience-kicker, .audience-card-head > div > span, .audience-index) { color: #855039; }
+/* Two roles, two subtle values of the same blue. */
+html body.landing-home:not(.persona-page) .audience-card { background: var(--editorial-mist); border-color: #ccd4db; }
+html body.landing-home:not(.persona-page) .audience-card:nth-child(2) { background: var(--editorial-frost); border-color: #ccd6df; }
+html body.landing-home:not(.persona-page) .audience-card :is(.audience-kicker, .audience-card-head > div > span, .audience-index) { color: #45658d; }
 html body.landing-home:not(.persona-page) .audience-card .audience-index { background: transparent; border-color: transparent; }
 html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal) { background: var(--brand-primary); color: var(--brand-paper); }
 html body.landing-home:not(.persona-page) .audience-card :is(.btn-primary, .btn-teal):hover { background: var(--brand-primary-hover); }
-html body.landing-home:not(.persona-page) .cta-band { background: #193e69; }
-html body.landing-home:not(.persona-page) .cta-band h2 { color: var(--landing-paper); }
-html body.landing-home:not(.persona-page) .cta-band p { color: #d6e1ed; }
-html body.landing-home:not(.persona-page) .cta-band .btn-primary { background: var(--landing-apricot); color: #203b56; box-shadow: none; }
-html body.landing-home:not(.persona-page) .cta-band .btn-primary:hover { background: #f7d6c3; }
-html body.landing-home:not(.persona-page) .faq-item { border-color: var(--landing-line); }
-html body.landing-home:not(.persona-page) .faq-item[open] { background: #f1e9df; border-color: #d5bcaa; }
+html body.landing-home:not(.persona-page) .cta-band { background: var(--brand-primary); }
+html body.landing-home:not(.persona-page) .cta-band h2 { color: var(--brand-paper); }
+html body.landing-home:not(.persona-page) .cta-band p { color: #dbe7fa; }
+html body.landing-home:not(.persona-page) .cta-band .btn-primary { background: #e4edfb; color: var(--brand-primary); }
+html body.landing-home:not(.persona-page) .cta-band .btn-primary:hover { background: #e8eef3; }
+html body.landing-home:not(.persona-page) .faq-item { border-color: #ced6dd; }
+html body.landing-home:not(.persona-page) .faq-item[open] { background: var(--brand-mist); border-color: #b2bec9; }
 
 /* Blue is reserved for selected words within editorial headings. */
 html body.landing-home:not(.persona-page) :is(
@@ -121,81 +111,5 @@ html body.landing-home:not(.persona-page) main :is(h1, h2) .title-accent { color
 html body.landing-home:not(.persona-page) .ml-documents { --documents-ink: var(--brand-primary); --documents-muted: var(--brand-muted); }
 html body.landing-home:not(.persona-page) .ml-workspace--editorial { --dossier-ink: var(--brand-primary); --dossier-muted: var(--brand-muted); }
 html body.landing-home:not(.persona-page) :is(.ml-continuity-copy header > p, .ml-testimonials-heading > p) { color: var(--brand-muted); }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-kicker, .ml-documents-kicker) { color: var(--landing-copper); }
+html body.landing-home:not(.persona-page) :is(.ml-continuity-kicker, .ml-documents-kicker) { color: #45658d; }
 html body.landing-home:not(.persona-page) .ml-process-art--v2:not(.ml-process-art--matching) { --v2-ink: var(--brand-primary); --v2-thread: #376aaf; }
-
-/* Small recurring copper rules connect the sections without extra decoration. */
-html body.landing-home:not(.persona-page) :is(.section-kicker, .ml-workspace-kicker, .ml-continuity-kicker, .ml-documents-kicker) {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 11px;
-  line-height: 1.5;
-}
-html body.landing-home:not(.persona-page) :is(.section-kicker, .ml-workspace-kicker, .ml-continuity-kicker, .ml-documents-kicker)::before {
-  content: '';
-  width: 24px;
-  height: 2px;
-  flex: 0 0 24px;
-  border-radius: 0;
-  background: #c58f70;
-  box-shadow: none;
-}
-html body.landing-home:not(.persona-page) .hero--structured .hero-human-frame::after { display: none; }
-html body.landing-home:not(.persona-page) .hero--structured .hero-sub { color: #4e5d6b; }
-html body.landing-home:not(.persona-page) .ml-process { padding-bottom: clamp(48px, 6vw, 80px); }
-html body.landing-home:not(.persona-page) .ml-process-panel { border: 1px solid #e8e2d9; }
-html body.landing-home:not(.persona-page) .ml-process-copy > .ml-process-kicker { color: var(--landing-copper); }
-
-/* More legible benefits, with warm editorial indices outside the native captures. */
-html body.landing-home:not(.persona-page) .ml-workspace--editorial { background: var(--landing-paper); }
-html body.landing-home:not(.persona-page) .ml-documents { background: var(--landing-ivory); }
-html body.landing-home:not(.persona-page) :is(.ml-workspace, .ml-continuity, .ml-documents) {
-  padding-block: clamp(48px, 6vw, 88px);
-}
-html body.landing-home:not(.persona-page) :is(.ml-continuity-copy header > p, .ml-documents-copy > p) {
-  font-size: 15px;
-  line-height: 1.75;
-}
-html body.landing-home:not(.persona-page) :is(.ml-continuity-benefits, .ml-documents-benefits) h3 { font-size: 14px; }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-benefits, .ml-documents-benefits) p { font-size: 14px; line-height: 1.7; }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-benefits, .ml-documents-benefits) li > span { color: var(--landing-copper); }
-html body.landing-home:not(.persona-page) .ml-workspace-benefits { border-color: var(--landing-line); }
-html body.landing-home:not(.persona-page) .ml-workspace-benefits p { font-size: 14px; line-height: 1.7; }
-html body.landing-home:not(.persona-page) .ml-workspace-benefits strong { font-size: 15px; color: var(--brand-heading); }
-html body.landing-home:not(.persona-page) .ml-workspace-benefits p > span { color: var(--landing-copper); }
-html body.landing-home:not(.persona-page) :is(.ml-continuity-connection, .ml-documents-connection) { border-color: var(--landing-line); }
-html body.landing-home:not(.persona-page) .ml-documents-connection p { font-size: 12px; }
-
-html body.landing-home:not(.persona-page) .audiences { padding-block: clamp(48px, 6vw, 80px); }
-html body.landing-home:not(.persona-page) .audience-card { border-radius: 20px; }
-html body.landing-home:not(.persona-page) .audience-card-head { padding-bottom: 22px; border-bottom: 1px solid #cdd9e6; }
-html body.landing-home:not(.persona-page) .audience-card:nth-child(2) .audience-card-head { border-color: #ddc6b6; }
-html body.landing-home:not(.persona-page) .audience-card .audience-index { width: 34px; flex-basis: 34px; font-size: 30px; }
-html body.landing-home:not(.persona-page) .audience-card .audience-kicker { font-size: 11px; }
-html body.landing-home:not(.persona-page) .audience-card-head > div > span { display: none; }
-html body.landing-home:not(.persona-page) .audience-card p { font-size: 15px; line-height: 1.7; margin-bottom: 28px; }
-html body.landing-home:not(.persona-page) .cta-band { border-radius: 24px; padding-block: 64px; }
-html body.landing-home:not(.persona-page) .cta-band::after {
-  display: block;
-  top: 0;
-  left: 60px;
-  width: 64px;
-  height: 3px;
-  border-radius: 0;
-  background: var(--landing-apricot);
-}
-html body.landing-home:not(.persona-page) .faq { padding-block: clamp(56px, 7vw, 96px); }
-html body.landing-home:not(.persona-page) .faq-item summary { font-size: 15px; }
-html body.landing-home:not(.persona-page) .faq-answer { font-size: 14px; }
-html body.landing-home:not(.persona-page) footer { background: #f1eae0; border-top-color: var(--landing-line); }
-
-@media (max-width: 700px) {
-  html body.landing-home:not(.persona-page) :is(.ml-workspace, .ml-continuity, .ml-documents) { padding-block: 44px; }
-  html body.landing-home:not(.persona-page) .ml-workspace-benefits p { font-size: 13px; }
-  html body.landing-home:not(.persona-page) .ml-workspace-benefits strong { font-size: 14px; }
-  html body.landing-home:not(.persona-page) .audience-card { padding: 28px 24px; }
-  html body.landing-home:not(.persona-page) .audience-card p { font-size: 14px; }
-  html body.landing-home:not(.persona-page) .cta-band { padding: 38px 24px; }
-  html body.landing-home:not(.persona-page) .cta-band::after { left: 24px; }
-}

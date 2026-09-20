@@ -1,8 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-// Preserve the original landing outside the explicitly requested guides links, process art,
-// two homepage previews, documents section and replacement of the contributor placeholders.
+// Preserve the original landing outside the explicitly requested guides links, process art, two homepage previews and documents section.
 const reference = '60c8e06';
 const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
@@ -13,6 +12,9 @@ function normalizeRequestedHomeCopy(html, updated) {
   const processNote = /^ *<p class="ml-process-note">[^\n]*?<\/p>\r?\n/gm;
   assert.equal([...html.matchAll(processNote)].length, updated ? 0 : 1, 'requested removal of the process closing note');
   html = html.replace(processNote, '');
+  const contributorsNote = /^ *<p class="ml-testimonials-note">[^\n]*?<\/p>\r?\n/gm;
+  assert.equal([...html.matchAll(contributorsNote)].length, updated ? 0 : 1, 'requested removal of the contributors placeholder note');
+  html = html.replace(contributorsNote, '');
   const heroPath = /^ *<ol class="hero-path"[^>]*>[\s\S]*?<\/ol>\r?\n/gm;
   assert.equal([...html.matchAll(heroPath)].length, updated ? 0 : 1, 'requested removal of the three links below the hero photo');
   html = html.replace(heroPath, '');
@@ -40,6 +42,10 @@ function normalizeRequestedHomeCopy(html, updated) {
     [
       "<h3>Les informations à transmettre</h3><p>Consultez les consignes et les éléments partagés au fil du remplacement.</p>",
       "<h3>Les informations utiles</h3><p>Consultez le brief, les contacts et les conditions convenues.</p>"
+    ],
+    [
+      "Des médecins ont participé <em>aux choix du produit.</em>",
+      "Des médecins ont participé <em>au développement de la plateforme.</em>"
     ],
     [
       "<h2 id=\"ml-workspace-title\">Quels horaires avez-vous convenus ?<br><em>Où est le dernier document envoyé ?</em></h2>",
@@ -154,36 +160,23 @@ function normalizeEditorialPreviews(html, updated) {
   }
   return html;
 }
-function normalizeHumanSection(html, updated) {
-  assert.equal([...html.matchAll(/\bid="temoignages"/g)].length, 1, 'human section: original anchor remains unique');
-  const section = /    <section class="ml-testimonials(?: [^"]+)?" id="temoignages" aria-labelledby="ml-testimonials-title">(?:(?!<\/?section\b)[\s\S])*?<\/section>\r?\n\r?\n/g;
+function normalizeContributorsPosition(html) {
+  const carousel = '<div class="ml-testimonials-grid" role="region" aria-label="Médecins contributeurs" tabindex="0">';
+  assert.equal(html.split(carousel).length - 1, 1, 'contributors: accessible scrollable mobile carousel');
+  html = html.replace(carousel, '<div class="ml-testimonials-grid">');
+  const section = /    <section class="ml-testimonials" id="temoignages"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\r?\n\r?\n/g;
   const matches = [...html.matchAll(section)];
-  assert.equal(matches.length, 1, 'human section: exactly one self-contained section with its accessible heading');
+  assert.equal(matches.length, 1, 'contributors: exactly one section');
   const [{ 0: markup, index: start }] = matches;
-  assert.equal([...markup.matchAll(/\bid="ml-testimonials-title"/g)].length, 1, 'human section: heading ID remains unique');
-  const heading = markup.match(/<h2\b[^>]*\bid="ml-testimonials-title"[^>]*>([\s\S]*?)<\/h2>/)?.[1];
-  assert.ok(heading && heading.replace(/<[^>]+>/g, '').trim().length > 10, 'human section: meaningful visible heading');
-
-  // Only this explicitly replaced section is normalized; all surrounding markup stays verbatim.
-  const marker = '    <section class="ml-testimonials" id="temoignages" aria-labelledby="ml-testimonials-title"><h2 id="ml-testimonials-title">REQUESTED_HUMAN_SECTION</h2></section>\n\n';
-  if (!updated) return html.replace(markup, marker);
-
-  assert.doesNotMatch(markup, /Dr \[Prénom Nom\]|À compléter|à renseigner|à remplacer par|<blockquote\b|class="ml-contributor(?: |")/, 'human section: no unfinished profiles or invented testimonials');
-  assert.match(markup, /<figcaption>Portraits d’illustration<\/figcaption>/, 'human section: illustrative portraits are labelled honestly');
-  assert.match(markup, /<ol class="ml-contributors-needs" aria-label="Les besoins précisés avec les médecins">/, 'human section: contributor needs remain an accessible list');
   const precedingSections = [...html.slice(0, start).matchAll(/<section\b[^>]*>/g)];
-  assert.equal(precedingSections.length, 2, 'human section: immediately after the first two sections');
+  assert.equal(precedingSections.length, 2, 'contributors: immediately after the first two sections');
   assert.match(precedingSections[0][0], /class="hero hero--structured"/, 'hero remains first');
-  assert.match(html.slice(0, start), /<section class="ml-process" id="matching"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\s*$/, 'human section: directly follows the complete process section');
-  assert.match(html.slice(start + markup.length), /^\s*<section class="ml-workspace ml-workspace--editorial" id="communication"/, 'human section: precedes the workspace section');
-  // Restore the reference position so the existing documents check and strict page comparison remain intact.
+  assert.match(html.slice(0, start), /<section class="ml-process" id="matching"[^>]*>(?:(?!<\/?section\b)[\s\S])*?<\/section>\s*$/, 'contributors: directly follows the complete process section');
+  assert.match(html.slice(start + markup.length), /^ {4}<section class="ml-workspace ml-workspace--editorial" id="communication"/, 'contributors: precedes the workspace section');
+  // Restore the original position for the remaining exact markup comparison.
   const target = '    <section class="audiences" id="audiences"';
-  assert.ok(html.includes(target), 'human section: original following section exists');
-  // The extracted template adds blank lines at its interpolation boundaries.
-  // Normalize only that separator, without relaxing any neighbouring element comparison.
-  const withoutSection = html.slice(0, start).replace(/\s*$/, '\n\n')
-    + html.slice(start + markup.length).replace(/^\s*/, '    ');
-  return withoutSection.replace(target, marker + target);
+  assert.ok(html.includes(target), 'contributors: original following section exists');
+  return html.replace(markup, '').replace(target, markup + target);
 }
 function normalizeDocumentsSection(html) {
   assert.equal([...html.matchAll(/\bid="documents"/g)].length, 1, 'documents: exactly one section anchor');
@@ -245,8 +238,7 @@ for (const [path, file] of Object.entries(pages)) {
       }
     }
     if (path === '/' && tag === 'main') {
-      rendered = normalizeHumanSection(rendered, true);
-      expected = normalizeHumanSection(expected, false);
+      rendered = normalizeContributorsPosition(rendered);
       rendered = normalizeRequestedHomeCopy(rendered, true);
       expected = normalizeRequestedHomeCopy(expected, false);
       rendered = normalizeProcessFigures(rendered, true);
@@ -261,7 +253,7 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizeEditorialPreviews(expected, false);
       rendered = normalizeDocumentsSection(rendered);
     }
-    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews, documents and human section`);
+    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews and documents section`);
   }
   const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
   assert.deepEqual(styles(actual), styles(original), `${path}: original stylesheet order`);
@@ -269,7 +261,7 @@ for (const [path, file] of Object.entries(pages)) {
   [...original.matchAll(/<script src="(\/landing-[^"]+\.js)"/g)].forEach(match => originalAssets.add(match[1]));
   assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
-  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews, documents and human section`);
+  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews and documents section`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });
