@@ -56,21 +56,16 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 .landing-home .ml-macos-toolbar { display: none; }
 
 @media (min-width: 701px) {
-  /* A separate macOS-style window sits inside the physical laptop screen.
+  /* The maximized macOS window fills the physical screen edge to edge.
      Its content keeps the complete native capture's own proportions. */
   .landing-home .ml-device-screen {
     aspect-ratio: auto;
-    padding: 1.5cqw;
-    background: radial-gradient(ellipse at 95% 100%, #d7e8f6, transparent 65%), radial-gradient(ellipse at 5% 0%, #87b3da, transparent 60%), linear-gradient(135deg, #427bb8, #1952a0 55%, #9ebfdf);
   }
   .landing-home .ml-macos-window {
     position: relative;
     display: block;
     overflow: hidden;
-    border: 1px solid #ffffffa6;
-    border-radius: .9cqw;
     background: var(--brand-paper);
-    box-shadow: 0 .8cqw 2cqw -.5cqw #102b5c66, 0 0 0 1px #16386726;
   }
   .landing-home .ml-macos-toolbar {
     position: relative;
@@ -106,13 +101,13 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   .landing-home .ml-interface-display picture::-webkit-scrollbar { display: none; }
   .landing-home .ml-interface-display img { width: 100%; max-height: none; }
   .landing-home .ml-interface-preview--messages img { border-radius: 0; }
-  /* Fit the native compact mission header and six steps completely in the phone. */
+  /* Fit the full mission capture at screen width; let the phone height follow
+     its native proportions so the six steps need neither gutters nor cropping. */
   .landing-home .ml-interface-preview--mission .ml-interface-stage { padding-inline: 20px; }
   .landing-home .ml-interface-preview--mission .ml-interface-window { width: min(100%, 300px); }
   .landing-home .ml-interface-preview--mission .ml-device-buttons::after { left: calc(min(100cqw, 300px) + 1px); }
-  .landing-home .ml-interface-preview--mission picture { display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  .landing-home .ml-interface-preview--mission img { width: auto; max-width: 100%; max-height: 100%; }
-  .landing-home .ml-interface-preview--documents picture { padding: 5px 9px 20px; }
+  .landing-home .ml-interface-preview--mission .ml-device-screen { aspect-ratio: auto; }
+  .landing-home .ml-interface-preview--mission picture { flex: 0 0 auto; aspect-ratio: var(--ml-mission-preview-ratio); overflow: hidden; }
   .landing-home .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-mobile-capture-width)) / calc(100% * 14 / var(--ml-mobile-capture-height)); }
   .landing-home .ml-interface-preview--documents .ml-device-screen::after { content: ''; position: absolute; inset: auto 0 7.5cqw; height: 6cqw; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
   .landing-home .ml-device-home { position: relative; display: block; flex: 0 0 7.5cqw; }
