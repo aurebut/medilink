@@ -49,6 +49,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
 .landing-home .ml-macos-toolbar { display: none; }
 
 @media (min-width: 701px) {
+  .landing-home :is(.ml-interface-preview--mission, .ml-interface-preview--documents) .ml-interface-stage { padding-inline: 12px; }
   /* The maximized macOS window fills the physical screen edge to edge.
      Its content keeps the complete native capture's own proportions. */
   .landing-home .ml-device-screen {

@@ -8,7 +8,7 @@
   color: var(--documents-ink);
   scroll-margin-top: 100px;
 }
-.ml-documents .ml-documents-inner { display: grid; grid-template-columns: minmax(0, 1.13fr) minmax(0, .87fr); align-items: center; gap: 76px; max-width: 1120px; margin: 0 auto; }
+.ml-documents .ml-documents-inner { display: grid; grid-template-columns: minmax(0, 1.16fr) minmax(0, .84fr); align-items: center; gap: 64px; max-width: 1200px; margin: 0 auto; }
 .ml-documents .ml-documents-copy { grid-column: 2; grid-row: 1; padding-block: 10px; }
 .ml-documents .ml-documents-kicker { display: block; margin-bottom: 20px; color: #61798e; font: 500 10px/1.5 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
 .ml-documents .ml-documents-copy h2 { color: var(--documents-ink); font: 400 clamp(36px, 3.55vw, 49px)/1.08 var(--serif); letter-spacing: -.025em; text-wrap: balance; }

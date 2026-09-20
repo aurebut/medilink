@@ -9,9 +9,9 @@
 }
 
 .ml-continuity--editorial .ml-continuity-inner {
-  grid-template-columns: minmax(0, .87fr) minmax(0, 1.13fr);
-  gap: 76px;
-  max-width: 1120px;
+  grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);
+  gap: 64px;
+  max-width: 1200px;
 }
 
 .ml-continuity--editorial .ml-continuity-copy { padding-block: 10px; }

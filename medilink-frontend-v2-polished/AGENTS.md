@@ -10,6 +10,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Landing pages and SEO
 
+The user subsequently requested moderately larger desktop mockups in the continuity and shared-documents sections. Their mirrored two-column grids use a 1200px maximum, a 64px desktop gap and 58% of the available column space for the preview; desktop preview side padding is 12px. This increases the large-screen captures by about 15% while retaining readable copy. Preserve existing tablet stacking, all phone dimensions, and the messages mockup size.
+
 The user subsequently shortened the continuity section by removing “Quand vous en avez besoin.” from its heading and repeated closing line. Keep “où en est la mission.” highlighted with the shared `.title-accent` brand blue in its existing h2, consistent with the other landing headings.
 
 The user subsequently requested square interface corners inside desktop mockups, especially below the macOS toolbar. The native desktop message layout and replacement dossier now have zero outer border radius above 700px; regenerate their genuine desktop captures after changes. Do not reapply rounded clipping to desktop capture images. Preserve the physical device screen/case rounding, internal controls/photos, and all mobile styling/assets. This supersedes the source-sized desktop capture corner treatment below.
