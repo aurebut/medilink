@@ -81,27 +81,27 @@
       "device": "desktop",
       "route": "/app/current-missions",
       "viewport": {
-        "width": 1100,
-        "height": 1000
+        "width": 1600,
+        "height": 1100
       },
       "crop": {
-        "x": 293,
-        "y": 251,
-        "width": 758,
-        "height": 684,
-        "scrollY": 208,
+        "x": 349,
+        "y": 340,
+        "width": 1146,
+        "height": 694,
+        "scrollY": 134,
         "selector": ".candidate-current-route",
         "clippedBottom": false
       },
-      "width": 758,
-      "height": 684,
-      "previewHeight": 684,
+      "width": 1146,
+      "height": 694,
+      "previewHeight": 694,
       "files": [
         "mission-desktop.webp",
         "mission-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "fe0f3771970c50181936f00d7d90f9b96f4cc96bf2a7cecd65bd3cdd15316ce8"
+      "sha256": "5f7727f19b1085ce4bc214c88ace61737d2f9d2bafdf70fdcf975071b54e2f49"
     },
     {
       "name": "mission",
@@ -135,19 +135,19 @@
       "device": "desktop",
       "route": "/app/current-missions?section=documents",
       "viewport": {
-        "width": 1040,
+        "width": 1600,
         "height": 1100
       },
       "crop": {
-        "x": 313,
+        "x": 369,
         "y": 118,
-        "width": 658,
+        "width": 1106,
         "height": 825,
-        "scrollY": 152,
+        "scrollY": 166,
         "selector": ".replacement-dossier",
         "clippedBottom": false
       },
-      "width": 658,
+      "width": 1106,
       "height": 825,
       "previewHeight": 825,
       "files": [
@@ -155,7 +155,7 @@
         "documents-desktop@2x.webp"
       ],
       "sourceScale": 2,
-      "sha256": "ddcf6f57bda2c0edb147bcd29f7375fe5dfa93971eee5fa06ce5b9821c735bee"
+      "sha256": "10d268199a33980fa0bc4c27ebffc26b0c8d5db1ca8c36276fe3524acba14e39"
     },
     {
       "name": "documents",

@@ -32,7 +32,8 @@ await mkdir(output, { recursive: true });
 
 async function capture(name, device) {
   const mobile = device === 'mobile';
-  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'documents' ? { width: 1040, height: 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1100, height: 1000 };
+  // Wider native layouts fit the landing's computer displays without clipping rows.
+  let viewport = mobile ? { width: 390, height: name === 'messages' ? 820 : 1100 } : name === 'messages' ? { width: 1440, height: 900 } : { width: 1600, height: 1100 };
   const context = await browser.newContext({ viewport, deviceScaleFactor: 2, locale: 'fr-FR', timezoneId: 'Europe/Paris', reducedMotion: 'reduce' });
   const page = await context.newPage();
   const errors = [];

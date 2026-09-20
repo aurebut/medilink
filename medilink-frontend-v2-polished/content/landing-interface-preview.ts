@@ -16,11 +16,18 @@ export function interfacePreview(name: PreviewName, className: string, title: st
     <a class="ml-interface-open" href="${source(desktop, true)}" target="_blank" rel="noopener" data-interface-preview="${name}" aria-label="Voir l’interface : ${title} (agrandir)">
       <span class="ml-interface-stage">
         <span class="ml-interface-window">
-          <picture style="--ml-capture-width:${desktop.width};--ml-capture-height:${desktop.height};--ml-mobile-capture-width:${mobile.width};--ml-mobile-capture-height:${mobile.height}">
-            <source media="(max-width: 700px)" srcset="${source(mobile)} 1x, ${source(mobile, true)} 2x" width="${mobile.width}" height="${mobile.height}">
-            <img src="${source(desktop)}" srcset="${source(desktop)} 1x, ${source(desktop, true)} 2x" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
-          </picture>
+          <span class="ml-device-camera" aria-hidden="true"></span>
+          <span class="ml-device-screen">
+            <span class="ml-device-status" aria-hidden="true"><span>9:41</span><span class="ml-device-island"></span><span class="ml-device-indicators"><svg viewBox="0 0 40 12" fill="currentColor"><path d="M0 8h2v4H0zm4-3h2v7H4zm4-2h2v9H8zm4-3h2v12h-2z"/><rect x="20" y="1" width="16" height="10" rx="3" fill="none" stroke="currentColor"/><rect x="22" y="3" width="12" height="6" rx="1"/><path d="M38 4h2v4h-2z"/></svg></span></span>
+            <picture style="--ml-capture-width:${desktop.width};--ml-capture-height:${desktop.height};--ml-mobile-capture-width:${mobile.width};--ml-mobile-capture-height:${mobile.height}">
+              <source media="(max-width: 700px)" srcset="${source(mobile)} 1x, ${source(mobile, true)} 2x" width="${mobile.width}" height="${mobile.height}">
+              <img src="${source(desktop)}" srcset="${source(desktop)} 1x, ${source(desktop, true)} 2x" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
+            </picture>
+            <span class="ml-device-home" aria-hidden="true"></span>
+          </span>
+          <span class="ml-device-buttons" aria-hidden="true"></span>
         </span>
+        <span class="ml-device-base" aria-hidden="true"></span>
       </span>
     </a>
   </figure>`;
