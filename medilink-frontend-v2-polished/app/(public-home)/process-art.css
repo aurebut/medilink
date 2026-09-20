@@ -159,6 +159,25 @@
 }
 
 /* The first tab follows the same pair from the map through criteria and discussion. */
+.ml-process-art.ml-process-art--criteria {
+  --v2-surface: #f3f6fa;
+  --v2-ink: var(--brand-heading);
+  --v2-muted: var(--brand-muted);
+  --v2-thread: var(--brand-primary);
+}
+/* Keep the map's terrain palette; focus the brand blue on the active connection. */
+.ml-process-art--criteria .ml-v2-title em { color: var(--brand-primary); }
+.ml-process-art--criteria :is(.ml-v2-tag, .ml-map-pin, .ml-map-compass, .ml-check-row) { color: var(--brand-primary); }
+.ml-process-art--criteria .ml-v2-tag > rect { stroke: #d7e1e9; }
+.ml-process-art--criteria .ml-map-waypoints { stroke: var(--brand-primary); }
+.ml-process-art--criteria .ml-map-compass path { fill: var(--brand-primary); }
+.ml-process-art--criteria .ml-sequence-label--map { fill: var(--brand-heading); stroke: #f3f6fa; }
+.ml-process-art--criteria .ml-v2-network { stroke: #c3d9f533; }
+.ml-process-art--criteria .ml-v2-network circle { fill: #a9c9f3; stroke: var(--brand-primary); }
+.ml-process-art--criteria .ml-checklist-title { fill: var(--brand-heading); }
+.ml-process-art--criteria .ml-check-label { fill: var(--brand-text); }
+.ml-process-art--criteria .ml-check-badge { fill: #e7effb; }
+.ml-process-art--criteria .ml-checklist-foot { fill: #e0ebfa; }
 .ml-process-art--criteria .ml-sequence-eyebrows,
 .ml-process-art--criteria .ml-sequence-titles,
 .ml-process-art--criteria .ml-sequence-captions { display: grid; min-width: 0; }
@@ -168,13 +187,13 @@
 .ml-process-art--criteria .ml-sequence-copy--match,
 .ml-process-art--criteria .ml-sequence-copy--discussion { opacity: 0; visibility: hidden; }
 .ml-process-art--criteria .ml-art-caption .ml-sequence-captions { max-width: none; margin: 0; color: inherit; font: inherit; text-wrap: wrap; }
-.ml-process-art--criteria .ml-sequence-copy--match em { color: #c4dff2; }
+.ml-process-art--criteria .ml-sequence-copy--match em { color: #dceaff; }
 .ml-process-art--criteria .ml-sequence-match { opacity: 0; visibility: hidden; }
 .ml-process-art--criteria .ml-sequence-discussion { opacity: 0; visibility: hidden; }
-.ml-process-art--criteria .ml-sequence-message { fill: #29456f; }
-.ml-process-art--criteria .ml-sequence-question-tail { fill: #fdfefe; stroke: #aebac6; stroke-width: 1; stroke-linejoin: round; }
-.ml-process-art--criteria .ml-sequence-reply-shadow { fill: #c9d3dd; }
-.ml-process-art--criteria .ml-sequence-reply-face { fill: #dce6ef; stroke: #acbccb; stroke-width: 1; }
+.ml-process-art--criteria .ml-sequence-message { fill: var(--brand-text); }
+.ml-process-art--criteria .ml-sequence-question-tail { fill: #fdfefe; stroke: #d7e1e9; stroke-width: 1; stroke-linejoin: round; }
+.ml-process-art--criteria .ml-sequence-reply-shadow { fill: #c8d9ee; }
+.ml-process-art--criteria .ml-sequence-reply-face { fill: #e7effb; stroke: #b5cbea; stroke-width: 1; }
 .ml-process-art--criteria .ml-sequence-contract-link { fill: none; stroke: #acb9c5; stroke-width: 1.5; stroke-linecap: round; }
 .ml-process-art--criteria .ml-sequence-contract-note { fill: #506d94; }
 .ml-process-art--criteria .ml-sequence-match .ml-v2-grid { display: block; }
