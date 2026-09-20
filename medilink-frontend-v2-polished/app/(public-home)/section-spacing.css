@@ -16,6 +16,13 @@ body.landing-home:not(.persona-page) main > :is(
   padding-block: var(--landing-section-space);
 }
 
+@media (min-width: 851px) {
+  /* Add 35px to the existing 18px gap below the process navigation. */
+  body.landing-home:not(.persona-page) .ml-process-nav {
+    margin-bottom: 53px;
+  }
+}
+
 /* Neighbouring sections already provide the space around this inset card. */
 body.landing-home:not(.persona-page) main > .cta-band {
   margin-block: 0;
