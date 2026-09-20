@@ -119,7 +119,6 @@ export const landingContent = {
             <li><span aria-hidden="true">02</span><div><h3>La prochaine étape</h3><p>Repérez ce qui est en cours et ce qui reste à finaliser.</p></div></li>
             <li><span aria-hidden="true">03</span><div><h3>Les informations utiles</h3><p>Consultez le brief, les contacts et les conditions convenues.</p></div></li>
         </ol>
-        <p class="ml-continuity-connection"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9m6-3 3 3-3 3M4 17h9m-6-3-3 3 3 3"/></svg><span>Pendant le remplacement, savoir où en est la mission.</span></p>
       </div>
     </section>
 

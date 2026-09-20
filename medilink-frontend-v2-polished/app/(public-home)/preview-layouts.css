@@ -29,10 +29,6 @@ html body.landing-home:not(.persona-page) .ml-continuity-benefits {
   margin-top: 32px;
 }
 
-html body.landing-home:not(.persona-page) .ml-continuity-connection {
-  justify-content: center;
-}
-
 html body.landing-home:not(.persona-page) .ml-workspace-inner {
   display: grid;
   grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);

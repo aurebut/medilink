@@ -9,6 +9,9 @@ const originalAssets = new Set();
 const normalize = html => html.replaceAll('\r\n', '\n').replaceAll('/landing-medecin.html', '/remplacement-medical').replaceAll('/landing-etablissement.html', '/trouver-medecin-remplacant').replaceAll('/landing.html', '/').trim();
 function normalizeRequestedHomeCopy(html, updated) {
   html = html.replace(/<span class="title-accent">([^<]+)<\/span>/g, '$1');
+  const missionClosing = /^ *<p class="ml-continuity-connection">[^\n]*?<\/p>\r?\n/gm;
+  assert.equal([...html.matchAll(missionClosing)].length, updated ? 0 : 1, 'requested removal of the repeated mission sentence and its icon');
+  html = html.replace(missionClosing, '');
   const processNote = /^ *<p class="ml-process-note">[^\n]*?<\/p>\r?\n/gm;
   assert.equal([...html.matchAll(processNote)].length, updated ? 0 : 1, 'requested removal of the process closing note');
   html = html.replace(processNote, '');
@@ -58,10 +61,6 @@ function normalizeRequestedHomeCopy(html, updated) {
     [
       '<h2 id="continuity-title">Pendant le remplacement, savoir où en est la mission.<br><em>Quand vous en avez besoin.</em></h2>',
       '<h2 id="continuity-title">Pendant le remplacement, savoir où en est la mission.</h2>'
-    ],
-    [
-      "<span>Un compte rendu partagé.<br><strong>Consultable par les deux médecins, quand ils en ont besoin.</strong></span>",
-      "<span>Pendant le remplacement, savoir où en est la mission.</span>"
     ]
   ];
   for (const [before, after] of replacements) {
@@ -193,16 +192,14 @@ function normalizePreviewLayouts(html, updated) {
       const benefits = markup.match(name === 'workspace'
         ? /<div class="ml-workspace-benefits">[\s\S]*?<\/div>/
         : /<ol class="ml-continuity-benefits">[\s\S]*?<\/ol>/)?.[0];
-      const connection = name === 'continuity' ? markup.match(/<p class="ml-continuity-connection">[\s\S]*?<\/p>/)?.[0] : '';
       const preview = `<!-- requested interface preview: ${id} -->`;
       assert.ok(header && benefits && markup.includes(preview), `${id}: heading, benefits and preview retained`);
-      if (name === 'continuity') assert.ok(connection, 'mission closing copy retained');
       if (updated) {
         assert.ok(markup.indexOf(header) < markup.indexOf(preview), `${id}: heading precedes the preview`);
         assert.equal(markup.indexOf(benefits) < markup.indexOf(preview), name === 'workspace', `${id}: requested content structure`);
         if (name === 'workspace') assert.match(markup, /<div class="ml-workspace-copy">/, 'conversation copy grouped beside its preview');
       }
-      const parts = [header, benefits, connection, preview].filter(Boolean);
+      const parts = [header, benefits, preview];
       let remainder = markup;
       for (const part of parts) remainder = remainder.replace(part, '');
       assert.equal(remainder.replace(/<[^>]*>/g, '').trim(), '', `${id}: no unaccounted visible copy`);
