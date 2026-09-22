@@ -11,10 +11,16 @@ export const capturedAt = '2026-09-22T10:00:00.000Z';
 export const profile = {
   ...originalProfile,
   candidateGender: 'FEMININE',
-  bio: 'Médecin généraliste, six années de pratique en cabinet. Disponible pour des remplacements à Paris.',
+  bio: 'Médecin généraliste depuis six ans, je privilégie les cabinets de quartier et le suivi de toute la famille. Habituée à Doctolib, je prends facilement le relais de votre organisation.',
   acceptedMissionTypes: ['REMPLACEMENT'], knownSoftware: ['Doctolib'],
   acceptedPatientTypes: ['Tout public'], refusedPatientTypes: [],
-  acceptedActs: [], refusedActs: [], languages: ['Français'],
+  acceptedActs: ['CONSULTATIONS', 'ECG', 'PEDIATRICS'], refusedActs: [], languages: ['Français'],
+  actsPerformed: ['Consultations', 'ECG / vaccination'],
+  acceptedPracticeSettings: ['CABINET', 'GROUP_PRACTICE'],
+  acceptedWeekdays: ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'],
+  acceptedTimeSlots: ['DAY'], preferredDurations: ['1 semaine', 'Longue mission'],
+  availabilityNotes: 'Remplacements en semaine à Paris ; dates à confirmer ensemble.',
+  maxPatientsPerDay: 30, secretaryRequired: true, accommodationRequired: false,
   minimumCompensation: 70, visibilityStatus: 'VISIBLE',
 };
 export const establishment = {
@@ -27,6 +33,8 @@ export const mission = {
   ...originalMission, establishment, city: 'Paris', specialty: 'Médecine générale',
   location: '12 rue des Tilleuls, 75011 Paris', sector: 'SECTEUR_1',
   patientType: 'Tout public', durationHours: 50,
+  practiceSetting: 'GROUP_PRACTICE', requiredActs: ['CONSULTATIONS'],
+  equipmentAvailable: ['ECG'], accommodationProvided: false,
   teamInfo: 'Deux médecins généralistes et une secrétaire',
 };
 export const offer = {
@@ -53,16 +61,42 @@ export const conversation = {
 // Three received applications are an illustrative sample, never a network total.
 // Missing portraits intentionally use the actual product's initials fallback.
 export const candidateApplications = [
-  { firstName: 'Sarah', lastName: 'Bernard', gender: 'FEMININE', avatarUrl: profile.avatarUrl, status: 'VIEWED', years: 6 },
-  { firstName: 'Olivier', lastName: 'Morel', gender: 'MASCULINE', avatarUrl: null, status: 'SUBMITTED', years: 8 },
-  { firstName: 'Camille', lastName: 'Laurent', gender: 'FEMININE', avatarUrl: null, status: 'SUBMITTED', years: 4 },
+  {
+    firstName: 'Sarah', lastName: 'Bernard', gender: 'FEMININE',
+    avatarUrl: profile.avatarUrl, status: 'VIEWED', years: 6,
+    details: { city: 'Paris', preferredCities: ['Paris'], knownSoftware: ['Doctolib', 'Weda'] },
+  },
+  {
+    firstName: 'Olivier', lastName: 'Morel', gender: 'MASCULINE',
+    avatarUrl: null, status: 'SUBMITTED', years: 8,
+    details: {
+      city: 'Boulogne-Billancourt', preferredCities: ['Paris', 'Boulogne-Billancourt'],
+      knownSoftware: ['Weda', 'Doctolib'], minimumCompensation: 75,
+      bio: 'Huit ans de médecine générale, en cabinet individuel et en maison de santé. Je recherche une équipe disponible et un rythme de consultations régulier.',
+      availabilityNotes: 'Paris et proche couronne. Rétrocession souhaitée de 75 %, à échanger selon les conditions du cabinet.',
+      acceptedActs: ['CONSULTATIONS', 'ECG', 'WOUND_CARE'],
+      actsPerformed: ['Consultations', 'ECG / vaccination', 'Gestion plaies'],
+    },
+  },
+  {
+    firstName: 'Camille', lastName: 'Laurent', gender: 'FEMININE',
+    avatarUrl: null, status: 'SUBMITTED', years: 2,
+    details: {
+      city: 'Paris', preferredCities: ['Paris'], medicalStatus: 'JUNIOR_DOCTOR',
+      knownSoftware: [], acceptedPatientTypes: ['Adultes'],
+      bio: 'Docteure junior en médecine générale, intéressée par la pratique de ville et les consultations de prévention. J’apprécie un temps de transmission avant le remplacement.',
+      availabilityNotes: 'Conditions d’exercice et prise en main du logiciel à préciser ensemble.',
+      acceptedActs: ['CONSULTATIONS'], actsPerformed: ['Consultations'],
+      preferredDurations: ['1 semaine'],
+    },
+  },
 ].map((person, index) => {
   const userId = `preview-applicant-${index}`;
   const candidateProfile = {
     ...profile, id: `preview-applicant-profile-${index}`, userId,
     firstName: person.firstName, lastName: person.lastName,
     candidateGender: person.gender, avatarUrl: person.avatarUrl, experienceYears: person.years,
-    bio: 'Médecin généraliste disponible pour un remplacement en cabinet à Paris.',
+    ...person.details,
   };
   return {
     ...originalApplication, id: `preview-received-application-${index}`,

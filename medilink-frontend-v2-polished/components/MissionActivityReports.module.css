@@ -1,0 +1,118 @@
+.report {
+  --ink: #223e57;
+  --muted: #617184;
+  --blue: #1952a0;
+  color: var(--ink);
+  background: #fdfefe;
+  border: 1px solid #dce4ec;
+  border-radius: 20px;
+  overflow: hidden;
+  min-width: 0;
+  font-family: var(--brand-sans);
+}
+.header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; padding: 30px 30px 24px; background: #f6f8fb; }
+.eyebrow { display: block; color: var(--blue); font-size: 10px; font-weight: 650; text-transform: uppercase; letter-spacing: .13em; line-height: 1.5; }
+.header h2 { font: 400 42px/1.05 var(--brand-serif); letter-spacing: -.025em; color: var(--ink); margin: 9px 0 10px; }
+.header p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.exampleBadge, .comingBadge { flex-shrink: 0; border: 1px solid #ccdbea; border-radius: 20px; padding: 6px 9px; font-size: 10px; color: var(--blue); line-height: 1.5; }
+.comingBadge { color: var(--muted); }
+.toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 17px 30px; border-block: 1px solid #e2e8ed; }
+.periods { display: flex; gap: 2px; border-radius: 8px; padding: 3px; background: #edf2f8; }
+.periods button { border: 0; border-radius: 6px; background: transparent; color: #5b6d82; padding: 8px 10px; font: 500 11px/1.3 var(--brand-sans); cursor: pointer; }
+.periods button[aria-pressed='true'] { background: #fff; color: var(--blue); box-shadow: 0 2px 4px #1b40670c; }
+.datePicker { display: flex; align-items: center; gap: 5px; color: var(--muted); }
+.datePicker > button { display: grid; place-items: center; width: 26px; height: 30px; background: none; border: 0; color: var(--muted); border-radius: 5px; cursor: pointer; }
+.datePicker label { display: flex; align-items: center; gap: 6px; }
+.datePicker input { font: 500 11px var(--brand-sans); border: 0; background: transparent; color: var(--ink); min-width: 0; max-width: 118px; padding: 5px 0; }
+.body { padding: 26px 30px 28px; }
+.periodHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.periodHeading h3 { font: 400 25px/1.2 var(--brand-serif); color: var(--ink); margin: 6px 0 0; }
+.periodHeading h3::first-letter { text-transform: uppercase; }
+.author { display: flex; align-items: center; gap: 9px; }
+.author img { object-fit: cover; border-radius: 50%; }
+.author strong, .author span { display: block; white-space: nowrap; }
+.author strong { font-size: 11px; font-weight: 600; }
+.author span { font-size: 10px; margin-top: 4px; color: var(--muted); }
+.overview { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 28px; padding: 25px 0; margin-bottom: 24px; border-bottom: 1px solid #dfe6ed; }
+.mainMetric { display: flex; flex-direction: column; }
+.mainMetric > strong { font: 400 70px/.95 var(--brand-serif); color: var(--blue); letter-spacing: -.035em; }
+.mainMetric > span { font-size: 11px; margin-top: 9px; color: var(--muted); }
+.reportCount { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: #397158; font-weight: 600; }
+.periodSummary p { color: #3e526c; font-size: 12px; line-height: 1.75; margin: 7px 0 0; max-width: 500px; }
+.coverage { display: block; font-size: 10px; color: var(--muted); margin-top: 6px; }
+.periodContent { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+.narrative h4 { font: 400 25px/1.2 var(--brand-serif); color: var(--ink); letter-spacing: -.02em; margin: 8px 0 11px; }
+.narrative > p, .handover p { color: #53657b; font-size: 12px; line-height: 1.75; margin: 0; }
+.handover { margin-top: 19px; padding: 15px 16px; background: #eef4fc; border-radius: 9px; }
+.handover > span { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--blue); margin-bottom: 7px; }
+.handover p { color: #425c7c; }
+.journal { min-width: 0; }
+.journalHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+.journalHeading h4 { margin: 0; font-size: 11px; font-weight: 600; color: var(--ink); }
+.journalHeading > span { color: var(--muted); font-size: 9px; white-space: nowrap; }
+.journalRow { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 12px; padding: 11px 0; border: 0; border-bottom: 1px solid #e6ebf1; border-radius: 0; background: transparent; color: var(--muted); text-align: left; cursor: pointer; }
+.journalRow:last-child { border-bottom: 0; }
+.journalDate { display: flex; align-items: baseline; gap: 7px; }
+.journalDate strong { font-size: 11px; font-weight: 550; text-transform: capitalize; color: var(--ink); min-width: 28px; }
+.journalDate > span { color: var(--muted); font-size: 10px; }
+.journalActivity { display: flex; align-items: baseline; gap: 5px; margin-left: auto; }
+.journalActivity strong { color: var(--blue); font-size: 13px; font-weight: 600; }
+.journalActivity > span { color: var(--muted); font-size: 9px; }
+.journalRow:hover { color: var(--blue); background: #f6f8fc; }
+.dailyContent .handover { max-width: 560px; }
+.weekLink { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 0; border: 0; background: none; font: 500 11px var(--brand-sans); color: var(--blue); cursor: pointer; }
+.footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 30px; border-top: 1px solid #e1e7ee; color: var(--muted); font-size: 9px; background: #f8fafc; }
+.footer button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 0; padding: 0; font: 500 10px var(--brand-sans); color: var(--blue); background: none; white-space: nowrap; cursor: pointer; }
+.empty { min-height: 370px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 45px 30px; text-align: center; }
+.empty > svg { color: #8ba6c3; margin-bottom: 18px; }
+.empty h3 { font: 400 32px/1.15 var(--brand-serif); color: var(--ink); margin: 10px 0 12px; }
+.empty > p { max-width: 430px; color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0; }
+.emptyActions { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 18px; margin-top: 24px; }
+.primaryButton { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 15px; background: var(--blue); color: #fff; border: 0; border-radius: 7px; font: 500 12px var(--brand-sans); cursor: pointer; }
+.textButton { padding: 8px 0; color: var(--blue); font: 500 12px var(--brand-sans); background: none; border: 0; cursor: pointer; }
+.report button:focus-visible, .report input:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 1100px) and (min-width: 701px) {
+  .toolbar { padding-inline: 24px; }
+  .periodContent { gap: 24px; }
+  .journalDate { flex-direction: column; gap: 2px; }
+}
+@media (max-width: 700px) {
+  .report { border-radius: 15px; }
+  .header { flex-direction: column; gap: 13px; padding: 24px 20px 20px; }
+  .header h2 { font-size: 37px; }
+  .header p { font-size: 12px; }
+  .eyebrow { font-size: 10px; }
+  .exampleBadge, .comingBadge { font-size: 10px; padding: 4px 8px; }
+  .toolbar { gap: 12px; padding: 15px 17px; }
+  .periods { width: 100%; justify-content: space-between; }
+  .periods button { padding: 9px 8px; font-size: 11px; flex: 1; }
+  .datePicker { width: 100%; justify-content: space-between; }
+  .datePicker input { font-size: 12px; max-width: 140px; }
+  .body { padding: 22px 20px; }
+  .periodHeading { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .periodHeading h3 { font-size: 25px; }
+  .author img { width: 32px; height: 32px; }
+  .author strong { font-size: 11px; }
+  .author span { font-size: 10px; }
+  .overview { grid-template-columns: 1fr; gap: 17px; padding: 22px 0; margin-bottom: 22px; }
+  .mainMetric { flex-direction: row; align-items: baseline; gap: 12px; }
+  .mainMetric > strong { font-size: 64px; }
+  .mainMetric > span { font-size: 11px; }
+  .periodSummary p, .narrative > p, .handover p { font-size: 12px; line-height: 1.7; }
+  .coverage { font-size: 10px; }
+  .periodContent { grid-template-columns: 1fr; gap: 25px; }
+  .narrative h4 { font-size: 25px; }
+  .handover { margin-top: 16px; padding: 13px 14px; }
+  .journalHeading h4 { font-size: 12px; }
+  .journalHeading > span { font-size: 10px; }
+  .journalRow { padding: 11px 0; }
+  .journalDate strong { font-size: 12px; }
+  .journalDate > span { font-size: 11px; }
+  .journalActivity strong { font-size: 14px; }
+  .journalActivity > span { font-size: 10px; }
+  .footer { padding: 13px 20px; align-items: flex-start; flex-direction: column; gap: 9px; font-size: 10px; }
+  .footer button { font-size: 11px; }
+  .empty { min-height: 390px; padding: 30px 20px; }
+  .empty h3 { font-size: 30px; }
+}

@@ -13,36 +13,33 @@ export const establishmentLanding = `
     </div>
   </section>
 
-  <section class="persona-section" id="vivier" aria-labelledby="vivier-title"><div class="persona-section-inner">
-    <div class="persona-feature-row">
-      <div class="persona-feature-copy reveal">
+  <section class="persona-section persona-section--product" id="vivier" aria-labelledby="vivier-title"><div class="persona-section-inner">
+      <header class="section-head reveal">
         <div class="section-kicker">01 · Le vivier de remplaçants</div>
-        <h2 id="vivier-title">Des médecins à rencontrer.<br><em>Un relais à choisir.</em></h2>
-        <p>Présentez vos dates et les conditions d’exercice de votre cabinet. Retrouvez les candidatures dans un même espace et prenez le temps de choisir le médecin avec qui travailler.</p>
-        <ul class="persona-benefits">
-          <li><h3>Des profils professionnels détaillés</h3><p>Spécialité, niveau d’exercice, expérience et documents autorisés : étudiez les informations utiles.</p></li>
-          <li><h3>Vos critères comme point de départ</h3><p>Disponibilités, lieu, organisation et rétrocession donnent un cadre clair aux échanges.</p></li>
-          <li><h3>La décision vous appartient</h3><p>Comparez les candidatures, discutez avec le médecin et confirmez ensemble les conditions.</p></li>
-        </ul>
-      </div>
-      ${interfacePreview('candidates', 'persona-screen reveal', 'Exemple de candidatures avec des données fictives', 'Candidatures MédiLink : profils des médecins, statut des candidatures et accès à leur dossier. Données fictives.')}
-    </div>
+        <h2 class="section-h" id="vivier-title">Des médecins à rencontrer.<br><em>Une compatibilité à comprendre.</em></h2>
+        <p class="section-sub">Au-delà d’un profil, voyez ce qui correspond à votre cabinet. Un clic sur « Voir pourquoi » détaille les points communs, les écarts et les conditions à confirmer.</p>
+      </header>
+      ${interfacePreview('candidates', 'persona-screen persona-screen--large reveal', 'Les candidatures et leurs critères de compatibilité, avec des données fictives', 'Candidatures MédiLink : profil sélectionné et compatibilité expliquée par spécialité, niveau, lieu, type de mission, logiciel, patientèle et rétrocession. Données fictives.')}
+      <ul class="persona-benefits persona-benefits--columns reveal">
+        <li><h3>Le profil, dans son contexte</h3><p>Parcours, expérience, préférences et mission concernée : les informations utiles pour préparer votre premier échange.</p></li>
+        <li><h3>Chaque concordance expliquée</h3><p>Comparez les critères renseignés des deux côtés. Une information manquante reste à confirmer, sans gonfler la compatibilité.</p></li>
+        <li><h3>Le choix reste le vôtre</h3><p>Les critères éclairent la discussion. Validez les disponibilités, les justificatifs et les conditions avec le médecin.</p></li>
+      </ul>
   </div></section>
 
-  <section class="persona-section" id="activite" aria-labelledby="activite-title"><div class="persona-section-inner">
-    <div class="persona-feature-row persona-feature-row--reverse">
-      <div class="persona-feature-copy reveal">
-        <div class="section-kicker">02 · Les comptes rendus</div>
-        <h2 id="activite-title">Pendant votre absence,<br><em>gardez le contexte.</em></h2>
-        <p>Retrouvez les comptes rendus que votre remplaçant transmet dans le dossier partagé. Les informations de la mission restent réunies pour préparer votre retour.</p>
-        <ul class="persona-benefits">
-          <li><h3>Les comptes rendus transmis</h3><p>Consultez les fichiers ajoutés au dossier du remplacement, au fil de la mission.</p></li>
-          <li><h3>Les échanges au même endroit</h3><p>Reprenez la conversation avec le médecin pour préciser un point ou demander un complément.</p></li>
-          <li><h3>Une reprise mieux préparée</h3><p>Retrouvez les éléments partagés sans reconstruire l’historique de vos échanges.</p></li>
-        </ul>
-      </div>
-      ${interfacePreview('report', 'persona-screen reveal', 'Exemple de compte rendu transmis dans un dossier fictif', 'Dossier MédiLink : compte rendu du remplacement ajouté aux documents partagés. Données fictives.')}
-    </div>
+  <section class="persona-section persona-section--product" id="activite" aria-labelledby="activite-title"><div class="persona-section-inner">
+      <header class="section-head reveal">
+        <div class="section-kicker">02 · Les rapports d’activité</div>
+        <h2 class="section-h" id="activite-title">Le détail d’une journée.<br><em>Le recul d’une semaine.</em></h2>
+        <p class="section-sub">Journalier, hebdomadaire ou mensuel : explorez le nouvel espace de rapports. L’activité déclarée, les points à retenir et la suite à préparer trouvent leur place.</p>
+        <p class="persona-feature-status">Rapports structurés à venir · aperçu interactif disponible en démo</p>
+      </header>
+      ${interfacePreview('report', 'persona-screen persona-screen--large reveal', 'Aperçu de la future interface de rapports avec des données fictives', 'Rapports d’activité MédiLink : sélection journalier, hebdomadaire ou mensuel, synthèse de la période et journal des rapports. Exemple fictif de la fonctionnalité en préparation.')}
+      <ul class="persona-benefits persona-benefits--columns reveal">
+        <li><h3>Le rythme qui vous convient</h3><p>Passez d’une journée à une semaine ou à un mois, puis revenez au rapport qui vous intéresse.</p></li>
+        <li><h3>Les informations à retenir</h3><p>Une synthèse lisible, les points d’organisation et la suite à préparer, au-delà d’un simple fichier à télécharger.</p></li>
+        <li><h3>Le dossier reste disponible</h3><p>En attendant les rapports structurés, les comptes rendus peuvent être partagés comme documents dans le dossier du remplacement.</p></li>
+      </ul>
   </div></section>
 
   <section class="persona-section" id="documents" aria-labelledby="documents-title"><div class="persona-section-inner">
@@ -107,8 +104,8 @@ export const establishmentLanding = `
   <section class="faq" id="faq" aria-labelledby="faq-title"><div class="faq-inner">
     <header class="section-head reveal"><div class="section-kicker">06 · Questions fréquentes</div><h2 class="section-h" id="faq-title">Avant de confier<br><em>votre cabinet.</em></h2><p class="section-sub">Le choix du médecin, le suivi et les conditions du remplacement.</p></header>
     <div class="faq-list">
-      <details class="faq-item reveal"><summary>Comment choisir mon remplaçant ?</summary><div class="faq-answer">Précisez votre besoin, puis étudiez les profils, les disponibilités et les candidatures. Échangez avec le médecin pour confirmer ensemble les conditions. MédiLink vous aide à comparer ; la décision vous appartient.</div></details>
-      <details class="faq-item reveal"><summary>Comment suivre ce qui se passe pendant la mission ?</summary><div class="faq-answer">Retrouvez les échanges et les comptes rendus transmis dans le dossier partagé. Ce suivi repose sur les informations et fichiers partagés par les médecins ; il ne constitue pas une remontée automatique des consultations.</div></details>
+      <details class="faq-item reveal"><summary>Comment choisir mon remplaçant ?</summary><div class="faq-answer">Consultez les candidatures et ouvrez « Voir pourquoi » pour comparer les critères renseignés dans le profil et la mission. Les concordances, les écarts et les informations à confirmer sont distingués. Les disponibilités et les justificatifs restent à vérifier ensemble. Aucune décision n’est prise automatiquement.</div></details>
+      <details class="faq-item reveal"><summary>Comment suivre ce qui se passe pendant la mission ?</summary><div class="faq-answer">Les échanges et les comptes rendus transmis restent accessibles dans le dossier partagé. L’interface de rapports journaliers, hebdomadaires et mensuels peut déjà être explorée avec un exemple interactif ; l’enregistrement et le partage de rapports structurés sont à venir. Il ne s’agit pas d’une remontée automatique des consultations.</div></details>
       <details class="faq-item reveal"><summary>Quels documents peut-on préparer sur MédiLink ?</summary><div class="faq-answer">Le dossier permet de préparer un contrat de remplacement libéral individuel et un courrier à l’Ordre, d’ajouter les pièces utiles et de transmettre les documents choisis. Les documents générés doivent être relus. La signature et les démarches d’autorisation restent à effectuer ; un envoi ne vaut pas validation par l’Ordre.</div></details>
       <details class="faq-item reveal"><summary>La rétrocession est-elle prélevée automatiquement ?</summary><div class="faq-answer">Pas encore. MédiLink permet de calculer le montant à partir des honoraires déclarés et du taux convenu, puis d’enregistrer le suivi du règlement. Le prélèvement bancaire automatique est à venir.</div></details>
       <details class="faq-item reveal"><summary>Quelle différence entre les deux tarifs ?</summary><div class="faq-answer">La formule à la réussite coûte 39 € par remplacement trouvé. L’abonnement illimité coûte 99 € par mois et s’adresse aux besoins réguliers. Présentez-nous votre organisation lors d’une démo pour choisir la formule adaptée.</div></details>

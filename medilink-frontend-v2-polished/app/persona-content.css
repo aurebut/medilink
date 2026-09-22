@@ -74,6 +74,14 @@ html body.persona-page .persona-price-card > .btn { width: 100%; margin-top: aut
 html body.persona-page .persona-pricing-note { max-width: 720px; margin: 24px auto 0; color: var(--brand-muted); font-size: 12px; line-height: 1.7; text-align: center; }
 html body.persona-page #tarifs::after { content: none; }
 
+/* Detailed product screens need room to read their actual interface. */
+html body.persona-page .persona-section--product > .persona-section-inner > .section-head { max-width: 760px; margin-inline: auto; }
+html body.persona-page .persona-screen.persona-screen--large { max-width: 1100px; margin: 38px auto 0; }
+html body.persona-page .persona-screen--large.ml-interface-preview--report { max-width: 960px; }
+html body.persona-page .persona-benefits--columns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; max-width: 1060px; margin: 34px auto 0; }
+html body.persona-page .persona-benefits--columns li { padding-top: 18px; }
+html body.persona-page .persona-feature-status { margin-top: 17px; color: var(--brand-muted); font-size: 11px; line-height: 1.6; }
+
 @media (min-width: 901px) {
   html body.persona-page .persona-feature-row--reverse { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
   html body.persona-page .persona-feature-row--reverse .persona-feature-copy { grid-column: 2; grid-row: 1; }
@@ -88,6 +96,8 @@ html body.persona-page #tarifs::after { content: none; }
   html body.persona-page .persona-price-card { padding: 28px; }
 }
 @media (max-width: 700px) {
+  html body.persona-page .persona-benefits--columns { grid-template-columns: minmax(0, 1fr); gap: 0; margin-top: 28px; }
+  html body.persona-page .persona-screen.persona-screen--large { max-width: 440px; margin-top: 30px; }
   html body.persona-page .persona-screen .ml-interface-stage { padding: 0 20px; }
   html body.persona-page .ml-interface-preview.persona-screen { max-width: 440px; margin-inline: auto; }
   html body.persona-page .persona-pricing-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; }

@@ -108,54 +108,85 @@
     {
       "name": "report",
       "device": "mobile",
-      "route": "/establishment/current-missions?section=documents",
+      "route": "/establishment/current-missions?section=reports&reportPeriod=week&reportDate=2026-09-25",
       "viewport": {
         "width": 390,
-        "height": 2400
+        "height": 844
       },
       "crop": {
-        "height": 1035,
-        "width": 336,
-        "x": 27,
-        "y": 555
+        "x": 14,
+        "y": 532,
+        "width": 362,
+        "height": 1223
       },
-      "selection": "Compléments, page 2",
-      "width": 336,
-      "height": 1035,
-      "previewHeight": 1035,
+      "selection": "Exemple interactif · période hebdomadaire",
+      "width": 362,
+      "height": 1223,
+      "previewHeight": 1223,
       "files": [
         "report-mobile.webp"
       ],
       "sourceScale": 1,
       "sourceFormat": "jpeg",
-      "sourceFullViewport": true,
-      "sha256": "062d17ff60697c919406b9a777f0b57ab9f059a527ee7698e8c6bccee9ef2ad3"
+      "sourceFullViewport": false,
+      "sourceSegments": [
+        {
+          "file": "report-mobile-segment-0.png",
+          "crop": {
+            "x": 14,
+            "y": 80,
+            "width": 362,
+            "height": 668
+          },
+          "destinationY": 0,
+          "sourceFormat": "jpeg",
+          "sourceWidth": 390,
+          "sourceHeight": 844
+        },
+        {
+          "file": "report-mobile-segment-1.png",
+          "crop": {
+            "x": 14,
+            "y": 190,
+            "width": 362,
+            "height": 555
+          },
+          "destinationY": 668,
+          "sourceFormat": "jpeg",
+          "sourceWidth": 390,
+          "sourceHeight": 844
+        }
+      ],
+      "capturedAt": "2026-09-22T16:16:05.878Z",
+      "sha256": "879ac8518123dbe7ac30f68bddfe7bba751de7c30c8f1c5f9ecb66891fceed05"
     },
     {
       "name": "report",
       "device": "desktop",
-      "route": "/establishment/current-missions?section=documents",
+      "route": "/establishment/current-missions?section=reports&reportPeriod=week&reportDate=2026-09-25",
       "viewport": {
         "width": 1600,
-        "height": 1400
+        "height": 1000
       },
       "crop": {
-        "height": 848,
-        "width": 796,
-        "x": 697,
-        "y": 291
+        "x": 678,
+        "y": 272,
+        "width": 834,
+        "height": 754
       },
-      "selection": "Compléments, page 2",
-      "width": 796,
-      "height": 848,
-      "previewHeight": 848,
+      "selection": "Exemple interactif · période hebdomadaire",
+      "width": 834,
+      "height": 754,
+      "previewHeight": 754,
       "files": [
         "report-desktop.webp"
       ],
       "sourceScale": 1,
       "sourceFormat": "jpeg",
-      "sourceFullViewport": true,
-      "sha256": "784e20758fe74af94be2cda36406f18ec0df357c29a7f87bc40f1a70683ce3f2"
+      "sourceFullViewport": false,
+      "sourceFullPage": true,
+      "capturedAt": "2026-09-22T16:16:05.878Z",
+      "sha256": "f0c55a2dcfd987f2d7c77b22604a9ce4d7c8db079e1f2ff03906fcf92703eb05"
     },
     {
       "name": "candidates",
@@ -163,24 +194,27 @@
       "route": "/establishment/missions?tab=applications",
       "viewport": {
         "width": 1600,
-        "height": 1400
+        "height": 1000
       },
       "crop": {
-        "height": 692,
+        "height": 1437,
         "width": 1180,
         "x": 332,
-        "y": 32
+        "y": 249
       },
+      "selection": "Sarah Bernard · Voir pourquoi développé",
       "width": 1180,
-      "height": 692,
-      "previewHeight": 692,
+      "height": 1437,
+      "previewHeight": 1437,
       "files": [
         "candidates-desktop.webp"
       ],
       "sourceScale": 1,
       "sourceFormat": "jpeg",
-      "sourceFullViewport": true,
-      "sha256": "15324827b625722b589ea613fe2046f75db4c6513cd1c521107bf5f42fd2c845"
+      "sourceFullViewport": false,
+      "sourceFullPage": true,
+      "capturedAt": "2026-09-22T16:16:05.878Z",
+      "sha256": "2cb7d74e8bd258204d76ef00694476b26c79922419e0aaa9a03c0dcebf316ac9"
     },
     {
       "name": "candidates",
@@ -188,24 +222,67 @@
       "route": "/establishment/missions?tab=applications",
       "viewport": {
         "width": 390,
-        "height": 2600
+        "height": 844
       },
       "crop": {
-        "height": 1554,
-        "width": 362,
         "x": 14,
-        "y": 84
+        "y": 828,
+        "width": 362,
+        "height": 1946
       },
+      "selection": "Sarah Bernard · Voir pourquoi développé",
       "width": 362,
-      "height": 1554,
-      "previewHeight": 1554,
+      "height": 1946,
+      "previewHeight": 1946,
       "files": [
         "candidates-mobile.webp"
       ],
       "sourceScale": 1,
       "sourceFormat": "jpeg",
-      "sourceFullViewport": true,
-      "sha256": "4e682b1cedd812116d57033013a686b83db5cfe5aaf85023fb090147c3861d48"
+      "sourceFullViewport": false,
+      "sourceSegments": [
+        {
+          "file": "candidates-mobile-segment-0.png",
+          "crop": {
+            "x": 14,
+            "y": 80,
+            "width": 362,
+            "height": 668
+          },
+          "destinationY": 0,
+          "sourceFormat": "jpeg",
+          "sourceWidth": 390,
+          "sourceHeight": 844
+        },
+        {
+          "file": "candidates-mobile-segment-1.png",
+          "crop": {
+            "x": 14,
+            "y": 80,
+            "width": 362,
+            "height": 668
+          },
+          "destinationY": 668,
+          "sourceFormat": "jpeg",
+          "sourceWidth": 390,
+          "sourceHeight": 844
+        },
+        {
+          "file": "candidates-mobile-segment-2.png",
+          "crop": {
+            "x": 14,
+            "y": 80,
+            "width": 362,
+            "height": 610
+          },
+          "destinationY": 1336,
+          "sourceFormat": "jpeg",
+          "sourceWidth": 390,
+          "sourceHeight": 844
+        }
+      ],
+      "capturedAt": "2026-09-22T16:16:05.878Z",
+      "sha256": "0da01185a7fb4600595b5e2618863ec94b0a69bfb1e7599dd2aebef5be4490b2"
     }
   ]
 }

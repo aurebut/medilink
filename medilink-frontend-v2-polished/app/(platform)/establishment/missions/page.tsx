@@ -11,6 +11,7 @@ import { statusLabel } from '@/lib/labels';
 import { MissionDeleteButton } from '@/components/MissionDeleteButton';
 import { MissionCard } from '@/components/MissionCard';
 import { ProfileAvatar } from '@/components/ProfileAvatar';
+import { CandidatesReview } from '@/components/CandidatesReview';
 import { EstablishmentCapabilityGate } from '@/components/EstablishmentCapability';
 import { Alert, Badge, Button, Card, LinkButton, LoadingCard, PageHeader, type BadgeTone } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
@@ -312,15 +313,10 @@ function ApplicationsTab({
 
   return (
     <div className="establishment-application-sections">
-      <ApplicationSection
-        title="Candidatures d’actualité"
-        description="Nouvelles candidatures et profils encore à qualifier."
-        variant="current"
+      <CandidatesReview
         applications={currentApplications}
-        emptyLabel="Aucune candidature d’actualité."
         updatingId={updatingId}
         updateApplication={updateApplication}
-        onMissionDeleted={onMissionDeleted}
       />
       <ApplicationSection
         title="Historique des candidatures"

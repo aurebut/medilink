@@ -15,6 +15,7 @@ import { getDepartmentLabel, getEquipmentLabel, getPatientTypeLabel, getSecretar
 import { Alert, Badge, Card, LinkButton, LoadingCard, PageHeader, Select, Textarea, Button, Input, type BadgeTone } from '@/components/ui';
 import { errorMessage } from '@/lib/user-facing';
 import { ReplacementDossier } from '@/components/ReplacementDossier';
+import { MissionActivityReports } from '@/components/MissionActivityReports';
 
 type MissionMoment = 'upcoming' | 'today' | 'active' | 'done';
 type MissionStep = {
@@ -34,10 +35,11 @@ type MissionRow = {
   startDate?: string | null;
 };
 
-type MissionSection = 'pilotage' | 'brief' | 'candidat' | 'documents' | 'payment';
+type MissionSection = 'pilotage' | 'reports' | 'brief' | 'candidat' | 'documents' | 'payment';
 
 const missionSections: Array<{ id: MissionSection; label: string }> = [
   { id: 'pilotage', label: 'Pilotage' },
+  { id: 'reports', label: 'Rapports d’activité' },
   { id: 'brief', label: 'Brief & notes' },
   { id: 'candidat', label: 'Candidat & contact' },
   { id: 'documents', label: 'Dossier du remplacement' },
@@ -239,8 +241,16 @@ export default function EstablishmentCurrentMissionsPage() {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [activeSection, setActiveSection] = useState<MissionSection>('pilotage');
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('section') === 'documents') setActiveSection('documents');
+    const section = new URLSearchParams(window.location.search).get('section');
+    if (missionSections.some(item => item.id === section)) setActiveSection(section as MissionSection);
   }, []);
+
+  function selectSection(section: MissionSection) {
+    setActiveSection(section);
+    const url = new URL(window.location.href);
+    url.searchParams.set('section', section);
+    window.history.replaceState(null, '', url);
+  }
 
   useEffect(() => {
     if (!primary) {
@@ -528,7 +538,7 @@ export default function EstablishmentCurrentMissionsPage() {
                         key={section.id}
                         type="button"
                         className={activeSection === section.id ? 'active' : ''}
-                        onClick={() => setActiveSection(section.id)}
+                        onClick={() => selectSection(section.id)}
                         role="tab"
                         aria-selected={activeSection === section.id}
                       >
@@ -539,6 +549,12 @@ export default function EstablishmentCurrentMissionsPage() {
 
                   {loadingDetails ? (
                     <LoadingCard label="Chargement des détails de la mission..." />
+                  ) : activeSection === 'reports' ? (
+                    <MissionActivityReports
+                      key={selectedRow.application.id}
+                      missionTitle={selectedRow.application.mission?.title || 'Mission confirmée'}
+                      onOpenDocuments={() => selectSection('documents')}
+                    />
                   ) : (
                     <div className="candidate-current-layout">
                       <MissionControlPanel
