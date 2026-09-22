@@ -2,7 +2,8 @@ import { processIllustrations } from './landing-process-art';
 import { workspacePreview } from './landing-workspace-preview';
 import { continuityPreview } from './landing-continuity-preview';
 import { documentsSection } from './landing-documents-section';
-import { interfacePreview } from './landing-interface-preview';
+import { candidateLanding } from './persona-candidate';
+import { establishmentLanding } from './persona-establishment';
 
 // Original landing restored from Git 60c8e06, with user-requested process illustrations.
 // Legacy hrefs use canonical routes. All markup is repository-authored, never user content.
@@ -167,123 +168,6 @@ export const landingContent = {
       </div>
     </div></section>
   `,
-  candidate: `
-    <section class="persona-hero" aria-labelledby="hero-title">
-      <div class="hero-bg" aria-hidden="true"><div class="blob one"></div><div class="blob two"></div><div class="blob three"></div></div>
-      <div class="persona-hero-inner">
-        <div class="persona-eyebrow">Pour les médecins remplaçants</div>
-        <h1 id="hero-title">Trouvez des remplacements qui correspondent <em>à votre façon d’exercer.</em></h1>
-        <p class="persona-hero-copy">Comparez les dates, les horaires, la rétrocession et l’organisation du cabinet avant de candidater. Votre profil, vos documents et vos échanges restent ensuite réunis pour chaque mission.</p>
-        <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/search">Voir les missions</a><a class="btn btn-outline btn-lg" href="/register?type=candidate">Créer mon profil gratuitement</a></div>
-        <div class="persona-stage">
-          <div class="persona-photo-frame"><img src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async"></div>
-          <div class="hero-action"><form action="/search" method="get" role="search" aria-label="Rechercher une mission"><label class="hero-field"><small>Je cherche</small><input name="q" type="search" autocomplete="off" placeholder="Spécialité, cabinet…"></label><label class="hero-field"><small>Où</small><input name="city" type="search" autocomplete="address-level2" placeholder="Ville ou département"></label><label class="hero-field"><small>Format</small><select name="missionType"><option value="">Tous les formats</option><option value="REMPLACEMENT">Remplacement</option><option value="GARDE">Garde</option><option value="VACATION">Vacation</option></select></label><button type="submit">Rechercher une mission <svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button></form></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="persona-section" id="parcours" aria-labelledby="parcours-title"><div class="persona-section-inner">
-      <header class="section-head reveal"><div class="section-kicker">Votre parcours MédiLink</div><h2 class="section-h" id="parcours-title">Choisissez avec les bonnes informations. <em>Candidatez sans repartir de zéro.</em></h2><p class="section-sub">Le parcours est conçu autour des trois moments où les informations se perdent habituellement : avant la candidature, pendant l’accord et le jour de la mission.</p></header>
-      <div class="continuous-grid reveal">
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">01</span><small>Avant de candidater</small></div><h3>Comparez ce qui compte vraiment</h3><p>Dates, horaires, rétrocession, logiciel, patientèle et organisation du cabinet sont visibles avant de vous positionner.</p><ul class="micro-list"><li>Conditions d’exercice détaillées</li><li>Préférences et mobilité prises en compte</li><li>Aucune décision automatique</li></ul></article>
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">02</span><small>Au moment de postuler</small></div><h3>Réutilisez votre dossier</h3><p>Votre profil et les documents autorisés accompagnent votre candidature. Vous ne recommencez pas les mêmes envois à chaque mission.</p><ul class="micro-list"><li>Profil professionnel commun</li><li>Documents liés à la candidature</li><li>Statut toujours visible</li></ul></article>
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">03</span><small>Après le premier échange</small></div><h3>Gardez l’accord dans son contexte</h3><p>Les questions, les conditions proposées et la prochaine action restent dans le même fil jusqu’à la clôture.</p><ul class="micro-list"><li>Messagerie liée à la mission</li><li>Proposition structurée</li><li>Agenda et suivi communs</li></ul></article>
-      </div>
-    </div></section>
-
-    <section class="persona-section product-section" id="apercu" aria-labelledby="apercu-title"><div class="persona-section-inner">
-      <header class="section-head reveal"><div class="section-kicker">Un choix plus lisible</div><h2 class="section-h" id="apercu-title">Comprenez en un coup d’œil <em>pourquoi une mission vous correspond.</em></h2><p class="section-sub">Le score organise les critères utiles sans choisir à votre place. Les conditions de chaque mission restent visibles à côté de la recommandation.</p></header>
-      <figure class="product-demo persona-preview reveal"><figcaption class="sr-only">Exemple de l’espace de recherche MédiLink présentant trois missions et leur niveau de compatibilité.</figcaption>
-        <div class="product-bar"><span class="product-path"><b>Espace remplaçant</b><i>/</i><span>Missions recommandées</span></span><span class="product-state">Préférences à jour</span></div>
-        <div class="candidate-workspace">
-          <aside class="workspace-sidebar"><span class="workspace-sidebar-label">Votre profil</span><div class="profile-card"><img src="/landing-assets/people/sarah-bernard.webp" width="320" height="320" alt="Portrait d’illustration de la Dre Sarah Bernard"><h3>Dre Sarah Bernard</h3><p>Médecin généraliste remplaçante</p><div class="profile-meter"><div><span>Profil complété</span><strong>86 %</strong></div><i aria-hidden="true"></i></div></div></aside>
-          <div class="workspace-main"><div class="workspace-head"><div><span>Selon vos disponibilités</span><h3>3 missions à découvrir</h3></div><p>Dates, distance et cadre d’exercice expliquent chaque recommandation.</p></div><div class="mission-stack">
-            <article class="mission-result is-featured"><div><small>Remplacement · Recommandé</small><h4>Cabinet des Tilleuls</h4><p>Paris 11e · Médecine générale · 14–18 septembre</p></div><div class="mission-data"><div><span>Rétrocession</span><strong>70 %</strong></div><div><span>Logiciel</span><strong>Doctolib</strong></div></div><div class="match-pill">92<small>/100</small></div></article>
-            <article class="mission-result"><div><small>Vacation · Bonne compatibilité</small><h4>Maison de santé Voltaire</h4><p>Montreuil · Médecine générale · 22 septembre</p></div><div class="mission-data"><div><span>Horaires</span><strong>09:00–18:00</strong></div><div><span>Distance</span><strong>7 km</strong></div></div><div class="match-pill">84<small>/100</small></div></article>
-            <article class="mission-result"><div><small>Remplacement · À examiner</small><h4>Cabinet du Parc</h4><p>Saint-Denis · Médecine générale · 2–5 octobre</p></div><div class="mission-data"><div><span>Rétrocession</span><strong>75 %</strong></div><div><span>Hébergement</span><strong>Non</strong></div></div><div class="match-pill">76<small>/100</small></div></article>
-          </div></div>
-        </div>
-      </figure>
-    </div></section>
-
-    <section class="persona-dark" aria-labelledby="mission-title"><div class="dark-inner">
-      <header class="dark-heading reveal"><div><div class="dark-kicker">Un dossier par mission</div><h2 id="mission-title">Le jour J, tout est encore là.</h2></div><p>Les conditions acceptées, les informations pratiques, l’agenda et les échanges restent rattachés à la mission. Vous retrouvez le bon contexte sans fouiller dans vos emails ou vos SMS.</p></header>
-      ${interfacePreview('mission', 'persona-detail-preview reveal', 'Exemple de suivi d’une mission avec des données fictives', 'Aperçu MédiLink avec des données fictives : contexte de la mission, étapes du remplacement et prochaine action.')}
-    </div></section>
-
-    <section class="persona-cta" aria-labelledby="cta-title"><h2 id="cta-title">Votre prochain remplacement peut commencer par un choix plus clair.</h2><p>Consultez les missions disponibles ou créez votre profil pour recevoir des recommandations adaptées à vos critères.</p><div class="cta-actions"><a class="btn btn-primary btn-lg" href="/search">Voir les missions</a><a class="btn btn-outline btn-lg" href="/register?type=candidate">Créer mon profil</a></div></section>
-
-    <section class="faq" id="faq" aria-labelledby="faq-title"><div class="faq-inner"><header class="section-head reveal"><div class="section-kicker">Questions fréquentes</div><h2 class="section-h" id="faq-title">Avant votre première candidature</h2><p class="section-sub">Les réponses concrètes sur le profil, les documents, l’accord et la rétrocession.</p></header><div class="faq-list">
-      <details class="faq-item reveal"><summary>Qui peut créer un profil de médecin remplaçant ?</summary><div class="faq-answer">Les médecins thésés, internes et docteurs juniors disposant des autorisations nécessaires peuvent renseigner leur statut et consulter les missions correspondant à leur niveau d’exercice.</div></details>
-      <details class="faq-item reveal"><summary>Dois-je envoyer mes documents à chaque candidature ?</summary><div class="faq-answer">Non. Vous déposez vos documents dans votre espace. Les pièces utiles et autorisées sont ensuite consultables par le cabinet uniquement dans le contexte de votre candidature.</div></details>
-      <details class="faq-item reveal"><summary>Quelles informations sont visibles avant de postuler ?</summary><div class="faq-answer">Selon la mission : lieu, dates, horaires, rétrocession, organisation du cabinet, logiciel, patientèle et informations pratiques renseignées par le cabinet.</div></details>
-      <details class="faq-item reveal"><summary>Comment l’accord est-il formalisé ?</summary><div class="faq-answer">Après les échanges, le cabinet envoie une proposition récapitulant la rétrocession, les dates, les horaires et les conditions. Vous pouvez l’accepter ou la refuser depuis la conversation.</div></details>
-      <details class="faq-item reveal"><summary>Comment la rétrocession est-elle suivie ?</summary><div class="faq-answer">Les conditions convenues et les statuts déclarés restent visibles dans le dossier de mission. MédiLink ne se présente pas comme un service de séquestre ou de conservation des fonds.</div></details>
-    </div></div></section>
-  `,
-  establishment: `
-    <section class="persona-hero" aria-labelledby="hero-title">
-      <div class="hero-bg" aria-hidden="true"><div class="blob one"></div><div class="blob two"></div><div class="blob three"></div></div>
-      <div class="persona-hero-inner">
-        <div class="persona-eyebrow">Pour les cabinets et médecins installés</div>
-        <h1 id="hero-title">Trouvez un remplaçant sans courir après <em>les informations.</em></h1>
-        <p class="persona-hero-copy">Publiez un besoin complet, recevez des candidatures adaptées et suivez les échanges, les documents et l’accord depuis un seul espace partagé avec votre équipe.</p>
-        <div class="hero-ctas"><a class="btn btn-teal btn-lg" href="/register?type=establishment">Publier mon besoin</a><a class="btn btn-outline btn-lg" href="#parcours">Voir comment ça marche</a></div>
-        <div class="persona-stage">
-          <div class="persona-photo-frame"><img src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin installée échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async"></div>
-          <div class="hero-action">
-            <form class="intent-grid" action="/register" method="get" data-intent-form="establishment" aria-describedby="intent-note">
-              <input type="hidden" name="type" value="establishment">
-              <label class="hero-field"><small>Besoin</small><select name="intentType"><option value="REMPLACEMENT">Remplacement</option><option value="GARDE">Garde</option><option value="VACATION">Vacation</option></select></label>
-              <label class="hero-field"><small>Spécialité</small><input name="intentSpecialty" autocomplete="off" placeholder="Médecine générale…"></label>
-              <label class="hero-field"><small>Quand</small><input name="intentPeriod" autocomplete="off" placeholder="Dates ou période"></label>
-              <label class="hero-field"><small>Où</small><input name="intentCity" autocomplete="address-level2" placeholder="Ville"></label>
-              <button type="submit">Préparer ma mission <svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></button>
-              <p class="hero-action-note" id="intent-note">Ces informations sont conservées dans ce navigateur pour préparer votre mission après la création du compte.</p>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="persona-section" id="parcours" aria-labelledby="parcours-title"><div class="persona-section-inner">
-      <header class="section-head reveal"><div class="section-kicker">Le parcours établissement</div><h2 class="section-h" id="parcours-title">Un besoin bien renseigné. <em>Une décision plus simple à prendre.</em></h2><p class="section-sub">MédiLink relie les trois moments du remplacement : le besoin publié, la candidature étudiée et l’accord confirmé.</p></header>
-      <div class="continuous-grid reveal">
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">01</span><small>Publier le besoin</small></div><h3>Donnez le bon niveau de détail</h3><p>Dates, horaires, rétrocession, organisation, logiciel et patientèle permettent au médecin de se positionner en connaissance de cause.</p><ul class="micro-list"><li>Critères essentiels explicites</li><li>Informations terrain réunies</li><li>Moins de candidatures mal alignées</li></ul></article>
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">02</span><small>Étudier les candidatures</small></div><h3>Comparez dans un dossier commun</h3><p>Profil, expérience, disponibilités, message et documents autorisés restent rattachés à la candidature concernée.</p><ul class="micro-list"><li>Compatibilité expliquée</li><li>Documents au bon endroit</li><li>Historique partagé par l’équipe</li></ul></article>
-        <article class="continuous-card"><div class="continuous-card-head"><span class="continuous-index">03</span><small>Confirmer et suivre</small></div><h3>Gardez l’accord dans son contexte</h3><p>La proposition reprend la rétrocession, les dates, les horaires et les conditions avant d’être acceptée ou refusée dans le fil.</p><ul class="micro-list"><li>Proposition structurée</li><li>Prochaine action visible</li><li>Agenda et clôture liés à la mission</li></ul></article>
-      </div>
-    </div></section>
-
-    <section class="persona-section product-section" id="apercu" aria-labelledby="apercu-title"><div class="persona-section-inner">
-      <header class="section-head reveal"><div class="section-kicker">Une vue commune</div><h2 class="section-h" id="apercu-title">Ce qui demande une action <em>remonte en premier.</em></h2><p class="section-sub">Chaque mission porte un statut, une prochaine étape et les informations utiles pour que les recruteurs et l’administratif travaillent avec le même contexte.</p></header>
-      <figure class="product-demo persona-preview reveal"><figcaption class="sr-only">Exemple de l’espace établissement présentant le suivi des missions et le détail d’une candidature recommandée.</figcaption>
-        <div class="product-bar"><span class="product-path"><b>Espace établissement</b><i>/</i><span>Suivi des missions</span></span><span class="product-state">Équipe synchronisée</span></div>
-        <div class="establishment-workspace">
-          <div class="pipeline-area"><div class="pipeline-heading"><h3>Vos missions en cours</h3><span>3 éléments demandent votre attention</span></div><div class="pipeline-list">
-            <article class="pipeline-item is-active"><div><small>Remplacement · Médecine générale</small><strong>Cabinet des Tilleuls · 14–18 septembre</strong></div><p>3 candidatures compatibles à étudier</p><span class="status-pill">À traiter</span></article>
-            <article class="pipeline-item"><div><small>Vacation · Médecine générale</small><strong>Maison de santé Voltaire · 22 septembre</strong></div><p>Proposition acceptée par le médecin</p><span class="status-pill">À confirmer</span></article>
-            <article class="pipeline-item"><div><small>Remplacement · Cabinet</small><strong>Cabinet du Parc · 2–5 octobre</strong></div><p>Conditions convenues et agenda à jour</p><span class="status-pill good">Confirmée</span></article>
-            <article class="pipeline-item"><div><small>Remplacement · Médecine générale</small><strong>Cabinet République · 8–12 octobre</strong></div><p>Besoin enregistré, publication en attente</p><span class="status-pill">Brouillon</span></article>
-          </div></div>
-          <aside class="candidate-drawer"><span>Candidature recommandée</span><div class="drawer-person"><img src="/landing-assets/people/sarah-bernard.webp" width="320" height="320" alt="Portrait d’illustration de la Dre Sarah Bernard"><div><h3>Dre Sarah Bernard</h3><p>Médecin généraliste remplaçante</p></div></div><div class="drawer-score"><span>Compatibilité mutuelle</span><strong>92<small>/100</small></strong></div><ul class="drawer-facts"><li><span>Spécialité</span><b>Compatible</b></li><li><span>Dates</span><b>Disponible</b></li><li><span>Mobilité</span><b>Paris · 8 km</b></li><li><span>Documents</span><b>Accessibles</b></li></ul><a class="drawer-action" href="/register?type=establishment">Étudier la candidature <svg class="landing-icon landing-icon--arrow-right" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a></aside>
-        </div>
-      </figure>
-    </div></section>
-
-    <section class="persona-dark" aria-labelledby="team-title"><div class="dark-inner">
-      <header class="dark-heading reveal"><div><div class="dark-kicker">Un dossier partagé par l’équipe</div><h2 id="team-title">Plus besoin de reconstruire l’historique.</h2></div><p>Le besoin, les candidatures, les échanges et les décisions restent rattachés à la même mission. Chaque membre retrouve ce qui a été décidé et ce qu’il reste à faire.</p></header>
-      ${interfacePreview('messages', 'persona-detail-preview reveal', 'Exemple de conversation liée au remplacement avec des données fictives', 'Aperçu MédiLink avec des données fictives : échanges entre médecins, conditions convenues et avancement du remplacement.')}
-    </div></section>
-
-    <section class="persona-cta" aria-labelledby="cta-title"><h2 id="cta-title">Votre prochain besoin mérite un dossier clair dès le départ.</h2><p>Créez votre espace établissement, ajoutez les membres concernés et préparez votre première mission.</p><div class="cta-actions"><a class="btn btn-teal btn-lg" href="/register?type=establishment">Publier mon besoin</a><a class="btn btn-outline btn-lg" href="/login">J’ai déjà un compte</a></div></section>
-
-    <section class="faq" id="faq" aria-labelledby="faq-title"><div class="faq-inner"><header class="section-head reveal"><div class="section-kicker">Questions fréquentes</div><h2 class="section-h" id="faq-title">Avant de publier une mission</h2><p class="section-sub">Les réponses utiles sur le besoin, les candidatures, les accès d’équipe et la confirmation.</p></header><div class="faq-list">
-      <details class="faq-item reveal"><summary>Quels cabinets peuvent utiliser MédiLink ?</summary><div class="faq-answer">Les cabinets médicaux, maisons et centres de santé ainsi que les structures qui organisent des remplacements médicaux peuvent créer un espace établissement.</div></details>
-      <details class="faq-item reveal"><summary>Quelles informations faut-il pour publier une mission ?</summary><div class="faq-answer">Vous renseignez la spécialité, le lieu, les dates et horaires, la rétrocession ainsi que les informations pratiques nécessaires au médecin pour se positionner.</div></details>
-      <details class="faq-item reveal"><summary>Que voit-on dans une candidature ?</summary><div class="faq-answer">La candidature rassemble le profil professionnel, le niveau d’exercice, l’expérience, les disponibilités, le message du médecin et les documents autorisés dans ce contexte.</div></details>
-      <details class="faq-item reveal"><summary>Plusieurs membres peuvent-ils accéder à l’espace ?</summary><div class="faq-answer">Oui. L’établissement peut gérer plusieurs membres et adapter les droits selon leurs responsabilités : propriétaire, administrateur, recruteur ou lecteur.</div></details>
-      <details class="faq-item reveal"><summary>Comment une mission est-elle confirmée ?</summary><div class="faq-answer">Après les échanges, le cabinet envoie une proposition récapitulative. Une fois acceptées, les conditions restent rattachées à la mission et son statut est mis à jour.</div></details>
-    </div></div></section>
-  `
+  candidate: candidateLanding,
+  establishment: establishmentLanding,
 };

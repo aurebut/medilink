@@ -356,7 +356,7 @@ export default function SearchMissionsPage() {
       </div>
 
       {activeTab === 'recommended' ? (
-        <div className="grid recommended-missions">
+        <div className="grid search-results recommended-missions">
           {error ? <Alert type="error">{error}</Alert> : null}
           {loading ? (
             <LoadingCard label="Chargement des missions pour vous..." />

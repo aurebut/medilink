@@ -1,14 +1,20 @@
 import captures from '@/public/landing-assets/interface/manifest.json';
+import personaCaptures from '@/public/landing-assets/persona-interface/manifest.json';
 
-type PreviewName = 'messages' | 'mission' | 'documents';
+type PreviewName = 'messages' | 'mission' | 'documents' | 'search' | 'offer' | 'candidates' | 'report';
 
 // Capture dimensions and cache keys are generated alongside the real app images.
 // Arguments are repository-authored strings only, never API or user content.
 export function interfacePreview(name: PreviewName, className: string, title: string, alt: string) {
-  const desktop = captures.assets.find(asset => asset.name === name && asset.device === 'desktop')!;
-  const mobile = captures.assets.find(asset => asset.name === name && asset.device === 'mobile')!;
+  const persona = ['search', 'offer', 'candidates', 'report'].includes(name);
+  const assets = persona ? personaCaptures.assets : captures.assets;
+  const desktop = assets.find(asset => asset.name === name && asset.device === 'desktop')!;
+  const mobile = assets.find(asset => asset.name === name && asset.device === 'mobile')!;
+  const directory = persona ? 'persona-interface' : 'interface';
   const source = (device: typeof desktop, retina = false) =>
-    `/landing-assets/interface/${name}-${device.device}${retina ? '@2x' : ''}.webp?v=${device.sha256.slice(0, 12)}`;
+    `/landing-assets/${directory}/${name}-${device.device}${retina ? '@2x' : ''}.webp?v=${device.sha256.slice(0, 12)}`;
+  const sourceSet = (device: typeof desktop) => device.sourceScale === 2
+    ? `${source(device)} 1x, ${source(device, true)} 2x` : `${source(device)} 1x`;
 
   const previewStyle = name === 'documents' ? ` style="--ml-documents-preview-ratio:${mobile.width}/${mobile.previewHeight}"` : '';
   const scrollAttributes = name === 'mission' ? '' : ` tabindex="0" role="group" aria-label="${title} — aperçu défilable${name === 'messages' ? ' sur mobile' : ''}"`;
@@ -23,8 +29,8 @@ export function interfacePreview(name: PreviewName, className: string, title: st
             <span class="ml-macos-window">
               <span class="ml-macos-toolbar" aria-hidden="true"><span class="ml-macos-lights"><span></span><span></span><span></span></span><span class="ml-macos-title">MédiLink</span></span>
               <picture${scrollAttributes} style="--ml-capture-width:${desktop.width};--ml-capture-height:${desktop.height};--ml-mobile-capture-width:${mobile.width};--ml-mobile-capture-height:${mobile.height}">
-                <source media="(max-width: 700px)" srcset="${source(mobile)} 1x, ${source(mobile, true)} 2x" width="${mobile.width}" height="${mobile.height}">
-                <img src="${source(desktop)}" srcset="${source(desktop)} 1x, ${source(desktop, true)} 2x" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
+                <source media="(max-width: 700px)" srcset="${sourceSet(mobile)}" width="${mobile.width}" height="${mobile.height}">
+                <img src="${source(desktop)}" srcset="${sourceSet(desktop)}" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
               </picture>
             </span>
             <span class="ml-device-home" aria-hidden="true"></span>

@@ -1,0 +1,211 @@
+{
+  "description": "Actual MédiLink application UI captured through CUA with fictional API fixtures. No screenshot-specific UI restyling or reconstruction.",
+  "captureMethod": "CUA browser screenshot",
+  "format": "lossless WebP conversion; native source dimensions",
+  "source": "scripts/prepare-persona-captures.mjs",
+  "fixture": "scripts/fixtures/persona-interface.mjs",
+  "assets": [
+    {
+      "name": "search",
+      "device": "desktop",
+      "route": "/app/search",
+      "viewport": {
+        "width": 1440,
+        "height": 1400
+      },
+      "crop": {
+        "height": 1083,
+        "width": 1132,
+        "x": 276,
+        "y": 200
+      },
+      "width": 1132,
+      "height": 1083,
+      "previewHeight": 1083,
+      "files": [
+        "search-desktop.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "e569469413970c4c5e2dbd6788836ef1cb0aeb4961838a02b7fd67ff9ae50276"
+    },
+    {
+      "name": "offer",
+      "device": "desktop",
+      "route": "/app/search?tab=search",
+      "viewport": {
+        "width": 1440,
+        "height": 1400
+      },
+      "crop": {
+        "height": 468,
+        "width": 786,
+        "x": 622,
+        "y": 378
+      },
+      "width": 786,
+      "height": 468,
+      "previewHeight": 468,
+      "files": [
+        "offer-desktop.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "af64a0a7841b784585d5c5b6b6d693465c29ed0527a182adeffb142f644bebe8"
+    },
+    {
+      "name": "search",
+      "device": "mobile",
+      "route": "/app/search",
+      "viewport": {
+        "width": 390,
+        "height": 2400
+      },
+      "crop": {
+        "height": 1651,
+        "width": 362,
+        "x": 14,
+        "y": 216
+      },
+      "width": 362,
+      "height": 1651,
+      "previewHeight": 1651,
+      "files": [
+        "search-mobile.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "f847e0770cfff64e101f5327ecb13ba1f12416ec1db8c7494df1afe4d82beb37"
+    },
+    {
+      "name": "offer",
+      "device": "mobile",
+      "route": "/app/search",
+      "viewport": {
+        "width": 390,
+        "height": 2400
+      },
+      "crop": {
+        "height": 696,
+        "width": 362,
+        "x": 14,
+        "y": 460
+      },
+      "width": 362,
+      "height": 696,
+      "previewHeight": 696,
+      "files": [
+        "offer-mobile.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "9f055455dd54109be66c569f09d912203289944acd1eee47de13a5f235609e57"
+    },
+    {
+      "name": "report",
+      "device": "mobile",
+      "route": "/establishment/current-missions?section=documents",
+      "viewport": {
+        "width": 390,
+        "height": 2400
+      },
+      "crop": {
+        "height": 1035,
+        "width": 336,
+        "x": 27,
+        "y": 555
+      },
+      "selection": "Compléments, page 2",
+      "width": 336,
+      "height": 1035,
+      "previewHeight": 1035,
+      "files": [
+        "report-mobile.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "062d17ff60697c919406b9a777f0b57ab9f059a527ee7698e8c6bccee9ef2ad3"
+    },
+    {
+      "name": "report",
+      "device": "desktop",
+      "route": "/establishment/current-missions?section=documents",
+      "viewport": {
+        "width": 1600,
+        "height": 1400
+      },
+      "crop": {
+        "height": 848,
+        "width": 796,
+        "x": 697,
+        "y": 291
+      },
+      "selection": "Compléments, page 2",
+      "width": 796,
+      "height": 848,
+      "previewHeight": 848,
+      "files": [
+        "report-desktop.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "784e20758fe74af94be2cda36406f18ec0df357c29a7f87bc40f1a70683ce3f2"
+    },
+    {
+      "name": "candidates",
+      "device": "desktop",
+      "route": "/establishment/missions?tab=applications",
+      "viewport": {
+        "width": 1600,
+        "height": 1400
+      },
+      "crop": {
+        "height": 692,
+        "width": 1180,
+        "x": 332,
+        "y": 32
+      },
+      "width": 1180,
+      "height": 692,
+      "previewHeight": 692,
+      "files": [
+        "candidates-desktop.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "15324827b625722b589ea613fe2046f75db4c6513cd1c521107bf5f42fd2c845"
+    },
+    {
+      "name": "candidates",
+      "device": "mobile",
+      "route": "/establishment/missions?tab=applications",
+      "viewport": {
+        "width": 390,
+        "height": 2600
+      },
+      "crop": {
+        "height": 1554,
+        "width": 362,
+        "x": 14,
+        "y": 84
+      },
+      "width": 362,
+      "height": 1554,
+      "previewHeight": 1554,
+      "files": [
+        "candidates-mobile.webp"
+      ],
+      "sourceScale": 1,
+      "sourceFormat": "jpeg",
+      "sourceFullViewport": true,
+      "sha256": "4e682b1cedd812116d57033013a686b83db5cfe5aaf85023fb090147c3861d48"
+    }
+  ]
+}

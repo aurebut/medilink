@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 
-// Preserve the original landing outside the explicitly requested guides links, homepage changes and persona preview harmonization.
+// Preserve the original homepage and public assets; validate the requested persona briefs separately.
 const reference = '60c8e06';
 const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const pages = { '/': 'landing.html', '/remplacement-medical': 'landing-medecin.html', '/trouver-medecin-remplacant': 'landing-etablissement.html' };
@@ -230,52 +230,76 @@ function normalizeDocumentsSection(html) {
   // Remove only the new section and its added separator; all surrounding markup remains compared verbatim.
   return html.slice(0, start) + html.slice(end).replace(separator, '');
 }
-function normalizePersonaPreviews(html, path, updated) {
-  const name = path === '/remplacement-medical' ? 'mission' : 'messages';
-  const title = name === 'mission'
-    ? 'Exemple de suivi d’une mission avec des données fictives'
-    : 'Exemple de conversation liée au remplacement avec des données fictives';
-  const originalFigure = '<figure class="product-demo reveal">';
-  const requestedFigure = '<figure class="product-demo persona-preview reveal">';
-  const figure = updated ? requestedFigure : originalFigure;
-  assert.equal(html.split(figure).length - 1, 1, `${path}: exactly one original product preview`);
-  if (updated) html = html.replace(requestedFigure, originalFigure);
-
-  const originalPortrait = '<img src="/landing-assets/temoignage-sarah-bernard.png" width="314" height="218" alt="Portrait de la Dre Sarah Bernard">';
-  const requestedPortrait = '<img src="/landing-assets/people/sarah-bernard.webp" width="320" height="320" alt="Portrait d’illustration de la Dre Sarah Bernard">';
-  const portrait = updated ? requestedPortrait : originalPortrait;
-  assert.equal(html.split(portrait).length - 1, 1, `${path}: one shared fictional portrait in the product preview`);
-  if (updated) html = html.replace(requestedPortrait, originalPortrait);
-
-  const tag = updated ? 'figure' : 'div';
-  const opening = updated
-    ? `<figure class="persona-detail-preview reveal ml-interface-preview ml-interface-preview--${name}" aria-label="${title}">`
-    : '<div class="dark-panel reveal">';
-  assert.equal(html.split(opening).length - 1, 1, `${path}: exactly one requested detail preview`);
-  const start = html.indexOf(opening);
-  const tags = new RegExp(`<\\/?${tag}\\b[^>]*>`, 'g');
+const visibleText = html => html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;|&#160;/g, ' ').replace(/\s+/g, ' ').trim();
+function sectionMarkup(html, id, path) {
+  const opening = new RegExp(`<section\\b[^>]*\\bid="${id}"[^>]*>`, 'g');
+  const matches = [...html.matchAll(opening)];
+  assert.equal(matches.length, 1, `${path}: exactly one ${id} section`);
+  const start = matches[0].index;
+  const tags = /<\/?section\b[^>]*>/g;
   tags.lastIndex = start;
   let depth = 0;
-  let end = -1;
   for (let token; (token = tags.exec(html));) {
     depth += token[0].startsWith('</') ? -1 : 1;
-    if (depth === 0) {
-      end = tags.lastIndex;
-      break;
+    if (depth === 0) return html.slice(start, tags.lastIndex);
+  }
+  assert.fail(`${path}: ${id} section has a matching closing tag`);
+}
+function assertPersonaBrief(html, path) {
+  const candidate = path === '/remplacement-medical';
+  const requiredSections = candidate
+    ? ['parcours', 'echanges', 'documents', 'faq']
+    : ['vivier', 'activite', 'documents', 'paiement', 'tarifs', 'faq'];
+  const main = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1];
+  const navigation = html.match(/<nav\b[^>]*>([\s\S]*?)<\/nav>/)?.[1];
+  assert.ok(main && navigation, `${path}: navigation and main content are present`);
+  assert.equal([...html.matchAll(/<h1\b/g)].length, 1, `${path}: exactly one page heading`);
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, `${path}: unique HTML IDs`);
+  const sectionIds = [...main.matchAll(/<section\b[^>]*\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.deepEqual(sectionIds.filter(id => id !== 'hero'), requiredSections, `${path}: requested section order`);
+  for (const id of requiredSections) {
+    assert.match(sectionMarkup(main, id, path), /<h2\b[^>]*>[\s\S]+?<\/h2>/, `${path}: ${id} has a visible heading`);
+  }
+  for (const [, id] of html.matchAll(/<a\b[^>]*\bhref="#([^"]+)"/g)) {
+    assert.ok(ids.includes(id), `${path}: local link #${id} targets an existing element`);
+  }
+  for (const [name, markup] of [['navigation', navigation], ['main', main]]) {
+    const primaryLinks = [...markup.matchAll(/<a\b[^>]*\bclass="[^"]*\bbtn-(?:primary|teal)\b[^"]*"[^>]*>[\s\S]*?<\/a>/g)];
+    assert.ok(primaryLinks.length, `${path}: ${name} has a primary demo action`);
+    for (const [link] of primaryLinks) assert.match(link, /\bhref="\/demo"/, `${path}: ${name} primary actions lead to the demo`);
+    if (name === 'navigation') {
+      for (const [link] of primaryLinks) assert.match(visibleText(link), /^Demander une démo\b/, `${path}: menu demo label`);
     }
   }
-  assert.ok(end > start, `${path}: detail preview has a matching closing tag`);
-  if (updated) {
-    const markup = html.slice(start, end);
-    assert.match(markup, new RegExp(`data-interface-preview="${name}"`), `${path}: shared native interface preview`);
-    assert.match(markup, new RegExp(`<source media="\\(max-width: 700px\\)" srcset="/landing-assets/interface/${name}-mobile\\.webp\\?v=`), `${path}: native mobile capture`);
-    assert.match(markup, new RegExp(`<img src="/landing-assets/interface/${name}-desktop\\.webp\\?v=`), `${path}: native desktop capture`);
-    assert.match(markup, /alt="Aperçu MédiLink avec des données fictives : [^"]+"/, `${path}: accessible fictional-data disclosure`);
-    assert.doesNotMatch(markup, /<a\b|<figcaption\b/, `${path}: no enlargement link or visible caption`);
+  const hero = main.slice(0, main.indexOf('</section>') + '</section>'.length);
+  assert.match(hero, /<h1\b/, `${path}: heading remains in the first hero section`);
+  assert.match(hero, /<a\b[^>]*\bhref="\/demo"[^>]*>[\s\S]*?Demander une démo[\s\S]*?<\/a>/, `${path}: hero demo action`);
+
+  const previews = [...main.matchAll(/<figure\b[^>]*>[\s\S]*?<\/figure>/g)].map(match => match[0]).filter(markup => markup.includes('data-interface-preview='));
+  assert.ok(previews.length >= 2, `${path}: multiple genuine application previews`);
+  for (const name of candidate ? ['messages', 'documents'] : ['documents']) {
+    assert.ok(previews.some(markup => markup.includes(`data-interface-preview="${name}"`)), `${path}: ${name} native preview retained`);
   }
-  // Only this replaced preview is exempt; the product preview's remaining markup,
-  // section headings, copy, calls to action and all surrounding sections stay exact.
-  return html.slice(0, start) + `<!-- requested persona interface preview: ${name} -->` + html.slice(end);
+  for (const preview of previews) {
+    assert.match(preview, /<source\b[^>]*\bsrcset="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-mobile\.webp(?:\?[^"\s]*)?/, `${path}: native mobile WebP capture`);
+    assert.match(preview, /<img\b[^>]*\bsrc="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-desktop\.webp(?:\?[^"\s]*)?/, `${path}: native desktop WebP capture`);
+    assert.match(preview, /\balt="[^"]+"/, `${path}: accessible preview image`);
+    assert.match(preview, /ficti(?:f|ve)|illustrati(?:f|ve|on)/i, `${path}: example data are disclosed`);
+  }
+  const faq = sectionMarkup(main, 'faq', path);
+  assert.ok([...faq.matchAll(/<details\b/g)].length >= 3, `${path}: useful expandable FAQ`);
+  if (!candidate) {
+    const payment = visibleText(sectionMarkup(main, 'paiement', path));
+    assert.match(payment, /prélèvement automatique/i, `${path}: requested automatic debit topic`);
+    assert.match(payment, /à venir/i, `${path}: automatic debit is disclosed as forthcoming`);
+    const pricing = visibleText(sectionMarkup(main, 'tarifs', path));
+    assert.match(pricing, /\b39\s*€/, `${path}: approved success price`);
+    assert.match(pricing, /\b99\s*€/, `${path}: approved monthly price`);
+    assert.match(pricing, /réussite/i, `${path}: success plan`);
+    assert.match(pricing, /illimité/i, `${path}: unlimited plan`);
+    assert.match(pricing, /mois/i, `${path}: monthly subscription period`);
+  }
 }
 for (const [path, file] of Object.entries(pages)) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public/${file}`], { encoding: 'utf8' });
@@ -302,6 +326,7 @@ for (const [path, file] of Object.entries(pages)) {
     }
     assert.match(compiledCss, /\.ml-documents(?:\s|[{:,.>])/, 'documents: section styles use versioned Next.js assets');
   }
+  if (path !== '/') assertPersonaBrief(actual, path);
   for (const tag of ['nav', 'main', 'footer']) {
     const pattern = new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`);
     let rendered = actual.match(pattern)?.[1] || '';
@@ -334,11 +359,9 @@ for (const [path, file] of Object.entries(pages)) {
       expected = normalizePreviewLayouts(expected, false);
       rendered = normalizeDocumentsSection(rendered);
     }
-    if (path !== '/' && tag === 'main') {
-      rendered = normalizePersonaPreviews(rendered, path, true);
-      expected = normalizePersonaPreviews(expected, path, false);
+    if (path === '/') {
+      assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews and documents section`);
     }
-    assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews, persona preview harmonization and documents section`);
   }
   const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
   assert.deepEqual(styles(actual), styles(original), `${path}: original stylesheet order`);
@@ -346,7 +369,9 @@ for (const [path, file] of Object.entries(pages)) {
   [...original.matchAll(/<script src="(\/landing-[^"]+\.js)"/g)].forEach(match => originalAssets.add(match[1]));
   assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
-  console.log(`PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews, persona preview harmonization and documents section`);
+  console.log(path === '/'
+    ? `PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews and documents section`
+    : `PASS ${path}: requested sections, demo actions, native previews and FAQ verified`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });

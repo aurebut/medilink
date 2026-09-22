@@ -1,0 +1,105 @@
+/* Editorial product stories for the two dedicated landing pages. */
+html body.persona-page .persona-section-inner { max-width: 1200px; }
+html body.persona-page .persona-feature-row {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: 52px;
+}
+html body.persona-page .persona-feature-row + .persona-feature-row { margin-top: 72px; }
+html body.persona-page .persona-feature-copy { min-width: 0; }
+html body.persona-page .persona-feature-copy .section-head { max-width: none; margin: 0; text-align: left; }
+html body.persona-page .persona-feature-copy :is(h2, .section-h) {
+  color: var(--brand-heading);
+  font: 400 clamp(34px, 3.3vw, 46px)/1.08 var(--brand-serif);
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+html body.persona-page .persona-feature-copy h2 em { color: var(--brand-primary); }
+html body.persona-page .persona-feature-copy > p,
+html body.persona-page .persona-feature-copy .section-sub { margin: 20px 0 0; color: var(--brand-muted); font-size: 15px; line-height: 1.7; text-wrap: pretty; }
+html body.persona-page .persona-benefits { display: grid; gap: 0; margin-top: 28px; list-style: none; }
+html body.persona-page .persona-benefits li { padding: 16px 0; border-top: 1px solid var(--brand-line); }
+html body.persona-page .persona-benefits li:last-child { padding-bottom: 0; }
+html body.persona-page .persona-benefits h3 { color: var(--brand-primary); font: 600 14px/1.5 var(--brand-sans); }
+html body.persona-page .persona-benefits p { margin: 6px 0 0; color: var(--brand-muted); font-size: 14px; line-height: 1.65; }
+html body.persona-page .persona-demo-link { margin-top: 28px; min-height: 46px; }
+html body.persona-page .ml-interface-preview.persona-screen { width: 100%; min-width: 0; margin: 0; }
+html body.persona-page .persona-screen .ml-interface-stage { padding: 12px; }
+/* Long native views stay readable and scroll within the common device proportions. */
+html body.persona-page .persona-screen:is(.ml-interface-preview--search, .ml-interface-preview--offer, .ml-interface-preview--candidates, .ml-interface-preview--report) picture {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #9fadc0 var(--brand-paper);
+}
+html body.persona-page .persona-faq-demo { display: flex; justify-content: center; margin: 42px auto 0; }
+
+html body.persona-page .persona-payment-example {
+  margin: 0;
+  padding: 38px;
+  border: 1px solid var(--brand-line);
+  border-radius: 24px;
+  background: var(--brand-frost);
+  color: var(--brand-heading);
+}
+html body.persona-page .persona-payment-example figcaption { font: 400 32px/1.1 var(--brand-serif); }
+html body.persona-page .persona-payment-source { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 30px; padding-bottom: 28px; }
+html body.persona-page .persona-payment-source > span { font: 400 42px/1.1 var(--brand-serif); }
+html body.persona-page .persona-payment-source > span:nth-child(2) { color: #8198b6; font-size: 28px; }
+html body.persona-page .persona-payment-source small { display: block; margin-top: 9px; color: var(--brand-muted); font: 12px/1.5 var(--brand-sans); }
+html body.persona-page .persona-payment-example dl { display: grid; gap: 14px; padding-block: 22px; border-block: 1px solid var(--brand-line); }
+html body.persona-page .persona-payment-example dl > div { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; }
+html body.persona-page .persona-payment-example dt { color: var(--brand-muted); }
+html body.persona-page .persona-payment-example dd { font-weight: 600; }
+html body.persona-page .persona-payment-total { display: grid; gap: 8px; padding-top: 26px; }
+html body.persona-page .persona-payment-total span { color: var(--brand-primary); font-size: 12px; }
+html body.persona-page .persona-payment-total strong { color: var(--brand-primary); font: 400 64px/1 var(--brand-serif); }
+html body.persona-page .persona-payment-example > p { margin-top: 24px; color: var(--brand-muted); font-size: 12px; line-height: 1.65; }
+html body.persona-page .persona-coming-soon { display: inline-block; margin-left: 6px; padding: 2px 8px; border: 1px solid var(--brand-line); border-radius: 6px; color: var(--brand-muted); font-size: 11px; font-weight: 500; white-space: nowrap; }
+
+html body.persona-page .persona-pricing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; max-width: 960px; margin: 0 auto; }
+html body.persona-page .persona-price-card { display: flex; flex-direction: column; align-items: flex-start; padding: 36px; border: 1px solid var(--brand-line); border-radius: 24px; background: var(--brand-paper); }
+html body.persona-page .persona-price-card--subscription { border-color: #bed1eb; background: var(--brand-mist); }
+html body.persona-page .persona-price-kicker { color: var(--brand-muted); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+html body.persona-page .persona-price-card h3 { margin-top: 16px; color: var(--brand-heading); font: 400 32px/1.12 var(--brand-serif); }
+html body.persona-page .persona-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-block: 26px; }
+html body.persona-page .persona-price strong { color: var(--brand-primary); font: 400 64px/1 var(--brand-serif); }
+html body.persona-page .persona-price span { color: var(--brand-muted); font-size: 13px; }
+html body.persona-page .persona-price-card > p:not(.persona-price) { color: var(--brand-muted); font-size: 15px; line-height: 1.7; }
+html body.persona-page .persona-price-card ul { display: grid; gap: 12px; margin: 28px 0 32px; padding: 24px 0 0; border-top: 1px solid var(--brand-line); list-style: none; color: var(--brand-text); font-size: 14px; line-height: 1.55; }
+html body.persona-page .persona-price-card li { display: flex; gap: 12px; }
+html body.persona-page .persona-price-card li::before { content: '✓'; color: var(--brand-primary); }
+html body.persona-page .persona-price-card > .btn { width: 100%; margin-top: auto; }
+html body.persona-page .persona-pricing-note { max-width: 720px; margin: 24px auto 0; color: var(--brand-muted); font-size: 12px; line-height: 1.7; text-align: center; }
+html body.persona-page #tarifs::after { content: none; }
+
+@media (min-width: 901px) {
+  html body.persona-page .persona-feature-row--reverse { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+  html body.persona-page .persona-feature-row--reverse .persona-feature-copy { grid-column: 2; grid-row: 1; }
+  html body.persona-page .persona-feature-row--reverse > figure { grid-column: 1; grid-row: 1; }
+}
+@media (max-width: 900px) {
+  html body.persona-page .persona-feature-row { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  html body.persona-page .persona-feature-copy { max-width: 680px; margin-inline: auto; }
+  html body.persona-page .persona-feature-row + .persona-feature-row { margin-top: 56px; }
+  html body.persona-page .persona-payment-example { width: 100%; max-width: 600px; margin-inline: auto; }
+  html body.persona-page .persona-pricing-grid { gap: 18px; }
+  html body.persona-page .persona-price-card { padding: 28px; }
+}
+@media (max-width: 700px) {
+  html body.persona-page .persona-screen .ml-interface-stage { padding: 0 20px; }
+  html body.persona-page .ml-interface-preview.persona-screen { max-width: 440px; margin-inline: auto; }
+  html body.persona-page .persona-pricing-grid { grid-template-columns: minmax(0, 1fr); max-width: 480px; }
+}
+@media (max-width: 640px) {
+  html body.persona-page .persona-feature-copy :is(h2, .section-h) { font-size: 34px; }
+  html body.persona-page .persona-benefits { margin-top: 24px; }
+  html body.persona-page .persona-feature-row + .persona-feature-row { margin-top: 48px; }
+  html body.persona-page .persona-payment-example { padding: 28px 24px; border-radius: 20px; }
+  html body.persona-page .persona-payment-source { gap: 12px; }
+  html body.persona-page .persona-payment-source > span { font-size: 36px; }
+  html body.persona-page .persona-payment-source small { font-size: 11px; }
+  html body.persona-page .persona-price-card { padding: 30px 24px; border-radius: 20px; }
+  html body.persona-page .persona-faq-demo .btn { width: 100%; max-width: 340px; }
+}
