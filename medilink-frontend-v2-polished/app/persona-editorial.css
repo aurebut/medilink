@@ -1,0 +1,275 @@
+/* The dedicated journeys share the homepage's blue / porcelain art direction.
+   Scope every rule: the home, guides and authenticated workspaces stay independent. */
+html body.persona-page:is(.candidate, .establishment) {
+  --ivory: var(--brand-canvas);
+  --navy: var(--brand-primary);
+  --blue: var(--brand-primary);
+  --blue-lt: var(--brand-primary-hover);
+  --teal: var(--brand-primary);
+  --teal-lt: var(--brand-primary-hover);
+  --accent: var(--brand-primary);
+  --accent-soft: var(--brand-mist);
+  --accent-ink: var(--brand-primary);
+  --text: var(--brand-text);
+  --text-2: #405b7b;
+  --text-3: var(--brand-muted);
+  --gray-1: #eef2f6;
+  --gray-2: var(--brand-line);
+  --gray-3: #bdcddb;
+  --gray-4: var(--brand-muted);
+  --sans: var(--brand-sans);
+  --serif: var(--brand-serif);
+  background: linear-gradient(#e1ebfa 0 80px, var(--brand-canvas) 80px);
+}
+
+html body.persona-page::before { content: none; }
+html body.persona-page main { --persona-space: clamp(36px, 4.5vw, 56px); }
+html body.persona-page nav,
+html body.persona-page nav.nav-scrolled {
+  background: #fafcfef2;
+  border-color: #dce5ed;
+  box-shadow: 0 8px 26px -20px #1952a033;
+}
+html body.persona-page .persona-switch { background: transparent; border-color: var(--brand-line); }
+html body.persona-page .persona-switch .active { background: var(--brand-mist); color: var(--brand-primary); }
+html body.persona-page :is(.btn-primary, .btn-teal, .hero-action button, .drawer-action) {
+  background: var(--brand-primary);
+  color: #fff;
+  box-shadow: 0 5px 12px #1952a014;
+}
+html body.persona-page :is(.btn-primary, .btn-teal, .hero-action button, .drawer-action):hover { background: var(--brand-primary-hover); }
+html body.persona-page .btn-outline { border: 1px solid #9badb9; background: #ffffff80; color: var(--brand-primary); }
+html body.persona-page :is(a, button, input, select, summary):focus-visible { outline: 2px solid var(--brand-focus); outline-offset: 4px; }
+html body.persona-page :is(.hero-ctas, .cta-actions) .btn { min-height: 49px; padding: 12px 21px; font-size: 14px; }
+
+/* Same centered promise, restrained type scale and framed photograph as the home. */
+html body.persona-page .persona-hero {
+  padding: 132px 32px 24px;
+  background: linear-gradient(180deg, #e1ebfa 0%, var(--brand-frost) 55%, var(--brand-canvas) 100%);
+}
+html body.persona-page .persona-hero > .hero-bg { display: none; }
+html body.persona-page .persona-hero::after { content: none; }
+html body.persona-page .persona-hero-inner { max-width: 1000px; }
+html body.persona-page :is(.persona-eyebrow, .section-kicker, .dark-kicker) {
+  padding: 0;
+  margin: 0 0 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #45658d;
+  font: 600 10px/1.5 var(--brand-sans);
+  letter-spacing: .12em;
+}
+html body.persona-page .persona-eyebrow { margin-bottom: 20px; }
+html body.persona-page .persona-eyebrow::before { content: none; }
+html body.persona-page :is(.section-kicker, .dark-kicker)::before { background: var(--brand-primary); box-shadow: none; }
+html body.persona-page .persona-hero h1 {
+  max-width: 780px;
+  color: var(--brand-heading);
+  font: 400 clamp(40px, 4.2vw, 54px)/1.08 var(--brand-serif);
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+html body.persona-page .persona-hero h1 em { color: var(--brand-primary); }
+html body.persona-page .persona-hero-copy { max-width: 660px; margin-top: 23px; font-size: 16px; line-height: 1.65; text-wrap: pretty; }
+html body.persona-page .persona-stage { width: 100%; margin-top: 38px; padding-bottom: 0; }
+html body.persona-page .persona-stage::after { content: none; }
+html body.persona-page .persona-photo-frame {
+  height: auto;
+  padding: 8px;
+  border: 1px solid var(--brand-line);
+  border-radius: 28px;
+  background: var(--brand-paper);
+  box-shadow: var(--brand-shadow);
+}
+html body.persona-page .persona-photo-frame img { aspect-ratio: 1217 / 562; height: auto; border-radius: 20px; }
+html body.persona-page .hero-action { position: relative; inset: auto; width: calc(100% - 48px); margin: -34px auto 0; transform: none; }
+html body.persona-page .hero-action form { border-color: var(--brand-line); background: var(--brand-paper); box-shadow: var(--brand-shadow); }
+html body.persona-page .hero-field { padding: 10px 14px; }
+html body.persona-page .hero-field small { font-size: 10px; }
+html body.persona-page .hero-field :is(input, select) { min-height: 24px; font-size: 13px; }
+html body.persona-page .hero-action button { font-size: 12px; }
+html body.persona-page .hero-action-note { font-size: 11px; }
+
+/* Open editorial sections, fine dividers and comfortable reading sizes. */
+html body.persona-page :is(.persona-section, .persona-dark, .faq) { padding: var(--persona-space) 32px; background: transparent; }
+html body.persona-page :is(.persona-section, .persona-dark)::after,
+html body.persona-page .faq::before {
+  content: '';
+  position: static;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 1100px;
+  margin: 31px auto 0;
+  border-top: 1px solid #d8dde2;
+  border-radius: 0;
+  background: none;
+  filter: none;
+}
+html body.persona-page .faq::before { margin: 0 auto 31px; }
+html body.persona-page .persona-dark::before { content: none; }
+html body.persona-page .section-head { max-width: 780px; margin-bottom: 36px; }
+html body.persona-page :is(.section-h, .dark-heading h2) {
+  color: var(--brand-heading);
+  font: 400 clamp(34px, 3.6vw, 48px)/1.08 var(--brand-serif);
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+html body.persona-page .section-h em { color: var(--brand-primary); }
+html body.persona-page .section-sub { margin-top: 20px; font-size: 15px; line-height: 1.7; text-wrap: pretty; }
+html body.persona-page .continuous-grid { gap: 28px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+html body.persona-page .continuous-card { min-height: 0; padding: 0 24px 0 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+html body.persona-page .continuous-card:nth-child(n) { background: transparent; }
+html body.persona-page .continuous-card:not(:last-child) { border-right: 1px solid var(--brand-line); }
+html body.persona-page .continuous-card-head { margin-bottom: 22px; gap: 14px; }
+html body.persona-page .continuous-card .continuous-index { border: 1px solid var(--brand-line); border-radius: 12px; background: var(--brand-mist); color: var(--brand-primary); box-shadow: none; }
+html body.persona-page .continuous-card small { font-size: 10px; line-height: 1.5; }
+html body.persona-page .continuous-card h3 { color: var(--brand-heading); font-size: 29px; }
+html body.persona-page .continuous-card p { font-size: 15px; line-height: 1.65; }
+html body.persona-page .micro-list { gap: 11px; }
+html body.persona-page .micro-list li { align-items: baseline; font-size: 12px; line-height: 1.5; }
+html body.persona-page .micro-list li::before { flex: 0 0 5px; box-shadow: none; }
+
+/* Keep the search / recruiting examples and give them the shared product palette. */
+html body.persona-page .product-demo { border: 1px solid var(--brand-line); border-radius: 20px; background: var(--brand-paper); box-shadow: var(--brand-shadow); }
+html body.persona-page .product-bar { min-height: 56px; background: var(--brand-frost); color: var(--brand-text); border-bottom: 1px solid var(--brand-line); }
+html body.persona-page :is(.product-path, .product-state) { color: var(--brand-muted); font-size: 11px; }
+html body.persona-page .product-path b { color: var(--brand-primary); font-weight: 600; }
+html body.persona-page .product-state::before { background: var(--brand-primary); box-shadow: 0 0 0 4px var(--brand-mist); }
+html body.persona-page :is(.workspace-sidebar, .candidate-drawer) { background: var(--brand-frost); }
+html body.persona-page :is(.workspace-main, .pipeline-area) { background: var(--brand-paper); }
+html body.persona-page .profile-card { padding: 0; border: 0; border-radius: 0; background: transparent; }
+html body.persona-page .profile-card img { height: 158px; border-radius: 12px; }
+html body.persona-page :is(.workspace-sidebar-label, .workspace-head span, .candidate-drawer > span) { font-size: 10px; }
+html body.persona-page :is(.profile-card p, .profile-meter div, .workspace-head p, .pipeline-heading span, .drawer-person p, .drawer-score span, .drawer-facts li) { font-size: 11px; line-height: 1.6; }
+html body.persona-page :is(.workspace-head h3, .pipeline-heading h3, .profile-card h3, .drawer-person h3) { color: var(--brand-heading); }
+html body.persona-page .candidate-workspace { min-height: 0; }
+html body.persona-page .mission-stack { gap: 0; }
+html body.persona-page .mission-result { padding: 20px 12px; border: 0; border-bottom: 1px solid var(--brand-line); border-radius: 0; background: transparent; box-shadow: none; }
+html body.persona-page .mission-result:last-child { border-bottom: 0; }
+html body.persona-page .mission-result.is-featured { background: var(--brand-frost); }
+html body.persona-page .mission-result h4 { margin: 7px 0; font-size: 23px; color: var(--brand-heading); }
+html body.persona-page :is(.mission-result small, .pipeline-item small) { font-size: 9px; line-height: 1.5; }
+html body.persona-page .mission-result p { font-size: 11px; line-height: 1.55; }
+html body.persona-page .mission-data { gap: 8px; }
+html body.persona-page .mission-data div { padding: 0; border-radius: 0; background: transparent; }
+html body.persona-page .mission-data span { font-size: 9px; }
+html body.persona-page .mission-data strong { font-size: 11px; }
+html body.persona-page .match-pill { background: var(--brand-mist); color: var(--brand-primary); }
+html body.persona-page .match-pill small { color: var(--brand-muted); font-size: 9px; }
+html body.persona-page .establishment-workspace { min-height: 0; grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr); }
+html body.persona-page .pipeline-list { border: 0; border-radius: 0; background: transparent; }
+html body.persona-page .pipeline-item { padding: 20px 12px; gap: 16px; border-color: var(--brand-line); }
+html body.persona-page .pipeline-item.is-active { background: var(--brand-frost); }
+html body.persona-page .pipeline-item strong { font-size: 12px; line-height: 1.5; }
+html body.persona-page .pipeline-item p { font-size: 11px; line-height: 1.6; }
+html body.persona-page .status-pill { font-size: 10px; background: var(--brand-mist); color: var(--brand-primary); }
+html body.persona-page .status-pill.good { background: #e7f2ed; color: #22654d; }
+html body.persona-page .drawer-person img { width: 64px; height: 64px; }
+html body.persona-page .drawer-facts { gap: 0; }
+html body.persona-page .drawer-facts li { padding: 10px 0; border-bottom: 1px solid var(--brand-line); border-radius: 0; background: transparent; }
+html body.persona-page .drawer-action { min-height: 44px; font-size: 12px; }
+
+/* Reuse the genuine homepage captures and the same responsive device frames. */
+html body.persona-page .dark-inner { max-width: 1100px; }
+html body.persona-page .dark-heading { grid-template-columns: 1fr 1fr; align-items: center; gap: 64px; }
+html body.persona-page .dark-heading p { padding: 0; font-size: 15px; line-height: 1.7; color: var(--brand-muted); }
+html body.persona-page .ml-interface-preview.persona-detail-preview { max-width: 960px; margin: 32px auto 0; }
+html body.persona-page .persona-detail-preview .ml-interface-stage { padding-block: 12px; }
+
+html body.persona-page .persona-cta { margin: 0 auto; padding: 48px 52px; border-color: var(--brand-primary); background: var(--brand-primary); box-shadow: none; }
+html body.persona-page .persona-cta::after { content: none; }
+html body.persona-page .persona-cta::before { background: #ffffff08; }
+html body.persona-page .persona-cta h2 { color: var(--brand-paper); text-wrap: balance; }
+html body.persona-page .persona-cta p { font-size: 15px; color: #dbe7fa; }
+html body.persona-page .persona-cta :is(.btn-primary, .btn-teal) { background: #e4edfb; color: var(--brand-primary); }
+html body.persona-page .persona-cta :is(.btn-primary, .btn-teal):hover { background: var(--brand-paper); }
+html body.persona-page .persona-cta .btn-outline { background: transparent; border-color: #9cb8df; color: #fff; }
+html body.persona-page .faq-inner { width: 100%; }
+html body.persona-page .faq-list { gap: 0; }
+html body.persona-page .faq-item { border: 0; border-bottom: 1px solid #ced6dd; border-radius: 0; background: transparent; box-shadow: none; }
+html body.persona-page .faq-item[open] { background: var(--brand-mist); }
+html body.persona-page .faq-item summary { grid-template-columns: minmax(0, 1fr) 28px; min-height: 64px; padding: 20px 16px; color: var(--brand-heading); font-size: 14px; line-height: 1.5; }
+html body.persona-page .faq-item summary::before { content: none; }
+html body.persona-page .faq-answer { padding: 0 16px 22px; color: var(--brand-muted); font-size: 14px; line-height: 1.7; }
+html body.persona-page footer { padding: 48px 32px 30px; border-top: 1px solid var(--brand-line); background: var(--brand-canvas); color: var(--brand-muted); }
+html body.persona-page .footer-inner { max-width: 1100px; }
+html body.persona-page :is(.footer-brand strong, .footer-brand em) { color: var(--brand-primary); }
+html body.persona-page :is(.footer-brand p, .footer-col a, .footer-bottom) { color: var(--brand-muted); }
+html body.persona-page .footer-col h4 { color: var(--brand-text); }
+html body.persona-page .footer-bottom { border-color: var(--brand-line); }
+
+@media (max-width: 1180px) {
+  html body.persona-page :is(.nav-links, .nav-right) { display: none; }
+  html body.persona-page .nav-mobile-toggle { display: grid; width: 44px; height: 44px; margin-left: auto; place-items: center; border: 1px solid var(--brand-line); border-radius: 12px; background: var(--brand-paper); cursor: pointer; }
+  html body.persona-page .nav-mobile-toggle > span:last-child { display: grid; gap: 5px; }
+  html body.persona-page .nav-mobile-toggle i { display: block; width: 17px; height: 1.5px; background: var(--brand-primary); }
+  html body.persona-page .nav-mobile-panel { position: absolute; top: 72px; left: 0; right: 0; max-height: calc(100dvh - 108px); overflow-y: auto; padding: 12px; border: 1px solid var(--brand-line); border-radius: 18px; background: var(--brand-paper); box-shadow: var(--brand-shadow); }
+  html body.persona-page nav.mobile-open .nav-mobile-panel { display: grid; }
+  html body.persona-page .nav-mobile-panel > a { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 13px 12px; border-bottom: 1px solid var(--brand-line); color: var(--brand-text); font-size: 13px; text-decoration: none; }
+  html body.persona-page .nav-mobile-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 12px; }
+  html body.persona-page .nav-mobile-actions .btn { min-height: 44px; }
+}
+
+@media (max-width: 900px) {
+  html body.persona-page .candidate-workspace { grid-template-columns: 190px minmax(0, 1fr); }
+  html body.persona-page .establishment-workspace { grid-template-columns: minmax(0, 1fr) 260px; }
+  html body.persona-page .continuous-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  html body.persona-page .continuous-card:last-child { grid-column: auto; border-top: 0; }
+  html body.persona-page .continuous-card { padding-right: 18px; }
+  html body.persona-page .dark-heading { gap: 32px; }
+}
+
+@media (max-width: 760px) {
+  html body.persona-page .persona-hero { padding: 112px 24px 24px; }
+  html body.persona-page :is(.persona-section, .persona-dark, .faq) { padding-inline: 24px; }
+  html body.persona-page .continuous-grid { grid-template-columns: 1fr; gap: 24px; }
+  html body.persona-page .continuous-card { padding: 0 0 24px; }
+  html body.persona-page .continuous-card:not(:last-child) { border-right: 0; border-bottom: 1px solid var(--brand-line); }
+  html body.persona-page .continuous-card:last-child { padding-bottom: 0; }
+  html body.persona-page .continuous-card h3 { max-width: none; }
+  html body.persona-page .continuous-card-head { margin-bottom: 16px; }
+  html body.persona-page .continuous-card p { margin-bottom: 18px; }
+  html body.persona-page .micro-list { gap: 8px; }
+  html body.persona-page :is(.candidate-workspace, .establishment-workspace, .dark-heading) { grid-template-columns: 1fr; }
+  html body.persona-page .dark-heading { gap: 20px; }
+  html body.persona-page .persona-cta { width: calc(100% - 48px); padding: 38px 28px; }
+  html body.persona-page .ml-interface-preview.persona-detail-preview { margin-top: 30px; }
+}
+
+@media (max-width: 640px) {
+  /* Retire the legacy horizontal card carousels on the dedicated journeys. */
+  html body.persona-page :is(.continuous-grid, .mission-stack, .pipeline-list) { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; margin-inline: 0; padding: 0; scroll-snap-type: none; }
+  html body.persona-page :is(.mission-stack, .pipeline-list) { gap: 0; }
+  html body.persona-page :is(.continuous-card, .mission-result, .pipeline-item) { min-height: 0; flex: auto; border: 0 !important; }
+  html body.persona-page :is(.continuous-card, .mission-result, .pipeline-item):not(:last-child) { border-bottom: 1px solid var(--brand-line) !important; }
+  html body.persona-page .persona-hero { padding: 112px 18px 20px; }
+  html body.persona-page .persona-hero h1 { max-width: 360px; font-size: clamp(32px, 9.2vw, 38px); line-height: 1.07; }
+  html body.persona-page .persona-hero-copy { font-size: 15px; }
+  html body.persona-page .persona-stage { margin-top: 28px; }
+  html body.persona-page .persona-photo-frame { padding: 6px; border-radius: 22px; }
+  html body.persona-page .persona-photo-frame img { border-radius: 16px; }
+  html body.persona-page .hero-action { width: 100%; margin-top: 16px; }
+  html body.persona-page .hero-action form { border-radius: 14px; }
+  html body.persona-page :is(.persona-section, .persona-dark, .faq) { padding-inline: 18px; }
+  html body.persona-page :is(.persona-section, .persona-dark)::after { margin-top: 25px; }
+  html body.persona-page .faq::before { margin-bottom: 25px; }
+  html body.persona-page :is(.section-h, .dark-heading h2) { font-size: 34px; }
+  html body.persona-page .section-head { margin-bottom: 28px; }
+  html body.persona-page .persona-detail-preview .ml-interface-stage { padding-block: 0; }
+  html body.persona-page .product-bar { flex-wrap: wrap; gap: 8px; padding-block: 14px; }
+  html body.persona-page .product-state { font-size: 10px; }
+  html body.persona-page .mission-result { padding-inline: 10px; }
+  html body.persona-page .mission-result h4 { font-size: 22px; }
+  html body.persona-page .pipeline-item { gap: 10px; padding-inline: 0; }
+  html body.persona-page .pipeline-heading span { margin-top: 6px; }
+  html body.persona-page .persona-cta { width: calc(100% - 36px); padding: 34px 24px; }
+  html body.persona-page .persona-cta h2 { font-size: 34px; }
+  html body.persona-page footer { padding-inline: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:has(body.persona-page) { scroll-behavior: auto; }
+  html body.persona-page .btn { transition: none; }
+}

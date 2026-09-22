@@ -1,5 +1,5 @@
 /* Genuine application captures. Only the surrounding presentation is styled here. */
-html body.landing-home:not(.persona-page) .ml-dossier--captured {
+html body:is(.landing-home:not(.persona-page), .persona-page) .ml-dossier--captured {
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -7,7 +7,7 @@ html body.landing-home:not(.persona-page) .ml-dossier--captured {
   box-shadow: none;
   scroll-margin-top: 100px;
 }
-html body.landing-home:not(.persona-page) .ml-interface-preview {
+html body:is(.landing-home:not(.persona-page), .persona-page) .ml-interface-preview {
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -16,15 +16,15 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   background: transparent;
   box-shadow: none;
 }
-.landing-home .ml-interface-display { position: relative; display: block; color: var(--brand-primary); }
-.landing-home .ml-interface-stage {
+:is(.landing-home, .persona-page) .ml-interface-display { position: relative; display: block; color: var(--brand-primary); }
+:is(.landing-home, .persona-page) .ml-interface-stage {
   position: relative;
   container-type: inline-size;
   display: block;
   padding: 48px 20px 44px;
   background: transparent;
 }
-.landing-home .ml-interface-window {
+:is(.landing-home, .persona-page) .ml-interface-window {
   position: relative;
   display: block;
   width: 90%;
@@ -35,23 +35,23 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
   background: linear-gradient(145deg, #39434e, #151c25 45%, #252f3b);
   box-shadow: inset 0 0 0 1px #e3e8ed80, 0 16px 32px -21px #1d354c80;
 }
-.landing-home .ml-device-camera { position: absolute; top: .75cqw; left: calc(50% - .2cqw); width: .4cqw; height: .4cqw; border-radius: 50%; background: #426078; box-shadow: 0 0 0 .13cqw #10161e; }
-.landing-home .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
-.landing-home .ml-interface-display picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
+:is(.landing-home, .persona-page) .ml-device-camera { position: absolute; top: .75cqw; left: calc(50% - .2cqw); width: .4cqw; height: .4cqw; border-radius: 50%; background: #426078; box-shadow: 0 0 0 .13cqw #10161e; }
+:is(.landing-home, .persona-page) .ml-device-screen { position: relative; display: block; box-sizing: content-box; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid #101c2c; border-radius: .7cqw; background: var(--brand-paper); }
+:is(.landing-home, .persona-page) .ml-interface-display picture { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; height: 100%; overflow: hidden; background: var(--brand-paper); }
 /* Desktop captures meet the macOS toolbar with square content corners. */
-.landing-home .ml-interface-display img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
-.landing-home .ml-interface-display picture:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: -3px; }
-.landing-home .ml-device-base { position: relative; display: block; width: 100%; height: 1.7cqw; margin-top: -.15cqw; border: 1px solid #a1adbc; border-top-color: #f7fafc; border-radius: .2cqw .2cqw 3cqw 3cqw / .2cqw .2cqw 1.3cqw 1.3cqw; background: linear-gradient(#e6ebef 0%, #cbd3dc 40%, #a2aebb 85%, #8a97a7); box-shadow: 0 .7cqw 1.5cqw -.5cqw #28476633; }
-.landing-home .ml-device-base::before { content: ''; position: absolute; top: -1px; left: 42%; width: 16%; height: .65cqw; border-radius: 0 0 .65cqw .65cqw; background: linear-gradient(#8693a2, #c0c9d3); box-shadow: 0 1px #edf2f6; }
-.landing-home :is(.ml-device-status, .ml-device-home, .ml-device-buttons) { display: none; }
-.landing-home .ml-interface-preview--wide .ml-interface-stage { padding: 56px 46px 50px; }
-.landing-home .ml-macos-window { display: contents; }
-.landing-home .ml-macos-toolbar { display: none; }
+:is(.landing-home, .persona-page) .ml-interface-display img { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
+:is(.landing-home, .persona-page) .ml-interface-display picture:focus-visible { outline: 2px solid var(--brand-focus); outline-offset: -3px; }
+:is(.landing-home, .persona-page) .ml-device-base { position: relative; display: block; width: 100%; height: 1.7cqw; margin-top: -.15cqw; border: 1px solid #a1adbc; border-top-color: #f7fafc; border-radius: .2cqw .2cqw 3cqw 3cqw / .2cqw .2cqw 1.3cqw 1.3cqw; background: linear-gradient(#e6ebef 0%, #cbd3dc 40%, #a2aebb 85%, #8a97a7); box-shadow: 0 .7cqw 1.5cqw -.5cqw #28476633; }
+:is(.landing-home, .persona-page) .ml-device-base::before { content: ''; position: absolute; top: -1px; left: 42%; width: 16%; height: .65cqw; border-radius: 0 0 .65cqw .65cqw; background: linear-gradient(#8693a2, #c0c9d3); box-shadow: 0 1px #edf2f6; }
+:is(.landing-home, .persona-page) :is(.ml-device-status, .ml-device-home, .ml-device-buttons) { display: none; }
+:is(.landing-home, .persona-page) .ml-interface-preview--wide .ml-interface-stage { padding: 56px 46px 50px; }
+:is(.landing-home, .persona-page) .ml-macos-window { display: contents; }
+:is(.landing-home, .persona-page) .ml-macos-toolbar { display: none; }
 
 @media (min-width: 701px) {
-  .landing-home :is(.ml-interface-preview--mission, .ml-interface-preview--documents) .ml-interface-stage { padding-inline: 12px; }
+  :is(.landing-home, .persona-page) :is(.ml-interface-preview--mission, .ml-interface-preview--documents) .ml-interface-stage { padding-inline: 12px; }
   /* All laptops share a 16:10 screen; content never determines the device shape. */
-  .landing-home .ml-macos-window {
+  :is(.landing-home, .persona-page) .ml-macos-window {
     position: absolute;
     inset: 0;
     display: flex;
@@ -59,7 +59,7 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
     overflow: hidden;
     background: var(--brand-paper);
   }
-  .landing-home .ml-macos-toolbar {
+  :is(.landing-home, .persona-page) .ml-macos-toolbar {
     position: relative;
     display: flex;
     align-items: center;
@@ -72,37 +72,37 @@ html body.landing-home:not(.persona-page) .ml-interface-preview {
     font: 600 1.2cqw/1 var(--brand-sans);
     letter-spacing: .01em;
   }
-  .landing-home .ml-macos-lights { position: absolute; left: 1.15cqw; display: flex; gap: .55cqw; }
-  .landing-home .ml-macos-lights > span { width: .9cqw; height: .9cqw; border-radius: 50%; background: #ff6058; box-shadow: inset 0 0 0 1px #00000012; }
-  .landing-home .ml-macos-lights > span:nth-child(2) { background: #febc2e; }
-  .landing-home .ml-macos-lights > span:nth-child(3) { background: #28c840; }
-  .landing-home .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; }
-  .landing-home .ml-interface-display img { width: 100%; max-height: none; }
-  .landing-home .ml-interface-preview--documents picture { overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #9fadc0 var(--brand-paper); }
+  :is(.landing-home, .persona-page) .ml-macos-lights { position: absolute; left: 1.15cqw; display: flex; gap: .55cqw; }
+  :is(.landing-home, .persona-page) .ml-macos-lights > span { width: .9cqw; height: .9cqw; border-radius: 50%; background: #ff6058; box-shadow: inset 0 0 0 1px #00000012; }
+  :is(.landing-home, .persona-page) .ml-macos-lights > span:nth-child(2) { background: #febc2e; }
+  :is(.landing-home, .persona-page) .ml-macos-lights > span:nth-child(3) { background: #28c840; }
+  :is(.landing-home, .persona-page) .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; }
+  :is(.landing-home, .persona-page) .ml-interface-display img { width: 100%; max-height: none; }
+  :is(.landing-home, .persona-page) .ml-interface-preview--documents picture { overflow-y: auto; overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #9fadc0 var(--brand-paper); }
 }
 
 @media (max-width: 700px) {
-  html body.landing-home:not(.persona-page) .ml-interface-preview { width: 100%; max-width: min(440px, calc(100vw - 40px)); margin-inline: auto; }
+  html body:is(.landing-home:not(.persona-page), .persona-page) .ml-interface-preview { width: 100%; max-width: min(440px, calc(100vw - 40px)); margin-inline: auto; }
   /* Section padding and grid gaps already provide the vertical breathing room. */
-  .landing-home .ml-interface-preview .ml-interface-stage { padding: 0 20px; }
-  .landing-home .ml-interface-window { --ml-phone-width: 300px; --ml-phone-radius: 38px; --ml-phone-inset: 6px; width: min(100%, var(--ml-phone-width)); padding: var(--ml-phone-inset); border: 1px solid #8a96a4; border-radius: var(--ml-phone-radius); background: linear-gradient(115deg, #566371, #202934 12%, #111922 80%, #62707f); box-shadow: inset 0 0 0 1px #e1e7ed99, inset 0 0 0 3px #1b2530, 12px 22px 36px -20px #233d6266, 0 3px 6px #263d581a; }
-  .landing-home .ml-device-screen { container-type: inline-size; display: flex; flex-direction: column; aspect-ratio: 9 / 19.5; border: 1px solid #101923; border-radius: calc(var(--ml-phone-radius) - var(--ml-phone-inset) - 1px); }
-  .landing-home .ml-device-status { position: relative; flex: 0 0 15cqw; display: flex; align-items: center; justify-content: space-between; padding: 0 7cqw .75cqw; color: #162438; font: 600 3.8cqw/1 var(--brand-sans); }
-  .landing-home .ml-device-island { position: absolute; top: 3.4cqw; left: 50%; width: 29%; height: 7.2cqw; transform: translateX(-50%); border-radius: 20px; background: #10151c; box-shadow: inset 0 0 0 1px #030609; }
-  .landing-home .ml-device-island::after { content: ''; position: absolute; right: 8px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 65% 35%, #244b65, #101c2c 65%); box-shadow: 0 0 0 1px #202936; }
-  .landing-home .ml-device-indicators { width: 11cqw; }
-  .landing-home .ml-device-indicators svg { display: block; width: 100%; height: 3.8cqw; }
-  .landing-home .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
-  .landing-home .ml-interface-display picture::-webkit-scrollbar { display: none; }
-  .landing-home .ml-interface-display img { width: 100%; max-height: none; }
-  .landing-home .ml-interface-preview--messages img { border-radius: 0; }
+  :is(.landing-home, .persona-page) .ml-interface-preview .ml-interface-stage { padding: 0 20px; }
+  :is(.landing-home, .persona-page) .ml-interface-window { --ml-phone-width: 300px; --ml-phone-radius: 38px; --ml-phone-inset: 6px; width: min(100%, var(--ml-phone-width)); padding: var(--ml-phone-inset); border: 1px solid #8a96a4; border-radius: var(--ml-phone-radius); background: linear-gradient(115deg, #566371, #202934 12%, #111922 80%, #62707f); box-shadow: inset 0 0 0 1px #e1e7ed99, inset 0 0 0 3px #1b2530, 12px 22px 36px -20px #233d6266, 0 3px 6px #263d581a; }
+  :is(.landing-home, .persona-page) .ml-device-screen { container-type: inline-size; display: flex; flex-direction: column; aspect-ratio: 9 / 19.5; border: 1px solid #101923; border-radius: calc(var(--ml-phone-radius) - var(--ml-phone-inset) - 1px); }
+  :is(.landing-home, .persona-page) .ml-device-status { position: relative; flex: 0 0 15cqw; display: flex; align-items: center; justify-content: space-between; padding: 0 7cqw .75cqw; color: #162438; font: 600 3.8cqw/1 var(--brand-sans); }
+  :is(.landing-home, .persona-page) .ml-device-island { position: absolute; top: 3.4cqw; left: 50%; width: 29%; height: 7.2cqw; transform: translateX(-50%); border-radius: 20px; background: #10151c; box-shadow: inset 0 0 0 1px #030609; }
+  :is(.landing-home, .persona-page) .ml-device-island::after { content: ''; position: absolute; right: 8px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: radial-gradient(circle at 65% 35%, #244b65, #101c2c 65%); box-shadow: 0 0 0 1px #202936; }
+  :is(.landing-home, .persona-page) .ml-device-indicators { width: 11cqw; }
+  :is(.landing-home, .persona-page) .ml-device-indicators svg { display: block; width: 100%; height: 3.8cqw; }
+  :is(.landing-home, .persona-page) .ml-interface-display picture { position: relative; inset: auto; display: block; flex: 1 1 0; min-height: 0; height: auto; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
+  :is(.landing-home, .persona-page) .ml-interface-display picture::-webkit-scrollbar { display: none; }
+  :is(.landing-home, .persona-page) .ml-interface-display img { width: 100%; max-height: none; }
+  :is(.landing-home, .persona-page) .ml-interface-preview--messages img { border-radius: 0; }
   /* The compact native mission capture fits the same screen, with all six steps visible. */
-  .landing-home .ml-interface-preview--mission picture { overflow: hidden; }
-  .landing-home .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-mobile-capture-width)) / calc(100% * 14 / var(--ml-mobile-capture-height)); }
-  .landing-home .ml-interface-preview--documents .ml-device-screen::after { content: ''; position: absolute; inset: auto 0 7.5cqw; height: 6cqw; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
-  .landing-home .ml-device-home { position: relative; display: block; flex: 0 0 7.5cqw; }
-  .landing-home .ml-device-home::after { content: ''; position: absolute; bottom: 2.65cqw; left: 34%; width: 32%; height: 1.1cqw; border-radius: 5px; background: #192535; }
-  .landing-home .ml-device-buttons { position: absolute; display: block; left: -3px; top: 18%; width: 2px; height: 24px; border-radius: 2px 0 0 2px; background: #63707d; box-shadow: 0 36px #63707d, 0 65px #63707d; }
-  .landing-home .ml-device-buttons::after { content: ''; position: absolute; top: 39px; left: calc(min(100cqw, var(--ml-phone-width)) + 1px); width: 2px; height: 45px; border-radius: 0 2px 2px 0; background: #63707d; }
-  .landing-home :is(.ml-device-camera, .ml-device-base) { display: none; }
+  :is(.landing-home, .persona-page) .ml-interface-preview--mission picture { overflow: hidden; }
+  :is(.landing-home, .persona-page) .ml-interface-preview--documents img { border-radius: calc(100% * 14 / var(--ml-mobile-capture-width)) / calc(100% * 14 / var(--ml-mobile-capture-height)); }
+  :is(.landing-home, .persona-page) .ml-interface-preview--documents .ml-device-screen::after { content: ''; position: absolute; inset: auto 0 7.5cqw; height: 6cqw; background: linear-gradient(transparent, var(--brand-paper)); pointer-events: none; }
+  :is(.landing-home, .persona-page) .ml-device-home { position: relative; display: block; flex: 0 0 7.5cqw; }
+  :is(.landing-home, .persona-page) .ml-device-home::after { content: ''; position: absolute; bottom: 2.65cqw; left: 34%; width: 32%; height: 1.1cqw; border-radius: 5px; background: #192535; }
+  :is(.landing-home, .persona-page) .ml-device-buttons { position: absolute; display: block; left: -3px; top: 18%; width: 2px; height: 24px; border-radius: 2px 0 0 2px; background: #63707d; box-shadow: 0 36px #63707d, 0 65px #63707d; }
+  :is(.landing-home, .persona-page) .ml-device-buttons::after { content: ''; position: absolute; top: 39px; left: calc(min(100cqw, var(--ml-phone-width)) + 1px); width: 2px; height: 45px; border-radius: 0 2px 2px 0; background: #63707d; }
+  :is(.landing-home, .persona-page) :is(.ml-device-camera, .ml-device-base) { display: none; }
 }

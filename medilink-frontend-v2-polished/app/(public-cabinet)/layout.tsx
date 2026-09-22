@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import { PublicDocument } from '@/components/marketing/PublicDocument';
+import '../(public-home)/interface-previews.css';
+import '../persona-editorial.css';
 export { publicMetadata as metadata } from '@/lib/seo';
-export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#EBF5F3' };
+export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#EEF3F8' };
 
 export default function Layout({ children }: { children: ReactNode }) {
   return <PublicDocument variant="establishment">{children}</PublicDocument>;
