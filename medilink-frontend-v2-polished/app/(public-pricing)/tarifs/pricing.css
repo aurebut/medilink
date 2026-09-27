@@ -3,20 +3,19 @@ html body.landing-home.pricing-page:not(.persona-page) {
 }
 body.pricing-page::before { display: none; }
 .pricing-page [aria-current="page"] { color: var(--brand-primary); background: var(--brand-mist); }
-.pricing-main { position: relative; max-width: 1200px; margin: 0 auto; padding: 65px 32px 60px; }
-.pricing-intro { text-align: center; margin: 0 auto 38px; }
+.pricing-main { --pricing-section-space: clamp(36px, 4.5vw, 56px); position: relative; max-width: 1164px; margin: 0 auto; padding: 65px 32px 60px; }
+.pricing-intro { text-align: center; margin: 0 auto 28px; }
 .pricing-eyebrow { color: var(--brand-primary); font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; }
 .pricing-intro h1 { margin: 17px 0 15px; color: var(--brand-heading); font: 400 clamp(44px, 4.4vw, 60px)/1.02 var(--brand-serif); letter-spacing: -.02em; }
 .pricing-page .pricing-intro h1 em { color: var(--brand-primary); font-weight: 400; }
 .pricing-intro > p:last-child { color: var(--brand-muted); font-size: 15px; line-height: 1.6; }
-.pricing-offers { display: grid; gap: 36px; overflow: hidden; border: 1px solid #cddbea; border-radius: 22px; background: #eef2f7; box-shadow: var(--brand-shadow); }
-.pricing-category { padding: 42px 36px; }
-.pricing-category--candidate { border-bottom: 1px solid #cddbea; background: var(--brand-paper); }
-.pricing-category--establishment { border-top: 1px solid #b9cce3; background: #e5eefb; }
-.pricing-category-heading { margin-bottom: 30px; }
-.pricing-role { padding-left: 12px; border-left: 3px solid var(--brand-primary); color: var(--brand-primary); font-size: 12px; font-weight: 600; line-height: 1.5; letter-spacing: .1em; text-transform: uppercase; }
-.pricing-category-heading h2 { margin: 10px 0 0; color: var(--brand-heading); font: 400 33px/1.15 var(--brand-serif); letter-spacing: -.015em; }
-.pricing-category-heading > p:last-child:not(.pricing-role) { margin-top: 10px; color: var(--brand-muted); font-size: 12px; line-height: 1.6; }
+.pricing-category { padding-block: var(--pricing-section-space); }
+.pricing-category--candidate::after { content: ''; display: block; max-width: 1100px; margin: 56px auto 0; border-top: 1px solid #d8dde2; }
+.pricing-category-heading { margin-bottom: 36px; }
+.pricing-role { color: #45658d; font-size: 11px; font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; }
+.pricing-category-heading h2 { margin: 13px 0 0; color: var(--brand-heading); font: 400 clamp(34px, 3.5vw, 44px)/1.08 var(--brand-serif); letter-spacing: -.015em; }
+.pricing-title-accent { color: var(--brand-primary); }
+.pricing-category-heading > p:last-child:not(.pricing-role) { margin-top: 16px; color: var(--brand-muted); font-size: 14px; line-height: 1.65; }
 .pricing-candidate-body { display: grid; grid-template-columns: .8fr 1.6fr; gap: 36px; }
 .pricing-free-offer { padding-right: 36px; border-right: 1px solid var(--brand-line); }
 .pricing-badge { display: inline-block; padding: 5px 9px; border: 1px solid var(--brand-line); border-radius: 6px; color: var(--brand-primary); font-size: 10px; font-weight: 600; line-height: 1.4; }
@@ -50,7 +49,6 @@ body.pricing-page::before { display: none; }
 .pricing-help svg { width: 14px; height: 14px; }
 @media (max-width: 1050px) {
   .pricing-main { max-width: 860px; padding: 56px 24px 44px; }
-  .pricing-category { padding: 36px 30px; }
   .pricing-candidate-body { grid-template-columns: 1fr 1.2fr; gap: 30px; }
   .pricing-free-offer { padding-right: 30px; }
   .pricing-candidate-body > .pricing-features { grid-template-columns: 1fr; }
@@ -65,11 +63,11 @@ body.pricing-page::before { display: none; }
   .pricing-intro { margin-bottom: 28px; }
   .pricing-intro h1 { font-size: 46px; margin-top: 14px; }
   .pricing-intro > p:last-child { font-size: 13px; }
-  .pricing-offers { gap: 26px; border-radius: 17px; }
-  .pricing-category { padding: 30px 22px; }
-  .pricing-category-heading { margin-bottom: 25px; }
-  .pricing-role { font-size: 11px; letter-spacing: .08em; }
-  .pricing-category-heading h2 { font-size: 29px; }
+  .pricing-category--candidate::after { margin-top: 36px; }
+  .pricing-category-heading { margin-bottom: 28px; }
+  .pricing-role { letter-spacing: .1em; }
+  .pricing-category-heading h2 { font-size: 34px; }
+  .pricing-category-heading > p:last-child:not(.pricing-role) { font-size: 13px; }
   .pricing-candidate-body { grid-template-columns: 1fr; gap: 25px; }
   .pricing-free-offer { padding: 0 0 25px; border-right: 0; border-bottom: 1px solid var(--brand-line); }
   .pricing-amount { font-size: 62px; }
@@ -83,8 +81,7 @@ body.pricing-page::before { display: none; }
 }
 @media (max-width: 360px) {
   .pricing-main { padding-right: 14px; padding-left: 14px; }
-  .pricing-category { padding: 28px 18px; }
-  .pricing-category-heading h2 { font-size: 27px; }
+  .pricing-category-heading h2 { font-size: 32px; }
   .pricing-plan { padding: 22px 16px; }
   .pricing-page .pricing-button { padding: 12px; font-size: 11px; }
 }
