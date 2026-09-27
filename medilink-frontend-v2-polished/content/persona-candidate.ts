@@ -1,3 +1,5 @@
+import { interfacePreview } from './landing-interface-preview';
+
 export const candidateLanding = `
   <section class="persona-hero" aria-labelledby="hero-title">
     <div class="persona-hero-inner">
@@ -26,6 +28,7 @@ export const candidateLanding = `
             <li><h3>La liberté d’affiner</h3><p>Filtrez par ville, spécialité, type de mission, niveau requis, date ou rétrocession. Précisez aussi le secteur, la patientèle, le logiciel et la présence d’un secrétariat.</p></li>
           </ul>
         </div>
+        ${interfacePreview('search', 'persona-screen reveal', 'La recherche de missions MédiLink avec des données de démonstration', 'Recherche MédiLink : filtres et offres de remplacement présentant les conditions de chaque mission. Données fictives.', 'screenshot')}
       </div>
 
       <div class="persona-feature-row persona-feature-row--reverse">
@@ -42,6 +45,7 @@ export const candidateLanding = `
             <li><h3>Les détails qui facilitent l’arrivée</h3><p>Consultez les indications d’accès, le parking et la possibilité d’un logement lorsqu’ils sont précisés dans l’offre.</p></li>
           </ul>
         </div>
+        ${interfacePreview('offer', 'persona-screen reveal', 'Une carte d’offre MédiLink avec des données de démonstration', 'Carte d’une offre de remplacement MédiLink : photo du cabinet, dates et conditions de la mission. Données fictives.', 'screenshot')}
       </div>
     </div>
   </section>
@@ -60,6 +64,7 @@ export const candidateLanding = `
           <li><h3>Gardez le fil</h3><p>Retrouvez les échanges et les conditions convenues au même endroit, avant et pendant la mission.</p></li>
         </ul>
       </div>
+      ${interfacePreview('messages', 'persona-screen reveal', 'La conversation liée au remplacement', 'Messagerie MédiLink entre le médecin titulaire et la remplaçante : échanges et proposition de remplacement. Données fictives.', 'screenshot')}
     </div>
   </section>
 
@@ -78,6 +83,7 @@ export const candidateLanding = `
         </ul>
         <a class="btn btn-primary persona-demo-link" href="/demo">Demander une démo</a>
       </div>
+      ${interfacePreview('documents', 'persona-screen reveal', 'L’espace partagé des documents du remplacement', 'Dossier MédiLink : contrat de remplacement, courrier à l’Ordre et justificatifs réunis avec leur statut et leurs actions. Données fictives.', 'screenshot')}
     </div>
   </section>
 

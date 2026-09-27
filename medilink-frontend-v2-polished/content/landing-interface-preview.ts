@@ -5,7 +5,7 @@ type PreviewName = 'messages' | 'mission' | 'documents' | 'search' | 'offer' | '
 
 // Capture dimensions and cache keys are generated alongside the real app images.
 // Arguments are repository-authored strings only, never API or user content.
-export function interfacePreview(name: PreviewName, className: string, title: string, alt: string) {
+export function interfacePreview(name: PreviewName, className: string, title: string, alt: string, presentation: 'device' | 'screenshot' = 'device') {
   const persona = ['search', 'offer', 'candidates', 'report'].includes(name);
   const assets = persona ? personaCaptures.assets : captures.assets;
   const desktop = assets.find(asset => asset.name === name && asset.device === 'desktop')!;
@@ -15,6 +15,16 @@ export function interfacePreview(name: PreviewName, className: string, title: st
     `/landing-assets/${directory}/${name}-${device.device}${retina ? '@2x' : ''}.webp?v=${device.sha256.slice(0, 12)}`;
   const sourceSet = (device: typeof desktop) => device.sourceScale === 2
     ? `${source(device)} 1x, ${source(device, true)} 2x` : `${source(device)} 1x`;
+
+  // Persona pages keep the native captures, without any phone or laptop decoration.
+  if (presentation === 'screenshot') {
+    return `<figure class="${className} persona-interface-capture" aria-label="${title}" data-interface-preview="${name}">
+      <picture>
+        <source media="(max-width: 700px)" srcset="${sourceSet(mobile)}" width="${mobile.width}" height="${mobile.height}">
+        <img src="${source(desktop)}" srcset="${sourceSet(desktop)}" width="${desktop.width}" height="${desktop.height}" alt="${alt}" loading="lazy" decoding="async">
+      </picture>
+    </figure>`;
+  }
 
   const previewStyle = name === 'documents' ? ` style="--ml-documents-preview-ratio:${mobile.width}/${mobile.previewHeight}"` : '';
   const scrollAttributes = name === 'mission' ? '' : ` tabindex="0" role="group" aria-label="${title} — aperçu défilable${name === 'messages' ? ' sur mobile' : ''}"`;

@@ -276,7 +276,16 @@ function assertPersonaBrief(html, path) {
   assert.match(hero, /<h1\b/, `${path}: heading remains in the first hero section`);
   assert.match(hero, /<a\b[^>]*\bhref="\/demo"[^>]*>[\s\S]*?Demander une démo[\s\S]*?<\/a>/, `${path}: hero demo action`);
 
-  assert.doesNotMatch(main, /data-interface-preview=|ml-interface-preview|persona-screen/, `${path}: device mockups removed from persona landing`);
+  const previews = [...main.matchAll(/<figure\b[^>]*data-interface-preview="([^"]+)"[^>]*>[\s\S]*?<\/figure>/g)];
+  assert.deepEqual(previews.map(match => match[1]), candidate ? ['search', 'offer', 'messages', 'documents'] : ['candidates', 'report', 'documents'], `${path}: all native screenshots retained in their original order`);
+  for (const [preview] of previews) {
+    assert.match(preview, /persona-interface-capture/, `${path}: unframed screenshot presentation`);
+    assert.match(preview, /<source\b[^>]*\bsrcset="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-mobile\.webp(?:\?[^"\s]*)?/, `${path}: native mobile WebP capture`);
+    assert.match(preview, /<img\b[^>]*\bsrc="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-desktop\.webp(?:\?[^"\s]*)?/, `${path}: native desktop WebP capture`);
+    assert.match(preview, /\balt="[^"]+"/, `${path}: accessible screenshot`);
+    assert.match(preview, /ficti(?:f|ve)|illustrati(?:f|ve|on)/i, `${path}: fictional data disclosed`);
+  }
+  assert.doesNotMatch(main, /ml-device-|ml-macos-|ml-interface-window/, `${path}: no phone or laptop decoration`);
   assert.match(hero, /<div class="persona-photo-frame"><img src="\/landing-assets\/hero-medecin\.png"[^>]*alt="[^"]+"/, `${path}: hero photograph and accessible description retained`);
   const faq = sectionMarkup(main, 'faq', path);
   assert.ok([...faq.matchAll(/<details\b/g)].length >= 3, `${path}: useful expandable FAQ`);
@@ -379,7 +388,7 @@ for (const [path, file] of Object.entries(pages)) {
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
   console.log(path === '/'
     ? `PASS ${path}: original landing matches ${reference} outside requested header links, homepage illustrations, interface previews and documents section`
-    : `PASS ${path}: requested sections, demo actions, preserved photograph, absence of device mockups and FAQ verified`);
+    : `PASS ${path}: requested sections, demo actions, preserved photograph, unframed native screenshots and FAQ verified`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });
