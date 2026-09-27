@@ -41,8 +41,7 @@ export default function PricingPage() {
 
     <section className="pricing-category pricing-category--candidate" aria-labelledby="pricing-candidate-title">
       <header className="pricing-category-heading">
-        <p className="pricing-role">Médecin remplaçant</p>
-        <h2 id="pricing-candidate-title">Trouvez votre <span className="pricing-title-accent">prochaine mission.</span></h2>
+        <h2 id="pricing-candidate-title">Médecin <span className="pricing-title-accent">remplaçant</span></h2>
       </header>
       <div className="pricing-candidate-body">
         <div className="pricing-free-offer">
@@ -57,8 +56,7 @@ export default function PricingPage() {
 
     <section className="pricing-category pricing-category--establishment" aria-labelledby="pricing-establishment-title">
       <header className="pricing-category-heading">
-        <p className="pricing-role">Médecin remplacé · Cabinet</p>
-        <h2 id="pricing-establishment-title">Trouvez le <span className="pricing-title-accent">bon remplaçant.</span></h2>
+        <h2 id="pricing-establishment-title">Médecin <span className="pricing-title-accent">remplacé</span></h2>
         <p>Un besoin ponctuel ou des remplacements toute l’année : choisissez votre formule.</p>
       </header>
       <div className="pricing-establishment-body">

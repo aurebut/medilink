@@ -12,10 +12,9 @@ body.pricing-page::before { display: none; }
 .pricing-category { padding-block: var(--pricing-section-space); }
 .pricing-category--candidate::after { content: ''; display: block; max-width: 1100px; margin: 56px auto 0; border-top: 1px solid #d8dde2; }
 .pricing-category-heading { margin-bottom: 36px; }
-.pricing-role { color: #45658d; font-size: 11px; font-weight: 600; line-height: 1.5; letter-spacing: .12em; text-transform: uppercase; }
-.pricing-category-heading h2 { margin: 13px 0 0; color: var(--brand-heading); font: 400 clamp(34px, 3.5vw, 44px)/1.08 var(--brand-serif); letter-spacing: -.015em; }
+.pricing-category-heading h2 { margin: 0; color: var(--brand-heading); font: 400 clamp(34px, 3.5vw, 44px)/1.08 var(--brand-serif); letter-spacing: -.015em; }
 .pricing-title-accent { color: var(--brand-primary); }
-.pricing-category-heading > p:last-child:not(.pricing-role) { margin-top: 16px; color: var(--brand-muted); font-size: 14px; line-height: 1.65; }
+.pricing-category-heading > p:last-child { margin-top: 16px; color: var(--brand-muted); font-size: 14px; line-height: 1.65; }
 .pricing-candidate-body { display: grid; grid-template-columns: .8fr 1.6fr; gap: 36px; }
 .pricing-free-offer { padding-right: 36px; border-right: 1px solid var(--brand-line); }
 .pricing-badge { display: inline-block; padding: 5px 9px; border: 1px solid var(--brand-line); border-radius: 6px; color: var(--brand-primary); font-size: 10px; font-weight: 600; line-height: 1.4; }
@@ -65,9 +64,8 @@ body.pricing-page::before { display: none; }
   .pricing-intro > p:last-child { font-size: 13px; }
   .pricing-category--candidate::after { margin-top: 36px; }
   .pricing-category-heading { margin-bottom: 28px; }
-  .pricing-role { letter-spacing: .1em; }
   .pricing-category-heading h2 { font-size: 34px; }
-  .pricing-category-heading > p:last-child:not(.pricing-role) { font-size: 13px; }
+  .pricing-category-heading > p:last-child { font-size: 13px; }
   .pricing-candidate-body { grid-template-columns: 1fr; gap: 25px; }
   .pricing-free-offer { padding: 0 0 25px; border-right: 0; border-bottom: 1px solid var(--brand-line); }
   .pricing-amount { font-size: 62px; }
