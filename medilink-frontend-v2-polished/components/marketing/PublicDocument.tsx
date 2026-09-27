@@ -6,7 +6,7 @@ import Script from 'next/script';
 import { landingShell } from '@/content/landing-shell';
 import { LandingProcess } from './LandingProcess';
 
-export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides';
+export type PublicVariant = 'home' | 'candidate' | 'establishment' | 'guides' | 'pricing';
 
 const homeStyles = ['main', 'mobile', 'hero', 'theme', 'previews', 'process', 'workspace', 'continuity', 'testimonials'];
 const links = [
@@ -38,9 +38,12 @@ function PublicFooter() {
 
 export function PublicDocument({ variant, children }: { variant: PublicVariant; children: ReactNode }) {
   const persona = variant === 'candidate' || variant === 'establishment';
-  const styles = persona ? ['persona', 'mobile'] : variant === 'home' ? homeStyles : ['main', 'mobile'];
-  const bodyClass = persona ? `persona-page ${variant}` : variant === 'home' ? 'landing-home' : 'guides-page';
-  const restored = variant === 'guides' ? null : landingShell[variant];
+  const styles = persona ? ['persona', 'mobile'] : variant === 'home' || variant === 'pricing' ? homeStyles : ['main', 'mobile'];
+  const bodyClass = persona ? `persona-page ${variant}` : variant === 'pricing' ? 'landing-home pricing-page' : variant === 'home' ? 'landing-home' : 'guides-page';
+  const restored = variant === 'guides' ? null : variant === 'pricing' ? {
+    navigation: landingShell.home.navigation.replaceAll('href="/tarifs"', 'href="/tarifs" aria-current="page"'),
+    footer: landingShell.home.footer.replaceAll('href="#', 'href="/#'),
+  } : landingShell[variant];
   return <html lang="fr"><head>
     {['special', ...styles, 'icons', ...(variant === 'guides' ? ['seo'] : [])].map(name => <link key={name} rel="stylesheet" href={`/landing-${name}.css`} />)}
   </head><body className={bodyClass}>

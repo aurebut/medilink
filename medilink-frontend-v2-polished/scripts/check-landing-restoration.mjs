@@ -294,7 +294,7 @@ function assertPersonaBrief(html, path) {
     assert.match(payment, /prélèvement automatique/i, `${path}: requested automatic debit topic`);
     assert.match(payment, /à venir/i, `${path}: automatic debit is disclosed as forthcoming`);
     const pricing = visibleText(sectionMarkup(main, 'tarifs', path));
-    assert.match(pricing, /\b39\s*€/, `${path}: approved success price`);
+    assert.match(pricing, /\b39,99\s*€/, `${path}: approved success price`);
     assert.match(pricing, /\b99\s*€/, `${path}: approved monthly price`);
     assert.match(pricing, /réussite/i, `${path}: success plan`);
     assert.match(pricing, /illimité/i, `${path}: unlimited plan`);
@@ -337,6 +337,17 @@ for (const [path, file] of Object.entries(pages)) {
         assert.equal([...expected.matchAll(removedLinks)].length, 4, 'original desktop and mobile process/FAQ links');
         assert.equal([...rendered.matchAll(removedLinks)].length, 0, 'requested removal of process/FAQ header links');
         expected = expected.replace(/^ *<a\b[^>]*href="#(?:matching|faq)"[^>]*>[^\n]*?<\/a>\r?\n/gm, '');
+        const pricingLinks = [...rendered.matchAll(/^ *<a\b[^>]*data-pricing-link="(desktop|mobile)"[^>]*>[^\n]*?<\/a>\r?\n/gm)];
+        assert.deepEqual(pricingLinks.map(match => match[1]), ['desktop', 'mobile'], 'homepage: desktop and mobile pricing links');
+        assert.equal([...rendered.matchAll(/<a\b[^>]*href="\/tarifs"/g)].length, 2, 'homepage: exactly two pricing links');
+        const desktopNavigation = rendered.match(/<div class="nav-links">([\s\S]*?)<\/div>/)?.[1] || '';
+        const mobileNavigation = rendered.match(/<div class="nav-mobile-panel" id="mobileNavigation">([\s\S]*?)<div class="nav-mobile-actions">/)?.[1] || '';
+        for (const [link, location] of pricingLinks) {
+          assert.match(link, /href="\/tarifs"/, `homepage: ${location} pricing destination`);
+          assert.equal(visibleText(link), 'Tarifs', `homepage: ${location} pricing label`);
+          assert.ok((location === 'desktop' ? desktopNavigation : mobileNavigation).includes(link), `homepage: pricing link belongs to the ${location} menu`);
+          rendered = rendered.replace(link, '');
+        }
       }
       const guideLinks = [...rendered.matchAll(/<a\b[^>]*data-guides-link="(desktop|mobile)"[^>]*>[\s\S]*?<\/a>/g)];
       assert.deepEqual(guideLinks.map(match => match[1]), ['desktop', 'mobile'], `${path}: desktop and mobile guide links`);
@@ -366,7 +377,7 @@ for (const [path, file] of Object.entries(pages)) {
       rendered = normalizeDocumentsSection(rendered);
     }
     if (path === '/') {
-      assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested guide links, process illustrations, interface previews and documents section`);
+      assert.equal(normalize(rendered), normalize(expected), `${path}: original ${tag} preserved outside requested header links, process illustrations, interface previews and documents section`);
     }
   }
   const styles = html => [...html.matchAll(/<link\b[^>]*>/g)].map(match => match[0]).filter(tag => /rel="stylesheet"/.test(tag)).flatMap(tag => tag.match(/href="(\/landing-[^"]+\.css)"/)?.[1] || []);
@@ -376,7 +387,7 @@ for (const [path, file] of Object.entries(pages)) {
   assert.doesNotMatch(actual, /seo-launch-note|seo-resources|href="\/landing-seo\.css"/, `${path}: no SEO layout additions`);
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
   console.log(path === '/'
-    ? `PASS ${path}: original landing matches ${reference} outside requested guide links, homepage illustrations, interface previews and documents section`
+    ? `PASS ${path}: original landing matches ${reference} outside requested header links, homepage illustrations, interface previews and documents section`
     : `PASS ${path}: requested sections, demo actions, native previews and FAQ verified`);
 }
 for (const asset of originalAssets) {

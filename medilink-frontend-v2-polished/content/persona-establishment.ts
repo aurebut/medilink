@@ -85,7 +85,7 @@ export const establishmentLanding = `
     <div class="persona-pricing-grid">
       <article class="persona-price-card reveal" aria-labelledby="success-price-title">
         <span class="persona-price-kicker">Pour un besoin ponctuel</span><h3 id="success-price-title">Paiement à la réussite</h3>
-        <p class="persona-price"><strong>39 €</strong><span>par remplacement trouvé</span></p>
+        <p class="persona-price"><strong>39,99 €</strong><span>par remplacement trouvé</span></p>
         <p>Vous payez à la réussite du matching, lorsqu’un remplaçant est trouvé pour votre besoin.</p>
         <ul><li>Une tarification à l’unité</li><li>Un coût lié au remplacement trouvé</li><li>Le dossier de votre mission au même endroit</li></ul>
         ${demo}
@@ -108,7 +108,7 @@ export const establishmentLanding = `
       <details class="faq-item reveal"><summary>Comment suivre ce qui se passe pendant la mission ?</summary><div class="faq-answer">Les échanges et les comptes rendus transmis restent accessibles dans le dossier partagé. L’interface de rapports journaliers, hebdomadaires et mensuels peut déjà être explorée avec un exemple interactif ; l’enregistrement et le partage de rapports structurés sont à venir. Il ne s’agit pas d’une remontée automatique des consultations.</div></details>
       <details class="faq-item reveal"><summary>Quels documents peut-on préparer sur MédiLink ?</summary><div class="faq-answer">Le dossier permet de préparer un contrat de remplacement libéral individuel et un courrier à l’Ordre, d’ajouter les pièces utiles et de transmettre les documents choisis. Les documents générés doivent être relus. La signature et les démarches d’autorisation restent à effectuer ; un envoi ne vaut pas validation par l’Ordre.</div></details>
       <details class="faq-item reveal"><summary>La rétrocession est-elle prélevée automatiquement ?</summary><div class="faq-answer">Pas encore. MédiLink permet de calculer le montant à partir des honoraires déclarés et du taux convenu, puis d’enregistrer le suivi du règlement. Le prélèvement bancaire automatique est à venir.</div></details>
-      <details class="faq-item reveal"><summary>Quelle différence entre les deux tarifs ?</summary><div class="faq-answer">La formule à la réussite coûte 39 € par remplacement trouvé. L’abonnement illimité coûte 99 € par mois et s’adresse aux besoins réguliers. Présentez-nous votre organisation lors d’une démo pour choisir la formule adaptée.</div></details>
+      <details class="faq-item reveal"><summary>Quelle différence entre les deux tarifs ?</summary><div class="faq-answer">La formule à la réussite coûte 39,99 € par remplacement trouvé. L’abonnement illimité coûte 99 € par mois et s’adresse aux besoins réguliers. Présentez-nous votre organisation lors d’une démo pour choisir la formule adaptée.</div></details>
       <details class="faq-item reveal"><summary>Que découvre-t-on pendant la démo ?</summary><div class="faq-answer">Nous parcourons la recherche d’un remplaçant, les échanges, les documents et le suivi de la mission. C’est aussi l’occasion de revoir votre organisation et les conditions tarifaires.</div></details>
     </div>
   </div><div class="persona-faq-demo">${demo}</div></section>

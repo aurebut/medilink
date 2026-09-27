@@ -5,6 +5,7 @@ import { SITE_URL, EDITORIAL_DATE } from '@/lib/seo';
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...['/', '/remplacement-medical', '/trouver-medecin-remplacant', '/guides'].map(path => ({ url: `${SITE_URL}${path === '/' ? '' : path}`, lastModified: EDITORIAL_DATE })),
+    { url: `${SITE_URL}/tarifs`, lastModified: '2026-09-27' },
     ...guides.map(guide => ({ url: `${SITE_URL}/guides/${guide.slug}`, lastModified: guide.updated })),
   ];
 }

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 const base = (process.argv[2] || 'http://localhost:3100').replace(/\/$/, '');
 const site = 'https://medilink-web.com';
 const publicPages = [
-  '/', '/remplacement-medical', '/trouver-medecin-remplacant', '/guides',
+  '/', '/remplacement-medical', '/trouver-medecin-remplacant', '/guides', '/tarifs',
   '/guides/premier-remplacement-medical-checklist', '/guides/annonce-remplacement-medical-cabinet',
   '/guides/choisir-remplacement-medecine-generale', '/guides/contrat-remplacement-medical-points-a-verifier',
   '/guides/retrocession-remplacement-medecine-generale', '/guides/accueillir-medecin-remplacant-cabinet',
