@@ -332,6 +332,12 @@ for (const [path, file] of Object.entries(pages)) {
     let rendered = actual.match(pattern)?.[1] || '';
     let expected = original.match(pattern)?.[1] || '';
     if (tag === 'nav') {
+      if (path === '/') {
+        const removedLinks = /<a\b[^>]*href="#(?:matching|faq)"[^>]*>[\s\S]*?<\/a>/g;
+        assert.equal([...expected.matchAll(removedLinks)].length, 4, 'original desktop and mobile process/FAQ links');
+        assert.equal([...rendered.matchAll(removedLinks)].length, 0, 'requested removal of process/FAQ header links');
+        expected = expected.replace(/^ *<a\b[^>]*href="#(?:matching|faq)"[^>]*>[^\n]*?<\/a>\r?\n/gm, '');
+      }
       const guideLinks = [...rendered.matchAll(/<a\b[^>]*data-guides-link="(desktop|mobile)"[^>]*>[\s\S]*?<\/a>/g)];
       assert.deepEqual(guideLinks.map(match => match[1]), ['desktop', 'mobile'], `${path}: desktop and mobile guide links`);
       for (const [link] of guideLinks) {

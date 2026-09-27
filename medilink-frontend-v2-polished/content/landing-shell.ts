@@ -9,8 +9,6 @@ export const landingShell = {
     <div class="nav-links">
       <a class="nav-link" href="/remplacement-medical">Médecin remplaçant</a>
       <a class="nav-link" href="/trouver-medecin-remplacant">Cabinet / médecin installé</a>
-      <a class="nav-link" href="#matching">Comment ça marche</a>
-      <a class="nav-link" href="#faq">FAQ</a>
     </div>
     <div class="nav-right"><a class="nav-link" href="/guides" data-guides-link="desktop">Guides pratiques</a>
       <a class="btn btn-ghost" href="/login">Se connecter</a>
@@ -22,8 +20,6 @@ export const landingShell = {
     <div class="nav-mobile-panel" id="mobileNavigation">
       <a href="/remplacement-medical">Médecin remplaçant <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <a href="/trouver-medecin-remplacant">Cabinet / médecin installé <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
-      <a href="#matching">Comment ça marche <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
-      <a href="#faq">Questions fréquentes <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a>
       <a href="/guides" data-guides-link="mobile">Guides pratiques <span aria-hidden="true"><svg class="landing-arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></span></a><div class="nav-mobile-actions"><a class="btn btn-ghost" href="/login">Se connecter</a><a class="btn btn-primary" href="/demo">Demander une démo</a></div>
     </div>
   `,
