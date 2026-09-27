@@ -39,45 +39,55 @@ export default function PricingPage() {
       <p>Gratuit pour les remplaçants.<br />Deux formules pour les médecins remplacés.</p>
     </header>
 
-    <section className="pricing-offers" aria-label="Les offres MédiLink">
-      <article className="pricing-offer" aria-labelledby="pricing-candidate-title">
-        <div className="pricing-offer-heading">
-          <span className="pricing-role">Médecins remplaçants</span>
-          <span className="pricing-badge">Gratuit</span>
+    <div className="pricing-offers">
+      <section className="pricing-category pricing-category--candidate" aria-labelledby="pricing-candidate-title">
+        <header className="pricing-category-heading">
+          <p className="pricing-role">Médecin remplaçant</p>
+          <h2 id="pricing-candidate-title">Trouvez votre prochaine mission.</h2>
+        </header>
+        <div className="pricing-candidate-body">
+          <div className="pricing-free-offer">
+            <span className="pricing-badge">Gratuit</span>
+            <p className="pricing-amount"><span>0</span><span className="pricing-currency">€</span></p>
+            <p className="pricing-condition">Aucun frais pour les remplaçants.</p>
+            <a className="btn pricing-button pricing-button--outline" href="/register?type=candidate">Créer mon profil gratuit<ArrowUpRight aria-hidden="true" /></a>
+          </div>
+          <Features items={candidateFeatures} />
         </div>
-        <h2 id="pricing-candidate-title">Trouvez votre prochaine mission.</h2>
-        <p className="pricing-amount"><span>0</span><span className="pricing-currency">€</span></p>
-        <p className="pricing-condition">Aucun frais pour les remplaçants.</p>
-        <Features items={candidateFeatures} />
-        <a className="btn pricing-button pricing-button--outline" href="/register?type=candidate">Créer mon profil gratuit<ArrowUpRight aria-hidden="true" /></a>
-      </article>
+      </section>
 
-      <article className="pricing-offer pricing-offer--success" aria-labelledby="pricing-establishment-title">
-        <div className="pricing-offer-heading">
-          <span className="pricing-role">Médecins remplacés et cabinets</span>
-          <span className="pricing-badge">À la réussite</span>
+      <section className="pricing-category pricing-category--establishment" aria-labelledby="pricing-establishment-title">
+        <header className="pricing-category-heading">
+          <p className="pricing-role">Médecin remplacé · Cabinet</p>
+          <h2 id="pricing-establishment-title">Trouvez le bon remplaçant.</h2>
+          <p>Un besoin ponctuel ou des remplacements toute l’année : choisissez votre formule.</p>
+        </header>
+        <div className="pricing-establishment-body">
+          <div className="pricing-plans">
+            <article className="pricing-plan" aria-labelledby="pricing-success-title">
+              <p className="pricing-plan-kicker">Pour un besoin ponctuel</p>
+              <h3 id="pricing-success-title">À la réussite</h3>
+              <p className="pricing-amount"><span>39,99</span><span className="pricing-currency">€</span></p>
+              <p className="pricing-condition">Par mission, uniquement si le match aboutit.</p>
+              <a className="btn pricing-button pricing-button--outline" href="/register?type=establishment">Trouver un remplaçant<ArrowUpRight aria-hidden="true" /></a>
+            </article>
+            <article className="pricing-plan pricing-plan--unlimited" aria-labelledby="pricing-unlimited-title">
+              <p className="pricing-plan-kicker">Pour des besoins réguliers</p>
+              <h3 id="pricing-unlimited-title">Abonnement illimité</h3>
+              <p className="pricing-amount"><span>99</span><span className="pricing-currency">€<span className="pricing-period">/mois</span></span></p>
+              <p className="pricing-condition"><strong>Matchs illimités inclus dans l’abonnement.</strong></p>
+              <a className="btn btn-primary pricing-button" href="/demo">Découvrir l’abonnement<ArrowUpRight aria-hidden="true" /></a>
+            </article>
+          </div>
+          <div className="pricing-shared-features">
+            <h3>Inclus dans les deux formules</h3>
+            <Features items={establishmentFeatures} />
+          </div>
         </div>
-        <h2 id="pricing-establishment-title">Trouvez le bon remplaçant.</h2>
-        <p className="pricing-amount"><span>39,99</span><span className="pricing-currency">€</span></p>
-        <p className="pricing-condition">Par mission, uniquement si le match aboutit.</p>
-        <Features items={establishmentFeatures} />
-        <a className="btn btn-primary pricing-button" href="/register?type=establishment">Trouver un remplaçant<ArrowUpRight aria-hidden="true" /></a>
-      </article>
+      </section>
+    </div>
 
-      <article className="pricing-offer pricing-offer--unlimited" aria-labelledby="pricing-unlimited-title">
-        <div className="pricing-offer-heading">
-          <span className="pricing-role">Médecins remplacés et cabinets</span>
-          <span className="pricing-badge">Illimité</span>
-        </div>
-        <h2 id="pricing-unlimited-title">Des besoins toute l’année.</h2>
-        <p className="pricing-amount"><span>99</span><span className="pricing-currency">€<span className="pricing-period">/mois</span></span></p>
-        <p className="pricing-condition"><strong>Matchs illimités inclus dans l’abonnement.</strong></p>
-        <Features items={establishmentFeatures} />
-        <a className="btn btn-primary pricing-button" href="/demo">Découvrir l’abonnement<ArrowUpRight aria-hidden="true" /></a>
-      </article>
-    </section>
-
-    <p className="pricing-note">À la réussite ou en illimité, les mêmes fonctionnalités pour les médecins remplacés.<br />Un match réussi, c’est un remplaçant trouvé pour votre mission. Les frais MédiLink sont distincts de la rétrocession.</p>
+    <p className="pricing-note">Un match réussi, c’est un remplaçant trouvé pour votre mission.<br />Les frais MédiLink sont distincts de la rétrocession versée au médecin.</p>
     <p className="pricing-help">Envie de découvrir la plateforme ? <a href="/demo">Demander une démo <ArrowUpRight aria-hidden="true" /></a></p>
   </main>;
 }
