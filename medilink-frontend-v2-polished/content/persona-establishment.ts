@@ -1,5 +1,3 @@
-import { interfacePreview } from './landing-interface-preview';
-
 const demo = '<a class="btn btn-primary btn-lg" href="/demo">Demander une démo <span aria-hidden="true">↗</span></a>';
 
 export const establishmentLanding = `
@@ -19,7 +17,6 @@ export const establishmentLanding = `
         <h2 class="section-h" id="vivier-title">Des médecins à rencontrer.<br><em>Une compatibilité à comprendre.</em></h2>
         <p class="section-sub">Au-delà d’un profil, voyez ce qui correspond à votre cabinet. Un clic sur « Voir pourquoi » détaille les points communs, les écarts et les conditions à confirmer.</p>
       </header>
-      ${interfacePreview('candidates', 'persona-screen persona-screen--large reveal', 'Les candidatures et leurs critères de compatibilité, avec des données fictives', 'Candidatures MédiLink : profil sélectionné et compatibilité expliquée par spécialité, niveau, lieu, type de mission, logiciel, patientèle et rétrocession. Données fictives.')}
       <ul class="persona-benefits persona-benefits--columns reveal">
         <li><h3>Le profil, dans son contexte</h3><p>Parcours, expérience, préférences et mission concernée : les informations utiles pour préparer votre premier échange.</p></li>
         <li><h3>Chaque concordance expliquée</h3><p>Comparez les critères renseignés des deux côtés. Une information manquante reste à confirmer, sans gonfler la compatibilité.</p></li>
@@ -34,7 +31,6 @@ export const establishmentLanding = `
         <p class="section-sub">Journalier, hebdomadaire ou mensuel : explorez le nouvel espace de rapports. L’activité déclarée, les points à retenir et la suite à préparer trouvent leur place.</p>
         <p class="persona-feature-status">Rapports structurés à venir · aperçu interactif disponible en démo</p>
       </header>
-      ${interfacePreview('report', 'persona-screen persona-screen--large reveal', 'Aperçu de la future interface de rapports avec des données fictives', 'Rapports d’activité MédiLink : sélection journalier, hebdomadaire ou mensuel, synthèse de la période et journal des rapports. Exemple fictif de la fonctionnalité en préparation.')}
       <ul class="persona-benefits persona-benefits--columns reveal">
         <li><h3>Le rythme qui vous convient</h3><p>Passez d’une journée à une semaine ou à un mois, puis revenez au rapport qui vous intéresse.</p></li>
         <li><h3>Les informations à retenir</h3><p>Une synthèse lisible, les points d’organisation et la suite à préparer, au-delà d’un simple fichier à télécharger.</p></li>
@@ -54,7 +50,6 @@ export const establishmentLanding = `
           <li><h3>Des envois que vous suivez</h3><p>Choisissez les documents et le destinataire, puis retrouvez l’historique des transmissions.</p></li>
         </ul>
       </div>
-      ${interfacePreview('documents', 'persona-screen reveal', 'Exemple du dossier documentaire avec des données fictives', 'Dossier partagé MédiLink : contrat à signer, déclaration à l’Ordre et justificatifs. Données fictives.')}
     </div>
   </div></section>
 

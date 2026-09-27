@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { PublicDocument } from '@/components/marketing/PublicDocument';
-import '../(public-home)/interface-previews.css';
 import '../persona-editorial.css';
 import '../persona-content.css';
 export { publicMetadata as metadata } from '@/lib/seo';
