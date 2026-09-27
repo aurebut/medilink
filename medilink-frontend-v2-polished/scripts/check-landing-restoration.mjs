@@ -279,13 +279,19 @@ function assertPersonaBrief(html, path) {
   const previews = [...main.matchAll(/<figure\b[^>]*data-interface-preview="([^"]+)"[^>]*>[\s\S]*?<\/figure>/g)];
   assert.deepEqual(previews.map(match => match[1]), candidate ? ['search', 'offer', 'messages', 'documents'] : ['candidates', 'report', 'documents'], `${path}: all native screenshots retained in their original order`);
   for (const [preview] of previews) {
-    assert.match(preview, /persona-interface-capture/, `${path}: unframed screenshot presentation`);
+    assert.match(preview, /persona-interface-capture ml-interface-preview/, `${path}: native screenshot with responsive phone presentation`);
+    assert.equal([...preview.matchAll(/<picture\b/g)].length, 1, `${path}: one responsive picture per screenshot`);
+    assert.equal([...preview.matchAll(/<img\b/g)].length, 1, `${path}: no duplicated screenshot image`);
+    assert.match(preview, /<picture\b[^>]*tabindex="0"[^>]*role="group"[^>]*aria-label="[^"]*aperçu défilable sur mobile"/, `${path}: mobile screenshot supports keyboard scrolling`);
+    for (const decoration of ['screen', 'status', 'island', 'home', 'buttons']) {
+      assert.equal([...preview.matchAll(new RegExp(`class="ml-device-${decoration}"`, 'g'))].length, 1, `${path}: one mobile phone ${decoration}`);
+    }
     assert.match(preview, /<source\b[^>]*\bsrcset="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-mobile\.webp(?:\?[^"\s]*)?/, `${path}: native mobile WebP capture`);
     assert.match(preview, /<img\b[^>]*\bsrc="\/landing-assets\/(?:persona-)?interface\/[^"\s]+-desktop\.webp(?:\?[^"\s]*)?/, `${path}: native desktop WebP capture`);
     assert.match(preview, /\balt="[^"]+"/, `${path}: accessible screenshot`);
     assert.match(preview, /ficti(?:f|ve)|illustrati(?:f|ve|on)/i, `${path}: fictional data disclosed`);
   }
-  assert.doesNotMatch(main, /ml-device-|ml-macos-|ml-interface-window/, `${path}: no phone or laptop decoration`);
+  assert.doesNotMatch(main, /ml-device-(?:camera|base)|ml-macos-/, `${path}: no laptop decoration`);
   assert.match(hero, /<div class="persona-photo-frame"><img src="\/landing-assets\/hero-medecin\.png"[^>]*alt="[^"]+"/, `${path}: hero photograph and accessible description retained`);
   const faq = sectionMarkup(main, 'faq', path);
   assert.ok([...faq.matchAll(/<details\b/g)].length >= 3, `${path}: useful expandable FAQ`);
@@ -388,7 +394,7 @@ for (const [path, file] of Object.entries(pages)) {
   assert.match(actual, /href="\/landing-special\.js" as="script"/, `${path}: original reveal script queued by Next.js`);
   console.log(path === '/'
     ? `PASS ${path}: original landing matches ${reference} outside requested header links, homepage illustrations, interface previews and documents section`
-    : `PASS ${path}: requested sections, demo actions, preserved photograph, unframed native screenshots and FAQ verified`);
+    : `PASS ${path}: requested sections, demo actions, preserved photograph, responsive native screenshots with mobile phones and FAQ verified`);
 }
 for (const asset of originalAssets) {
   const original = execFileSync('git', ['show', `${reference}:medilink-frontend-v2-polished/public${asset}`], { encoding: 'utf8' });

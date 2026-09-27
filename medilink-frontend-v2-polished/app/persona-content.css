@@ -24,7 +24,7 @@ html body.persona-page .persona-benefits li:last-child { padding-bottom: 0; }
 html body.persona-page .persona-benefits h3 { color: var(--brand-primary); font: 600 14px/1.5 var(--brand-sans); }
 html body.persona-page .persona-benefits p { margin: 6px 0 0; color: var(--brand-muted); font-size: 14px; line-height: 1.65; }
 html body.persona-page .persona-demo-link { margin-top: 28px; min-height: 46px; }
-/* Native interface screenshots retain their own proportions, with no device frame. */
+/* Native captures stay unframed on desktop and reuse the homepage iPhone on mobile. */
 html body.persona-page .persona-interface-capture {
   width: 100%;
   min-width: 0;
@@ -86,6 +86,10 @@ html body.persona-page .persona-benefits--columns { grid-template-columns: repea
 html body.persona-page .persona-benefits--columns li { padding-top: 18px; }
 html body.persona-page .persona-feature-status { margin-top: 17px; color: var(--brand-muted); font-size: 11px; line-height: 1.6; }
 
+@media (min-width: 701px) {
+  html body.persona-page .persona-interface-capture :is(.ml-interface-stage, .ml-interface-window, .ml-device-screen) { display: contents; }
+  html body.persona-page .persona-interface-capture picture { position: static; height: auto; overflow: visible; }
+}
 @media (min-width: 901px) {
   html body.persona-page .persona-feature-row--reverse { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
   html body.persona-page .persona-feature-row--reverse .persona-feature-copy { grid-column: 2; grid-row: 1; }
