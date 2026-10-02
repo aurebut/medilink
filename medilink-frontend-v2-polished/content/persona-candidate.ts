@@ -5,7 +5,7 @@ export const candidateLanding = `
     <div class="persona-hero-inner">
       <div class="persona-eyebrow">Pour les médecins remplaçants</div>
       <h1 id="hero-title">Le bon remplacement.<br><em>Les bonnes conditions pour exercer.</em></h1>
-      <p class="persona-hero-copy">Trouvez les offres qui vous correspondent, échangez avec le médecin et préparez vos documents. Tout votre remplacement commence au même endroit.</p>
+      <p class="persona-hero-copy">Trouvez les offres qui vous correspondent, échangez avec le médecin et préparez vos documents.</p>
       <div class="hero-ctas"><a class="btn btn-primary btn-lg" href="/demo">Demander une démo</a></div>
       <div class="persona-stage">
         <div class="persona-photo-frame"><img src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async"></div>
@@ -74,7 +74,7 @@ export const candidateLanding = `
         <header class="section-head">
           <div class="section-kicker">03 · Préparer les documents</div>
           <h2 class="section-h" id="documents-title">Moins d’allers-retours. <em>Un dossier partagé.</em></h2>
-          <p class="section-sub">Pour vos remplacements en exercice libéral individuel, préparez les documents et retrouvez les pièces utiles dans l’espace dédié à la mission.</p>
+          <p class="section-sub">Préparez les documents et retrouvez les pièces utiles dans l’espace dédié à la mission.</p>
         </header>
         <ul class="persona-benefits">
           <li><h3>Générez vos documents</h3><p>Les informations du remplacement alimentent le contrat et le courrier à l’Ordre. Relisez-les, puis ajoutez votre exemplaire signé au dossier.</p></li>

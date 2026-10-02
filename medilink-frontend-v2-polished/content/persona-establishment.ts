@@ -6,7 +6,7 @@ export const establishmentLanding = `
   <section class="persona-hero" aria-labelledby="hero-title">
     <div class="persona-hero-inner">
       <div class="persona-eyebrow">Pour les médecins remplacés et les cabinets</div>
-      <h1 id="hero-title">Préparez votre remplacement.<br><em>Gardez le fil, même à distance.</em></h1>
+      <h1 id="hero-title">Préparez votre remplacement.</h1>
       <p class="persona-hero-copy">Trouvez votre remplaçant, partagez les documents et retrouvez les comptes rendus de la mission. Un même espace, du premier échange à la rétrocession.</p>
       <div class="hero-ctas">${demo}</div>
       <div class="persona-stage"><div class="persona-photo-frame"><img src="/landing-assets/hero-medecin.png" width="1217" height="562" alt="Médecin généraliste échangeant avec une patiente dans son cabinet" fetchpriority="high" decoding="async"></div></div>
@@ -16,13 +16,13 @@ export const establishmentLanding = `
   <section class="persona-section persona-section--product" id="vivier" aria-labelledby="vivier-title"><div class="persona-section-inner">
       <header class="section-head reveal">
         <div class="section-kicker">01 · Le vivier de remplaçants</div>
-        <h2 class="section-h" id="vivier-title">Des médecins à rencontrer.<br><em>Une compatibilité à comprendre.</em></h2>
+        <h2 class="section-h" id="vivier-title">Des médecins à rencontrer.</h2>
         <p class="section-sub">Au-delà d’un profil, voyez ce qui correspond à votre cabinet. Un clic sur « Voir pourquoi » détaille les points communs, les écarts et les conditions à confirmer.</p>
       </header>
       ${interfacePreview('candidates', 'persona-screen persona-screen--large reveal', 'Les candidatures et leurs critères de compatibilité, avec des données fictives', 'Candidatures MédiLink : profil sélectionné et compatibilité expliquée par spécialité, niveau, lieu, type de mission, logiciel, patientèle et rétrocession. Données fictives.', 'screenshot')}
       <ul class="persona-benefits persona-benefits--columns reveal">
         <li><h3>Le profil, dans son contexte</h3><p>Parcours, expérience, préférences et mission concernée : les informations utiles pour préparer votre premier échange.</p></li>
-        <li><h3>Chaque concordance expliquée</h3><p>Comparez les critères renseignés des deux côtés. Une information manquante reste à confirmer, sans gonfler la compatibilité.</p></li>
+        <li><h3>Chaque concordance expliquée</h3><p>Comparez les critères renseignés des deux côtés. Une information manquante reste à confirmer.</p></li>
         <li><h3>Le choix reste le vôtre</h3><p>Les critères éclairent la discussion. Validez les disponibilités, les justificatifs et les conditions avec le médecin.</p></li>
       </ul>
   </div></section>
@@ -30,9 +30,8 @@ export const establishmentLanding = `
   <section class="persona-section persona-section--product" id="activite" aria-labelledby="activite-title"><div class="persona-section-inner">
       <header class="section-head reveal">
         <div class="section-kicker">02 · Les rapports d’activité</div>
-        <h2 class="section-h" id="activite-title">Le détail d’une journée.<br><em>Le recul d’une semaine.</em></h2>
+        <h2 class="section-h" id="activite-title">Le rapport d’activité<br><em>dans un espace dédié</em></h2>
         <p class="section-sub">Journalier, hebdomadaire ou mensuel : explorez le nouvel espace de rapports. L’activité déclarée, les points à retenir et la suite à préparer trouvent leur place.</p>
-        <p class="persona-feature-status">Rapports structurés à venir · aperçu interactif disponible en démo</p>
       </header>
       ${interfacePreview('report', 'persona-screen persona-screen--large reveal', 'Aperçu de la future interface de rapports avec des données fictives', 'Rapports d’activité MédiLink : sélection journalier, hebdomadaire ou mensuel, synthèse de la période et journal des rapports. Exemple fictif de la fonctionnalité en préparation.', 'screenshot')}
       <ul class="persona-benefits persona-benefits--columns reveal">
@@ -46,7 +45,7 @@ export const establishmentLanding = `
     <div class="persona-feature-row">
       <div class="persona-feature-copy reveal">
         <div class="section-kicker">03 · L’espace documents</div>
-        <h2 id="documents-title">Le bon document.<br><em>Dans le bon dossier.</em></h2>
+        <h2 id="documents-title">Le bon document,<br><em>au bon endroit</em></h2>
         <p>Préparez les documents du remplacement et retrouvez les pièces partagées avec votre remplaçant, dans un espace dédié à la mission.</p>
         <ul class="persona-benefits">
           <li><h3>Un contrat à préparer ensemble</h3><p>Identités, dates et rétrocession alimentent le contrat et le courrier à l’Ordre, prêts à relire.</p></li>
@@ -67,11 +66,10 @@ export const establishmentLanding = `
         <ul class="persona-benefits">
           <li><h3>Un calcul compréhensible</h3><p>Le nombre de consultations et leurs honoraires permettent d’estimer l’activité. Le taux convenu détermine la part du remplaçant.</p></li>
           <li><h3>Une clôture à valider</h3><p>Vérifiez le montant final et conservez le suivi du règlement dans le dossier.</p></li>
-          <li><h3>Le prélèvement automatique <span class="persona-coming-soon">À venir</span></h3><p>Le débit bancaire automatique n’est pas encore disponible. Découvrez le parcours prévu lors de votre démo.</p></li>
+          <li><h3>Le prélèvement automatique <span class="persona-coming-soon">À venir</span></h3><p>Automatisez le règlement : le montant est calculé selon le taux de rétrocession convenu et le nombre de consultations réalisées.</p></li>
         </ul>
       </div>
-      <figure class="persona-payment-example reveal" aria-labelledby="payment-example-title">
-        <figcaption id="payment-example-title">Un exemple de rétrocession</figcaption>
+      <figure class="persona-payment-example reveal" aria-labelledby="paiement-title">
         <div class="persona-payment-source"><span>90 <small>consultations</small></span><span aria-hidden="true">×</span><span>30 € <small>par consultation</small></span></div>
         <dl><div><dt>Honoraires illustratifs</dt><dd>2 700 €</dd></div><div><dt>Taux du remplaçant</dt><dd>70 %</dd></div></dl>
         <div class="persona-payment-total"><span>Rétrocession estimée</span><strong>1 890 €</strong></div>
@@ -98,7 +96,6 @@ export const establishmentLanding = `
         ${demo}
       </article>
     </div>
-    <p class="persona-pricing-note">La démo vous permet de préciser vos besoins et les conditions de la formule. Les tarifs MédiLink sont distincts de la rétrocession versée au médecin.</p>
   </div></section>
 
   <section class="faq" id="faq" aria-labelledby="faq-title"><div class="faq-inner">
