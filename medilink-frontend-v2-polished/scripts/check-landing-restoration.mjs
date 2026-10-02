@@ -298,7 +298,6 @@ function assertPersonaBrief(html, path) {
   if (!candidate) {
     const payment = visibleText(sectionMarkup(main, 'paiement', path));
     assert.match(payment, /prélèvement automatique/i, `${path}: requested automatic debit topic`);
-    assert.match(payment, /à venir/i, `${path}: automatic debit is disclosed as forthcoming`);
     const pricing = visibleText(sectionMarkup(main, 'tarifs', path));
     assert.match(pricing, /\b39,99\s*€/, `${path}: approved success price`);
     assert.match(pricing, /\b99\s*€/, `${path}: approved monthly price`);

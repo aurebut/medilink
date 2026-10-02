@@ -66,7 +66,7 @@ export const establishmentLanding = `
         <ul class="persona-benefits">
           <li><h3>Un calcul compréhensible</h3><p>Le nombre de consultations et leurs honoraires permettent d’estimer l’activité. Le taux convenu détermine la part du remplaçant.</p></li>
           <li><h3>Une clôture à valider</h3><p>Vérifiez le montant final et conservez le suivi du règlement dans le dossier.</p></li>
-          <li><h3>Le prélèvement automatique <span class="persona-coming-soon">À venir</span></h3><p>Automatisez le règlement : le montant est calculé selon le taux de rétrocession convenu et le nombre de consultations réalisées.</p></li>
+          <li><h3>Le prélèvement automatique</h3><p>Automatisez le règlement : le montant est calculé selon le taux de rétrocession convenu et le nombre de consultations réalisées.</p></li>
         </ul>
       </div>
       <figure class="persona-payment-example reveal" aria-labelledby="paiement-title">
