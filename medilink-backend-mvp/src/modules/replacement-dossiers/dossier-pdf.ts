@@ -137,6 +137,9 @@ export async function generateDossierPdf(
         ? 'L’exécution du remplacement est subordonnée à la réunion des conditions légales applicables à l’étudiant et à l’autorisation de remplacement relevant du conseil départemental compétent. La licence justifie le niveau de formation ; elle ne remplace pas cette autorisation. La demande, pour une période de trois mois au plus, et son éventuel renouvellement doivent être traités distinctement.'
         : 'Avant le début du remplacement, les parties vérifient l’inscription du remplaçant au tableau de l’Ordre, sa qualification pour la spécialité concernée et l’absence de restriction incompatible avec les actes prévus. L’attestation d’inscription est jointe au dossier.',
       `Le médecin remplacé effectue l’information préalable du conseil départemental compétent et lui communique le contrat signé ainsi que les pièces requises. Conseil destinataire renseigné : ${d.orderCouncilName}. Les parties vérifient sa compétence et le circuit de transmission, notamment si le lieu d’activité relève d’un autre département. Tout avenant ou accord relatif au remplacement est également communiqué à l’Ordre.`,
+      student
+        ? 'Avant le début du remplacement, le médecin remplacé communique le contrat au conseil départemental au tableau duquel il est inscrit ; l’étudiant le transmet également au conseil départemental auprès duquel il est enregistré, selon les modalités de ce conseil. Les avenants sont également communiqués aux conseils concernés.'
+        : 'Chaque médecin signataire communique le contrat et ses avenants au conseil départemental au tableau duquel il est inscrit, y compris lorsque les deux médecins relèvent de départements différents. Cette communication intervient dans le mois suivant leur conclusion et, pour le contrat initial, avant le début du remplacement.',
     ]);
     section('3. Exercice, moyens et continuité des soins', [
       'Le remplaçant conserve son indépendance professionnelle et exerce sous sa propre responsabilité, dans le respect de la déontologie, du libre choix du patient et du secret professionnel. Les patients sont informés de sa qualité de remplaçant. Les obligations de permanence et de continuité des soins sont organisées entre les parties.',
@@ -158,7 +161,8 @@ export async function generateDossierPdf(
     ]);
     section('7. Lecture, pièces et signature', [
       `Les parties relisent l’ensemble du contrat et les données saisies avant de le signer. Elles vérifient le dossier joint : contrat signé, ${student ? 'licence de remplacement, autorisation ordinale lorsqu’elle a été délivrée' : 'attestation d’inscription au tableau de l’Ordre'}, attestation de RCP et toute pièce complémentaire demandée par le conseil compétent.`,
-      'Chaque partie conserve un exemplaire signé ; un exemplaire est destiné à l’Ordre. Le fichier généré ne contient aucune signature électronique. Après signature manuscrite, une copie complète peut être importée dans le dossier partagé.',
+      'En signant, chaque partie atteste sur l’honneur qu’aucun accord distinct (contre-lettre ou avenant) relatif à ce contrat n’a été conclu sans être communiqué au conseil départemental compétent.',
+      'Chaque partie conserve un exemplaire signé ; les exemplaires nécessaires sont communiqués aux conseils départementaux concernés. Le fichier généré ne contient aucune signature électronique. Après signature manuscrite, une copie complète peut être importée dans le dossier partagé.',
     ]);
     signatures(true);
   } else {
@@ -183,7 +187,7 @@ export async function generateDossierPdf(
     signatures(false);
   }
   space(60);
-  p(`Gabarit MédiLink ${DOSSIER_TEMPLATE_VERSION}. Références : code de la santé publique, articles R. 4127-65, R. 4127-66, R. 4127-86, R. 4127-91 et L. 1142-2${student ? ', L. 4131-2 et D. 4131-2' : ''}. Sources vérifiées le 19 septembre 2026. Ce document ne constitue pas un modèle homologué par l’Ordre.`, true);
+  p(`Gabarit MédiLink ${DOSSIER_TEMPLATE_VERSION}. Références : code de la santé publique, articles R. 4127-65, R. 4127-66, R. 4127-86, R. 4127-91, L. 4113-9 et L. 1142-2${student ? ', L. 4131-2 et D. 4131-2' : ''}. Sources vérifiées le 20 octobre 2026. Ce document ne constitue pas un modèle homologué par l’Ordre.`, true);
 
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i++) {

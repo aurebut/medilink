@@ -33,6 +33,17 @@ for filename, (page_count, required, signatures) in expected.items():
     if "contrat-" in filename:
         assert "Aucune clause de non-réinstallation" in full
         assert "80 % des honoraires" in full
+        assert "chaque partie atteste sur l’honneur" in normalized
+        assert "contre-lettre ou avenant" in normalized
+        assert "sans être communiqué au conseil départemental compétent" in normalized
+        if "medecin" in filename:
+            assert "Chaque médecin signataire communique le contrat et ses avenants" in normalized
+            assert "départements différents" in normalized
+        else:
+            assert "l’étudiant le transmet également" in normalized
+            assert "conseil départemental auprès duquel il est enregistré" in normalized
+    assert "FR-LIBERAL-2026-10-20.1" in full
+    assert "Sources vérifiées le 20 octobre 2026" in normalized
     if "texte-long" in filename:
         assert 'Анна / Ελένη' in normalized
         assert '250 €' in full

@@ -43,7 +43,7 @@ async function main() {
   // Scripts are run from the backend package, including the compiled smoke test.
   const output = resolve(process.cwd(), '../output/pdf');
   await mkdir(output, { recursive: true });
-  const generatedAt = new Date('2026-09-19T12:00:00.000Z');
+  const generatedAt = new Date('2026-10-20T12:00:00.000Z');
   const longFixture: DossierDetails = {
     ...studentFixture,
     holderName: 'Dr Élodie Lefèvre de Saint-Étienne et de la Croix',

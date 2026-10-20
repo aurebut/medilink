@@ -36,7 +36,7 @@ export const DOSSIER_ATTACHMENT_KINDS = [
 export type DossierAttachmentKind = typeof DOSSIER_ATTACHMENT_KINDS[number];
 
 /** Bump whenever the legal text or semantics of a template changes. */
-export const DOSSIER_TEMPLATE_VERSION = 'FR-LIBERAL-2026-09-19.1';
+export const DOSSIER_TEMPLATE_VERSION = 'FR-LIBERAL-2026-10-20.1';
 
 export const DOSSIER_FIELD_LABELS: Record<keyof DossierDetails, string> = {
   practiceFramework: 'Confirmation du remplacement médical libéral individuel',
