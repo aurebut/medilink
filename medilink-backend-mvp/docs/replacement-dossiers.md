@@ -21,7 +21,7 @@ Toutes les routes sont authentifiées et commencent par `/api/applications/:appl
 | --- | --- |
 | GET | Vue du dossier, détails, révision, documents, historique d’envoi, droits et champs manquants |
 | PUT | `{revision, details}` ; incrémente la révision des informations |
-| POST `/generate` | `{kind: CONTRACT ou DECLARATION, revision}` ; PDF immuable versionné |
+| POST `/generate` | `{kind: CONTRACT, DECLARATION ou FEE_STATEMENT, revision}` ; PDF immuable versionné |
 | POST `/upload-url` | `{kind, revision, fileName, mimeType, sizeBytes, expiresAt?}` ; `{documentId, uploadUrl, method, headers, expiresInSeconds}` |
 | POST `/documents/:documentId/confirm` | Fige les octets avant contrôle de signature/type et taille ; rend le document READY |
 | GET `/documents/:documentId/download-url` | URL temporaire du fichier autorisé |
@@ -38,11 +38,19 @@ Les mutations, sauf `upload-url`, retournent la vue complète. `/send` ne retour
 
 Le registre de l’application comporte trois rubriques, limitées à trois lignes visibles par page, y compris sur mobile :
 
-- **Remplacement** : contrat préparé ou exemplaire signé, courrier au Conseil, inscription à l’Ordre ou licence/autorisation selon le statut, assurance RCP.
+- **Remplacement** : contrat préparé ou exemplaire signé, courrier au Conseil préparé ou signé (`SIGNED_DECLARATION`), inscription à l’Ordre ou licence/autorisation selon le statut, assurance RCP. Les exemplaires signés occupent la même ligne que leur document préparatoire, sans élargir le registre.
 - **Paiement** : `BANK_DETAILS` (RIB pour le règlement), `FEE_STATEMENT` (décompte de rétrocession), `PAYMENT_PROOF` (reçu ou preuve de virement). Lorsque la mission est réglée sur MediLink, son justificatif existant est téléchargeable via la route authentifiée des factures. Il n’est pas copié ni envoyé automatiquement dans le dossier.
 - **Compléments** : `ADDENDUM` (avenant), `REPLACEMENT_CERTIFICATE` (attestation demandée par la CPAM), `ORDER_RESPONSE` (courrier ou accusé de réception du Conseil), `OTHER` (autres pièces). Plusieurs avenants, réponses et autres pièces restent accessibles séparément, avec leurs actions propres.
 
-La liste autorisée des imports est centralisée dans `DOSSIER_ATTACHMENT_KINDS` et utilisée par la validation HTTP et le service. Le champ Prisma `kind` est une chaîne : cette extension ne nécessite pas de migration. Seuls `CONTRACT` et `DECLARATION` sont générés; les autres pièces restent des imports explicites. Le formulaire rappelle leur partage avec l’autre partie. Les pièces complémentaires sont conditionnelles, sans indicateur de conformité ou de validation automatique.
+La liste autorisée des imports est centralisée dans `DOSSIER_ATTACHMENT_KINDS` et utilisée par la validation HTTP et le service. Le champ Prisma `kind` est une chaîne : cette extension ne nécessite pas de migration. `DOSSIER_GENERATED_KINDS` autorise `CONTRACT`, `DECLARATION` et `FEE_STATEMENT` ; ce dernier reste également importable. Les autres pièces restent des imports explicites. Le formulaire rappelle leur partage avec l’autre partie. Les pièces complémentaires sont conditionnelles, sans indicateur de conformité ou de validation automatique.
+
+### Périodes et recettes (3 novembre 2026)
+
+Les champs JSON facultatifs `holderSiret`, `replacementSiret`, `practiceResources`, `periods` et `feeEntries` sont compatibles avec les dossiers existants. Une liste de périodes vide conserve le début et la fin historiques. L’enregistrement trie jusqu’à 24 périodes et en déduit les bornes ; inversions et chevauchements sont refusés. La limite de trois mois pour l’étudiant s’applique à toute l’enveloppe de la demande.
+
+`feeEntries` contient au plus 200 objets stricts : `date`, `actCount`, `feesCents`, `supplementsCents`, `patientReceiptsCents`, `thirdPartyReceiptsCents`, `paymentMethod` (`CARD`, `CASH`, `CHEQUE`, `TRANSFER`, `OTHER`). Aucun champ libre ni identifiant patient n’est accepté. Les montants sont des centimes entiers positifs ou nuls ; les encaissements ne peuvent dépasser les honoraires et suppléments. La génération vérifie que chaque date appartient à une période effective, y compris lorsque la demande comporte des interruptions. Le journal et son décompte ne modifient ni les règlements ni les écritures comptables.
+
+L’action « Enregistrer et générer le récapitulatif » utilise la révision retournée par l’enregistrement. Un conflit conserve le formulaire local et impose de recharger le dossier avant un nouvel enregistrement. Le formulaire et les lignes du registre sont utilisables à 320 px, avec trois documents visibles au maximum.
 
 L’action de transmission d’une attestation de remplacement présélectionne le type CPAM et uniquement cette pièce, en laissant le nom et l’adresse du destinataire à renseigner. Aucune adresse n’est déduite. Les autres destinataires restent configurables; tous les envois exigent la vérification du contenu, du destinataire et la confirmation explicite. Le canal de dépôt demandé par la CPAM ou le Conseil reste à vérifier par l’utilisateur.
 
@@ -53,7 +61,7 @@ Le périmètre s’appuie sur les démarches décrites par le [Conseil national 
 - La révision augmente quand les informations changent. Une requête sur une révision périmée reçoit 409. Chaque génération conserve sa version, la révision utilisée, les détails figés et la version du modèle.
 - PDF, JPEG, PNG et WEBP : 10 Mo maximum par pièce, 20 Mo au total et 15 pièces maximum par envoi. Le corps du message est limité à 3 000 caractères.
 - Les URL de téléversement écrivent seulement dans la quarantaine. La confirmation déplace le fichier vers une clé privée jamais signée pour écriture, puis contrôle les octets définitifs. Rejouer une URL ne modifie donc pas le document confirmé.
-- Les anciennes versions restent consultables. Les documents générés et contrats signés d’une ancienne révision ne peuvent plus être envoyés. Les pièces expirées sont refusées; une date de fin de validité renseignée pour licence/RCP doit couvrir la fin du remplacement. Une date déclarée n’est pas une vérification de l’authenticité du justificatif.
+- Les anciennes versions restent consultables. Chaque nouvel import conserve les détails de son dossier. Le champ de réponse `isCurrent` compare le contenu du document aux détails actuels : la modification des recettes seule n’invalide pas un contrat ou un courrier signé. Une modification des périodes ou autres données contractuelles invalide ces exemplaires ; pour un ancien exemplaire sans instantané, la comparaison de révision reste conservatrice. Un PDF généré avec un ancien gabarit doit être régénéré. Le serveur utilise le même contrôle avant envoi. Les pièces expirées sont refusées ; une date de fin de validité renseignée pour licence/RCP doit couvrir la fin du remplacement. Une date déclarée n’est pas une vérification de l’authenticité du justificatif.
 - Une même clé d’idempotence avec un autre destinataire ou une autre sélection reçoit 409. Un envoi SENT n’est pas répété. Un envoi FAILED peut être retenté avec la même clé et les mêmes pièces; la clé Resend est elle aussi conservée. Un échec ambigu vieux de plus de 23 heures nécessite de vérifier le journal du fournisseur avant un nouvel envoi, la [rétention d’idempotence de Resend](https://resend.com/changelog/idempotency-keys) étant limitée à 24 heures.
 - Si un processus s’arrête brutalement en cours d’envoi, la tentative peut rester SENDING. Vérifier l’événement email, la clé `dossier-<deliveryId>` et le journal Resend avant une correction administrative; ne pas créer une nouvelle tentative à l’aveugle.
 - Les événements email et audits tracent les actions sans exposer les clés de stockage ni les détails des contrats dans la réponse publique. L’historique d’envoi conserve les identifiants, versions et révisions des pièces sélectionnées.

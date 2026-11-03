@@ -40,7 +40,7 @@ export function missionProgress(
     return document && dossierDocumentIsCurrent(document, dossier!) ? document : null;
   }
   const contract = current('SIGNED_CONTRACT') || current('CONTRACT');
-  const letter = current('DECLARATION');
+  const letter = current('SIGNED_DECLARATION') || current('DECLARATION');
   const prepared = Boolean(contract && letter && dossier?.missingFields.length === 0);
   const orderDeliveries = dossier?.deliveries.filter(delivery => delivery.recipientType === 'ORDER') || [];
   const sentDeliveries = orderDeliveries.filter(delivery => delivery.status === 'SENT');

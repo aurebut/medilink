@@ -177,7 +177,8 @@ try {
     const categories = subject.getByRole('group', { name: 'Rubriques du dossier', exact: true });
     await categories.getByRole('button', { name: /^Paiement/ }).click();
     assert.deepEqual(await subject.locator('.rd-document-row').evaluateAll(rows => rows.map(row => row.dataset.kind)), ['BANK_DETAILS', 'FEE_STATEMENT', 'PAYMENT_PROOF']);
-    assert.equal(await subject.getByRole('button', { name: /^Générer/ }).count(), 0, 'Payment documents are imports');
+    assert.equal(await subject.getByRole('button', { name: /^Générer/ }).count(), 1, 'Only the receipts statement is generated in the payment category');
+    assert.equal(await subject.locator('[data-kind="FEE_STATEMENT"]').getByRole('button', { name: /^Générer/ }).count(), 1);
     await captureSubject(page, subject, 'payment-320.png');
     await categories.getByRole('button', { name: /^Compléments/ }).click();
     assert.deepEqual(await subject.locator('.rd-document-row').evaluateAll(rows => rows.map(row => row.dataset.kind)), ['ADDENDUM', 'REPLACEMENT_CERTIFICATE', 'ORDER_RESPONSE']);
@@ -314,6 +315,70 @@ try {
     if (!state.documents.some(document => document.kind === 'DECLARATION')) {
       state.documents.push({ ...state.documents.find(document => document.kind === 'CONTRACT'), id: 'test-declaration', kind: 'DECLARATION', fileName: 'Declaration-test.pdf', status: 'READY', source: 'GENERATED', revision: state.revision });
     }
+  });
+  await scenario('candidate', 390, async ({ page, subject, state, requests }) => {
+    const row = subject.locator('[data-kind="DECLARATION"]');
+    await row.getByRole('button', { name: /^Gérer/ }).click();
+    await subject.getByRole('button', { name: 'Ajouter le courrier signé', exact: true }).click();
+    assert.equal(await page.getByLabel('Nature de la pièce').inputValue(), 'SIGNED_DECLARATION');
+    await page.getByLabel(/^Fichier/).setInputFiles({ name: 'courrier-signe.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n% fictional signed letter fixture\n%%EOF') });
+    await subject.getByRole('button', { name: 'Ajouter au dossier', exact: true }).click();
+    await row.getByText('Exemplaire signé ajouté', { exact: true }).waitFor();
+    assert.equal(await row.getAttribute('data-document-id'), state.documents.find(document => document.kind === 'SIGNED_DECLARATION').id);
+    await row.getByRole('button', { name: /^Transmettre/ }).click();
+    assert.equal(await page.getByLabel('Destinataire', { exact: true }).inputValue(), 'ORDER');
+    assert.equal(await page.locator('.rd-send-selection input:checked').count(), 1);
+    assert.equal(requests.filter(request => request.endpoint.endsWith('/send')).length, 0);
+  }, state => {
+    if (!state.documents.some(document => document.kind === 'DECLARATION')) state.documents.push({ ...state.documents[0], id: 'letter-upload-fixture', kind: 'DECLARATION', source: 'GENERATED', revision: state.revision });
+  });
+  await scenario('candidate', 1280, async ({ page, subject, state, requests }) => {
+    await subject.getByRole('button', { name: 'Informations du remplacement', exact: true }).click();
+    await page.getByLabel('Premier jour de la période 1', { exact: true }).fill('2026-10-01');
+    await page.getByLabel('Dernier jour de la période 1', { exact: true }).fill('2026-10-02');
+    await subject.getByRole('button', { name: 'Ajouter une période', exact: true }).click();
+    await page.getByLabel('Premier jour de la période 2', { exact: true }).fill('2026-10-05');
+    await page.getByLabel('Dernier jour de la période 2', { exact: true }).fill('2026-10-06');
+    await page.getByLabel('Locaux, matériel et secrétariat mis à disposition', { exact: true }).fill('Cabinet et secrétariat le matin.');
+    await page.getByRole('button', { name: 'Enregistrer les informations', exact: true }).click();
+    await subject.getByText(/Informations enregistrées/).waitFor();
+    assert.equal(state.details.startDate, '2026-10-01');
+    assert.equal(state.details.endDate, '2026-10-06');
+    assert.equal(state.details.periods.length, 2);
+    assert.ok(requests.some(request => request.method === 'PUT' && request.body.details.periods.length === 2));
+  });
+  for (const width of [390, 320]) await scenario('candidate', width, async ({ page, subject, state, requests, conflictSave }) => {
+    await subject.getByRole('button', { name: /^Paiement/ }).click();
+    await subject.locator('[data-kind="FEE_STATEMENT"]').getByRole('button', { name: /^Générer/ }).click();
+    await page.getByLabel('Honoraires (€) 1').fill('30');
+    await page.getByLabel('Encaissé patient (€) 1').fill('9');
+    await subject.getByRole('button', { name: 'Ajouter une ligne de recettes', exact: true }).click();
+    await page.getByLabel('Honoraires (€) 2').fill('35');
+    await page.getByLabel('Encaissé patient (€) 2').fill('10.50');
+    assert.match(await subject.locator('.rd-receipt-totals').innerText(), /65,00/);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'Receipts form fits small mobile screens');
+    await captureSubject(page, subject, `receipts-form-${width}.png`);
+    await page.getByLabel('Date des actes 1').fill('2026-01-01');
+    await subject.getByRole('button', { name: 'Enregistrer et générer le récapitulatif', exact: true }).click();
+    await subject.getByText(/Chaque date des actes doit appartenir/).waitFor();
+    assert.equal(requests.filter(request => request.method === 'PUT').length, 0, 'Dates outside the actual replacement periods are rejected before saving');
+    await page.getByLabel('Date des actes 1').fill(state.details.startDate);
+    await subject.getByRole('button', { name: 'Enregistrer et générer le récapitulatif', exact: true }).click();
+    await subject.getByText(/Le récapitulatif des recettes et de la rétrocession est prêt/).waitFor();
+    assert.equal(state.details.feeEntries[1].patientReceiptsCents, 1050);
+    assert.equal(state.details.feeEntries[0].feesCents, 3000);
+    const generated = requests.find(request => request.endpoint.endsWith('/generate') && request.body.kind === 'FEE_STATEMENT');
+    assert.equal(generated.body.revision, state.revision);
+    await subject.locator('[data-kind="FEE_STATEMENT"]').getByRole('button', { name: /^Gérer/ }).click();
+    await subject.getByRole('button', { name: 'Préparer le récapitulatif', exact: true }).click();
+    await page.getByLabel('Honoraires (€) 1').fill('42');
+    conflictSave();
+    await subject.getByRole('button', { name: 'Enregistrer et générer le récapitulatif', exact: true }).click();
+    await subject.getByRole('button', { name: 'Recharger les recettes du dossier', exact: true }).waitFor();
+    assert.equal(await page.getByLabel('Honoraires (€) 1').inputValue(), '42', 'A conflict preserves the local receipt draft');
+    assert.equal(await subject.getByRole('button', { name: 'Enregistrer et générer le récapitulatif', exact: true }).isEnabled(), false);
+    await subject.getByRole('button', { name: 'Recharger les recettes du dossier', exact: true }).click();
+    assert.equal(await page.getByLabel('Honoraires (€) 1').inputValue(), '30.00');
   });
   await scenario('candidate', 390, async ({ subject, requests }) => {
     assert.equal(await subject.getByRole('button', { name: 'Transmettre le dossier', exact: true }).isEnabled(), false);

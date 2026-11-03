@@ -1,10 +1,32 @@
 export const dossierUploadKinds = [
-  'SIGNED_CONTRACT', 'REGISTRATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE',
+  'SIGNED_CONTRACT', 'SIGNED_DECLARATION', 'REGISTRATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE',
   'ADDENDUM', 'REPLACEMENT_CERTIFICATE', 'ORDER_RESPONSE',
   'BANK_DETAILS', 'FEE_STATEMENT', 'PAYMENT_PROOF', 'OTHER',
 ] as const;
 export type DossierUploadKind = typeof dossierUploadKinds[number];
 export type DossierDocumentKind = 'CONTRACT' | 'DECLARATION' | DossierUploadKind;
+export type GeneratedDossierKind = 'CONTRACT' | 'DECLARATION' | 'FEE_STATEMENT';
+export type DossierPeriod = { startDate: string; endDate: string };
+export type DossierFeeEntry = {
+  date: string; actCount: number; feesCents: number; supplementsCents: number;
+  patientReceiptsCents: number; thirdPartyReceiptsCents: number;
+  paymentMethod: 'CARD' | 'CASH' | 'CHEQUE' | 'TRANSFER' | 'OTHER';
+};
+export const dossierPaymentMethods: Record<DossierFeeEntry['paymentMethod'], string> = {
+  CARD: 'Carte bancaire', CASH: 'Espèces', CHEQUE: 'Chèque', TRANSFER: 'Virement', OTHER: 'Autre / en attente',
+};
+
+export function dossierPeriods(details: ReplacementDetails): DossierPeriod[] {
+  return details.periods?.length ? details.periods : [{ startDate: details.startDate, endDate: details.endDate }];
+}
+
+export function withDossierPeriods(details: ReplacementDetails, periods: DossierPeriod[]): ReplacementDetails {
+  const complete = periods.length && periods.every(period => period.startDate && period.endDate);
+  return { ...details, periods, ...(complete ? {
+    startDate: [...periods].map(period => period.startDate).sort()[0],
+    endDate: [...periods].map(period => period.endDate).sort().at(-1)!,
+  } : {}) };
+}
 export type DossierCategory = 'replacement' | 'payment' | 'additional';
 export type DossierRecipientType = 'COUNTERPART' | 'ORDER' | 'CPAM' | 'OTHER';
 export const dossierRecipientLabels: Record<DossierRecipientType, string> = {
@@ -52,6 +74,11 @@ export type ReplacementDetails = {
   paymentTerms: string;
   orderCouncilName: string;
   orderEmail: string;
+  holderSiret?: string;
+  replacementSiret?: string;
+  practiceResources?: string;
+  periods?: DossierPeriod[];
+  feeEntries?: DossierFeeEntry[];
 };
 
 export type DossierDocument = {
@@ -67,6 +94,7 @@ export type DossierDocument = {
   expiresAt?: string | null;
   source: 'GENERATED' | 'UPLOADED';
   templateVersion?: string | null;
+  isCurrent?: boolean;
 };
 
 export type DossierDelivery = {
@@ -97,6 +125,7 @@ export type ReplacementDossierData = {
 export const dossierDocumentLabels: Record<DossierDocumentKind, string> = {
   CONTRACT: 'Contrat de remplacement',
   SIGNED_CONTRACT: 'Contrat signé',
+  SIGNED_DECLARATION: 'Courrier signé au Conseil de l’Ordre',
   DECLARATION: 'Courrier au Conseil de l’Ordre',
   REGISTRATION: 'Inscription au Tableau de l’Ordre',
   LICENSE: 'Licence de remplacement',
@@ -112,11 +141,12 @@ export const dossierDocumentLabels: Record<DossierDocumentKind, string> = {
 };
 
 export const dossierDocumentHints: Partial<Record<DossierDocumentKind, string>> = {
+  SIGNED_DECLARATION: 'Ajoutez le courrier signé par le médecin remplacé. Une demande signée ne constitue pas une autorisation.',
   ADDENDUM: 'Ajoutez l’avenant signé si les conditions du remplacement ont été modifiées.',
   REPLACEMENT_CERTIFICATE: 'Ajoutez l’attestation de remplacement si votre CPAM la demande.',
   ORDER_RESPONSE: 'Conservez ici les courriers et accusés de réception du Conseil. Un accusé de réception ne vaut pas autorisation.',
   BANK_DETAILS: 'Le RIB partagé permet à l’autre partie de préparer le règlement.',
-  FEE_STATEMENT: 'Ajoutez le décompte des honoraires et de la rétrocession convenus pour cette période.',
+  FEE_STATEMENT: 'Préparez le journal des recettes et le décompte de rétrocession, ou importez le récapitulatif du cabinet.',
   PAYMENT_PROOF: 'Ajoutez le reçu ou la confirmation de virement correspondant au règlement.',
   OTHER: 'Ajoutez une pièce utile à ce remplacement. Elle sera partagée avec l’autre partie.',
 };
@@ -130,6 +160,8 @@ export const dossierFieldLabels: Record<keyof ReplacementDetails, string> = {
   licenseNumber: 'N° de licence', licenseValidUntil: 'Validité de la licence', specialty: 'Spécialité', practiceAddress: 'Lieu du remplacement',
   startDate: 'Premier jour', endDate: 'Dernier jour', scheduleDetails: 'Jours et horaires convenus', retrocessionPercent: 'Rétrocession au remplaçant (%)',
   paymentTerms: 'Modalités et délai de paiement', orderCouncilName: 'Conseil départemental destinataire', orderEmail: 'Email du Conseil départemental',
+  holderSiret: 'SIRET du médecin remplacé (facultatif)', replacementSiret: 'SIRET du remplaçant (facultatif)',
+  practiceResources: 'Locaux, matériel et secrétariat mis à disposition', periods: 'Périodes effectives', feeEntries: 'Recettes du remplacement',
 };
 
 export function currentDossierDocument(dossier: ReplacementDossierData, kind: DossierDocumentKind) {
@@ -138,7 +170,8 @@ export function currentDossierDocument(dossier: ReplacementDossierData, kind: Do
 }
 
 export function dossierDocumentIsCurrent(document: DossierDocument, dossier: ReplacementDossierData) {
-  if ((document.source === 'GENERATED' || document.kind === 'SIGNED_CONTRACT') && document.revision !== dossier.revision) return false;
+  if (document.isCurrent === false) return false;
+  if (document.isCurrent === undefined && (document.source === 'GENERATED' || ['SIGNED_CONTRACT', 'SIGNED_DECLARATION'].includes(document.kind)) && document.revision !== dossier.revision) return false;
   // An attestation must cover the replacement through its final day.
   const coverageDate = dossier.details.endDate?.slice(0, 10) || new Date().toISOString().slice(0, 10);
   return !document.expiresAt || document.expiresAt.slice(0, 10) >= coverageDate;

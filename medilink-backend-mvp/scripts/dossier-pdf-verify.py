@@ -9,10 +9,12 @@ from pypdf import PdfReader
 output = Path(__file__).resolve().parents[2] / "output" / "pdf"
 expected = {
     "contrat-medecin-exemple.pdf": (3, "Dr François Cœur", 2),
-    "declaration-medecin-exemple.pdf": (2, "Déclaration de remplacement", 1),
+    "declaration-medecin-exemple.pdf": (1, "Déclaration de remplacement", 1),
     "contrat-etudiant-exemple.pdf": (3, "Chloé Noël", 2),
-    "demande-etudiant-exemple.pdf": (2, "Demande d’autorisation", 1),
+    "demande-etudiant-exemple.pdf": (1, "Demande d’autorisation", 1),
     "contrat-texte-long-qa.pdf": (6, "FIN DES MODALITÉS DE RÈGLEMENT.", 2),
+    "recapitulatif-recettes-exemple.pdf": (1, "Journal des recettes", 0),
+    "recapitulatif-recettes-pagination-qa.pdf": (4, "Journal des recettes", 0),
 }
 for filename, (page_count, required, signatures) in expected.items():
     path = output / filename
@@ -28,22 +30,40 @@ for filename, (page_count, required, signatures) in expected.items():
         assert f"{i} / {page_count}" in text, (filename, i, "Missing page number")
         assert len(text) > 100, (filename, i, "Unexpected almost empty page")
     signature_pages = [text for text in texts if "Signature manuscrite" in text]
-    assert len(signature_pages) == 1
-    assert signature_pages[0].count("Signature manuscrite") == signatures
+    assert len(signature_pages) == (1 if signatures else 0)
+    if signatures:
+        assert signature_pages[0].count("Signature manuscrite") == signatures
     if "contrat-" in filename:
+        for text in texts:
+            body_lines = [line for line in text.splitlines() if line.strip() and not line.startswith("MédiLink") and not re.fullmatch(r"\d+ / \d+", line.strip())]
+            assert not body_lines[-1].startswith("Article "), (filename, "Heading separated from its first paragraph")
         assert "Aucune clause de non-réinstallation" in full
         assert "80 % des honoraires" in full
         assert "chaque partie atteste sur l’honneur" in normalized
         assert "contre-lettre ou avenant" in normalized
         assert "sans être communiqué au conseil départemental compétent" in normalized
+        for article in range(1, 13):
+            assert f"Article {article} -" in normalized, (filename, article, "Missing contract article")
         if "medecin" in filename:
             assert "Chaque médecin signataire communique le contrat et ses avenants" in normalized
             assert "départements différents" in normalized
         else:
             assert "l’étudiant le transmet également" in normalized
             assert "conseil départemental auprès duquel il est enregistré" in normalized
-    assert "FR-LIBERAL-2026-10-20.1" in full
-    assert "Sources vérifiées le 20 octobre 2026" in normalized
+        assert "Sources vérifiées le 3 novembre 2026" in normalized
+    assert "FR-LIBERAL-2026-11-03.1" in full
+    if "etudiant" in filename or "texte-long" in filename:
+        for period in ["7 septembre 2026 au 19 septembre 2026", "14 octobre 2026 au 17 octobre 2026", "26 octobre 2026 au 7 novembre 2026"]:
+            assert period in normalized, (filename, "Actual replacement periods missing")
+    if filename == "recapitulatif-recettes-exemple.pdf":
+        for amount in ["654,77", "158,93", "495,84", "523,82"]:
+            assert amount in normalized, (filename, amount, "Incorrect financial total")
+        assert "21 actes" in normalized
+        assert "ne certifie aucun virement" in normalized
+        assert "Signature manuscrite" not in normalized
+    if "pagination-qa" in filename:
+        for text in texts:
+            assert "NOEMIE / tiers" in text, (filename, "Missing repeated table header")
     if "texte-long" in filename:
         assert 'Анна / Ελένη' in normalized
         assert '250 €' in full

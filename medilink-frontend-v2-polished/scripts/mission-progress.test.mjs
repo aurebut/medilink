@@ -99,6 +99,21 @@ try {
   await check('documents', 'À compléter');
 
   dossier = structuredClone(missionTrackingDossier);
+  dossier.revision += 1;
+  for (const document of dossier.documents) document.isCurrent = true;
+  await load();
+  await check('documents', 'Transmis', true);
+
+  dossier = structuredClone(missionTrackingDossier);
+  const draftLetter = dossier.documents.find(document => document.kind === 'DECLARATION');
+  dossier.documents.unshift({ ...draftLetter, id: 'signed-letter-current', kind: 'SIGNED_DECLARATION', source: 'UPLOADED', isCurrent: true });
+  await load();
+  await check('documents', 'À compléter');
+  dossier.deliveries[0].documentIds.push('signed-letter-current');
+  await load();
+  await check('documents', 'Transmis', true);
+
+  dossier = structuredClone(missionTrackingDossier);
   dossier.missingFields = ['holderName'];
   await load();
   await check('documents', 'À compléter');

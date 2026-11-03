@@ -268,6 +268,35 @@ async function testDtoAndEmailMock() {
   console.log('PASS bounded input validation and real EmailService mock protection');
 }
 
+async function testPeriodsAndReceipts(storage: StorageService) {
+  const env = setup(storage);
+  const imported = await upload(env, storage, 'SIGNED_DECLARATION');
+  await env.service.confirmUpload(user('candidate'), 'application-1', imported.documentId);
+  const withFees: DossierDetails = { ...details, feeEntries: [
+    { date: '2030-10-01', actCount: 2, feesCents: 6000, supplementsCents: 0, patientReceiptsCents: 1800, thirdPartyReceiptsCents: 4200, paymentMethod: 'CARD' },
+  ] };
+  await env.service.update(user('owner'), 'application-1', { revision: 1, details: withFees });
+  let view = await env.service.get(user('candidate'), 'application-1');
+  assert.equal(view.documents.find(document => document.id === imported.documentId)!.isCurrent, true, 'A receipts update preserves the unchanged signed letter.');
+  await env.service.send(user('candidate'), 'application-1', sendDto([imported.documentId], 'signed-letter-delivery-0001'));
+  assert.deepEqual(await validate(plainToInstance(GenerateDossierDto, { revision: 2, kind: 'FEE_STATEMENT' })), []);
+  view = await env.service.generate(user('owner'), 'application-1', { revision: 2, kind: 'FEE_STATEMENT' });
+  assert.ok(view.documents.some(document => document.kind === 'FEE_STATEMENT' && document.source === 'GENERATED'));
+  const periods = [{ startDate: '2030-10-04', endDate: '2030-10-05' }, { startDate: '2030-10-01', endDate: '2030-10-02' }];
+  view = await env.service.update(user('owner'), 'application-1', { revision: 2, details: { ...withFees, periods } });
+  assert.equal(view.documents.find(document => document.id === imported.documentId)!.isCurrent, false, 'Changing the periods invalidates the signed letter.');
+  assert.deepEqual((view.details as unknown as DossierDetails).periods, [...periods].reverse());
+  await expectStatus(() => env.service.send(user('candidate'), 'application-1', sendDto([imported.documentId], 'stale-letter-delivery-0001')), 409);
+  await expectStatus(() => env.service.update(user('candidate'), 'application-1', { revision: 3, details: { ...details, periods: [periods[1], periods[1]] } }), 400);
+  await expectStatus(() => env.service.update(user('candidate'), 'application-1', { revision: 3, details: { ...withFees, feeEntries: [{ ...withFees.feeEntries![0], patientName: 'not permitted' } as any] } }), 400);
+  await expectStatus(() => env.service.update(user('candidate'), 'application-1', { revision: 3, details: { ...withFees, feeEntries: [{ ...withFees.feeEntries![0], feesCents: 1.5 }] } }), 400);
+  await expectStatus(() => env.service.update(user('candidate'), 'application-1', { revision: 3, details: { ...withFees, feeEntries: [{ ...withFees.feeEntries![0], patientReceiptsCents: 6001 }] } }), 400);
+  await expectStatus(() => env.service.update(user('candidate'), 'application-1', { revision: 3, details: { ...withFees, feeEntries: Array(201).fill(withFees.feeEntries![0]) } }), 400);
+  env.dossier.details = { ...withFees, feeEntries: [{ ...withFees.feeEntries![0], date: '2030-09-30' }] };
+  await expectStatus(() => env.service.generate(user('candidate'), 'application-1', { revision: 3, kind: 'FEE_STATEMENT' }), 400);
+  console.log('PASS periods, receipts, anonymous bounded entries, integer cents, PDF generation and signed letter revision scope');
+}
+
 async function testPostSendPersistenceFailure(storage: StorageService) {
   const env = setup(storage);
   const uploaded = await upload(env, storage);
@@ -309,6 +338,7 @@ async function main() {
     await testUploadAndVersions(storage);
     await testAdditionalDocuments(storage);
     await testSending(storage);
+    await testPeriodsAndReceipts(storage);
     await testDtoAndEmailMock();
     await testPostSendPersistenceFailure(storage);
     await testOpenUploadHandle(storage, root);

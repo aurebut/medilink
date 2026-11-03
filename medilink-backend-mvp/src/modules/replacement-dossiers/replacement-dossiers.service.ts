@@ -7,7 +7,7 @@ import { AuditService } from '../audit/audit.service';
 import { StorageService } from '../documents/storage.service';
 import { EmailService } from '../notifications/email.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { DossierDetails, DOSSIER_ATTACHMENT_KINDS, DOSSIER_FIELD_LABELS, DOSSIER_TEMPLATE_VERSION, getMissingDossierFields } from './dossier-types';
+import { DossierDetails, DOSSIER_ATTACHMENT_KINDS, DOSSIER_FIELD_LABELS, DOSSIER_TEMPLATE_VERSION, dossierDocumentMatchesDetails, isDossierDate, getMissingDossierFields } from './dossier-types';
 import { generateDossierPdf } from './dossier-pdf';
 import { GenerateDossierDto, SendDossierDto, UpdateDossierDto, UploadDossierDto } from './dossier.dto';
 
@@ -39,7 +39,7 @@ export class ReplacementDossiersService {
     const canEdit = ACTIVE_APPLICATIONS.includes(application.status);
     return {
       id: dossier.id, applicationId, revision: dossier.revision, details: dossier.details,
-      documents: documents.map((document) => this.documentView(document)),
+      documents: documents.map((document) => ({ ...this.documentView(document), isCurrent: dossierDocumentMatchesDetails(document, dossier.details as unknown as DossierDetails, dossier.revision) })),
       deliveries: deliveries.map((delivery) => ({
         id: delivery.id, recipientEmail: delivery.recipientEmail, recipientName: delivery.recipientName,
         recipientType: delivery.recipientType, status: delivery.status, createdAt: delivery.createdAt,
@@ -80,7 +80,7 @@ export class ReplacementDossiersService {
         const version = await this.nextVersion(tx, dossier.id, dto.kind);
         const bytes = await generateDossierPdf(dto.kind, details, { version, generatedAt: new Date() });
         const id = randomUUID();
-        const fileName = `${dto.kind === 'CONTRACT' ? 'contrat' : 'declaration'}-remplacement-v${version}.pdf`;
+        const fileName = `${dto.kind === 'CONTRACT' ? 'contrat' : dto.kind === 'FEE_STATEMENT' ? 'recapitulatif-recettes' : 'declaration'}-remplacement-v${version}.pdf`;
         storedKey = `replacement-dossiers/${dossier.id}/${id}.pdf`;
         await this.storage.writeBuffer(storedKey, bytes, 'application/pdf');
         await tx.replacementDossierDocument.create({ data: {
@@ -116,6 +116,7 @@ export class ReplacementDossiersService {
         storageKey: `quarantine/replacement-dossiers/${dossier.id}/${id}`,
         mimeType: dto.mimeType, sizeBytes: dto.sizeBytes, source: 'UPLOADED', status: 'UPLOADING',
         version: await this.nextVersion(tx, dossier.id, dto.kind), revision: dto.revision,
+        detailsSnapshot: dossier.details as Prisma.InputJsonValue,
         createdById: user.id, expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
       } });
     });
@@ -202,7 +203,7 @@ export class ReplacementDossiersService {
       if (!documents.length || documents.length !== request.documentIds.length || new Set(request.documentIds).size !== request.documentIds.length) {
         throw new BadRequestException('Sélectionnez uniquement des documents disponibles dans ce dossier.');
       }
-      if (documents.some((document) => (document.source === 'GENERATED' || document.kind === 'SIGNED_CONTRACT') && document.revision !== current.revision)) {
+      if (documents.some((document) => !dossierDocumentMatchesDetails(document, current.details as unknown as DossierDetails, current.revision))) {
         throw new ConflictException('Les informations ont changé. Régénérez les documents et ajoutez le contrat signé correspondant avant de les envoyer.');
       }
       const today = new Date().toISOString().slice(0, 10);
@@ -300,6 +301,7 @@ export class ReplacementDossiersService {
       startDate: isoDate(agreement?.startDate || mission.startDate), endDate: isoDate(agreement?.endDate || mission.endDate),
       scheduleDetails: timeRange, retrocessionPercent: agreement?.retrocessionPercentage ?? mission.retrocessionPercentage ?? null,
       paymentTerms: agreement?.terms || '', orderCouncilName: '', orderEmail: '',
+      holderSiret: '', replacementSiret: '', practiceResources: '', periods: [], feeEntries: [],
     };
   }
 
@@ -309,12 +311,35 @@ export class ReplacementDossiersService {
     const result: Record<string, unknown> = {};
     for (const key of keys) {
       const value = input[key];
-      if (key === 'retrocessionPercent') {
+      if (key === 'periods') {
+        if (value !== undefined && (!Array.isArray(value) || value.length > 24)) throw new BadRequestException('Limitez le dossier à 24 périodes.');
+        result.periods = (input.periods || []).map(period => {
+          if (!period || typeof period !== 'object' || Object.keys(period).some(field => !['startDate', 'endDate'].includes(field))
+            || ['startDate', 'endDate'].some(field => typeof period[field] !== 'string' || (period[field] && !isDossierDate(period[field])))) {
+            throw new BadRequestException('Période de remplacement invalide.');
+          }
+          return { startDate: period.startDate, endDate: period.endDate };
+        });
+      } else if (key === 'feeEntries') {
+        if (value !== undefined && (!Array.isArray(value) || value.length > 200)) throw new BadRequestException('Limitez le récapitulatif à 200 lignes.');
+        const fields = ['date', 'actCount', 'feesCents', 'supplementsCents', 'patientReceiptsCents', 'thirdPartyReceiptsCents', 'paymentMethod'];
+        result.feeEntries = (input.feeEntries || []).map(entry => {
+          if (!entry || typeof entry !== 'object' || Object.keys(entry).some(field => !fields.includes(field))
+            || !isDossierDate(entry.date) || !['CARD', 'CASH', 'CHEQUE', 'TRANSFER', 'OTHER'].includes(entry.paymentMethod)
+            || !Number.isInteger(entry.actCount) || entry.actCount < 1 || entry.actCount > 10000
+            || fields.slice(2, 6).some(field => !Number.isSafeInteger(entry[field]) || entry[field] < 0 || entry[field] > 1_000_000_000)
+            || entry.patientReceiptsCents + entry.thirdPartyReceiptsCents > entry.feesCents + entry.supplementsCents) {
+            throw new BadRequestException('Ligne de recettes invalide. Utilisez uniquement les dates, nombres d’actes, montants et modes de paiement prévus.');
+          }
+          return Object.fromEntries(fields.map(field => [field, entry[field]]));
+        });
+      } else if (key === 'retrocessionPercent') {
         if (value !== null && (typeof value !== 'number' || !Number.isFinite(value) || value < 0 || value > 100)) throw new BadRequestException('La rétrocession doit être comprise entre 0 et 100 %.');
         result[key] = value;
       } else {
-        if (typeof value !== 'string' || value.length > (['paymentTerms', 'scheduleDetails'].includes(key) ? 4000 : 500) || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(value)) throw new BadRequestException(`Valeur invalide : ${DOSSIER_FIELD_LABELS[key]}.`);
-        result[key] = value.trim();
+        const text = value === undefined && ['holderSiret', 'replacementSiret', 'practiceResources'].includes(key) ? '' : value;
+        if (typeof text !== 'string' || text.length > (['paymentTerms', 'scheduleDetails', 'practiceResources'].includes(key) ? 4000 : 500) || /[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(text)) throw new BadRequestException(`Valeur invalide : ${DOSSIER_FIELD_LABELS[key]}.`);
+        result[key] = text.trim();
       }
     }
     if (!['DOCTOR', 'STUDENT'].includes(result.replacementKind as string) || !['', 'INDIVIDUAL_LIBERAL'].includes(result.practiceFramework as string)) throw new BadRequestException('Cadre ou statut du remplacement non reconnu.');
@@ -324,6 +349,15 @@ export class ReplacementDossiersService {
     for (const key of ['startDate', 'endDate', 'licenseValidUntil']) {
       const date = result[key] as string;
       if (date && (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`)) || new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) !== date)) throw new BadRequestException(`Date invalide : ${DOSSIER_FIELD_LABELS[key]}.`);
+    }
+    const periods = result.periods as DossierDetails['periods'];
+    if (periods.length && periods.every(period => period.startDate && period.endDate)) {
+      periods.sort((a, b) => a.startDate.localeCompare(b.startDate));
+      if (periods.some((period, index) => period.endDate < period.startDate || (index && period.startDate <= periods[index - 1].endDate))) {
+        throw new BadRequestException('Les périodes doivent être ordonnées, sans dates inversées ni chevauchement.');
+      }
+      result.startDate = periods[0].startDate;
+      result.endDate = periods[periods.length - 1].endDate;
     }
     return result as unknown as DossierDetails;
   }

@@ -2,7 +2,7 @@ import {
   ArrayMaxSize, ArrayMinSize, ArrayUnique, IsArray, IsDateString, IsEmail,
   IsIn, IsInt, IsObject, IsOptional, IsString, Matches, Max, MaxLength, Min,
 } from 'class-validator';
-import { DOSSIER_ATTACHMENT_KINDS, DossierAttachmentKind, DossierDetails, GeneratedDossierKind } from './dossier-types';
+import { DOSSIER_ATTACHMENT_KINDS, DOSSIER_GENERATED_KINDS, DossierAttachmentKind, DossierDetails, GeneratedDossierKind } from './dossier-types';
 
 export class DossierRevisionDto {
   @IsInt() @Min(1) revision: number;
@@ -13,7 +13,7 @@ export class UpdateDossierDto extends DossierRevisionDto {
 }
 
 export class GenerateDossierDto extends DossierRevisionDto {
-  @IsIn(['CONTRACT', 'DECLARATION']) kind: GeneratedDossierKind;
+  @IsIn(DOSSIER_GENERATED_KINDS) kind: GeneratedDossierKind;
 }
 
 export class UploadDossierDto extends DossierRevisionDto {

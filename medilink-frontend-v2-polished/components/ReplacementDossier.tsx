@@ -4,12 +4,14 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { ArrowDownToLine, ArrowUpRight, ChevronLeft, ChevronRight, FileCheck2, FileText, FolderOpen, History, Mail, Plus, Send, Settings2, ShieldCheck, Upload, X } from 'lucide-react';
 import { api, apiFetch, ApiError, getApiUrl, isMockStorageUrl, openDocumentPreviewWindow, showDocumentInPreview } from '@/lib/api';
 import { errorMessage } from '@/lib/user-facing';
-import { currentDossierDocument, dossierCategories, dossierCategoryFor, dossierDate, dossierDocumentHints, dossierDocumentIsCurrent, dossierDocumentLabels, dossierFieldLabels, dossierKindAllowsMultiple, dossierRecipientLabels, dossierUploadKinds, type DossierCategory, type DossierDocument, type DossierDocumentKind, type DossierRecipientType, type DossierUploadKind, type ReplacementDetails, type ReplacementDossierData } from '@/lib/replacement-dossier';
+import { currentDossierDocument, dossierCategories, dossierCategoryFor, dossierDate, dossierDocumentHints, dossierDocumentIsCurrent, dossierDocumentLabels, dossierFieldLabels, dossierKindAllowsMultiple, dossierPeriods, withDossierPeriods, dossierRecipientLabels, dossierUploadKinds, type DossierCategory, type DossierDocument, type DossierDocumentKind, type DossierFeeEntry, type GeneratedDossierKind, type DossierRecipientType, type DossierUploadKind, type ReplacementDetails, type ReplacementDossierData } from '@/lib/replacement-dossier';
 import { Alert, Button, Field, Input, Select, Textarea } from '@/components/ui';
 import { ProfileAvatar } from '@/components/ProfileAvatar';
+import { DossierReceiptsForm } from '@/components/DossierReceiptsForm';
 
 type UploadResponse = { documentId: string; uploadUrl: string; method: string; headers: Record<string, string> };
-type Panel = 'details' | 'upload' | 'send' | 'manage' | null;
+type Panel = 'details' | 'fees' | 'upload' | 'send' | 'manage' | null;
+type TextField = Exclude<keyof ReplacementDetails, 'periods' | 'feeEntries'>;
 type RegisterRow = { kind: DossierDocumentKind; document?: DossierDocument } | { kind: 'PLATFORM_RECEIPT' };
 type DossierPresentation = {
   establishment?: { name: string; imageUrl?: string | null; city?: string | null };
@@ -32,6 +34,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   const [managedId, setManagedId] = useState<string | null>(null);
   const [draft, setDraft] = useState<ReplacementDetails | null>(null);
   const [editConflict, setEditConflict] = useState(false);
+  const [feesFormKey, setFeesFormKey] = useState(0);
   const [uploadKind, setUploadKind] = useState<DossierUploadKind>('SIGNED_CONTRACT');
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadInputKey, setUploadInputKey] = useState(0);
@@ -75,8 +78,8 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
     catch (cause) {
       if (cause instanceof ApiError && cause.status === 409) {
         await refresh().catch(() => undefined);
-        if (action === 'save') setEditConflict(true);
-        setError(`${errorMessage(cause)} Le dossier a été actualisé. ${action === 'save' ? 'Rechargez les informations du formulaire pour reprendre la dernière version avant de modifier à nouveau.' : 'Vérifiez les informations avant de réessayer.'}`);
+        if (action.startsWith('save')) setEditConflict(true);
+        setError(`${errorMessage(cause)} Le dossier a été actualisé. ${action.startsWith('save') ? 'Rechargez les informations du formulaire pour reprendre la dernière version avant de modifier à nouveau.' : 'Vérifiez les informations avant de réessayer.'}`);
       } else setError(errorMessage(cause));
     } finally { setBusy(null); }
   }
@@ -84,13 +87,15 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   function rememberPanelTrigger() { if (!panel && document.activeElement instanceof HTMLElement) panelTriggerRef.current = document.activeElement; }
   function closePanel() { setPanel(null); window.requestAnimationFrame(() => panelTriggerRef.current?.focus({ preventScroll: false })); }
   function openDetails() { if (!dossier) return; rememberPanelTrigger(); setDraft({ ...dossier.details }); setEditConflict(false); setPanel('details'); setError(null); }
+  function openFees() { if (!dossier) return; rememberPanelTrigger(); setEditConflict(false); setFeesFormKey(value => value + 1); setPanel('fees'); setError(null); }
   function openUpload(kind: DossierUploadKind) { rememberPanelTrigger(); setUploadKind(kind); setUploadFile(null); setUploadInputKey((value) => value + 1); setExpiry(''); setPanel('upload'); setError(null); }
   function openManage(kind: DossierDocumentKind, documentId?: string) { rememberPanelTrigger(); setManagedKind(kind); setManagedId(documentId || null); setPanel('manage'); setError(null); }
   function changeCategory(next: DossierCategory) { setCategory(next); setRegisterPage(0); setRevealedDocumentId(null); }
   function changePage(next: number) { setRegisterPage(next); setRevealedDocumentId(null); }
 
-  async function generate(kind: 'CONTRACT' | 'DECLARATION') {
+  async function generate(kind: GeneratedDossierKind) {
     if (!dossier) return;
+    if (kind === 'FEE_STATEMENT' && !dossier.details.feeEntries?.length) { openFees(); return; }
     if (kind === 'CONTRACT' && dossier.missingFields.length) { openDetails(); setError('Complétez les informations du remplacement avant de générer le document.'); return; }
     await run(kind, async () => { await api.postSilent(`${path}/generate`, { kind, revision: dossier.revision }); await refresh(); setNotice('Le PDF est prêt. Relisez-le avant signature ou transmission.'); });
   }
@@ -144,6 +149,16 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
     });
   }
 
+  async function saveFees(feeEntries: DossierFeeEntry[]) {
+    if (!dossier || editConflict) return;
+    await run('save-fees', async () => {
+      const updated = await apiFetch<ReplacementDossierData>(path, { method: 'PUT', body: { revision: dossier.revision, details: { ...dossier.details, feeEntries } }, invalidateCache: false });
+      setDossier(updated);
+      await api.postSilent(`${path}/generate`, { kind: 'FEE_STATEMENT', revision: updated.revision });
+      await refresh(); closePanel(); changeCategory('payment'); setNotice('Le récapitulatif des recettes et de la rétrocession est prêt. Vérifiez les montants avant de le partager.');
+    });
+  }
+
   async function upload(event: FormEvent) {
     event.preventDefault(); if (!dossier || !uploadFile) return;
     if (uploadFile.size > 10 * 1024 * 1024) { setError('Le fichier doit faire moins de 10 Mo.'); return; }
@@ -170,7 +185,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   function openSend(document?: DossierDocument) {
     if (!dossier) return;
     rememberPanelTrigger();
-    changeRecipient(document?.kind === 'DECLARATION' ? 'ORDER' : document?.kind === 'REPLACEMENT_CERTIFICATE' ? 'CPAM' : 'COUNTERPART');
+    changeRecipient(document && ['DECLARATION', 'SIGNED_DECLARATION'].includes(document.kind) ? 'ORDER' : document?.kind === 'REPLACEMENT_CERTIFICATE' ? 'CPAM' : 'COUNTERPART');
     setSelectedIds(document ? [document.id] : []); setSendMessage(''); setPanel('send'); setError(null);
   }
 
@@ -199,6 +214,9 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   const signed = currentDossierDocument(dossier, 'SIGNED_CONTRACT');
   const currentSigned = signed && dossierDocumentIsCurrent(signed, dossier) ? signed : undefined;
   const activeContract = currentSigned || contract || signed;
+  const signedLetter = currentDossierDocument(dossier, 'SIGNED_DECLARATION');
+  const letter = currentDossierDocument(dossier, 'DECLARATION');
+  const activeLetter = signedLetter && dossierDocumentIsCurrent(signedLetter, dossier) ? signedLetter : letter || signedLetter;
   const supportingKinds: DossierDocumentKind[] = dossier.details.replacementKind === 'STUDENT' ? ['DECLARATION', 'LICENSE', 'AUTHORIZATION', 'INSURANCE'] : ['DECLARATION', 'REGISTRATION', 'INSURANCE'];
   const ready = dossier.documents.filter((document) => document.status === 'READY');
   const availableToSend = ready.filter((document) => dossierDocumentIsCurrent(document, dossier));
@@ -215,7 +233,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
         if (files.length) return files.map(document => ({ kind, document }));
         if (kind === 'OTHER') return [];
       }
-      return [{ kind, document: kind === 'CONTRACT' ? activeContract : currentDossierDocument(dossier, kind) }];
+      return [{ kind, document: kind === 'CONTRACT' ? activeContract : kind === 'DECLARATION' ? activeLetter : currentDossierDocument(dossier, kind) }];
     });
     if (id === 'payment' && conversationId && paymentReleased) rows.unshift({ kind: 'PLATFORM_RECEIPT' });
     return [id, rows];
@@ -225,7 +243,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   const revealedIndex = revealedDocumentId ? rows.findIndex(row => row.kind !== 'PLATFORM_RECEIPT' && row.document?.id === revealedDocumentId) : -1;
   const currentPage = Math.min(revealedIndex >= 0 ? Math.floor(revealedIndex / PAGE_SIZE) : registerPage, pageCount - 1);
   const visibleRows = rows.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
-  const managedDocument = managedId && dossierKindAllowsMultiple(managedKind) ? ready.find(document => document.id === managedId) : managedKind === 'CONTRACT' ? activeContract : currentDossierDocument(dossier, managedKind);
+  const managedDocument = managedId && dossierKindAllowsMultiple(managedKind) ? ready.find(document => document.id === managedId) : managedKind === 'CONTRACT' ? activeContract : managedKind === 'DECLARATION' ? activeLetter : currentDossierDocument(dossier, managedKind);
   const managedCurrent = managedDocument && dossierDocumentIsCurrent(managedDocument, dossier);
 
   function documentLabel(kind: DossierDocumentKind) { return kind === 'DECLARATION' && dossier?.details.replacementKind === 'STUDENT' ? 'Demande d’autorisation à l’Ordre' : dossierDocumentLabels[kind]; }
@@ -247,10 +265,10 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
   }
   function rowStatus(document?: DossierDocument) {
     if (!document) return 'À ajouter';
-    if (!dossierDocumentIsCurrent(document, dossier!)) return document.source === 'GENERATED' || document.kind === 'SIGNED_CONTRACT' ? 'À actualiser' : 'Validité à renouveler';
+    if (!dossierDocumentIsCurrent(document, dossier!)) return document.source === 'GENERATED' || ['SIGNED_CONTRACT', 'SIGNED_DECLARATION'].includes(document.kind) ? 'À actualiser' : 'Validité à renouveler';
     const transmitted = dossier!.deliveries.some(delivery => delivery.status === 'SENT' && delivery.documentIds.includes(document.id));
     if (document.kind === 'CONTRACT') return transmitted ? 'Transmis · à relire et signer' : 'À relire et signer';
-    if (document.kind === 'SIGNED_CONTRACT') return transmitted ? 'Exemplaire signé ajouté · transmis' : 'Exemplaire signé ajouté';
+    if (['SIGNED_CONTRACT', 'SIGNED_DECLARATION'].includes(document.kind)) return transmitted ? 'Exemplaire signé ajouté · transmis' : 'Exemplaire signé ajouté';
     if (transmitted) return 'Transmis';
     return document.source === 'GENERATED' ? 'Prêt à relire' : 'Pièce ajoutée';
   }
@@ -284,7 +302,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
 
     <div className="rd-mission-context">
       <p>{dossier.details.holderName || 'Médecin remplacé'}<span aria-hidden="true"> & </span>{dossier.details.replacementName || 'Remplaçant'}</p>
-      <span>{dossierDate(dossier.details.startDate)} — {dossierDate(dossier.details.endDate)}</span>
+      <span>{dossierDate(dossier.details.startDate)} — {dossierDate(dossier.details.endDate)}{dossierPeriods(dossier.details).length > 1 ? ` · ${dossierPeriods(dossier.details).length} périodes` : ''}</span>
     </div>
 
     {notice ? <div role="status"><Alert type="success">{notice}</Alert></div> : null}
@@ -306,7 +324,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
         </li>;
         const { kind, document } = row;
         const current = document && dossierDocumentIsCurrent(document, dossier);
-        const generated = kind === 'CONTRACT' || kind === 'DECLARATION';
+        const generated = kind === 'CONTRACT' || kind === 'DECLARATION' || kind === 'FEE_STATEMENT';
         const canTransmit = current && dossier.canSend;
         const needsFile = !current && dossier.canEdit;
         const action = document ? 'Actualiser' : generated ? 'Générer' : 'Ajouter';
@@ -320,7 +338,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
           </div>
           <div className="rd-row-actions" role="group" aria-label={`Actions : ${shortLabel(kind)}`}>
             {document ? <button className="rd-row-action" aria-label={`Télécharger ${rowActionLabel(kind, document)}`} disabled={disabled} onClick={() => void download(document)}><ArrowDownToLine size={14} aria-hidden="true" /><span>{busy === `download-${document.id}` ? 'Chargement…' : 'Télécharger'}</span></button> : null}
-            {needsFile ? <button className="rd-row-action is-primary" aria-label={`${action} ${documentLabel(kind)}`} disabled={disabled} onClick={() => generated ? void generate(kind) : openUpload(kind as DossierUploadKind)}>{generated ? <FileText size={14} aria-hidden="true" /> : <Upload size={14} aria-hidden="true" />}<span>{generating ? 'Création…' : action}</span></button> : null}
+            {needsFile ? <button className="rd-row-action is-primary" aria-label={`${action} ${documentLabel(kind)}`} disabled={disabled} onClick={() => kind === 'FEE_STATEMENT' ? openFees() : generated ? void generate(kind as GeneratedDossierKind) : openUpload(kind as DossierUploadKind)}>{generated ? <FileText size={14} aria-hidden="true" /> : <Upload size={14} aria-hidden="true" />}<span>{generating ? 'Création…' : action}</span></button> : null}
             {canTransmit ? <button className="rd-row-action is-primary" aria-label={`Transmettre ${rowActionLabel(kind, document)}`} disabled={disabled} onClick={() => openSend(document)}><Send size={14} aria-hidden="true" /><span>Transmettre</span></button> : null}
             {document || dossier.canEdit ? <button className="rd-row-action rd-more-action" aria-label={`Gérer ${rowActionLabel(kind, document)}`} disabled={disabled} onClick={() => openManage(kind, document?.id)}><span>Gérer</span><ChevronRight size={13} aria-hidden="true" /></button> : <span className="rd-readonly">Non fourni</span>}
           </div>
@@ -335,7 +353,7 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
     {!dossier.canSend ? <p className="rd-service-note">L’envoi par email n’est pas disponible pour ce dossier. Les pièces restent consultables et téléchargeables.</p> : null}
 
     {panel ? <div className="rd-edit-panel" ref={panelRef} tabIndex={-1}>
-      <div className="rd-panel-heading"><div><span className="rd-eyebrow">Dossier du remplacement</span><h3>{panel === 'manage' ? shortLabel(managedKind) : panel === 'details' ? 'Les informations convenues' : panel === 'upload' ? 'Ajouter une pièce' : 'Préparer l’envoi'}</h3></div><button className="rd-icon-button" aria-label="Fermer le formulaire" disabled={disabled} onClick={closePanel}><X size={20} /></button></div>
+      <div className="rd-panel-heading"><div><span className="rd-eyebrow">Dossier du remplacement</span><h3>{panel === 'manage' ? shortLabel(managedKind) : panel === 'details' ? 'Les informations convenues' : panel === 'fees' ? 'Les recettes du remplacement' : panel === 'upload' ? 'Ajouter une pièce' : 'Préparer l’envoi'}</h3></div><button className="rd-icon-button" aria-label="Fermer le formulaire" disabled={disabled} onClick={closePanel}><X size={20} /></button></div>
       {error ? <Alert type="error">{error}</Alert> : null}
       {panel === 'manage' ? <div className="rd-manage">
         {managedDocument ? <div className="rd-managed-file"><FileText size={24} strokeWidth={1.4} /><div><strong>{managedDocument.fileName}</strong><span>Version {managedDocument.version}</span><small>{managedDocument.expiresAt ? `Valable jusqu’au ${dossierDate(managedDocument.expiresAt)}` : `Ajouté le ${dossierDate(managedDocument.createdAt)}`}</small><span className={`rd-status ${managedCurrent ? 'is-prepared' : ''}`}><span />{rowStatus(managedDocument)}</span></div></div> : <p className="rd-form-note">{managedKind === 'CONTRACT' || managedKind === 'DECLARATION' ? 'Ce document sera préparé à partir des informations du remplacement.' : dossierDocumentHints[managedKind] || 'Ajoutez le justificatif délivré par votre organisme.'}</p>}
@@ -343,7 +361,8 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
           {managedDocument ? <Button variant="light" disabled={disabled} onClick={() => void preview(managedDocument)}>{managedDocument.mimeType === 'application/pdf' ? 'Voir le PDF' : 'Voir le document'} <ArrowUpRight size={15} /></Button> : null}
           {managedCurrent && dossier.canSend ? <Button disabled={disabled} onClick={() => openSend(managedDocument)}><Send size={15} /> Transmettre ce document</Button> : null}
           {dossier.canEdit && (managedKind === 'CONTRACT' || managedKind === 'DECLARATION') ? <Button variant="light" disabled={disabled} onClick={() => void generate(managedKind)}><FileText size={15} />{busy === managedKind ? 'Génération…' : managedKind === 'CONTRACT' ? contract ? 'Régénérer le contrat' : 'Générer le contrat' : 'Générer le courrier à l’Ordre'}</Button> : null}
-          {dossier.canEdit ? managedKind === 'CONTRACT' ? <Button variant="light" disabled={disabled} onClick={() => openUpload('SIGNED_CONTRACT')}><Upload size={15} /> Ajouter l’exemplaire signé</Button> : managedKind !== 'DECLARATION' ? <Button variant="light" disabled={disabled} onClick={() => openUpload(managedKind as DossierUploadKind)}><Upload size={15} />{managedDocument ? dossierKindAllowsMultiple(managedKind) ? 'Ajouter une autre pièce' : 'Remplacer la pièce' : 'Ajouter la pièce'}</Button> : null : null}
+          {dossier.canEdit && managedKind === 'FEE_STATEMENT' ? <Button variant="light" disabled={disabled} onClick={openFees}><FileText size={15} /> Préparer le récapitulatif</Button> : null}
+          {dossier.canEdit ? managedKind === 'CONTRACT' || managedKind === 'DECLARATION' ? <Button variant="light" disabled={disabled} onClick={() => openUpload(managedKind === 'CONTRACT' ? 'SIGNED_CONTRACT' : 'SIGNED_DECLARATION')}><Upload size={15} />{managedKind === 'CONTRACT' ? 'Ajouter l’exemplaire signé' : 'Ajouter le courrier signé'}</Button> : <Button variant="light" disabled={disabled} onClick={() => openUpload(managedKind as DossierUploadKind)}><Upload size={15} />{managedDocument ? dossierKindAllowsMultiple(managedKind) ? 'Ajouter une autre pièce' : 'Remplacer la pièce' : 'Ajouter la pièce'}</Button> : null}
         </div>
         <p className="rd-form-note">{managedKind === 'CONTRACT' ? 'Relisez le contrat avant de le signer. L’import d’un exemplaire signé ne vérifie pas les signatures.' : managedKind === 'DECLARATION' ? 'Relisez le courrier et vérifiez les modalités de dépôt de votre Conseil. Un envoi ne vaut pas autorisation.' : managedDocument ? dossierDocumentHints[managedKind] || 'Les pièces officielles sont délivrées par leur organisme émetteur.' : null}</p>
       </div> : null}
@@ -354,13 +373,15 @@ export function ReplacementDossier({ applicationId, viewer, conversationId, paym
         <div className="rd-fields"><Field label="Cadre d’exercice"><Select value={draft.practiceFramework || ''} onChange={(event) => setDraft({ ...draft, practiceFramework: event.target.value as ReplacementDetails['practiceFramework'] })}><option value="">Choisir le cadre du remplacement</option><option value="INDIVIDUAL_LIBERAL">Remplacement libéral individuel d’un médecin</option></Select></Field><Field label="Statut du remplaçant"><Select value={draft.replacementKind} onChange={(event) => setDraft({ ...draft, replacementKind: event.target.value as ReplacementDetails['replacementKind'] })}><option value="DOCTOR">Médecin inscrit au Tableau</option><option value="STUDENT">Étudiant / interne avec licence</option></Select></Field></div>
         <p className="rd-form-note">Les modèles proposés couvrent le remplacement libéral individuel. Les autres cadres d’exercice nécessitent un contrat adapté.</p>
         {([
-          ['Le médecin remplacé', ['holderName', 'holderRpps', 'holderOrderNumber', 'holderAddress', 'holderEmail']],
-          ['Le remplaçant', draft.replacementKind === 'STUDENT' ? ['replacementName', 'replacementRpps', 'replacementAddress', 'replacementEmail', 'licenseNumber', 'licenseValidUntil'] : ['replacementName', 'replacementRpps', 'replacementOrderNumber', 'replacementAddress', 'replacementEmail']],
-          ['Le remplacement', ['specialty', 'practiceAddress', 'startDate', 'endDate', 'scheduleDetails', 'retrocessionPercent', 'paymentTerms']],
+          ['Le médecin remplacé', ['holderName', 'holderRpps', 'holderOrderNumber', 'holderAddress', 'holderEmail', 'holderSiret']],
+          ['Le remplaçant', draft.replacementKind === 'STUDENT' ? ['replacementName', 'replacementRpps', 'replacementAddress', 'replacementEmail', 'replacementSiret', 'licenseNumber', 'licenseValidUntil'] : ['replacementName', 'replacementRpps', 'replacementOrderNumber', 'replacementAddress', 'replacementEmail', 'replacementSiret']],
+          ['Le remplacement', ['specialty', 'practiceAddress', 'practiceResources', 'scheduleDetails', 'retrocessionPercent', 'paymentTerms']],
           ['Le Conseil de l’Ordre', ['orderCouncilName', 'orderEmail']],
-        ] as Array<[string, Array<keyof ReplacementDetails>]>).map(([title, fields]) => <fieldset className="rd-fieldset" key={title}><legend>{title}</legend><div className="rd-fields">{fields.map((key) => <Field key={key} label={dossierFieldLabels[key]}>{key === 'paymentTerms' || key === 'scheduleDetails' ? <Textarea rows={2} value={String(draft[key] ?? '')} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} /> : <Input type={key === 'retrocessionPercent' ? 'number' : key.toLowerCase().includes('email') ? 'email' : ['startDate', 'endDate', 'licenseValidUntil'].includes(key) ? 'date' : 'text'} value={draft[key] ?? ''} min={key === 'retrocessionPercent' ? 0 : undefined} max={key === 'retrocessionPercent' ? 100 : undefined} step={key === 'retrocessionPercent' ? 0.01 : undefined} onChange={(event) => setDraft({ ...draft, [key]: key === 'retrocessionPercent' ? event.target.value === '' ? null : Number(event.target.value) : event.target.value })} />}</Field>)}</div></fieldset>)}
+        ] as Array<[string, TextField[]]>).map(([title, fields]) => <fieldset className="rd-fieldset" key={title}><legend>{title}</legend><div className="rd-fields">{fields.map((key) => <Field key={key} label={dossierFieldLabels[key]}>{['paymentTerms', 'scheduleDetails', 'practiceResources'].includes(key) ? <Textarea rows={2} value={String(draft[key] ?? '')} onChange={(event) => setDraft({ ...draft, [key]: event.target.value })} /> : <Input type={key === 'retrocessionPercent' ? 'number' : key.toLowerCase().includes('email') ? 'email' : key === 'licenseValidUntil' ? 'date' : 'text'} value={draft[key] ?? ''} min={key === 'retrocessionPercent' ? 0 : undefined} max={key === 'retrocessionPercent' ? 100 : undefined} step={key === 'retrocessionPercent' ? 0.01 : undefined} onChange={(event) => setDraft({ ...draft, [key]: key === 'retrocessionPercent' ? event.target.value === '' ? null : Number(event.target.value) : event.target.value })} />}</Field>)}</div></fieldset>)}
+        <fieldset className="rd-fieldset"><legend>Périodes effectives du remplacement</legend><p className="rd-form-note">Indiquez chaque période séparément. Ces mêmes dates figureront dans le contrat et le courrier au Conseil.</p>{dossierPeriods(draft).map((period, index) => <div className="rd-period-row" key={index}><div className="rd-fields"><Field label={`Premier jour de la période ${index + 1}`}><Input type="date" value={period.startDate} onChange={event => setDraft(withDossierPeriods(draft, dossierPeriods(draft).map((item, i) => i === index ? { ...item, startDate: event.target.value } : item)))} /></Field><Field label={`Dernier jour de la période ${index + 1}`}><Input type="date" value={period.endDate} onChange={event => setDraft(withDossierPeriods(draft, dossierPeriods(draft).map((item, i) => i === index ? { ...item, endDate: event.target.value } : item)))} /></Field></div>{dossierPeriods(draft).length > 1 ? <button type="button" className="rd-text-button rd-delete" disabled={disabled} onClick={() => setDraft(withDossierPeriods(draft, dossierPeriods(draft).filter((_, i) => i !== index)))}>Retirer la période {index + 1}</button> : null}</div>)}<Button type="button" variant="light" disabled={disabled || dossierPeriods(draft).length >= 24} onClick={() => setDraft(withDossierPeriods(draft, [...dossierPeriods(draft), { startDate: '', endDate: '' }]))}><Plus size={15} /> Ajouter une période</Button></fieldset>
         <div className="rd-form-actions"><Button disabled={disabled || editConflict}>{busy === 'save' ? 'Enregistrement…' : 'Enregistrer les informations'}</Button><Button type="button" variant="light" disabled={disabled} onClick={closePanel}>Annuler</Button></div>
       </form> : null}
+      {panel === 'fees' ? <>{editConflict ? <div className="rd-conflict"><Alert type="error">Le dossier a changé. Votre saisie est conservée dans ce formulaire.</Alert><Button variant="light" onClick={openFees}>Recharger les recettes du dossier</Button></div> : null}<DossierReceiptsForm key={feesFormKey} entries={dossier.details.feeEntries || []} startDate={dossier.details.startDate} periods={dossierPeriods(dossier.details)} busy={disabled} conflict={editConflict} onSave={saveFees} /></> : null}
       {panel === 'upload' ? <form onSubmit={upload}><p className="rd-form-note">Cette pièce sera visible par vous et l’autre partie du remplacement.</p>{dossierDocumentHints[uploadKind] ? <p className="rd-form-note">{dossierDocumentHints[uploadKind]}</p> : null}<div className="rd-fields"><Field label="Nature de la pièce"><Select value={uploadKind} onChange={(event) => setUploadKind(event.target.value as DossierUploadKind)}>{dossierUploadKinds.map((kind) => <option key={kind} value={kind}>{documentLabel(kind)}</option>)}</Select></Field><Field label="Date de fin de validité" description="À renseigner si la pièce comporte une échéance."><Input type="date" value={expiry} onChange={(event) => setExpiry(event.target.value)} /></Field></div><Field label="Fichier" description="PDF, JPEG, PNG ou WebP · 10 Mo maximum"><Input key={uploadInputKey} required type="file" accept="application/pdf,image/jpeg,image/png,image/webp" onChange={(event) => setUploadFile(event.target.files?.[0] || null)} /></Field>{uploadKind === 'SIGNED_CONTRACT' ? <p className="rd-form-note">Importez l’exemplaire signé par les deux médecins. L’ajout du fichier ne vérifie pas les signatures.</p> : null}<div className="rd-form-actions"><Button disabled={disabled || !uploadFile}><Upload size={16} />{busy === 'upload' ? 'Transfert…' : 'Ajouter au dossier'}</Button></div></form> : null}
       {panel === 'send' ? <form onSubmit={send}><div className="rd-fields"><Field label="Destinataire"><Select value={recipientType} onChange={(event) => changeRecipient(event.target.value as DossierRecipientType)}><option value="COUNTERPART">{viewer === 'candidate' ? 'Médecin remplacé' : 'Remplaçant'}</option><option value="ORDER">Conseil départemental de l’Ordre</option><option value="CPAM">Assurance maladie (CPAM)</option><option value="OTHER">Autre destinataire</option></Select></Field><Field label="Nom du destinataire"><Input required value={recipientName} onChange={(event) => { setRecipientName(event.target.value); resetSendConfirmation(); }} /></Field><Field label="Adresse email"><Input required type="email" value={recipientEmail} onChange={(event) => { setRecipientEmail(event.target.value); resetSendConfirmation(); }} /></Field></div>
         <fieldset className="rd-fieldset"><legend>Pièces à transmettre</legend><div className="rd-send-selection">{availableToSend.map((document) => <label key={document.id}><input type="checkbox" checked={selectedIds.includes(document.id)} onChange={(event) => { setSelectedIds((current) => event.target.checked ? [...current, document.id] : current.filter((id) => id !== document.id)); resetSendConfirmation(); }} /><span><strong>{documentLabel(document.kind)}</strong><small>{document.fileName} · version {document.version}</small></span></label>)}</div></fieldset>

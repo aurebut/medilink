@@ -123,6 +123,15 @@
 .replacement-dossier .field-description { font-size: 10px; line-height: 1.5; }
 .replacement-dossier .input, .replacement-dossier .select, .replacement-dossier .textarea { font-size: 12px; }
 .replacement-dossier .rd-form-actions { display: flex; gap: 12px; align-items: center; margin-top: 20px; }
+.replacement-dossier .rd-period-row { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--rd-line); }
+.replacement-dossier .rd-period-row > button { margin-top: 8px; }
+.replacement-dossier .rd-receipt-entry { margin-block: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--rd-line); }
+.replacement-dossier .rd-receipt-fields { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.replacement-dossier .rd-receipt-balance { display: flex; flex-direction: column; justify-content: center; gap: 7px; font-size: 11px; color: var(--rd-muted); }
+.replacement-dossier .rd-receipt-balance strong { color: var(--rd-ink); font-size: 15px; font-weight: 550; }
+.replacement-dossier .rd-receipt-totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-block: 20px; padding-block: 16px; border-block: 1px solid var(--rd-line); }
+.replacement-dossier .rd-receipt-totals dt { color: var(--rd-muted); font-size: 11px; line-height: 1.5; }
+.replacement-dossier .rd-receipt-totals dd { margin: 6px 0 0; font-size: 17px; font-weight: 550; }
 .replacement-dossier .rd-send-selection { display: grid; gap: 8px; }
 .replacement-dossier .rd-send-selection label { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--rd-line); border-radius: 6px; cursor: pointer; }
 .replacement-dossier .rd-send-selection input, .replacement-dossier .rd-send-confirmation input { width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--rd-blue); }
@@ -185,6 +194,7 @@
   .replacement-dossier .rd-panel-heading { align-items: flex-start; }
   .replacement-dossier .rd-panel-heading h3 { font-size: 26px; }
   .replacement-dossier .rd-fields { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .replacement-dossier .rd-receipt-totals { grid-template-columns: minmax(0, 1fr); }
   .replacement-dossier .rd-form-actions { flex-wrap: wrap; }
   .replacement-dossier .rd-edit-panel .rd-icon-button { min-width: 44px; min-height: 44px; }
   .replacement-dossier .input, .replacement-dossier .select, .replacement-dossier .textarea { font-size: 16px; }

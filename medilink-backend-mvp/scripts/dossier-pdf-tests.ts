@@ -2,7 +2,7 @@ import assert = require('node:assert/strict');
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { generateDossierPdf } from '../src/modules/replacement-dossiers/dossier-pdf';
-import { DossierDetails, getMissingDossierFields } from '../src/modules/replacement-dossiers/dossier-types';
+import { DossierDetails, dossierFeeTotals, getMissingDossierFields } from '../src/modules/replacement-dossiers/dossier-types';
 
 // Entirely fictitious data. No account, database or email provider is accessed.
 export const doctorFixture: DossierDetails = {
@@ -17,15 +17,33 @@ export const doctorFixture: DossierDetails = {
   scheduleDetails: 'Du lundi au vendredi de 9 h à 13 h et de 14 h à 18 h. Consultations au cabinet et visites à domicile selon les besoins des patients.',
   retrocessionPercent: 80, paymentTerms: 'Virement sous huit jours suivant la fin du remplacement, après rapprochement des actes et encaissements. Les honoraires encaissés plus tard sont régularisés à la fin du mois suivant.',
   orderCouncilName: 'Conseil départemental de Paris de l’Ordre des médecins', orderEmail: 'conseil@example.test',
+  practiceResources: 'Cabinet de consultations, matériel médical, logiciel métier et secrétariat aux horaires habituels.',
 };
 export const studentFixture: DossierDetails = {
-  ...doctorFixture, replacementKind: 'STUDENT', replacementName: 'Chloé Noël',
+  ...doctorFixture, replacementKind: 'STUDENT', replacementName: 'Chloé Noël', replacementEmail: 'chloe@example.test',
   replacementRpps: '', replacementOrderNumber: '', licenseNumber: 'LIC-FICTIVE-2026-42', licenseValidUntil: '2027-03-31',
+  startDate: '2026-09-07', endDate: '2026-11-07', periods: [
+    { startDate: '2026-09-07', endDate: '2026-09-19' },
+    { startDate: '2026-10-14', endDate: '2026-10-17' },
+    { startDate: '2026-10-26', endDate: '2026-11-07' },
+  ],
 };
+export const feeFixture: DossierDetails = { ...studentFixture, feeEntries: [
+  { date: '2026-10-26', actCount: 16, feesCents: 49477, supplementsCents: 0, patientReceiptsCents: 14993, thirdPartyReceiptsCents: 0, paymentMethod: 'CARD' },
+  { date: '2026-10-26', actCount: 1, feesCents: 3000, supplementsCents: 0, patientReceiptsCents: 900, thirdPartyReceiptsCents: 0, paymentMethod: 'CASH' },
+  { date: '2026-10-26', actCount: 4, feesCents: 13000, supplementsCents: 0, patientReceiptsCents: 0, thirdPartyReceiptsCents: 0, paymentMethod: 'OTHER' },
+] };
 
 async function main() {
   assert.deepEqual(getMissingDossierFields(doctorFixture), []);
   assert.deepEqual(getMissingDossierFields(studentFixture), []);
+  assert.deepEqual(getMissingDossierFields(feeFixture, 'FEE_STATEMENT'), []);
+  assert.equal(dossierFeeTotals(feeFixture).outstandingCents, 49584);
+  assert.equal(dossierFeeTotals(feeFixture).retrocessionCents, 52382);
+  assert.ok(getMissingDossierFields({ ...feeFixture, feeEntries: [{ ...feeFixture.feeEntries![0], date: '2026-10-23' }] }, 'FEE_STATEMENT').some(value => value.includes('période effective')));
+  assert.ok(getMissingDossierFields({ ...feeFixture, feeEntries: [{ ...feeFixture.feeEntries![0], patientReceiptsCents: 50000 }] }, 'FEE_STATEMENT').some(value => value.includes('dépassent')));
+  assert.ok(getMissingDossierFields({ ...studentFixture, periods: [{ startDate: '2026-09-07', endDate: '2026-10-15' }, studentFixture.periods![1], studentFixture.periods![2]] }).some(value => value.includes('chevaucher')));
+  assert.ok(getMissingDossierFields({ ...studentFixture, periods: [{ startDate: '2026-09-07', endDate: '2026-11-06' }] }).some(value => value.includes('dates globales')));
   assert.deepEqual(getMissingDossierFields({ ...doctorFixture, holderName: 'Dr E\u0301lodie Lefèvre' }), []);
   assert.deepEqual(getMissingDossierFields({ ...doctorFixture, replacementName: 'Анна Иванова / Ελένη Παπαδοπούλου' }), []);
   assert.ok(getMissingDossierFields({ ...doctorFixture, replacementName: '李' }).some(v => v.includes('caractère non pris en charge')));
@@ -43,7 +61,7 @@ async function main() {
   // Scripts are run from the backend package, including the compiled smoke test.
   const output = resolve(process.cwd(), '../output/pdf');
   await mkdir(output, { recursive: true });
-  const generatedAt = new Date('2026-10-20T12:00:00.000Z');
+  const generatedAt = new Date('2026-11-03T12:00:00.000Z');
   const longFixture: DossierDetails = {
     ...studentFixture,
     holderName: 'Dr Élodie Lefèvre de Saint-Étienne et de la Croix',
@@ -58,6 +76,7 @@ async function main() {
     ['contrat-etudiant-exemple.pdf', 'CONTRACT', studentFixture],
     ['demande-etudiant-exemple.pdf', 'DECLARATION', studentFixture],
     ['contrat-texte-long-qa.pdf', 'CONTRACT', longFixture],
+    ['recapitulatif-recettes-exemple.pdf', 'FEE_STATEMENT', feeFixture],
   ] as const) {
     const buffer = await generateDossierPdf(kind, fixture, { version: 1, generatedAt });
     assert.equal(buffer.subarray(0, 5).toString(), '%PDF-');
@@ -65,7 +84,9 @@ async function main() {
     await writeFile(resolve(output, filename), buffer);
     console.log(`${filename}: ${buffer.byteLength} octets`);
   }
-  console.log('Validation des gabarits et génération des 5 PDF : OK');
+  const paginated = await generateDossierPdf('FEE_STATEMENT', { ...feeFixture, feeEntries: Array.from({ length: 80 }, () => feeFixture.feeEntries![0]) }, { version: 1, generatedAt });
+  await writeFile(resolve(output, 'recapitulatif-recettes-pagination-qa.pdf'), paginated);
+  console.log('Validation des gabarits et génération des 6 exemples et du journal paginé : OK');
 }
 
 if (require.main === module) main().catch((error) => { console.error(error); process.exitCode = 1; });
