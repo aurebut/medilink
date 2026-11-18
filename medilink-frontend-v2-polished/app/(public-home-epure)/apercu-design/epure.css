@@ -1,0 +1,421 @@
+/* Épure — alternative art direction for the homepage, shown only on /apercu-design.
+   Same markup, sections, copy, captures and animations as the homepage: this file
+   restyles them on a white page with sans headings, hairlines and a single blue accent.
+   Every rule is scoped to the preview's body id, so the published homepage is untouched. */
+
+#landing-epure {
+  --e-ink: #0f1c2e;
+  --e-text: #46546a;
+  --e-mute: #6d7a8c;
+  --e-line: #e6e9ee;
+  --e-soft: #f5f7fa;
+  --e-blue: var(--brand-primary);
+  --e-width: 1120px;
+  --e-gutter: 32px;
+  --e-section: clamp(72px, 9vw, 128px);
+  --ivory: #fff;
+  --surface-line: var(--e-line);
+  background: #fff;
+  color: var(--e-text);
+}
+
+/* ── Type: sans headings, with the serif kept for the highlighted words only ── */
+#landing-epure main :is(h1, h2, h3) {
+  color: var(--e-ink);
+  font-family: var(--brand-sans);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: -.026em;
+  text-wrap: balance;
+}
+#landing-epure main :is(h1, h2) em {
+  color: inherit;
+  font: inherit;
+  font-style: normal;
+  letter-spacing: inherit;
+}
+#landing-epure main :is(h1, h2) .title-accent {
+  color: var(--e-blue);
+  font-family: var(--brand-serif);
+  font-size: 1.12em;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -.015em;
+  line-height: .9;
+}
+#landing-epure main h2 {
+  font-size: clamp(30px, 3.3vw, 44px);
+  line-height: 1.12;
+}
+#landing-epure main h3 { letter-spacing: -.02em; }
+
+/* Kickers become a quiet line of blue text instead of tracked capitals. */
+#landing-epure :is(
+  .hero-eyebrow, .section-kicker, .ml-process-kicker, .ml-testimonials-kicker,
+  .ml-continuity-kicker, .ml-workspace-kicker, .ml-documents-kicker
+) {
+  display: block;
+  margin: 0 0 18px;
+  padding: 0;
+  color: var(--e-blue);
+  font: 500 13px/1.5 var(--brand-sans);
+  letter-spacing: 0;
+  text-transform: none;
+}
+#landing-epure :is(.section-kicker, .hero-eyebrow)::before { content: none; }
+
+/* ── Actions ── */
+#landing-epure .btn {
+  border-radius: 999px;
+  box-shadow: none;
+  font-weight: 500;
+  letter-spacing: -.005em;
+}
+#landing-epure :is(.btn-primary, .btn-teal) {
+  background: var(--e-blue);
+  color: #fff;
+  box-shadow: none;
+}
+#landing-epure :is(.btn-primary, .btn-teal):hover { background: var(--brand-primary-hover); }
+#landing-epure .btn-ghost { background: transparent; border-color: transparent; color: var(--e-ink); }
+#landing-epure .btn-ghost:hover { background: var(--e-soft); }
+
+/* ── Navigation: a flat bar on a hairline ── */
+#landing-epure > nav,
+#landing-epure > nav.nav-scrolled {
+  top: 0;
+  width: 100%;
+  height: 64px;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: max(var(--e-gutter), calc((100% - var(--e-width)) / 2));
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: #ffffffe6;
+  box-shadow: none;
+}
+#landing-epure > nav.nav-scrolled { border-bottom-color: var(--e-line); }
+#landing-epure .nav-logo { color: var(--e-ink); }
+#landing-epure .nav-logo em { color: var(--e-blue); }
+#landing-epure .nav-link { color: var(--e-text); font-size: 13.5px; }
+#landing-epure .nav-link:hover { background: transparent; color: var(--e-ink); }
+#landing-epure .nav-right .btn { min-height: 38px; padding: 8px 16px; font-size: 13.5px; }
+/* The mobile menu drops as a flat sheet of ruled links under the bar. */
+#landing-epure .nav-mobile-toggle { border: 0; border-radius: 0; background: transparent; }
+#landing-epure .nav-mobile-toggle i { background: var(--e-ink); }
+#landing-epure .nav-mobile-panel {
+  top: 100%;
+  gap: 0;
+  padding: 4px var(--e-gutter) 20px;
+  border: 0;
+  border-bottom: 1px solid var(--e-line);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 24px 40px -28px #0f1c2e40;
+}
+#landing-epure .nav-mobile-panel > a {
+  padding: 16px 0;
+  border: 0;
+  border-bottom: 1px solid var(--e-line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--e-ink);
+  font-size: 15px;
+}
+#landing-epure > nav .nav-mobile-actions { gap: 10px; padding-top: 18px; }
+#landing-epure > nav .nav-mobile-actions .btn { min-height: 46px; border-radius: 999px; font-size: 14px; }
+#landing-epure > nav .nav-mobile-actions .btn-ghost { border: 1px solid var(--e-ink); background: transparent; color: var(--e-ink); }
+
+/* ── Hero: left-aligned promise, photograph without its frame ── */
+#landing-epure .hero--structured {
+  height: auto;
+  min-height: 0;
+  margin-top: 0;
+  padding: clamp(48px, 6vw, 84px) var(--e-gutter) 0;
+  background: #fff;
+}
+#landing-epure .hero--structured .hero-layout-human {
+  max-width: var(--e-width);
+  row-gap: clamp(36px, 4.4vw, 56px);
+  justify-items: stretch;
+}
+#landing-epure .hero--structured .hero-copy {
+  max-width: none;
+  text-align: left;
+}
+#landing-epure .hero--structured h1 {
+  max-width: none;
+  margin: 0;
+  font-size: clamp(34px, 5.2vw, 66px);
+  line-height: 1.05;
+  letter-spacing: -.034em;
+  text-wrap: wrap;
+}
+#landing-epure .hero--structured .hero-sub {
+  max-width: 560px;
+  margin: 28px 0 0;
+  color: var(--e-text);
+  font-size: 16px;
+  line-height: 1.65;
+  text-align: left;
+}
+#landing-epure .hero--structured .hero-ctas { justify-content: flex-start; margin: 28px 0 0; }
+#landing-epure .hero--structured .hero-ctas .btn { min-height: 50px; padding: 12px 24px; font-size: 15px; gap: 14px; }
+#landing-epure .hero-story {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#landing-epure .hero--structured .hero-human-frame {
+  width: 100%;
+  border: 0;
+  border-radius: 18px;
+  box-shadow: none;
+}
+#landing-epure .hero--structured .hero-human-frame::after { content: none; }
+
+@media (min-width: 901px) {
+  /* Promise across the full measure; explanation and action share the line below. */
+  #landing-epure .hero--structured .hero-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: 48px;
+  }
+  #landing-epure .hero--structured :is(.hero-eyebrow, h1) { grid-column: 1 / -1; }
+  #landing-epure .hero--structured .hero-ctas { margin: 0; }
+}
+
+/* ── Sections: one measure, generous air, no dividers ── */
+#landing-epure main {
+  --landing-section-space: calc(var(--e-section) / 2);
+  --landing-divider-space: 0px;
+}
+#landing-epure main > :is(.ml-process, .ml-testimonials, .ml-continuity, .ml-workspace, .ml-documents, .audiences, .faq) {
+  padding-inline: var(--e-gutter);
+  background: #fff;
+}
+#landing-epure main > :is(.ml-process, .ml-testimonials, .ml-continuity, .ml-workspace, .ml-documents, .audiences)::after,
+#landing-epure main > .faq::before { content: none; }
+#landing-epure main > .ml-process { padding-top: var(--e-section); }
+#landing-epure :is(
+  .ml-process-inner, .ml-testimonials-inner, .ml-continuity-inner, .ml-workspace-inner,
+  .ml-documents-inner, .audiences-inner, .faq-inner, .footer-inner
+) { max-width: var(--e-width); }
+
+/* Section introductions read from the left, heading and paragraph side by side. */
+#landing-epure :is(.ml-process-head, .ml-testimonials-heading, .ml-continuity-copy, .audiences .section-head) {
+  max-width: none;
+  margin-inline: 0;
+  text-align: left;
+}
+#landing-epure :is(.ml-process-head, .audiences .section-head) h2 { max-width: 920px; margin-inline: 0; }
+#landing-epure :is(.ml-testimonials-heading, .ml-continuity-copy header) > p {
+  max-width: 520px;
+  margin: 20px 0 0;
+  color: var(--e-text);
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: left;
+}
+@media (min-width: 901px) {
+  #landing-epure :is(.ml-testimonials-heading, .ml-continuity-copy header) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+    align-items: end;
+    column-gap: 64px;
+  }
+  #landing-epure :is(.ml-testimonials-heading, .ml-continuity-copy header) > :is(span, .ml-testimonials-kicker, .ml-continuity-kicker) { grid-column: 1 / -1; }
+  #landing-epure :is(.ml-testimonials-heading, .ml-continuity-copy header) > p { margin: 0 0 6px; justify-self: end; }
+}
+
+/* ── Process: a three-step rail instead of the pill navigation ── */
+#landing-epure .ml-process-head { margin-bottom: clamp(32px, 4vw, 52px); }
+#landing-epure .ml-process-nav {
+  margin-bottom: clamp(28px, 4vw, 52px);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#landing-epure .ml-process-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+#landing-epure .ml-process-tab,
+#landing-epure .ml-process-tab[aria-selected="true"],
+#landing-epure .ml-process-tab[aria-selected="false"]:hover {
+  gap: 12px;
+  padding: 18px 0 6px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 2px 0 var(--e-line);
+  color: var(--e-mute);
+  font-size: 15px;
+  font-weight: 500;
+}
+#landing-epure .ml-process-tab[aria-selected="true"] { color: var(--e-ink); }
+#landing-epure .ml-process-tab[aria-selected="false"]:hover { color: var(--e-ink); }
+#landing-epure .ml-tab-fill {
+  top: 0;
+  bottom: auto;
+  height: 2px;
+  border-radius: 0;
+  background: var(--e-blue);
+}
+#landing-epure .ml-tab-num,
+#landing-epure .ml-process-tab[aria-selected="true"] .ml-tab-num {
+  display: block;
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--e-mute);
+  font: 400 13px/1 var(--brand-sans);
+  font-variant-numeric: tabular-nums;
+}
+#landing-epure .ml-process-tab[aria-selected="true"] .ml-tab-num { color: var(--e-blue); }
+
+#landing-epure .ml-process-panel { padding: 0; border-radius: 0; background: transparent; }
+#landing-epure .ml-process-copy { padding: 0 56px 0 0; }
+#landing-epure .ml-process-copy > h3 { font-size: clamp(30px, 3vw, 40px); line-height: 1.08; }
+#landing-epure .ml-process-copy > :is(.ml-match-intro, .ml-pilot-intro, .ml-close-intro) { color: var(--e-text); font-size: 17px; }
+#landing-epure :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) > p { border-top-color: var(--e-line); color: var(--e-text); }
+#landing-epure :is(.ml-match-audience, .ml-pilot-explainer, .ml-close-explainer) strong { color: var(--e-ink); }
+#landing-epure .ml-process-art.ml-process-art--v2 { border-radius: 16px; }
+
+/* ── Contributors ── */
+#landing-epure .ml-testimonials-heading { margin-bottom: clamp(32px, 4vw, 52px); }
+#landing-epure .ml-testimonials-grid { max-width: none; gap: 32px; }
+#landing-epure .ml-contributor { padding: 0; }
+#landing-epure .ml-contributor-photo { border-radius: 14px; }
+/* The supplied portraits carry a pale edge on two sides; crop it instead of framing it. */
+#landing-epure .ml-contributor-photo img { transform: scale(1.07); transform-origin: 100% 100%; }
+#landing-epure .ml-contributor figcaption { padding-inline: 0; }
+#landing-epure .ml-contributor h3 { color: var(--e-ink); font-size: 22px; letter-spacing: -.03em; }
+#landing-epure .ml-contributor-label { color: var(--e-mute); font-size: 12px; letter-spacing: 0; text-transform: none; }
+#landing-epure .ml-contributor-contribution h4 { color: var(--e-ink); font-size: 13px; font-weight: 500; }
+#landing-epure .ml-contributor-specialty { font-size: 13px; }
+#landing-epure .ml-contributor-contribution p { font-size: 13px; line-height: 1.65; }
+#landing-epure :is(.ml-contributor-specialty, .ml-contributor-contribution p) { color: var(--e-text); }
+#landing-epure .ml-contributor-contribution { border-color: var(--e-line); }
+
+/* ── Mission tracking, exchanges and documents ── */
+#landing-epure .ml-continuity-copy { margin-bottom: 16px; }
+#landing-epure :is(.ml-continuity-copy, .ml-workspace-heading, .ml-documents-copy) h2 { font-size: clamp(30px, 3.3vw, 44px); line-height: 1.1; }
+#landing-epure :is(.ml-workspace-heading > p, .ml-documents-copy > p) { color: var(--e-text); font-size: 15px; line-height: 1.7; }
+#landing-epure .ml-continuity-benefits { gap: 32px; margin-top: 16px; }
+#landing-epure .ml-continuity-benefits li { padding-top: 20px; border-top: 1px solid var(--e-line); }
+#landing-epure :is(.ml-continuity-benefits li > span, .ml-workspace-benefits span, .ml-documents-benefits li > span) {
+  color: var(--e-blue);
+  font: 400 13px/1.7 var(--brand-sans);
+  font-variant-numeric: tabular-nums;
+}
+#landing-epure :is(.ml-continuity-benefits, .ml-documents-benefits) h3,
+#landing-epure .ml-workspace-benefits strong {
+  color: var(--e-ink);
+  font: 500 15px/1.5 var(--brand-sans);
+  letter-spacing: -.01em;
+}
+#landing-epure :is(.ml-continuity-benefits, .ml-documents-benefits) p,
+#landing-epure .ml-workspace-benefits p { color: var(--e-text); font-size: 14px; line-height: 1.65; }
+#landing-epure .ml-documents-connection { border-color: var(--e-line); color: var(--e-mute); }
+#landing-epure .ml-documents-connection strong { color: var(--e-ink); }
+
+/* ── Audiences: two open columns ── */
+#landing-epure .audiences .section-head { margin-bottom: clamp(28px, 3.6vw, 44px); }
+#landing-epure .audience-grid { gap: 48px; }
+/* `!important` only answers the legacy mobile rules that force these card borders. */
+#landing-epure .audience-card,
+#landing-epure .audience-card:nth-child(2) {
+  min-height: 0;
+  padding: 28px 0 0;
+  border: 0 !important;
+  border-top: 1px solid var(--e-ink) !important;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+#landing-epure .audience-card h3 { max-width: 480px; font-size: clamp(24px, 2.3vw, 30px); line-height: 1.15; }
+#landing-epure .audience-card p { color: var(--e-text); font-size: 15px; }
+#landing-epure .audience-card .audience-index { width: auto; height: auto; flex: 0 0 auto; color: var(--e-blue); font: 400 13px/1 var(--brand-sans); font-variant-numeric: tabular-nums; }
+#landing-epure .audience-card-head { gap: 16px; }
+#landing-epure .audience-card h3 { margin-top: 28px; }
+#landing-epure .audience-card :is(.audience-kicker, .audience-card-head > div > span) { color: var(--e-mute); font: 400 12px/1.4 var(--brand-sans); letter-spacing: 0; text-transform: none; }
+#landing-epure .audience-card .audience-card-head > div > .audience-kicker { color: var(--e-ink); font-weight: 500; font-size: 13px; }
+#landing-epure .audience-card-head > div { gap: 1px; }
+#landing-epure .audience-card .btn-teal { background: transparent; border: 1px solid var(--e-ink); color: var(--e-ink); }
+#landing-epure .audience-card .btn-teal:hover { background: var(--e-ink); color: #fff; }
+
+/* ── Closing invitation ── */
+#landing-epure main > .cta-band {
+  width: min(var(--e-width), calc(100% - 2 * var(--e-gutter)));
+  margin-block: calc(var(--e-section) / 2);
+  border-radius: 20px;
+  background: var(--e-soft);
+  box-shadow: none;
+}
+#landing-epure .cta-band h2 { color: var(--e-ink); font-size: clamp(28px, 3vw, 40px); line-height: 1.12; }
+#landing-epure .cta-band p { color: var(--e-text); }
+#landing-epure .cta-band .btn-primary { background: var(--e-blue); color: #fff; }
+#landing-epure .cta-band .btn-primary:hover { background: var(--brand-primary-hover); }
+
+/* ── Questions ── */
+#landing-epure main .faq-group-title {
+  margin: 36px 0 4px;
+  color: var(--e-mute);
+  font: 500 13px/1.5 var(--brand-sans);
+  letter-spacing: 0;
+  text-transform: none;
+}
+#landing-epure main .faq-group-title:first-child { margin-top: 0; }
+#landing-epure .faq-list { gap: 0; }
+#landing-epure .faq-item,
+#landing-epure .faq-item[open],
+#landing-epure .faq-item:hover {
+  border: 0;
+  border-bottom: 1px solid var(--e-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+#landing-epure .faq-item summary { padding: 22px 0; color: var(--e-ink); font-size: 16px; font-weight: 500; letter-spacing: -.01em; }
+#landing-epure .faq-item summary::after,
+#landing-epure .faq-item[open] summary::after { width: 24px; height: 24px; background: transparent; color: var(--e-ink); font-size: 20px; font-weight: 300; line-height: 1; }
+#landing-epure .faq-answer { max-width: 620px; padding: 0 40px 24px 0; color: var(--e-text); font-size: 15px; }
+#landing-epure .faq-inner > .section-head .section-h { font-size: clamp(30px, 3.3vw, 44px); line-height: 1.12; }
+
+/* ── Footer ── */
+#landing-epure > footer { border-top: 1px solid var(--e-line); background: #fff; }
+#landing-epure .footer-col h4 { color: var(--e-ink); font: 500 13px/1.5 var(--brand-sans); letter-spacing: 0; text-transform: none; }
+#landing-epure .footer-brand strong { color: var(--e-ink); }
+#landing-epure .footer-brand strong em { color: var(--e-blue); }
+#landing-epure :is(.footer-brand p, .footer-col a, .footer-bottom) { color: var(--e-text); }
+#landing-epure .footer-col a:hover { color: var(--e-ink); }
+
+@media (max-width: 850px) {
+  /* Stacked steps: artwork first, then its copy on the page measure. */
+  #landing-epure .ml-process-copy { max-width: none; margin: 0; padding: 28px 0 0; }
+}
+
+@media (max-width: 640px) {
+  #landing-epure { --e-gutter: 20px; }
+  #landing-epure .hero--structured { padding-top: 32px; }
+  /* The promise wraps naturally on narrow screens. */
+  #landing-epure .hero--structured h1 { max-width: none; font-size: clamp(32px, 9vw, 40px); line-height: 1.08; }
+  #landing-epure .hero--structured h1 > :is(span, em),
+  #landing-epure .hero--structured .hero-title-audience { display: inline; }
+  #landing-epure .hero--structured .hero-sub { max-width: none; margin: 22px 0 0; font-size: 15px; }
+  #landing-epure .hero--structured .hero-ctas { display: flex; max-width: none; margin: 24px 0 0; }
+  #landing-epure .hero--structured .hero-human-frame { border-radius: 14px; }
+  #landing-epure .ml-process-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; overflow: visible; }
+  #landing-epure .ml-process-tab { min-width: 0; gap: 8px; font-size: 14px; }
+  #landing-epure .faq-item summary { padding: 18px 0; font-size: 15px; }
+  #landing-epure .faq-answer { padding-right: 0; font-size: 14px; }
+}
