@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { LandingContent } from '@/components/marketing/LandingContent';
+import { epureLanding } from '@/content/landing-epure';
 import '../../(public-home)/process-art.css';
 import '../../(public-home)/process-copy.css';
 import '../../(public-home)/workspace-editorial.css';
@@ -13,10 +13,11 @@ import '../../(public-home)/preview-layouts.css';
 import '../../(public-home)/contributors-carousel.css';
 import './epure.css';
 
-// Same content, sections and animations as the homepage; only `epure.css` differs.
+// Same sections, captures and animations as the homepage, with `epure.css` and the lighter copy of `landing-epure.ts`.
 export const metadata: Metadata = {
   title: { absolute: 'Aperçu design épuré — MédiLink' },
   alternates: { canonical: '/' },
 };
 
-export default function Page() { return <LandingContent variant="home" />; }
+// Repository-authored markup only, derived from the homepage content; never API or user content.
+export default function Page() { return <main id="main-content" dangerouslySetInnerHTML={{ __html: epureLanding }} />; }
