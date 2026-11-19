@@ -36,8 +36,7 @@ function PublicFooter() {
   </div><div className="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div></footer>;
 }
 
-// `design="apercu"` only adds a body id, so the design preview can restyle the unchanged homepage markup.
-export function PublicDocument({ variant, design, children }: { variant: PublicVariant; design?: 'apercu'; children: ReactNode }) {
+export function PublicDocument({ variant, children }: { variant: PublicVariant; children: ReactNode }) {
   const persona = variant === 'candidate' || variant === 'establishment';
   const styles = persona ? ['persona', 'mobile'] : variant === 'home' || variant === 'pricing' ? homeStyles : ['main', 'mobile'];
   const bodyClass = persona ? `persona-page ${variant}` : variant === 'pricing' ? 'landing-home pricing-page' : variant === 'home' ? 'landing-home' : 'guides-page';
@@ -47,7 +46,7 @@ export function PublicDocument({ variant, design, children }: { variant: PublicV
   } : landingShell[variant];
   return <html lang="fr"><head>
     {['special', ...styles, 'icons', ...(variant === 'guides' ? ['seo'] : [])].map(name => <link key={name} rel="stylesheet" href={`/landing-${name}.css`} />)}
-  </head><body className={bodyClass} id={design ? `landing-${design}` : undefined}>
+  </head><body className={bodyClass}>
     {restored ? <nav aria-label="Navigation principale" dangerouslySetInnerHTML={{ __html: restored.navigation }} /> : <><a className="skip-link" href="#main-content">Aller au contenu</a><PublicNavigation variant={variant} /></>}
     {children}
     {restored ? <footer dangerouslySetInnerHTML={{ __html: restored.footer }} /> : <PublicFooter />}
