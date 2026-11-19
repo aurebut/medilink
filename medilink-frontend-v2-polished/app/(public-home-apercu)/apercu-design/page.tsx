@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ApercuMotion } from '@/components/marketing/ApercuMotion';
 import { apercuLanding } from '@/content/landing-apercu';
 import '../../(public-home)/process-art.css';
 import '../../(public-home)/process-copy.css';
@@ -20,4 +21,9 @@ export const metadata: Metadata = {
 };
 
 // Repository-authored markup only, derived from the homepage content; never API or user content.
-export default function Page() { return <main id="main-content" dangerouslySetInnerHTML={{ __html: apercuLanding }} />; }
+export default function Page() {
+  return <>
+    <main id="main-content" dangerouslySetInnerHTML={{ __html: apercuLanding }} />
+    <ApercuMotion />
+  </>;
+}

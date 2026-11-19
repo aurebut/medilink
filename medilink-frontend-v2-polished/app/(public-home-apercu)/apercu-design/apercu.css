@@ -177,7 +177,19 @@
   letter-spacing: -.012em;
   text-wrap: wrap;
 }
-#landing-apercu .hero--structured h1 .title-accent { color: var(--a-sun); }
+/* In the promise, the two highlighted words are set inside capsules. */
+#landing-apercu .hero--structured h1 .title-accent {
+  display: inline-block;
+  padding: .03em .26em .11em .2em;
+  border-radius: 999px;
+  background: var(--a-sun);
+  color: var(--a-ink);
+  font-size: .96em;
+  line-height: .92;
+  rotate: -3deg;
+}
+#landing-apercu .hero--structured h1 .title-accent + .title-accent,
+#landing-apercu .hero--structured h1 .title-accent:nth-of-type(2) { background: var(--a-coral); rotate: 2.5deg; }
 #landing-apercu .hero--structured .hero-sub {
   max-width: 520px;
   margin: 30px 0 0;
@@ -198,57 +210,28 @@
 #landing-apercu .hero--structured .hero-ctas .btn:hover { background: #ffd666; }
 
 /* A week of days: the five filled ones are the replacement. */
-#landing-apercu .hero--structured .hero-copy::after {
-  content: '';
+#landing-apercu .apercu-week {
   position: absolute;
-  top: 54%;
-  right: 180px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #ffffff3d;
-  box-shadow:
-    30px 0px 0 #ffffff3d,
-    60px 0px 0 #ffffff3d,
-    90px 0px 0 #ffffff3d,
-    120px 0px 0 #ffffff3d,
-    150px 0px 0 #ffffff3d,
-    180px 0px 0 #ffffff3d,
-    0px 30px 0 #ffffff3d,
-    30px 30px 0 #ffffff3d,
-    60px 30px 0 #ffffff3d,
-    90px 30px 0 #ffffff3d,
-    120px 30px 0 #ffffff3d,
-    150px 30px 0 #ffffff3d,
-    180px 30px 0 #ffffff3d,
-    0px 60px 0 var(--a-sun),
-    30px 60px 0 var(--a-sun),
-    60px 60px 0 var(--a-sun),
-    90px 60px 0 var(--a-sun),
-    120px 60px 0 var(--a-sun),
-    150px 60px 0 #ffffff3d,
-    180px 60px 0 #ffffff3d,
-    0px 90px 0 #ffffff3d,
-    30px 90px 0 #ffffff3d,
-    60px 90px 0 #ffffff3d,
-    90px 90px 0 #ffffff3d,
-    120px 90px 0 #ffffff3d,
-    150px 90px 0 #ffffff3d,
-    180px 90px 0 #ffffff3d;
+  top: 150px;
+  right: 0;
+  display: grid;
+  gap: 10px;
+  width: 194px;
+  color: #dbe7fa;
+  translate: calc(var(--lean-x, 0) * 8px) calc(var(--lean-y, 0) * 6px);
+  transition: translate .5s cubic-bezier(.2, .7, .2, 1);
 }
+#landing-apercu :is(.apercu-week-days, .apercu-week-grid) { display: grid; grid-template-columns: repeat(7, 14px); gap: 16px; }
+#landing-apercu .apercu-week-days span { font: 600 11px/1 var(--brand-sans); text-align: center; }
+#landing-apercu .apercu-week-grid i { width: 14px; height: 14px; border-radius: 50%; background: #ffffff3d; }
+#landing-apercu .apercu-week-grid i.on { background: var(--a-sun); }
+#landing-apercu .apercu-week p { margin: 4px 0 0; font: 500 12px/1.3 var(--brand-sans); }
 
 #landing-apercu .hero--structured .hero-human-wrap { position: relative; }
 #landing-apercu .hero--structured .hero-human-wrap::before,
 #landing-apercu .hero--structured .hero-human-wrap::after { content: ''; position: absolute; z-index: 0; }
-/* Two cut-outs sit behind the capsule: a coral disc on the blue, a yellow half-disc on the paper. */
-#landing-apercu .hero--structured .hero-human-wrap::before {
-  top: -13%;
-  right: 7%;
-  width: 21%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--a-coral);
-}
+/* A yellow half-disc peeks out under the capsule; the coral seal sits on its shoulder. */
+#landing-apercu .hero--structured .hero-human-wrap::before { content: none; }
 #landing-apercu .hero--structured .hero-human-wrap::after {
   bottom: -10%;
   left: 9%;
@@ -256,7 +239,28 @@
   aspect-ratio: 2;
   border-radius: 0 0 999px 999px;
   background: var(--a-sun);
+  translate: calc(var(--lean-x, 0) * 14px) calc(var(--lean-y, 0) * 10px);
+  transition: translate .5s cubic-bezier(.2, .7, .2, 1);
 }
+#landing-apercu .apercu-seal {
+  position: absolute;
+  z-index: 2;
+  top: -16%;
+  right: 5%;
+  display: grid;
+  place-items: center;
+  width: clamp(104px, 17.5%, 196px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--a-coral) var(--a-grain);
+  translate: calc(var(--lean-x, 0) * -12px) calc(var(--lean-y, 0) * -9px);
+  transition: translate .5s cubic-bezier(.2, .7, .2, 1);
+}
+#landing-apercu .apercu-seal-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+#landing-apercu .apercu-seal-ring text { fill: var(--a-ink); font: 700 18px/1 var(--a-display); font-stretch: 100%; text-transform: uppercase; }
+#landing-apercu .apercu-seal-core { width: 38%; rotate: -28deg; }
+#landing-apercu .apercu-seal-core path:first-child { fill: var(--a-ink); }
+#landing-apercu .apercu-seal-core path:last-child { fill: #fff; }
 #landing-apercu .hero-story {
   position: relative;
   z-index: 1;
@@ -593,21 +597,209 @@
   #landing-apercu .hero--structured h1 > * { animation: apercu-rise .7s cubic-bezier(.2, .7, .2, 1) both; }
   #landing-apercu .hero--structured h1 > :nth-child(2) { animation-delay: .08s; }
   #landing-apercu .hero--structured .hero-story { animation: apercu-capsule .9s cubic-bezier(.2, .7, .2, 1) .15s both; }
-  #landing-apercu .hero--structured .hero-human-wrap::before { animation: apercu-pop .6s cubic-bezier(.3, 1.4, .5, 1) .55s both; }
-  #landing-apercu .hero--structured .hero-human-wrap::after { animation: apercu-pop .6s cubic-bezier(.3, 1.4, .5, 1) .7s both; }
+  #landing-apercu .hero--structured h1 .title-accent { animation: apercu-stamp .5s cubic-bezier(.3, 1.5, .5, 1) .5s both; }
+  #landing-apercu .hero--structured h1 .title-accent:nth-of-type(2) { animation-delay: .62s; }
+  #landing-apercu .apercu-seal { animation: apercu-pop .7s cubic-bezier(.3, 1.4, .5, 1) .6s both; }
+  #landing-apercu .apercu-seal-ring { animation: apercu-spin 40s linear infinite; }
+  #landing-apercu .hero--structured .hero-human-wrap::after { animation: apercu-pop .6s cubic-bezier(.3, 1.4, .5, 1) .75s both; }
+  #landing-apercu .apercu-week-grid i.on { animation: apercu-day .45s cubic-bezier(.3, 1.6, .5, 1) both; }
+  #landing-apercu .apercu-week-grid i.on:nth-child(15) { animation-delay: 1s; }
+  #landing-apercu .apercu-week-grid i.on:nth-child(16) { animation-delay: 1.14s; }
+  #landing-apercu .apercu-week-grid i.on:nth-child(17) { animation-delay: 1.28s; }
+  #landing-apercu .apercu-week-grid i.on:nth-child(18) { animation-delay: 1.42s; }
+  #landing-apercu .apercu-week-grid i.on:nth-child(19) { animation-delay: 1.56s; }
 }
 @keyframes apercu-rise { from { opacity: 0; transform: translateY(.35em); } }
 @keyframes apercu-capsule { from { clip-path: inset(0 50% 0 50% round 999px); } to { clip-path: inset(0 0 0 0 round 999px); } }
 @keyframes apercu-pop { from { transform: scale(0); } }
+@keyframes apercu-stamp { from { opacity: 0; transform: scale(1.5); } }
+@keyframes apercu-spin { to { transform: rotate(360deg); } }
+@keyframes apercu-day { from { background: #ffffff3d; transform: scale(.4); } }
+
+/* ── Process illustrations: each state of a scene takes its own flat field ──
+   The scenes already publish their state as `data-scene`; the colour follows it. */
+#landing-apercu .ml-process-art.ml-process-art--v2 { background-color: var(--a-sky); background-image: var(--a-grain); }
+#landing-apercu .ml-process-art--v2:is(.ml-process-art--criteria, .ml-process-art--report) { background-color: var(--a-sun); }
+/* The next colour is painted over the previous one from the centre of the drawing, rather than
+   cross-faded: yellow and blue would meet in a muddy olive. */
+#landing-apercu .ml-process-art--v2::before,
+#landing-apercu .ml-process-art--v2::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--a-grain);
+  clip-path: circle(0% at 50% 58%);
+}
+#landing-apercu .ml-process-art--criteria::before { background-color: var(--a-blue); }
+#landing-apercu .ml-process-art--criteria::after,
+#landing-apercu .ml-process-art--report::before { background-color: var(--a-sky); }
+#landing-apercu .ml-process-art--matching::before { background-color: var(--a-sun); }
+#landing-apercu .ml-process-art--matching::after { background-color: var(--a-coral); }
+#landing-apercu .ml-process-art--criteria:is([data-scene="transition"], [data-scene="criteria"], [data-scene="discussion-transition"], [data-scene="discussion"])::before,
+#landing-apercu .ml-process-art--criteria:is([data-scene="discussion-transition"], [data-scene="discussion"])::after,
+#landing-apercu .ml-process-art--matching:is([data-scene="information-transition"], [data-scene="information"], [data-scene="contact-transition"], [data-scene="contact"])::before,
+#landing-apercu .ml-process-art--matching:is([data-scene="contact-transition"], [data-scene="contact"])::after,
+#landing-apercu .ml-process-art--report:is([data-scene="summary-transition"], [data-scene="summary"])::before {
+  clip-path: circle(130% at 50% 58%);
+  transition: clip-path .85s cubic-bezier(.5, 0, .2, 1);
+}
+/* Blue italics vibrate on coral: the highlighted line turns white there. */
+#landing-apercu .ml-process-art--matching:is([data-scene="contact"], [data-scene="contact-transition"]) .ml-v2-title em { color: #fff; }
+
+#landing-apercu .ml-process-art--v2 .ml-v2-heading { font-size: 13px; letter-spacing: 0; text-transform: none; }
+#landing-apercu .ml-process-art--v2 .ml-v2-title {
+  font: 700 46px/.98 var(--a-display);
+  font-stretch: 86%;
+  letter-spacing: -.008em;
+}
+#landing-apercu .ml-process-art--v2 .ml-v2-title em { font: italic 400 1.08em/.9 var(--brand-serif); letter-spacing: -.01em; }
+#landing-apercu .ml-process-art--v2 .ml-art-caption { font-size: 13px; }
+/* Ink that holds on yellow and coral, where the pale-blue strokes would wash out. */
+#landing-apercu .ml-process-art--matching { --v2-ink: var(--a-ink); --v2-muted: #2c3c5a; --v2-thread: var(--a-ink); --pilot-em: var(--a-blue); --pilot-actor-stroke: var(--a-ink); }
+#landing-apercu .ml-process-art--report { --v2-ink: var(--a-ink); --v2-muted: #2c3c5a; --v2-thread: var(--a-ink); --close-em: var(--a-blue); }
+#landing-apercu .ml-process-art--matching :is(.ml-pilot-condition, .ml-pilot-document-note) { fill: #2c3c5a; }
+#landing-apercu .ml-process-art--matching .ml-pilot-info-content,
+#landing-apercu .ml-process-art--matching .ml-pilot-tile:nth-of-type(2n) .ml-pilot-info-content { color: var(--a-ink); }
+#landing-apercu .ml-process-art--matching .ml-pilot-contact-link { stroke: var(--a-ink); }
+#landing-apercu .ml-process-art--matching .ml-pilot-contact-pulse { fill: var(--a-ink); }
+#landing-apercu .ml-process-art--matching .ml-pilot-contact-bubble { stroke: var(--a-ink); }
+#landing-apercu .ml-process-art--matching .ml-pilot-contact-message--locum .ml-pilot-contact-bubble { fill: var(--a-blue); stroke: var(--a-blue); }
+#landing-apercu .ml-process-art--report .ml-close-payment-name { fill: #2c3c5a; }
+#landing-apercu .ml-process-art--report .ml-close-route { stroke: var(--a-ink); opacity: .45; }
+#landing-apercu .ml-process-art--report .ml-close-actor-face { stroke: var(--a-ink); }
+/* The map reads as a sheet of paper laid on the yellow. */
+#landing-apercu .ml-process-art--criteria .ml-map-base { fill: #fbf8f1; }
+#landing-apercu .ml-process-art--criteria .ml-map-fields { fill: #dfe8f4; }
+#landing-apercu .ml-process-art--criteria .ml-map-fields path:nth-child(3n) { fill: #e6edf6; }
+#landing-apercu .ml-process-art--criteria .ml-map-fields path:nth-child(3n + 1) { fill: #d5e1f1; }
+#landing-apercu .ml-process-art--criteria .ml-map-woodland { fill: #c3d6ee; }
+#landing-apercu .ml-process-art--criteria .ml-map-roads { stroke: #fff; }
+#landing-apercu .ml-process-art--criteria .ml-sequence-label--map { stroke: #fbf8f1; }
+
+/* ── Mission tracking sits in a rounded blue slab ── */
+#landing-apercu main > .ml-continuity { margin-inline: 12px; padding-inline: calc(var(--a-gutter) - 12px); overflow: hidden; border-radius: 64px; }
+
+/* ── Cut-outs behind the three device previews ── */
+#landing-apercu .ml-interface-display { isolation: isolate; }
+#landing-apercu .ml-interface-display::before,
+#landing-apercu .ml-interface-display::after { content: ''; position: absolute; z-index: -1; }
+#landing-apercu .ml-continuity .ml-interface-display::before { top: 0; right: 3%; width: 30%; aspect-ratio: 1; border-radius: 50%; background: var(--a-sun); }
+#landing-apercu .ml-continuity .ml-interface-display::after { bottom: -3%; left: 0; width: 19%; aspect-ratio: 1; border-radius: 50%; background: var(--a-coral); }
+#landing-apercu .ml-workspace .ml-interface-display::before { top: 4%; right: 0; width: 58%; aspect-ratio: 1; border-radius: 50%; background: var(--a-sky); }
+#landing-apercu .ml-workspace .ml-interface-display::after { bottom: 8%; left: 2%; width: 17%; aspect-ratio: 1; border-radius: 50%; background: var(--a-coral); }
+#landing-apercu .ml-documents .ml-interface-display::before { bottom: 2%; left: 0; width: 56%; aspect-ratio: 1; border-radius: 50%; background: var(--a-sun); }
+#landing-apercu .ml-documents .ml-interface-display::after { top: 10%; right: 4%; width: 22%; aspect-ratio: 2; border-radius: 999px 999px 0 0; background: var(--a-blue); }
+
+/* ── Small responses ── */
+#landing-apercu .btn .landing-arrow { transition: translate .25s cubic-bezier(.2, .7, .2, 1); }
+#landing-apercu .btn:hover .landing-arrow { translate: 3px 0; }
+#landing-apercu .hero-ctas .btn:hover .landing-arrow { translate: 2px -2px; }
+/* Answers unfold where the browser can animate to an intrinsic height. */
+#landing-apercu { interpolate-size: allow-keywords; }
+#landing-apercu .faq-item::details-content { height: 0; overflow: hidden; transition: height .4s cubic-bezier(.2, .7, .2, 1), content-visibility .4s allow-discrete; }
+#landing-apercu .faq-item[open]::details-content { height: auto; }
+
+/* ── Footer: the name set large behind the links ── */
+#landing-apercu > footer { position: relative; overflow: hidden; padding-bottom: clamp(96px, 21vw, 300px); border-radius: 64px 64px 0 0; }
+#landing-apercu > footer::before,
+#landing-apercu > footer::after {
+  position: absolute;
+  bottom: -.2em;
+  color: var(--a-blue);
+  font: 400 clamp(110px, 26vw, 400px)/1 var(--brand-serif);
+  letter-spacing: -.02em;
+  pointer-events: none;
+}
+#landing-apercu > footer::before { content: 'Médi'; right: 46.5%; }
+#landing-apercu > footer::after { content: 'Link'; left: 53.5%; color: var(--a-sun); font-style: italic; }
+#landing-apercu .footer-inner { position: relative; z-index: 1; }
+
+/* ── Entrances: each block arrives once as it scrolls into view ──
+   Only under `apercu-motion`, which the preview's script sets when motion is welcome. */
+.apercu-motion #landing-apercu :is(.ml-process-head, .ml-testimonials-heading, .audiences .section-head, .faq-inner > .section-head, .ml-documents-copy, .ml-workspace-heading > div) > *,
+.apercu-motion #landing-apercu :is(.ml-continuity-copy header, .ml-workspace-heading) > *,
+.apercu-motion #landing-apercu :is(.ml-continuity-benefits li, .ml-workspace-benefits p, .ml-documents-benefits li, .faq-content > *, .ml-contributor, .ml-interface-stage) {
+  transition: opacity .7s cubic-bezier(.2, .7, .2, 1), transform .8s cubic-bezier(.2, .7, .2, 1);
+}
+.apercu-motion #landing-apercu :is(.ml-process-head, .ml-testimonials-heading, .audiences .section-head, .faq-inner > .section-head, .ml-documents-copy):not([data-apercu-seen]) > *,
+.apercu-motion #landing-apercu .ml-continuity-copy:not([data-apercu-seen]) header > *,
+.apercu-motion #landing-apercu .ml-workspace-copy:not([data-apercu-seen]) :is(.ml-workspace-heading > *, .ml-workspace-benefits p),
+.apercu-motion #landing-apercu .ml-continuity-benefits:not([data-apercu-seen]) li,
+.apercu-motion #landing-apercu .ml-documents-copy:not([data-apercu-seen]) .ml-documents-benefits li,
+.apercu-motion #landing-apercu .faq-content:not([data-apercu-seen]) > *,
+.apercu-motion #landing-apercu .ml-contributor:not([data-apercu-seen]) {
+  opacity: 0;
+  transform: translateY(32px);
+}
+.apercu-motion #landing-apercu :is(.ml-process-head, .ml-testimonials-heading, .audiences .section-head, .faq-inner > .section-head, .ml-documents-copy, .ml-continuity-copy header, .ml-workspace-heading) > :nth-child(2),
+.apercu-motion #landing-apercu :is(.ml-continuity-benefits li, .ml-workspace-benefits p, .ml-documents-benefits li, .ml-contributor):nth-child(2),
+.apercu-motion #landing-apercu .faq-content > :nth-child(2) { transition-delay: .09s; }
+.apercu-motion #landing-apercu :is(.ml-process-head, .ml-documents-copy, .ml-continuity-copy header, .ml-workspace-heading) > :nth-child(3),
+.apercu-motion #landing-apercu :is(.ml-continuity-benefits li, .ml-workspace-benefits p, .ml-documents-benefits li, .ml-contributor):nth-child(3),
+.apercu-motion #landing-apercu .faq-content > :nth-child(3) { transition-delay: .18s; }
+.apercu-motion #landing-apercu .ml-documents-copy > :nth-child(4),
+.apercu-motion #landing-apercu .faq-content > :nth-child(4) { transition-delay: .27s; }
+.apercu-motion #landing-apercu .ml-documents-copy > :nth-child(5),
+.apercu-motion #landing-apercu .faq-content > :nth-child(n + 5) { transition-delay: .36s; }
+
+/* The three capsules of the process drop in one after the other. */
+.apercu-motion #landing-apercu .ml-process-tab {
+  transition: opacity .6s cubic-bezier(.2, .7, .2, 1), transform .7s cubic-bezier(.3, 1.4, .5, 1), background-color .2s, border-color .2s, color .2s;
+}
+.apercu-motion #landing-apercu .ml-process-nav:not([data-apercu-seen]) .ml-process-tab { opacity: 0; transform: translateY(18px) scale(.94); }
+.apercu-motion #landing-apercu .ml-process-tab:nth-child(2) { transition-delay: .08s, .08s, 0s, 0s, 0s; }
+.apercu-motion #landing-apercu .ml-process-tab:nth-child(3) { transition-delay: .16s, .16s, 0s, 0s, 0s; }
+
+/* Portraits rise, then their coloured disc slides out from behind. */
+.apercu-motion #landing-apercu .ml-contributor-photo::before { transition: transform .7s cubic-bezier(.3, 1.4, .5, 1) .35s; }
+.apercu-motion #landing-apercu .ml-contributor:not([data-apercu-seen]) .ml-contributor-photo::before { transform: none; }
+
+/* Devices come forward while their cut-outs grow behind them. */
+.apercu-motion #landing-apercu .ml-interface-display::before,
+.apercu-motion #landing-apercu .ml-interface-display::after { transition: scale .9s cubic-bezier(.3, 1.3, .5, 1) .25s; }
+.apercu-motion #landing-apercu .ml-interface-display::after { transition-delay: .4s; }
+.apercu-motion #landing-apercu .ml-interface-preview:not([data-apercu-seen]) .ml-interface-display::before,
+.apercu-motion #landing-apercu .ml-interface-preview:not([data-apercu-seen]) .ml-interface-display::after { scale: 0; }
+.apercu-motion #landing-apercu .ml-interface-preview:not([data-apercu-seen]) .ml-interface-stage { opacity: 0; transform: translateY(56px); }
+
+/* The signature moment: the two halves of the capsule come together. */
+.apercu-motion #landing-apercu .audience-card { transition: transform 1s cubic-bezier(.25, 1.25, .4, 1), opacity .5s ease; }
+.apercu-motion #landing-apercu .audience-grid:not([data-apercu-seen]) .audience-card { opacity: 0; transform: translateX(-140px); }
+.apercu-motion #landing-apercu .audience-grid:not([data-apercu-seen]) .audience-card:nth-child(2) { transform: translateX(140px); }
+
+/* The closing capsule opens from its centre. */
+.apercu-motion #landing-apercu main > .cta-band { transition: clip-path 1s cubic-bezier(.2, .7, .2, 1); clip-path: inset(0 0 0 0 round var(--cta-radius, 999px)); }
+/* A sliver stays visible: a fully clipped element is never reported as on screen. */
+.apercu-motion #landing-apercu main > .cta-band:not([data-apercu-seen]) { clip-path: inset(0 47% 0 47% round var(--cta-radius, 999px)); }
+.apercu-motion #landing-apercu .cta-band > * { transition: opacity .6s ease .45s; }
+.apercu-motion #landing-apercu .cta-band:not([data-apercu-seen]) > * { opacity: 0; }
+
+/* Where scroll-linked animation exists, the cut-outs drift and the photograph settles. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    #landing-apercu .ml-interface-display::before { animation: apercu-drift-up linear both; animation-timeline: view(); }
+    #landing-apercu .ml-interface-display::after { animation: apercu-drift-down linear both; animation-timeline: view(); }
+    #landing-apercu .hero--structured .hero-human-photo { animation: apercu-settle linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+  }
+}
+@keyframes apercu-drift-up { from { translate: 0 60px; } to { translate: 0 -60px; } }
+@keyframes apercu-drift-down { from { translate: 0 -36px; } to { translate: 0 36px; } }
+@keyframes apercu-settle { to { scale: 1.14; } }
+
+
+/* The week grid needs the free corner beside the last two lines of the promise. */
+@media (max-width: 1180px) {
+  #landing-apercu .apercu-week { display: none; }
+}
 
 @media (max-width: 1100px) {
-  #landing-apercu .hero--structured .hero-copy::after { right: 0; }
   #landing-apercu .audience-card { padding-left: 110px; }
   #landing-apercu .audience-card:nth-child(2) { padding-right: 110px; }
 }
 
 @media (max-width: 900px) {
-  #landing-apercu .hero--structured .hero-copy::after { display: none; }
+
   /* Stacked, the two halves close top to bottom. */
   #landing-apercu .audience-card,
   #landing-apercu .audience-card:nth-child(2) {
@@ -620,7 +812,9 @@
   #landing-apercu .audience-card:nth-child(2) { padding: 48px 32px 120px; border-radius: 0 0 999px 999px; }
   #landing-apercu .audience-grid:hover .audience-card,
   #landing-apercu .audience-grid:hover .audience-card:nth-child(2) { transform: none; }
-  #landing-apercu main > .cta-band { padding: 48px 40px; border-radius: 56px; }
+  #landing-apercu main > .cta-band { --cta-radius: 56px; padding: 48px 40px; border-radius: 56px; }
+  .apercu-motion #landing-apercu .audience-grid:not([data-apercu-seen]) .audience-card { transform: translateY(-90px); }
+  .apercu-motion #landing-apercu .audience-grid:not([data-apercu-seen]) .audience-card:nth-child(2) { transform: translateY(90px); }
 }
 
 @media (max-width: 850px) {
@@ -646,5 +840,8 @@
   #landing-apercu .ml-process-art.ml-process-art--v2 { border-radius: 24px; }
   #landing-apercu .faq-item summary { padding: 18px 0; font-size: 18px; }
   #landing-apercu .faq-answer { padding-right: 0; font-size: 15px; }
-  #landing-apercu main > .cta-band { padding: 44px 26px; border-radius: 40px; }
+  #landing-apercu main > .cta-band { --cta-radius: 40px; padding: 44px 26px; border-radius: 40px; }
+  #landing-apercu main > .ml-continuity { margin-inline: 8px; padding-inline: calc(var(--a-gutter) - 8px); border-radius: 36px; }
+  #landing-apercu > footer { border-radius: 36px 36px 0 0; }
+  #landing-apercu .ml-process-art--v2 .ml-v2-title { font-size: 36px; }
 }
