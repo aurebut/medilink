@@ -5,7 +5,7 @@ import { landingContent } from './landing-content';
 // A cut that no longer matches fails the build instead of silently restoring the text.
 function cut(html: string, pattern: RegExp, replacement: string, expected: number, label: string) {
   const found = html.match(pattern)?.length ?? 0;
-  if (found !== expected) throw new Error(`landing-epure: ${label} matched ${found} time(s), expected ${expected}`);
+  if (found !== expected) throw new Error(`landing-apercu: ${label} matched ${found} time(s), expected ${expected}`);
   return html.replace(pattern, replacement);
 }
 
@@ -27,4 +27,4 @@ html = cut(html, /(<article class="audience-card reveal">[\s\S]*?<\/h3><p>[^<.]*
 // Closing invitation: heading and action only.
 html = cut(html, /(<h2 id="cta-title">[^<]*<\/h2>)<p>[^<]*<\/p>/g, '$1', 1, 'closing sentence');
 
-export const epureLanding = html;
+export const apercuLanding = html;

@@ -7,5 +7,5 @@ export const metadata = { ...publicMetadata, robots: { index: false, follow: fal
 export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#FFFFFF' };
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <PublicDocument variant="home" design="epure">{children}</PublicDocument>;
+  return <PublicDocument variant="home" design="apercu">{children}</PublicDocument>;
 }

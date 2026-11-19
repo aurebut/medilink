@@ -36,8 +36,8 @@ function PublicFooter() {
   </div><div className="footer-bottom"><span>© 2026 MédiLink</span><span>Remplacements médicaux · France</span></div></div></footer>;
 }
 
-// `design="epure"` only adds a body id, so the design preview can restyle the unchanged homepage markup.
-export function PublicDocument({ variant, design, children }: { variant: PublicVariant; design?: 'epure'; children: ReactNode }) {
+// `design="apercu"` only adds a body id, so the design preview can restyle the unchanged homepage markup.
+export function PublicDocument({ variant, design, children }: { variant: PublicVariant; design?: 'apercu'; children: ReactNode }) {
   const persona = variant === 'candidate' || variant === 'establishment';
   const styles = persona ? ['persona', 'mobile'] : variant === 'home' || variant === 'pricing' ? homeStyles : ['main', 'mobile'];
   const bodyClass = persona ? `persona-page ${variant}` : variant === 'pricing' ? 'landing-home pricing-page' : variant === 'home' ? 'landing-home' : 'guides-page';
